@@ -493,8 +493,9 @@ Carlyle.Reader = function (node, bookData) {
 
     setPage(pageDivs[1], pageNum, componentId);
     if (pageNum != 1) {
-      setPage(pageDivs[0], chapPage, componentId);
+      setPage(pageDivs[0], pageNum, componentId);
     }
+    completedTurn();
   }
 
 

@@ -103,7 +103,7 @@
     var lastPage = document.cookie.match(/page=(\d+?)(;|$)/);
     if (lastComp && lastComp[1] && lastPage && lastPage[1]) {
       lastPage = parseInt(lastPage[1]);
-      lastComp = lastComp[1];
+      lastComp = decodeURIComponent(lastComp[1]);
       console.log("Going to page "+lastPage+" of "+lastComp);
       reader.goToPage(lastPage, lastComp);
     }
@@ -121,21 +121,16 @@
       var chap = chaps[i];
       var li = document.createElement('li');
       li.innerHTML = chap.title;
-      li.setAttribute('component', chap.component);
-      if (chap.fragment) {
-        li.setAttribute('fragment', chap.fragment);
-      }
+      li.component = chap.component;
+      li.fragment = chap.fragment;
       subUl.appendChild(li);
     }
     subLi.appendChild(subUl);
     ul.appendChild(subLi);
     document.body.appendChild(ul);
     ul.onclick = function (evt) {
-      console.log(li = evt.srcElement);
-      reader.goToChapter(
-        li.getAttribute('fragment'),
-        li.getAttribute('component')
-      );
+      li = evt.srcElement;
+      reader.goToChapter(li.fragment, li.component);
     }
   }
 
