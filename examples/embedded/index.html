@@ -29,11 +29,13 @@
     <script type="text/javascript">
       (function () {
         var bookData = {
-          components: [
-            'book1part1',
-            'book1part2',
-            'book1part3'
-          ],
+          getComponents: function () {
+            return [
+              'book1part1',
+              'book1part2',
+              'book1part3'
+            ];
+          },
           getContents: function () {
             return [
               {

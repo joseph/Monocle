@@ -7,6 +7,8 @@ Carlyle.Book = function (bookData) {
   if (Carlyle == this) { return new Carlyle.Book(bookData); }
 
   var dataSource = bookData;
+  var components = dataSource.getComponents();
+  var contents = dataSource.getContents();
   var componentData = [];
 
   // componentData:
@@ -56,7 +58,7 @@ Carlyle.Book = function (bookData) {
     // The componentId is optional -- if it is not provided (or it is invalid),
     // we default to the currently active component, and if that doesn't exist,
     // we default to the very first component.
-    var cIndex = dataSource.components.indexOf(componentId);
+    var cIndex = components.indexOf(componentId);
     if (cIndex == -1) {
       if (contentDiv.componentData) {
         cIndex = contentDiv.componentData.componentIndex
@@ -97,7 +99,7 @@ Carlyle.Book = function (bookData) {
     // adjust the pageN accordingly.
     var cData = contentDiv.componentData;
     var cIndex = cData.componentIndex;
-    var lastComponentIndex = dataSource.components.length - 1;
+    var lastComponentIndex = components.length - 1;
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
       return false;
@@ -232,7 +234,7 @@ Carlyle.Book = function (bookData) {
         }
       }
     }
-    recurseParts(dataSource.getContents());
+    recurseParts(contents);
 
     cData.chapters = [];
     for (var i = partsInComponent.length - 1; i >= 0; --i) {
@@ -263,13 +265,13 @@ Carlyle.Book = function (bookData) {
       return componentData[n].elements[0];
     }
 
-    if (n >= dataSource.components.length) {
+    if (n >= components.length) {
       // TODO: gone above the number of components defined in the dataSource?
       console.log("TEMPWARN: gone above number of components in dataSource");
       return;
     }
 
-    var html = dataSource.getComponent(dataSource.components[n]);
+    var html = dataSource.getComponent(components[n]);
     if (html == null || html == "") {
       // TODO: accessed an empty component?
       console.log("TEMPWARN: accessed an empty component");
@@ -279,7 +281,7 @@ Carlyle.Book = function (bookData) {
     // Okay, create the component data.
     componentData[n] = componentData[n] || {};
     componentData[n].componentIndex = n;
-    componentData[n].componentId = dataSource.components[n];
+    componentData[n].componentId = components[n];
     componentData[n].elements = [[]];
 
     // Populate the zeroth view of elements with the elements from a
@@ -326,7 +328,8 @@ Carlyle.Book = function (bookData) {
     constructor: Carlyle.Book,
     preparePageFor: preparePageFor,
     getMetaData: dataSource.getMetaData,
-    components: dataSource.components
+    components: components,
+    contents: contents
   }
 
   return PublicAPI;
@@ -428,7 +431,7 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function getBook() {
-    return bk;
+    return book;
   }
 
 
@@ -475,17 +478,22 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function goToChapter(chapterId, componentId) {
-    if (setPage(pageDivs[0], 1, componentId)) {
+    if (!setPage(pageDivs[0], 1, componentId)) { return; }
+
+    var pageNum = 1;
+    if (chapterId) {
       var chaps = pageDivs[0].content.componentData.chapters;
-      var chapPage;
       for (var i = chaps.length - 1; i <= 0; --i) {
         if (chaps[i].id == chapterId) {
-          chapPage = chaps[i].page;
+          pageNum = chaps[i].page;
           break;
         }
       }
+    }
+
+    setPage(pageDivs[1], pageNum, componentId);
+    if (pageNum != 1) {
       setPage(pageDivs[0], chapPage, componentId);
-      setPage(pageDivs[1], chapPage, componentId);
     }
   }
 
@@ -603,7 +611,7 @@ Carlyle.Reader = function (node, bookData) {
   function completedTurn() {
     turnData = {};
     var turnEvt = document.createEvent("Events");
-    turnEvt.initEvent("pageturn", false, true);
+    turnEvt.initEvent("carlyle:turn", false, true);
     boxDiv.dispatchEvent(turnEvt);
   }
 

@@ -28,14 +28,16 @@
       (function () {
 
         var bookData = {
-          components: [
-            'part1.xhtml',
-            'part2.xhtml',
-            'part3.xhtml',
-            'part4.xhtml',
-            'part5.xhtml',
-            'part6.xhtml'
-          ],
+          getComponents: function () {
+            return [
+              'part1.xhtml',
+              'part2.xhtml',
+              'part3.xhtml',
+              'part4.xhtml',
+              'part5.xhtml',
+              'part6.xhtml'
+            ];
+          },
           getContents: function () {
             return [];
           },

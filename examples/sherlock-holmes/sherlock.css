@@ -1,0 +1,36 @@
+#bookBox {
+  position: relative;
+  width: 400px;
+  height: 550px;
+  margin: 0;
+  padding: 0;
+  background-color: #999;
+}
+
+
+ul.tocSelect, ul.tocSelect ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+ul.tocSelect li {
+  position: relative;
+  cursor: default;
+  color: #999;
+}
+
+ul.tocSelect li ul {
+  display: none;
+  position: absolute;
+  padding-left: 1em;
+}
+
+ul.tocSelect li:hover ul {
+  display: block;
+}
+
+ul.tocSelect li ul li {
+  cursor: pointer;
+  color: #000;
+}

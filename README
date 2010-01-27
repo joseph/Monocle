@@ -1,17 +1,14 @@
-
 Specification of the data object
 --------------------------------
 
-The book data object should provide certain required properties and methods.
-
-Properties:
-
-* components: the total number of linear components (ie, slabs of content)
-    for the book
-* metaDataKeys: the names of the keys for which there may be metadata for
-    this book
+The book data object should provide certain required methods.
 
 Methods:
+
+* getComponents: returns an array of all the component ids that are to be
+    accessed in linear reading order (ie, like the spine in an EPUB OPF file --
+    you don't have to list every component, just the ones that are read in
+    order).
 
 * getContents: a function that returns an array of nested objects. Each object
     responds to `title` (a string), and `component` (a number). Any such object
@@ -39,13 +36,17 @@ Methods:
        }
     ]
 
-* getComponent(n): a function that takes an integer (between 0 and
-    this.components-1) and returns the body text of the corresponding
+* getComponent(componentId): takes a component id (from the list returned
+    by this.getComponents) and returns the body text of the corresponding
     component.
     Q: should it also return the stylesheet rules?
 
-* getMetaData(key): a function that takes a string (matching a key in
-    this.metaDataKeys) and returns the value of that metadata for this book.
+* getMetaData(key): takes a string "key" and returns the value of that
+    metadata for this book. There is not yet any standardised list of
+    possible keys -- we'll just see what happens for a bit. Note that if
+    nothing will go wrong if you return null or an empty string for any
+    requested key.
+
 
 Note that if these methods retrieve any data from a server using AJAX
 techniques, it should be a synchronous operation, because the clients of the
@@ -57,12 +58,14 @@ Example use
 -----------
 
   var bookData = {
-    components: [
-      'part1.xhtml',
-      'part2.xhtml',
-      'part3.xhtml',
-      'part4.xhtml'
-    ],
+    getComponents: function () {
+      return [
+        'part1.xhtml',
+        'part2.xhtml',
+        'part3.xhtml',
+        'part4.xhtml'
+      ];
+    },
     getContents: function () {
       return [
         {
@@ -125,4 +128,3 @@ Carlyle.Reader(node) - constructor. Node can be a string of the id of the
   * goToFragment(fragment_id, component_id)
   * resized -- call when the node changes dimensions
   * spin -- show loading graphic / and spun -- hide loading graphic
-
