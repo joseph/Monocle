@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>The adventures of Sherlock Holmes</title>
+<style type="text/css">
+.flow {
+  margin:0 0 0 0;
+  font-size:1em;
+}
+.flow .pagebreak {
+  page-break-before:always;
+}
+.flow p {
+  text-align:left;
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+}
+.flow .gstxt_sup {
+  font-size:75%;
+  position:relative;
+  bottom:0.5em;
+}
+.flow .gstxt_sub {
+  font-size:75%;
+  position:relative;
+  top:0.3em;
+}
+.flow .gstxt_hlt {
+  background-color:yellow;
+}
+.flow div.gtxt_inset_box {
+  padding: 1em 1em 0.5em 1em;
+  margin: 1em 1em 1em 1em;
+  border: 1px black solid;
+}
+.flow div.gtxt_footnote {
+  padding: 0 5 0 5;
+  border: 1px black dotted;
+}
+.flow .gstxt_underline {
+  text-decoration: underline;
+}
+.flow span,p {
+  font-family: serif;
+}
+
+</style>
+</head>
+<body>
+<!-- Content from Google Book Search, generated at 1262002402280349 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA229'></a>
+<div id='block.268.0.0.box.83.399.1079.1554.q.60' class='gtxt_body'>
+<a id='GBS.PA229.w.0.0.0'></a>
+<p class='gtxt_body' style='text-align:center;' id='para.268.0.0.box.517.399.229.33.q.80'><span>adventure </span><span>&#163;</span></p>
+<a id='GBS.PA229.w.0.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.268.0.1.box.183.477.893.29.q.70'><span>THE </span><span>ADVENTURE </span><span>OF </span><span>THE </span><span>NOBLE </span><span>BACHELOR</span></p>
+<a id='GBS.PA229.w.0.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.268.0.2.box.86.560.1076.539.q.60'>|HE Lord St. Simon marriage, and its curious termination, have long ceased to be a subject of interest in those exalted circles in which the unfortunate bridegroom moves. Fresh scandals have eclipsed it, and their more piquant details have drawn the gossips away from this four-year-old drama. As I have reason to believe, however, that the full facts have never been revealed to the general<sup>&#39;</sup> public, and as my friend Sherlock Holmes had a considerable share in clearing the matter up, I feel that no memoir of him would be complete without some little sketch of this remarkable episode.</p>
+<a id='GBS.PA229.w.0.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.268.0.3.box.83.1112.1073.691.q.60'>It was a few weeks before my own marriage, during the days when I was still sharing rooms with Holmes in Baker Street, that he came home from an afternoon stroll to find a letter on the table waiting for him. I had remained in-doors all day, for the weather had taken a sudden turn to rain, with high autumnal winds, and the jezail bullet which I had brought back in one of my limbs as a relic of my Afghan campaign, throbbed with dull persistency. With my body in one easychair and my legs upon another, I had surrounded myself with a cloud of newspapers, until at last, saturated with the news of the day, I tossed them all aside and lay listless, watching the huge crest and monogram upon the envelope upon the table, and wondering lazily who my friend&#39;s noble correspondent could be.</p>
+<a id='GBS.PA229.w.0.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.268.0.4.box.88.1812.1065.141.q.50'>&quot; Here is a very fashionable epistle,&quot; I remarked, as he entered. &quot;Your morning letters, if I remember right, were from a fish-monger and a tide-waiter.&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002402855028 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA230'></a>
+<div id='block.269.1.0.box.174.163.1088.1797.q.60' class='gtxt_body'>
+<a id='GBS.PA230.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.0.box.182.163.1067.232.q.60'>&quot; Yes, my correspondence has certainly the charm of variety,&quot; he answered, smiling, &quot; and the humbler are usually the more interesting. This looks like one of those unwelcome social summonses which call upon a man either to be bored or to lie.&quot;</p>
+<a id='GBS.PA230.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.1.box.223.415.852.39.q.70'>He broke the seal and glanced over the contents.</p>
+<a id='GBS.PA230.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.2.box.182.464.1067.81.q.60'>&quot; Oh, come, it may prove to be something of interest after all.&quot;</p>
+<a id='GBS.PA230.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.3.box.223.566.343.36.q.80'>&quot; Not social, then ?&quot;</p>
+<a id='GBS.PA230.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.4.box.223.616.512.40.q.70'>&quot; No, distinctly professional.&quot;</p>
+<a id='GBS.PA230.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.5.box.223.666.481.30.q.60'>&quot; And from a noble client ?&quot;</p>
+<a id='GBS.PA230.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.6.box.222.716.580.39.q.70'>&quot; One of the highest in England.&quot;</p>
+<a id='GBS.PA230.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.7.box.223.766.663.40.q.60'>&quot; My dear fellow, I congratulate you.&quot;</p>
+<a id='GBS.PA230.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.8.box.179.816.1069.242.q.60'>&quot; I assure you, Watson, without affectation, that the status of my client is a matter of less moment to me than the interest of his case. It is just possible, however, that that also may not be wanting in this new investigation. You have been reading the papers diligently of late, have you not?&quot;</p>
+<a id='GBS.PA230.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.9.box.178.1068.1070.89.q.50'>&quot; It looks like it,&quot; said I, ruefully, pointing to a huge bundle in the corner. &quot; I have had nothing else to do.&quot;</p>
+<a id='GBS.PA230.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.10.box.177.1168.1071.239.q.60'>&quot; It is fortunate, for you will perhaps be able to post me up. I read nothing except the criminal news and the agony column. The latter is always instructive. But if you have followed recent events so closely you must have read about Lord St. Simon and his wedding ?&quot;</p>
+<a id='GBS.PA230.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.11.box.219.1418.624.39.q.60'>&quot; Oh yes, with the deepest interest.&quot;</p>
+<a id='GBS.PA230.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.12.box.174.1469.1078.189.q.60'>&quot; That is well. The letter which   hold in my hand is from Lord St. Simon. I will read it to you, and in return you must turn over these papers and let me have whatever bears upon the matter. This is what he says:</p>
+<a id='GBS.PA230.w.1.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.269.1.13.box.174.1719.1088.241.q.60'>&quot; &#39; <span style='font-variant:small-caps;'>My </span><span style='font-variant:small-caps;'>Dear </span><span style='font-variant:small-caps;'>Mr. </span><span style='font-variant:small-caps;'>Sherlock </span><span style='font-variant:small-caps;'>Holmes, </span>&#8212; Lord Backwater tells me that I may place implicit reliance upon your judgment and discretion. I have determined, therefore, to call upon you, and to consult you in reference to the very painful event which has occurred in connection with my wedding.<a id='GBS.PA231.w.1.0.0'></a>
+<span class='gtxt_body' id='para.270.1.0.box.102.149.1072.342.q.60'>
+Mr. Lestrade, of Scotland Yard, is acting already in the matter, but he assures me that he sees no objection to your cooperation, and that he even thinks that it might be of some assistance. I will call at four o&#39;clock in the afternoon, and, should you have any other engagement at that time, I hope that you will postpone it, as this matter is of paramount importance. Yours faithfully, <span style='font-variant:small-caps;'>St. </span><span style='font-variant:small-caps;'>Simon.&#39;</span></span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002403129498 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA231'></a>
+<div id='block.270.1.0.box.102.149.1080.1796.q.60' class='gtxt_body'>
+<a id='GBS.PA231.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.270.1.1.box.103.552.1071.188.q.60'>&quot; It is dated from Grosvenor Mansions, written with a quill pen, and the noble lord has had the misfortune to get a smear of ink upon the outer side of his right little finger,&quot; remarked Holmes, as he folded up the epistle.</p>
+<a id='GBS.PA231.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.270.1.2.box.104.751.1069.80.q.60'>&quot; He says four o&#39;clock. It is three now. He will be here in an hour.&quot;</p>
+<a id='GBS.PA231.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.270.1.3.box.102.852.1080.790.q.60'>&quot; Then I have just time, with your assistance, to get clear upon the subject. Turn over those papers, and arrange the extracts in their order of time, while I take a glance as to who our client is.&quot; He picked a red-covered volume from a line of books of reference beside the mantel-piece. &quot; Here he is,&quot; said he, sitting down and flattening it out upon his knee. &quot; Lord Robert Walsingham de Vere St. Simon, second son of the Duke of Balmoral&#8212;Hum! Arms: Azure, three caltrops in chief over a fess sable. Born in 1846. He&#39;s fortyone years of age, which is mature for marriage. Was Undersecretary for the Colonies in a late Administration. The Duke, his father, was at one time Secretary for Foreign Affairs. They inherit Plantagenet blood by direct descent, and Tudor on the distaff side. Ha ! Well, there is nothing very instructive in all this. I think that I must turn to you, Wat-, son, for something more solid.&quot;</p>
+<a id='GBS.PA231.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.270.1.4.box.103.1654.1071.232.q.60'>&quot; I have very little difficulty in finding what I want,&quot; said I, &quot;for the facts are quite recent, and the matter struck me as remarkable. I feared to refer them to you, however, as I knew that you had an inquiry on hand, and that you disliked the intrusion of other matters.&quot;</p>
+<a id='GBS.PA231.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.270.1.5.box.148.1904.1022.41.q.60'>&quot; Oh, you mean the little problem of the Grosvenor Square</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002403357165 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA232'></a>
+<div id='block.271.1.0.box.182.141.1074.1790.q.60' class='gtxt_body'>
+<a id='GBS.PA232.w.1.0.0'></a>
+<p class='gtxt_body' id='para.271.1.0.box.183.141.1072.142.q.60'>furniture van. That is quite cleared up now&#8212;though, indeed, it was obvious from the first. Pray give me the results of your newspaper selections.&quot;</p>
+<a id='GBS.PA232.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.271.1.1.box.183.292.1073.339.q.50'>&quot; Here is the first notice which I can find. It is in the personal column of <i>The Morning Post, </i>and dates, as you see, some weeks back. &#39; A marriage has been arranged,&#39; it says, &#39; and will, if rumor is correct, very shortly take place, between Lord Robert St. Simon, second son of the Duke of Balmoral, and Miss Hatty Doran, the only daughter of Aloysius Doran, Esq., of San Francisco, Cal., U.S.A.&#39; That is all.&quot;</p>
+<a id='GBS.PA232.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.271.1.2.box.182.643.1073.89.q.60'>&quot; Terse and to the point,&quot; remarked Holmes, stretching his long, thin legs towards the fire.</p>
+<a id='GBS.PA232.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.271.1.3.box.182.743.1072.1188.q.60'>&quot; There was a paragraph amplifying this in one of the society papers of the same week. Ah, here it is. &#39; There will soon be a call for protection in the marriage market, for the present free-trade principle appears to tell heavily against our home product. One by one the management of the noble houses of Great Britain is passing into the hands of our fair cousins from across the Atlantic. An important addition has been made during the last week to the list of the prizes which have been borne away by these charming invaders. Lord St. Simon, who has shown himself for over twenty years proof against the little god&#39;s arrows, has now definitely announced his approaching marriage with Miss Hatty Doran, the fascinating daughter of a California millionaire. Miss Doran, whose graceful figure and striking face attracted much attention at the Westbury House festivities, is an only child, and it is currently reported that her dowry will run to considerably over the six figures, with expectancies for the future. As it is an open secret that the Duke of Balmoral has been compelled to sell his pictures within the last few years, and as Lord St. Simon has no property of his own, save the small estate of Birchmoor, it is obvious that the Californian heiress is not the only gainer by an alliance which will enable her to make the easy and common transition from a Republican lady to a British peeress.&#39; &quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002403592624 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA233'></a>
+<div id='block.272.1.0.box.64.162.1074.1793.q.60' class='gtxt_body'>
+<a id='GBS.PA233.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.0.box.108.162.743.41.q.60'>&quot; Anything else ?&quot; asked Holmes, yawning.</p>
+<a id='GBS.PA233.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.1.box.64.212.1073.540.q.60'>&quot; Oh yes ; plenty. Then there is another note in <i>The Morning Post </i>to say that the marriage would be an absolutely quiet one, that it would be at St. George&#39;s, Hanover Square, that only half a dozen intimate friends would be invited, and that the party would return to the furnished house at Lancaster Gate which has been taken by Mr. Aloysius Doran. Two days later&#8212;that is, on Wednesday last&#8212;there is a curt announcement that the wedding had taken place, and that the honey-moon would be passed at Lord Backwater&#39;s place, near Petersfield. Those are all the notices which appeared before the disappearance of the bride.&quot;</p>
+<a id='GBS.PA233.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.2.box.106.764.827.36.q.60'>&quot; Before the what ?&quot; asked Holmes, with a start.</p>
+<a id='GBS.PA233.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.3.box.107.814.501.39.q.70'>&quot; The vanishing of the lady.&quot;</p>
+<a id='GBS.PA233.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.4.box.107.864.530.36.q.60'>&quot; When did she vanish, then ?&quot;</p>
+<a id='GBS.PA233.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.5.box.107.914.503.38.q.80'>&quot; At the wedding breakfast.&quot;</p>
+<a id='GBS.PA233.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.6.box.66.964.1068.91.q.60'>&quot; Indeed. This is more interesting than it promised to be ; quite dramatic, in fact.&quot;</p>
+<a id='GBS.PA233.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.7.box.107.1065.989.39.q.60'>&quot; Yes ; it struck me as being a little out of the common.&quot;</p>
+<a id='GBS.PA233.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.8.box.68.1115.1067.140.q.60'>&quot; They often vanish before the ceremony, and occcasionally during the honey-moon; but I cannot call to mind anything quite so prompt as this. Pray let me have the details.&quot;</p>
+<a id='GBS.PA233.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.9.box.110.1266.766.39.q.60'>&quot; I warn you that they are very incomplete.&quot;</p>
+<a id='GBS.PA233.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.10.box.110.1316.662.39.q.70'>&quot; Perhaps we may make them less so.&quot;</p>
+<a id='GBS.PA233.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.11.box.71.1366.1065.189.q.60'>&quot; Such as they are, they are set forth in a single article of a morning paper of yesterday, which I will read to you. It is headed, &#39;Singular Occurrence at a Fashionable Wedding &#39;:</p>
+<a id='GBS.PA233.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.272.1.12.box.65.1565.1073.390.q.60'>&quot;&#39; The family of Lord Robert St. Simon has been thrown into the greatest consternation by the strange and painful episodes which have taken place in connection with his wedding. The ceremony, as shortly announced in the papers of yesterday, occurred on the previous morning; but it is only now that it has been possible to confirm the strange rumors which have been so persistently floating about. In spite of the attempts of the friends to hush the matter up, so much<a id='GBS.PA234.w.1.0.0'></a>
+<span class='gtxt_body' id='para.273.1.0.box.210.158.1054.140.q.60'>
+public attention has now been drawn to it that no good pur-pose can be served by affecting to disregard what is a common subject for conversation.</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002404032395 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA234'></a>
+<div id='block.273.1.0.box.205.158.1071.1789.q.60' class='gtxt_body'>
+<a id='GBS.PA234.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.273.1.1.box.205.309.1071.1638.q.60'>&quot;&#39; The ceremony, which was performed at St. George&#39;s, Hanover Square, was a very quiet one, no one being present save the father of the bride, Mr. Aloysius Doran, the Duchess of Balmoral, Lord Backwater, Lord Eustace, and Lady Clara St. Simon (the younger brother and sister of the bridegroom), and Lady Alicia Whittington. The whole party proceeded afterwards to the house of Mr. Aloysius Doran, at Lancaster Gate, where breakfast had been prepared. It appears that some little trouble was caused by a woman, whose name has not been ascertained, who endeavored to force her way into the house after the bridal party, alleging that she had some claim upon Lord St. Simon. It was only after a painful and prolonged scene that she was ejected by the butler and the footman. The bride, who had fortunately entered the house before this unpleasant interruption, had sat down to breakfast with the rest, when she complained of a sudden indisposition, and retired to her room. Her prolonged absence having caused some comment, her father followed her, but learned from her maid that she had only come up to her chamber for an instant, caught up an ulster and bonnet, and hurried down to the passage. One of the footmen declared that he had seen a lady leave the house thus apparelled, but had refused to credit that it was his mistress, believing her to be with the company. On ascertaining that his daughter had disappeared, Mr. Aloysius Doran, in conjunction with the bridegroom, instantly put themselves into communication with the police, and very energetic inquiries are being made, which will probably result in a speedy clearing up of this very singular business. Up to a late hour last night, however, nothing had transpired as to the whereabouts of the missing lady. There are rumors of foul play in the matter, and it is said that the police have caused the arrest of the woman who had caused the original disturbance, in the belief that, from<a id='GBS.PA235.w.1.0.0'></a>
+<span class='gtxt_body' id='para.274.1.0.box.66.160.1073.89.q.60'>
+jealousy or some other motive, she may have been concerned in the strange disappearance of the bride.&#39;&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002404393015 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA235'></a>
+<div id='block.274.1.0.box.66.160.1073.1795.q.60' class='gtxt_body'>
+<a id='GBS.PA235.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.1.box.113.261.320.29.q.70'>&quot;And is that all?&quot;</p>
+<a id='GBS.PA235.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.2.box.66.310.1072.90.q.70'>&quot; Only one little item in another of the morning papers, but it is a suggestive one.&quot;</p>
+<a id='GBS.PA235.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.3.box.111.411.238.30.q.70'>&quot; And it is&#8212;&quot;</p>
+<a id='GBS.PA235.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.4.box.66.456.1072.292.q.60'>&quot; That Miss Flora Millar, the lady who had caused the disturbance, has actually been arrested. It appears that she was formerly a <i>danseuse </i>at the &#39;Allegro,&#39; and that she has known the bridegroom for some years. There are no further particulars, and the whole case is in your hands now&#8212;so far as it has been set forth in the public press.&quot;</p>
+<a id='GBS.PA235.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.5.box.67.761.1070.290.q.60'>&quot; And an exceedingly interesting case it appears to be. I would not have missed it for worlds. But there is a ring at the bell, Watson, and as the clock makes it a few minutes after four, I have no doubt that this will prove to be our noble client. Do not dream of going, Watson, for I very much prefer having a witness, if only as a check to my own memory.&quot;</p>
+<a id='GBS.PA235.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.6.box.69.1062.1068.793.q.60'>&quot; Lord Robert St. Simon,&quot; announced our page-boy, throwing open the door. A gentleman entered, with a pleasant, cultured face, high-nosed and pale, with something perhaps of petulance about the mouth, and with the steady, well-opened eye of a man whose pleasant lot it had ever been to command and to be obeyed. His manner was brisk, and yet his general appearance gave an undue impression of age, for he had a slight forward stoop and a little bend of the knees as he walked. His hair, too, as he swept off his very curly-brimmed hat, was grizzled round the edges and thin upon the top. As to his dress, it was careful to the verge of foppishness, with high collar, black frock-coat, white waistcoat, yellow gloves, patent-leather shoes, and light-colored gaiters. He advanced slowly into the room, turning his head from left to right, and swinging in his right hand the cord which held his golden eye-glasses.</p>
+<a id='GBS.PA235.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.274.1.7.box.79.1866.1058.89.q.50'>&quot; Good-day, Lord St. Simon,&quot; said Holmes, rising and bowing. &quot;Pray take the basket-chair. This is my friend and</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002404622549 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA236'></a>
+<div id='block.275.1.0.box.1246.60.14.32.q.30' class='gimg_body' style='margin-bottom:1.5em;'>
+<img src='../data/epubfile-0035.jpg' width='9' alt='[ocr errors]' /></div>
+<div id='block.275.2.0.box.200.158.1069.1790.q.60' class='gtxt_body'>
+<a id='GBS.PA236.w.2.0.0'></a>
+<p class='gtxt_body' id='para.275.2.0.box.209.158.1053.80.q.60'>colleague, Dr. Watson. Draw up a little to the fire, and we will talk this matter over.&quot;</p>
+<a id='GBS.PA236.w.2.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.1.box.207.258.1062.240.q.60'>&quot; A most painful matter to me, as you can most readily imagine, Mr. Holmes. I have been cut to the quick. I understand that you have already managed several delicate cases of this sort, sir, though I presume that they were hardly from the same class of society.&quot;</p>
+<a id='GBS.PA236.w.2.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.2.box.248.509.424.38.q.60'>&quot; No, I am descending.&quot;</p>
+<a id='GBS.PA236.w.2.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.3.box.249.560.281.38.q.60'>&quot; I beg pardon.&quot;</p>
+<a id='GBS.PA236.w.2.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.4.box.248.610.686.40.q.70'>&quot; My last client of the sort was a king.&quot;</p>
+<a id='GBS.PA236.w.2.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.5.box.248.660.855.40.q.60'>&quot; Oh, really! I had no idea. And which king ?&quot;</p>
+<a id='GBS.PA236.w.2.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.6.box.247.710.491.39.q.70'>&quot; The King of Scandinavia.&quot;</p>
+<a id='GBS.PA236.w.2.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.7.box.247.760.571.30.q.60'>&quot; What! Had he lost his wife ?&quot;</p>
+<a id='GBS.PA236.w.2.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.8.box.205.811.1064.140.q.60'>&quot; You can understand,&quot; said Holmes, suavely, &quot; that I extend to the affairs of my other clients the same secrecy which I promise to you in yours.&quot;</p>
+<a id='GBS.PA236.w.2.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.9.box.204.961.1063.140.q.60'>&quot; Of course ! Very right! very right! I&#39;m sure I beg pardon. As to my own case, I am ready to give you any information which may assist you in forming an opinion.&quot;</p>
+<a id='GBS.PA236.w.2.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.10.box.203.1111.1064.181.q.60'>&quot;Thank you. I have already learned all that is in the public prints, nothing more. I presume that I may take it as correct&#8212;this article, for example, as to the disappearance of the bride.&quot;</p>
+<a id='GBS.PA236.w.2.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.11.box.202.1311.1064.89.q.60'>Lord St. Simon glanced over it. &quot; Yes, it is correct, as far as it goes.&quot;</p>
+<a id='GBS.PA236.w.2.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.12.box.200.1411.1066.140.q.60'>&quot; But it needs a great deal of supplementing before any one could offer an opinion. I think that I may arrive at my facts most directly by questioning you.&quot;</p>
+<a id='GBS.PA236.w.2.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.13.box.242.1563.238.39.q.60'>&quot; Pray do so.&quot;</p>
+<a id='GBS.PA236.w.2.14.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.14.box.242.1611.813.40.q.60'>&quot; When did you first meet Miss Hatty Doran ?&quot;</p>
+<a id='GBS.PA236.w.2.15.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.15.box.242.1662.555.38.q.60'>&quot; In San Francisco, a year ago.&quot;</p>
+<a id='GBS.PA236.w.2.16.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.16.box.241.1711.633.38.q.70'>&quot; You were travelling in the States ?&quot;</p>
+<a id='GBS.PA236.w.2.17.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.17.box.241.1761.117.30.q.101'>&quot;Yes.&quot;</p>
+<a id='GBS.PA236.w.2.18.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.18.box.240.1811.589.38.q.60'>&quot; Did you become engaged then ?&quot;</p>
+<a id='GBS.PA236.w.2.19.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.19.box.239.1861.105.29.q.101'>&quot; No.&quot;</p>
+<a id='GBS.PA236.w.2.20.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.275.2.20.box.240.1908.657.40.q.70'>&quot; But you were on a friendly footing?&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002404957617 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA237'></a>
+<div id='block.276.1.0.box.45.159.1076.1792.q.60' class='gtxt_body'>
+<a id='GBS.PA237.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.0.box.45.159.1072.81.q.60'>&quot; I was amused by her society, and she could see that I was amused.&quot;</p>
+<a id='GBS.PA237.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.1.box.89.260.465.39.q.70'>&quot; Her father is very rich ?&quot;</p>
+<a id='GBS.PA237.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.2.box.89.312.968.39.q.60'>&quot; He is said to be the richest man on the Pacific slope.&quot;</p>
+<a id='GBS.PA237.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.3.box.90.362.639.39.q.60'>&quot; And how did he make his money ?&quot;</p>
+<a id='GBS.PA237.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.4.box.49.412.1069.89.q.60'>&quot;In mining. He had nothing a few years ago. Then he struck gold, invested it, and came up by leaps and bounds.&quot;</p>
+<a id='GBS.PA237.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.5.box.50.512.1067.90.q.50'>&quot; Now, what is your own impression as to the young lady&#39;s &#8212;your wife&#39;s character ?&quot;</p>
+<a id='GBS.PA237.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.6.box.53.612.1065.783.q.60'>The nobleman swung his glasses a little faster and stared down into the fire. &quot; You see, Mr. Holmes,&quot; said he, &quot; my wife was twenty before her father became a rich man. During that time she ran free in a mining camp, and wandered through woods or mountains, so that her education has come from Nature rather than from the school-master. She is what we call in England a tomboy, with a strong nature, wild and free, unfettered by any sort of traditions. She is impetuous&#8212;volcanic, I was about to say. She is swift in making up her mind, and fearless in carrying out her resolutions. On the other hand, I would not have given her the name which I have the honor to bear&quot;&#8212;he gave a little stately cough &#8212; &quot;had not I thought her to be at bottom a noble woman. I believe that she is capable of heroic selfsacrifice, and that anything dishonorable would be repugnant to her.&quot;</p>
+<a id='GBS.PA237.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.7.box.97.1414.511.41.q.70'>&quot; Have you her photograph ?&quot;</p>
+<a id='GBS.PA237.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.8.box.60.1464.1060.331.q.60'>&quot; I brought this with me.&quot; He opened a locket, and showed us the full face of a very lovely woman. It was not a photograph, but an ivory miniature, and the artist had brought out the full effect of the lustrous black hair, the large dark eyes, and the exquisite mouth. Holmes gazed long and earnestly at it. Then he closed the locket and handed it back to Lord St. Simon.</p>
+<a id='GBS.PA237.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.9.box.64.1814.1057.90.q.60'>&quot; The young lady came to London, then, and you renewed your acquaintance ?&quot;</p>
+<a id='GBS.PA237.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.276.1.10.box.101.1912.1018.39.q.70'>&quot; Yes, her father brought her over for this last London sea<a id='GBS.PA238.w.1.0.0'></a>
+<span class='gtxt_body' id='para.277.1.0.box.218.155.1049.85.q.60'>son. I met her several times, became engaged to her, and have now married her.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002405185539 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA238'></a>
+<div id='block.277.1.0.box.218.155.1083.1796.q.60' class='gtxt_body'>
+<a id='GBS.PA238.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.1.box.260.258.909.40.q.60'>&quot; She brought, I understand, a considerable dowry ?&quot;</p>
+<a id='GBS.PA238.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.2.box.260.307.951.41.q.60'>&quot; A fair dowry. Not more than is usual in my family.&quot;</p>
+<a id='GBS.PA238.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.3.box.219.355.1052.94.q.60'>&quot; And this, of course, remains to you, since the marriage is a <i>fait accompli ?&quot;</i></p>
+<a id='GBS.PA238.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.4.box.261.459.855.41.q.70'><i>&quot; </i>I really have made no inquiries on the subject.&quot;</p>
+<a id='GBS.PA238.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.5.box.219.508.1056.91.q.60'>&quot; Very naturally not. Did you see Miss Doran on the day before the wedding?&quot;</p>
+<a id='GBS.PA238.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.6.box.262.613.119.28.q.101'>&quot;Yes.&quot;</p>
+<a id='GBS.PA238.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.7.box.262.660.473.40.q.60'>&quot; Was she in good spirits ?&quot;</p>
+<a id='GBS.PA238.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.8.box.220.710.1059.82.q.60'>&quot; Never better. She kept talking of what we should do in our future lives.&quot;</p>
+<a id='GBS.PA238.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.9.box.220.810.1062.89.q.60'>&quot; Indeed ! That is very interesting. And on the morning of the wedding ?&quot;</p>
+<a id='GBS.PA238.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.10.box.219.911.1064.90.q.60'>&quot;She was as bright as possible&#8212;at least, until after the ceremony.&quot;</p>
+<a id='GBS.PA238.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.11.box.263.1012.837.40.q.60'>&quot; And did you observe any change in her then ?&quot;</p>
+<a id='GBS.PA238.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.12.box.219.1061.1068.191.q.60'>&quot; Well, to tell the truth, I saw then the first signs that I had ever seen that her temper was just a little sharp. The incident, however, was too trivial to relate, and can have no possible bearing upon the case.&quot;</p>
+<a id='GBS.PA238.w.1.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.13.box.262.1263.586.39.q.60'>&quot; Pray let us have it, for all that.&quot;</p>
+<a id='GBS.PA238.w.1.14.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.14.box.220.1313.1077.389.q.60'>&quot; Oh, it is childish. She dropped her bouquet as we went towards the vestry. She was passing the front pew at the time, and it fell over into the pew. There was a moment&#39;s delay, but the gentleman in the pew handed it up to her again, and it did not appear to be the worse for the fall. Yet, when I spoke to her of the matter, she answered me abruptly; and in the carriage, on our way home, she seemed absurdly agitated over this trifling cause.&quot;</p>
+<a id='GBS.PA238.w.1.15.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.15.box.223.1712.1075.90.q.60'>&quot; Indeed ! You say that there was a gentleman in the pew. Some of the general public were present, then ?&quot;</p>
+<a id='GBS.PA238.w.1.16.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.16.box.222.1812.1079.87.q.60'>&quot; Oh yes. It is impossible to exclude them when the church is open.&quot;</p>
+<a id='GBS.PA238.w.1.17.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.277.1.17.box.265.1910.927.41.q.70'>&quot;This gentleman was not one of your wife&#39;s friends?&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002405519583 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA239'></a>
+<div id='block.278.1.0.box.55.161.1076.1791.q.60' class='gtxt_body'>
+<a id='GBS.PA239.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.0.box.56.161.1071.190.q.60'>&quot; No, no; I call him a gentleman by courtesy, but he was quite a common-looking person. I hardly noticed his appearance. But really I think that we are wandering rather far from the point.&quot;</p>
+<a id='GBS.PA239.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.1.box.56.364.1071.139.q.60'>&quot; Lady St. Simon, then, returned from the wedding in a less cheerful frame of mind than she had gone to it. What did she do on re-entering her father&#39;s house ?&quot;</p>
+<a id='GBS.PA239.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.2.box.96.514.749.30.q.60'>&quot; I saw her in conversation with her maid.&quot;</p>
+<a id='GBS.PA239.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.3.box.97.564.431.30.q.60'>&quot;And who is her maid?&quot;</p>
+<a id='GBS.PA239.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.4.box.61.614.1065.80.q.60'>&quot; Alice is her name. She is an American, and came from California with her.&quot;</p>
+<a id='GBS.PA239.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.5.box.99.714.447.31.q.80'>&quot; A confidential servant ?&quot;</p>
+<a id='GBS.PA239.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.6.box.61.764.1066.140.q.60'>&quot; A little too much so. ft seemed to me that her mistress allowed her to take great liberties. Still, of course, in America they look upon these things in a different way.&quot;</p>
+<a id='GBS.PA239.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.7.box.101.915.717.39.q.60'>&quot; How long did she speak to this Alice ?&quot;</p>
+<a id='GBS.PA239.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.8.box.101.964.984.39.q.60'>&quot;Oh, a few minutes. I had something else to think of.&quot;</p>
+<a id='GBS.PA239.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.9.box.100.1015.710.39.q.70'>&quot;You did not overhear what they said ?&quot;</p>
+<a id='GBS.PA239.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.10.box.62.1063.1066.133.q.60'>&quot; Lady St. Simon said something about &#39; jumping a claim.&#39; She was accustomed to use slang of the kind. I have no idea what she meant.&quot;</p>
+<a id='GBS.PA239.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.11.box.63.1214.1066.91.q.60'>&quot; American slang is very expressive sometimes. And what did your wife do when she finished speaking to her maid ?&quot;</p>
+<a id='GBS.PA239.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.12.box.102.1315.671.30.q.60'>&quot; She walked into the breakfast-room.&quot;</p>
+<a id='GBS.PA239.w.1.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.13.box.101.1367.288.38.q.70'>&quot; On your arm ?&quot;</p>
+<a id='GBS.PA239.w.1.14.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.14.box.62.1416.1067.181.q.60'>&quot;No, alone. She was very independent in little matters like that. Then, after we had sat down for ten minutes or so, she rose hurriedly, muttered some words of apology, and left the room. She never came back.&quot;</p>
+<a id='GBS.PA239.w.1.15.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.15.box.55.1615.1074.140.q.60'>&quot; But this maid, Alice, as I understand, deposes that she .went to her room, covered her bride&#39;s dress with a long ulster, put on a bonnet, and went out.&quot;</p>
+<a id='GBS.PA239.w.1.16.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.278.1.16.box.63.1765.1068.187.q.60'>&quot;Quite so. And she was afterwards seen walking into Hyde Park in company with Flora Millar, a woman who is now in custody, and who had already made a disturbance at Mr. Doran&#39;s house that morning.&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002405843084 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA240'></a>
+<div id='block.279.1.0.box.207.154.1074.1790.q.60' class='gtxt_body'>
+<a id='GBS.PA240.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.0.box.209.154.1054.90.q.50'>&quot; Ah, yes. I should like a few particulars as to this young lady, and your relations to her.&quot;</p>
+<a id='GBS.PA240.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.1.box.209.254.1064.890.q.60'>Lord St. Simon shrugged his shoulders and raised his eyebrows. &quot; We have been on a friendly footing for some years &#8212;I may say on a <i>very </i>friendly footing. She used to be at the &#39; Allegro.&#39; I have not treated her ungenerously, and she has no just cause of complaint against me; but you know what women are, Mr. Holmes. Flora was a dear little thing, but exceedingly hot-headed, and devotedly attached to me. She wrote me dreadful letters when she heard that I was about to be married; and, to tell the truth, the reason why I had the marriage celebrated so quietly was that I feared lest there might be a scandal in the-church. She came to Mr. Doran&#39;s door just after we returned, and she endeavored to push her way in, uttering very abusive expressions towards my wife, and even threatening her, but I had foreseen the possibility of something of the sort, and I had two police fellows there in private clothes, who soon pushed her out again. She was quiet when she saw that there was no good in making a row.&quot;</p>
+<a id='GBS.PA240.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.2.box.251.1156.523.39.q.60'>&quot; Did your wife hear all this ?&quot;</p>
+<a id='GBS.PA240.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.3.box.251.1206.621.39.q.60'>&quot; No, thank goodness, she did not.&quot;</p>
+<a id='GBS.PA240.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.4.box.208.1256.1066.79.q.70'>&quot; And she was seen walking with this very woman afterwards?&quot;</p>
+<a id='GBS.PA240.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.5.box.207.1356.1069.139.q.60'>&quot; Yes. That is what Mr. Lestrade, of Scotland Yard, looks upon as so serious. It is thought that Flora decoyed my wife out, and laid some terrible trap for her.&quot;</p>
+<a id='GBS.PA240.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.6.box.251.1506.615.38.q.70'>&quot; Well, it is a possible supposition.&quot;</p>
+<a id='GBS.PA240.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.7.box.250.1556.367.36.q.70'>&quot;You think so, too?&quot;</p>
+<a id='GBS.PA240.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.8.box.208.1606.1070.89.q.60'>&quot; I did not say a probable one. But you do not yourself look upon this as likely ?&quot;</p>
+<a id='GBS.PA240.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.9.box.251.1705.690.41.q.60'>&quot; I do not think Flora would hurt a fly.&quot;</p>
+<a id='GBS.PA240.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.10.box.207.1754.1074.91.q.60'>&quot; Still, jealousy is a strange transformer of characters. Pray what is your own theory as to what took place ?&quot;</p>
+<a id='GBS.PA240.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.279.1.11.box.208.1854.1072.90.q.60'>&quot; Well, really, I came to seek a theory, not to propound one. I have given you all the facts. Since you ask me, however,<a id='GBS.PA241.w.1.0.0'></a>
+<span class='gtxt_body' id='para.280.1.0.box.70.158.1066.190.q.60'>
+I may say that it has occurred to me as possible that the excitement of this affair, the consciousness that she had made so immense a social stride, had the effect of causing some little nervous disturbance in my wife.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002406607460 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA241'></a>
+<div id='block.280.1.0.box.68.158.1068.1793.q.60' class='gtxt_body'>
+<a id='GBS.PA241.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.1.box.109.359.930.39.q.60'>&quot; In short, that she had become suddenly deranged ?&quot;</p>
+<a id='GBS.PA241.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.2.box.69.409.1067.190.q.60'>&quot;Well, really, when I consider that she has turned her back&#8212;I will not say upon me, but upon so much that many have aspired to without success&#8212;I can hardly explain it in any other fashion.&quot;</p>
+<a id='GBS.PA241.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.3.box.71.609.1065.231.q.60'>&quot;Well, certainly that is also a conceivable hypothesis,&quot; said Holmes, smiling. &quot; And now, Lord St. Simon, I think that I have nearly all my data. May I ask whether you were seated at the breakfast-table so that you could see out of the window ?&quot;</p>
+<a id='GBS.PA241.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.4.box.109.860.985.31.q.60'>&quot; We could see the other side of the road and the Park.&quot;</p>
+<a id='GBS.PA241.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.5.box.70.910.1065.90.q.60'>&quot; Quite so. Then I do not think that I need to detain you longer. I shall communicate with you.&quot;</p>
+<a id='GBS.PA241.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.6.box.70.1010.1065.90.q.60'>&quot; Should you be fortunate enough to solve this problem,&quot; said our client, rising.</p>
+<a id='GBS.PA241.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.7.box.108.1111.326.29.q.70'>&quot; I have solved it.&quot;</p>
+<a id='GBS.PA241.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.8.box.108.1161.424.30.q.70'>&quot;Eh? What was that?&quot;</p>
+<a id='GBS.PA241.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.9.box.108.1211.511.39.q.70'>&quot; I say that I have solved it.&quot;</p>
+<a id='GBS.PA241.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.10.box.108.1261.478.39.q.60'>&quot; Where, then, is my wife ?&quot;</p>
+<a id='GBS.PA241.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.11.box.107.1312.837.42.q.60'>&quot; That is a detail which I shall speedily supply.&quot;</p>
+<a id='GBS.PA241.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.12.box.70.1362.1065.140.q.60'>Lord St. Simon shook his head. &quot; I am afraid that it will take wiser heads than yours or mine,&quot; he remarked, and bowing in a stately, old-fashioned manner, he departed.</p>
+<a id='GBS.PA241.w.1.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.13.box.68.1512.1066.231.q.60'>&quot; It is very good of Lord St. Simon to honor my head by putting it on a level with his own,&quot; said Sherlock Holmes, laughing. &quot; I think that I shall have a whiskey-and-soda and a cigar after all this cross-questioning. I had formed my conclusions as to the case before our client came into the room.&quot;</p>
+<a id='GBS.PA241.w.1.14.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.14.box.105.1763.358.39.q.60'>&quot; My dear Holmes !&quot;</p>
+<a id='GBS.PA241.w.1.15.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.280.1.15.box.68.1813.1065.138.q.60'>&quot; I have notes of several similar cases, though none, as I remarked before, which were quite as prompt. My whole examination served to turn my conjecture into a certainty. Cir<a id='GBS.PA242.w.1.0.0'></a>
+<span class='gtxt_body' id='para.281.1.0.box.197.144.1061.90.q.60'>cumstantial evidence is occasionally very convincing, as when you find a trout in the milk, to quote Thoreau&#39;s example.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002406865083 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA242'></a>
+<div id='block.281.1.0.box.189.144.1076.1792.q.60' class='gtxt_body'>
+<a id='GBS.PA242.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.1.box.239.245.765.40.q.70'>&quot; But I have heard all that you have heard.&quot;</p>
+<a id='GBS.PA242.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.2.box.196.295.1066.341.q.60'>&quot;Without, however, the knowledge of pre-existing cases which serves me so well. There was a parallel instance in Aberdeen some years back, and something on very much the same lines at Munich the year after the Franco-Prussian war. It is one of these cases&#8212;but, hello, here is Lestrade ! Goodafternoon, Lestrade! You will find an extra tumbler upon the sideboard, and there are cigars in the box.&quot;</p>
+<a id='GBS.PA242.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.3.box.195.647.1069.229.q.60'>The official detective was attired in a pea-jacket and cravat, which gave him a decidedly nautical appearance, and he carried a black canvas bag in his hand. With a short greeting he seated himself and lit the cigar which had been offered to him.</p>
+<a id='GBS.PA242.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.4.box.195.897.1068.90.q.50'>&quot; What&#39;s up, then ?&quot; asked Holmes, with a twinkle in his eye. &quot; You look dissatisfied.&quot;</p>
+<a id='GBS.PA242.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.5.box.193.998.1072.130.q.60'>&quot;And I feel dissatisfied. It is this infernal St. Simon marriage case. I can make neither head nor tail of the business.&quot;</p>
+<a id='GBS.PA242.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.6.box.235.1149.511.40.q.70'>&quot; Really ! You surprise me.&quot;</p>
+<a id='GBS.PA242.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.7.box.191.1198.1074.139.q.50'>&quot;Who ever heard of such a mixed affair? Every clew seems to slip through my fingers. I have been at work upon it all day.&quot;</p>
+<a id='GBS.PA242.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.8.box.191.1348.1069.91.q.60'>&quot; And very wet it seems to have made you,&quot; said Holmes, laying his hand upon the arm of the pea-jacket.</p>
+<a id='GBS.PA242.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.9.box.232.1449.779.39.q.70'>&quot; Yes, I have been dragging the Serpentine.&quot;</p>
+<a id='GBS.PA242.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.10.box.232.1500.556.36.q.60'>&quot; In Heaven&#39;s name, what for ?&quot;</p>
+<a id='GBS.PA242.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.11.box.232.1549.783.40.q.60'>&quot; In search of the body of Lady St. Simon.&quot;</p>
+<a id='GBS.PA242.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.12.box.189.1599.1073.89.q.60'>Sherlock Holmes leaned back in his chair and laughed heartily.</p>
+<a id='GBS.PA242.w.1.13.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.13.box.190.1700.1072.78.q.60'>&quot; Have you dragged the basin of Trafalgar Square fountain ?&quot; he asked.</p>
+<a id='GBS.PA242.w.1.14.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.14.box.231.1798.542.40.q.70'>&quot; Why ? What do you mean ?&quot;</p>
+<a id='GBS.PA242.w.1.15.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.281.1.15.box.190.1850.1071.86.q.60'>&quot; Because you have just as good a chance of finding this lady in the one as in the other.&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002407277160 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA243'></a>
+<div id='block.282.1.0.box.81.156.1074.1794.q.60' class='gtxt_body'>
+<a id='GBS.PA243.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.0.box.82.156.1073.89.q.60'>Lestrade shot an angry glance at my companion. &quot; I suppose you know all about it,&quot; he snarled.</p>
+<a id='GBS.PA243.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.1.box.83.256.1071.88.q.60'>&quot; Well, I have only just heard the facts, but my mind is made up.&quot;</p>
+<a id='GBS.PA243.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.2.box.84.356.1070.89.q.60'>&quot; Oh, indeed ! Then you think that the Serpentine plays no part in the matter ?&quot;</p>
+<a id='GBS.PA243.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.3.box.129.457.456.40.q.70'>&quot; I think it very unlikely.&quot;</p>
+<a id='GBS.PA243.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.4.box.84.507.1070.340.q.60'>&quot; Then perhaps you will kindly explain how it is that we found this in it ?&quot; He opened his bag as he spoke, and tumbled onto the floor a wedding-dress of watered silk, a pair of white satin shoes, and a bride&#39;s wreath and veil, all discolored and soaked in water. &quot; There,&quot; said he, putting a new wedding-ring upon the top of the pile. &quot; There is a little nut for you to crack, Master Holmes.&quot;</p>
+<a id='GBS.PA243.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.5.box.85.858.1068.90.q.50'>&quot; Oh, indeed !&quot; said my friend, blowing blue rings into the air. &quot; You dragged them from the Serpentine ?&quot;</p>
+<a id='GBS.PA243.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.6.box.84.956.1071.183.q.60'>&quot; No. They were found floating near the margin by a parkkeeper. They have been identified as her clothes, and it seemed to me that if the clothes were there the body would not be far off.&quot;</p>
+<a id='GBS.PA243.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.7.box.83.1159.1072.140.q.60'>&quot; By the same brilliant reasoning, every man&#39;s body is to be found in the neighborhood of his wardrobe. And pray what did you hope to arrive at through this ?&quot;</p>
+<a id='GBS.PA243.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.8.box.82.1310.1073.91.q.70'>&quot; At some evidence implicating Flora Millar in the disappearance.&quot;</p>
+<a id='GBS.PA243.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.9.box.128.1411.739.39.q.60'>&quot; I am afraid that you will find it difficult.&quot;</p>
+<a id='GBS.PA243.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.10.box.81.1461.1074.230.q.60'>&quot; Are you, indeed, now ?&quot; cried Lestrade, with some bitterness. &quot; I am afraid, Holmes, that you are not very practical with your deductions and your inferences. You have made two blunders in as many minutes. This dress does implicate Miss Flora Millar.&quot;</p>
+<a id='GBS.PA243.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.11.box.127.1711.226.30.q.70'>&quot; And how ?&quot;</p>
+<a id='GBS.PA243.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.282.1.12.box.83.1762.1072.188.q.60'>&quot; In the dress is a pocket. In the pocket is a card-case. In the card-case is a note. And here is the very note.&quot; He slapped it down upon the table in front of him. &quot; Listen to this: &#39; You will see me when all is ready. Come at once.<a id='GBS.PA244.w.1.0.0'></a>
+<span class='gtxt_body' id='para.283.1.0.box.193.151.1062.283.q.60'>
+F. H. M.&#39; Now my theory all along has been that Lady St. Simon was decoyed away by Flora Millar, and that she, with confederates, no doubt, was responsible for her disappearance. Here, signed with her initials, is the very note which was no doubt quietly slipped into her hand at the door, and which lured her within their reach.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002407646640 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA244'></a>
+<div id='block.283.1.0.box.192.151.1066.1792.q.60' class='gtxt_body'>
+<a id='GBS.PA244.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.1.box.193.453.1065.239.q.60'>&quot;Very good, Lestrade,&quot; said Holmes, laughing. &quot;You really are very fine indeed. Let me see it.&quot; He took up the paper in a listless way, but his attention instantly became riveted, and he gave a little cry of satisfaction. &quot; This is indeed important,&quot; said he.</p>
+<a id='GBS.PA244.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.2.box.235.703.384.41.q.60'>&quot; Ha! you find it so ?&quot;</p>
+<a id='GBS.PA244.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.3.box.235.752.785.41.q.60'>&quot; Extremely so. I congratulate you warmly.&quot;</p>
+<a id='GBS.PA244.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.4.box.195.803.1060.89.q.60'>Lestrade rose in his triumph and bent his head to look. &quot; Why,&quot; he shrieked, &quot; you&#39;re looking at the wrong side !&quot;</p>
+<a id='GBS.PA244.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.5.box.234.903.704.39.q.70'>&quot; On the contrary, this is the right side.&quot;</p>
+<a id='GBS.PA244.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.6.box.193.953.1062.90.q.70'>&quot; The right side ? You&#39;re mad! Here is the note written in pencil over here.&quot;</p>
+<a id='GBS.PA244.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.7.box.193.1054.1065.89.q.60'>&quot;And over here is what appears to be the fragment of a hotel bill, which interests me deeply.&quot;</p>
+<a id='GBS.PA244.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.8.box.194.1154.1062.141.q.30'>&quot; There&#39;s nothing in it. I looked at it before,&quot; said Lestrade. &quot; &#39; Oct. 4th, rooms <i>8s., </i>breakfast <i>2S. </i>6&lt;/., cocktail <i>if, </i>lunch <i>2s. 6d., </i>glass sherry, <i>8d.&#39; I </i>see nothing in that.&quot;</p>
+<a id='GBS.PA244.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.9.box.193.1305.1061.140.q.60'>&quot; Very likely not. It is most important, all the same. As to the note, it is important also, or at least the initials are, so I congratulate you again.&quot;</p>
+<a id='GBS.PA244.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.10.box.193.1455.1061.240.q.60'>&quot; I&#39;ve wasted time enough,&quot; said Lestrade, rising. &quot; I believe in hard work, and not in sitting by the fire spinning fine theories. Good-day, Mr. Holmes, and we shall see which gets to the bottom of the matter first.&quot; He gathered up the garments, thrust them into the bag, and made for the door.</p>
+<a id='GBS.PA244.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.11.box.192.1705.1062.188.q.60'>&quot;Just one hint to you, Lestrade,&quot; drawled Holmes, before his rival vanished; &quot; I will tell you the true solution of the matter. Lady St. Simon is a myth. There is not, and there never has been, any such person.&quot;</p>
+<a id='GBS.PA244.w.1.12.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.283.1.12.box.233.1903.1019.40.q.60'>Lestrade looked sadly at my companion. Then he turned<a id='GBS.PA245.w.1.0.0'></a>
+<span class='gtxt_body' id='para.284.1.0.box.66.180.1074.90.q.60'>
+to me, tapped his forehead three times, shook his head solemnly, and hurried away.</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002408466488 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA245'></a>
+<div id='block.284.1.0.box.66.180.1076.1796.q.60' class='gtxt_body'>
+<a id='GBS.PA245.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.1.box.66.280.1074.191.q.60'>He had hardly shut the door behind him when Holmes rose and put on his overcoat. &quot; There is something in what the fellow says about out-door work,&quot; he remarked, &quot; so I think, Watson, that I must leave you to your papers for a little.&quot;</p>
+<a id='GBS.PA245.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.2.box.70.481.1071.592.q.60'>It was after five o&#39;clock when Sherlock Holmes left me, but I had no time to be lonely, for within an hour there arrived a confectioner&#39;s man with a very large flat box. This he unpacked with the help of a youth whom he had brought with him, and presently, to my very great astonishment, a quite epicurean little cold supper began to be laid out upon our humble lodging-house mahogany. There were a couple of brace of cold woodcock, a pheasant, a <i>p&#226;t&#232; de foie gras </i>pie, with a group of ancient and cobwebby bottles. Having laid out all these luxuries, my two visitors vanished away, like the genii of the Arabian Nights, with no explanation save that the things had been paid for and were ordered to this address.</p>
+<a id='GBS.PA245.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.3.box.73.1085.1069.190.q.60'>Just before nine o&#39;clock Sherlock Holmes stepped briskly into the room. His features were gravely set, but there was a light in his eye which made me think that he had not been disappointed in his conclusions.</p>
+<a id='GBS.PA245.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.4.box.72.1285.1068.81.q.60'>&quot; They have laid the supper, then,&quot; he said, rubbing his hands.</p>
+<a id='GBS.PA245.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.5.box.115.1386.1005.40.q.60'>&quot; You seem to expect company. They have laid for five.&quot;</p>
+<a id='GBS.PA245.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.6.box.71.1436.1070.181.q.50'>&quot; Yes, I fancy we may have some company dropping in,&quot; said he. &quot; I am surprised that Lord St. Simon has not already arrived. Ha! I fancy that I hear his step now upon the stairs.&quot;</p>
+<a id='GBS.PA245.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.7.box.70.1636.1072.142.q.60'>It was indeed our visitor of the morning who came bustling in, dangling his glasses more vigorously than ever, and with a very perturbed expression upon his aristocratic features.</p>
+<a id='GBS.PA245.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.8.box.114.1788.905.39.q.60'>&quot; My messenger reached you, then ?&quot; asked Holmes.</p>
+<a id='GBS.PA245.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.9.box.72.1838.1069.89.q.50'>&quot; Yes, and I confess that the contents startled me beyond measure. Have you good authority for what you say ?&quot;</p>
+<a id='GBS.PA245.w.1.10.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.284.1.10.box.115.1938.362.38.q.80'>&quot; The best possible.&quot;</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002408687078 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA246'></a>
+<div id='block.285.1.0.box.203.166.1078.1798.q.60' class='gtxt_body'>
+<a id='GBS.PA246.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.0.box.207.166.1053.82.q.60'>Lord St. Simon sank into a chair and passed his hand over his forehead.</p>
+<a id='GBS.PA246.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.1.box.206.268.1057.130.q.60'>&quot; What will the duke say,&quot; he murmured, &quot; when he hears that one of the family has been subjected to such humiliation ?&quot;</p>
+<a id='GBS.PA246.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.2.box.206.418.1059.80.q.60'>&quot; It is the purest accident. I cannot allow that there is any humiliation.&quot;</p>
+<a id='GBS.PA246.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.3.box.247.519.984.39.q.70'>&quot; Ah, you look on these things from another stand-point.&quot;</p>
+<a id='GBS.PA246.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.4.box.205.569.1063.186.q.60'>&quot; I fail to see that any one is to blame. I can hardly see how the lady could have acted otherwise, though her abrupt method of doing it was undoubtedly to be regretted. Having no mother, she had no one to advise her at such a crisis.&quot;</p>
+<a id='GBS.PA246.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.5.box.205.769.1062.88.q.60'>&quot; It was a slight, sir, a public slight,&quot; said Lord St. Simon, tapping his fingers upon the table.</p>
+<a id='GBS.PA246.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.6.box.206.869.1062.89.q.60'>&quot; You must make allowance for this poor girl, placed in so unprecedented a position.&quot;</p>
+<a id='GBS.PA246.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.7.box.205.969.1063.90.q.60'>&quot; I will make no allowance. I am very angry indeed, and I have been shamefully used.&quot;</p>
+<a id='GBS.PA246.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.8.box.204.1072.1070.380.q.60'>&quot;   think that I heard a ring,&quot; said Holmes. &quot; Yes, there are steps on the landing. If   cannot persuade you to take a lenient view of the matter, Lord St. Simon, I have brought an advocate here who may be more successful.&quot; He opened the door and ushered in a lady and gentleman. &quot; Lord St. Simon,&quot; said he, &quot; allow me to introduce you to Mr. and Mrs. Francis Hay Moulton. The lady, I think, you have already met.&quot;</p>
+<a id='GBS.PA246.w.1.9.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.9.box.203.1473.1076.335.q.60'>At the sight of these new-comers our client had sprung from his seat and stood very erect, with his eyes cast down and his hand thrust into the breast of his frock-coat, a picture of offended dignity. The lady had taken a quick step forward and had held out her hand to him, but he still refused to raise his eyes. It was as well for his resolution, perhaps, for her pleading face was one which it was hard to resist.</p>
+<a id='GBS.PA246.w.1.10.0'></a>
+<p class='gtxt_body' id='para.285.1.10.box.204.1821.1077.87.q.60'>&quot;You&#39;re angry, Robert,&quot; said she. &quot;Well, I guess you have every cause to be.&quot;</p>
+<a id='GBS.PA246.w.1.11.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.285.1.11.box.247.1920.1028.44.q.60'>&quot; Pray make no apology to me,&quot; said Lord St. Simon, bitterly.</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002408930485 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA247'></a>
+<div id='block.286.1.0.box.69.174.1078.1797.q.60' class='gtxt_body'>
+<a id='GBS.PA247.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.286.1.0.box.77.174.1070.284.q.60'>&quot; Oh yes, I know that I have treated you real bad, and that I should have spoken to you before I went; but I was kind of rattled, and from the time when I saw Frank here again I just didn&#39;t know what I was doing or saying. I only wonder I didn&#39;t fall down and do a faint right there before the altar.&quot;</p>
+<a id='GBS.PA247.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.286.1.1.box.78.477.1066.92.q.60'>&quot; Perhaps, Mrs. Moulton, you would like my friend and me to leave the room while you explain this matter?&quot;</p>
+<a id='GBS.PA247.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.286.1.2.box.76.578.1068.282.q.60'>&quot; If I may give an opinion,&quot; remarked the strange gentleman, &quot;we&#39;ve had just a little too much secrecy over this business already. For my part, I should like all Europe and America to hear the rights of it.&quot; He was a small, wiry, sunburnt man, clean shaven, with a sharp face and alert manner.</p>
+<a id='GBS.PA247.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.286.1.3.box.69.880.1077.1091.q.50'>&quot; Then I&#39;ll tell our story right away,&quot; said the lady. &quot; Frank here and   met in &#39;84, in McQuire&#39;s camp, near the Rockies, where pa was working a claim. We were engaged to each other, Frank and I; but then&quot; one day father struck a rich pocket and made a pile, while poor Frank here had a claim that petered out and came to nothing. The richer pa grew, the poorer was Frank; so at last pa wouldn&#39;t hear of our engagement lasting any longer, and he took me away to &#39;Frisco. Frank wouldn&#39;t throw up his hand, though ; so he followed me there, and he saw me without pa knowing anything about it. It would only have made him mad to know, so we just fixed it all up for ourselves. Frank said that he would go and make his pile, too, and never come back to claim me until he had as much as pa. So then I promised to wait for him to the end of time, and pledged myself not to marry any one else while he lived. &#39; Why shouldn&#39;t we be married right away, then,&#39; said he, &#39; and then I will feel sure of you; and I won&#39;t claim to be your husband until I come back ?&#39; Well, we talked it over, and he had fixed it all up so nicely, with a clergyman all ready in waiting, that we just did it right there ; and then Frank went off to seek his fortune, and I went back to pa.</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002409215604 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA248'></a>
+<div id='block.287.1.0.box.181.160.1077.1787.q.60' class='gtxt_body'>
+<a id='GBS.PA248.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.287.1.0.box.186.160.1071.641.q.60'>&quot; The next I heard of Frank was that he was in Montana, and then he went prospecting in Arizona, and then I heard of him from New Mexico. After that came a long newspaper story about how a miners&#39; camp had been attacked by Apache Indians, and there was my Frank&#39;s name among the killed. I fainted dead away, and I was very sick for months after. Pa thought I had a decline, and took me to half the doctors in &#39;Frisco. Not a word of news came for a year and more, so that I never doubted that Frank was really dead. Then Lord St. Simon came to &#39;Frisco, and we came to London, and a marriage was arranged, and pa was very pleased, but I felt all the time that no man on this earth would ever take the place in my heart that had been given to my poor Frank.</p>
+<a id='GBS.PA248.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.287.1.1.box.181.810.1077.1137.q.60'>&quot; Still, if I had married Lord St. Simon, of course I&#39;d have done my duty by him. We can&#39;t command our love, but we can our actions. I went to the altar with him with the intention to make him just as good a wife as it was in me to be. But you may imagine what I felt when, just as I came to the altar rails, I glanced back and saw Frank standing and looking at me out of the first pew. I thought it was his ghost at first; but when   looked again, there he was still, with a kind of question in his eyes as if to ask me whether I were glad or sorry to see him. I wonder I didn&#39;t drop. I know that everything was turning round, and the words of the clergyman were just like the buzz of a bee in my ear. I didn&#39;t know what to do. Should I stop the service and make a scene in the church ? I glanced at him again, and he seemed to know what I was thinking, for he raised his finger to his lips to tell me to be still. Then I saw him scribble on a piece of paper, and I knew that he was writing me a note. As I passed his pew on the way out I dropped my bouquet over to him, and he. slipped the note into my hand when he returned me the flowers. It was only a line asking me to join him when he made the sign to me to do so. Of course I never doubted for a moment that my first duty was now to him, and I determined to do just whatever he might direct.</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002409495821 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA249'></a>
+<div id='block.288.1.0.box.63.180.1078.1790.q.60' class='gtxt_body'>
+<a id='GBS.PA249.w.1.0.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.288.1.0.box.67.180.1073.1042.q.60'>&quot; When I got back I told my maid, who had known him in California, and had always been his friend. I ordered her to say nothing, but to get a few things packed and my ulster ready. I know I ought to have spoken to Lord St. Simon, but it was dreadful hard before his mother and all those great people. I just made up my mind to run away and explain afterwards. I hadn&#39;t been at the table ten minutes before I saw Frank out of the window at the other side of the road. He beckoned to me, and then began walking into the Park. I slipped out, put on my things, and followed him. Some woman came talking something or other about Lord St. Simon to me &#8212;seemed to me from the little I heard as if he had a little secret of his own before marriage also&#8212;but I managed to get away from her, and soon overtook Frank. We got into a cab together, and away we drove to some lodgings he had taken in Gordon Square, and that was my true wedding after all those years of waiting. Frank had been a prisoner among the Apaches, had escaped, came on to &#39;Frisco, found that I had given him up for dead and had gone to England, followed me there, and had come upon me at last on the very morning of my second wedding.&quot;</p>
+<a id='GBS.PA249.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.288.1.1.box.70.1233.1067.89.q.60'>&quot; I saw it in a paper,&quot; explained the American. &quot; It gave the name and the church, but not where the lady lived.&quot;</p>
+<a id='GBS.PA249.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.288.1.2.box.63.1333.1078.637.q.60'>&quot; Then we had a talk as to what we should do, and Frank was all for openness, but I was so ashamed of it all that I felt as if I should like to vanish away and never see any of them again&#8212;just sending a line to pa, perhaps, to show him that I was alive. It was awful to me to think of all those lords and ladies sitting round that breakfast-table and waiting for me to come back. So Frank took my wedding-clothes and things and made a bundle of them, so that I should not be traced, and dropped them away somewhere where no one could find them. It is likely that we should have gone on to Paris tomorrow, only that this good gentleman, Mr. Holmes, came round to us this evening, though how he found us is more than I can think, and he showed us very clearly and kindly<a id='GBS.PA250.w.1.0.0'></a>
+<span class='gtxt_body' id='para.289.1.0.box.203.172.1074.341.q.60'>
+that I was wrong and that Frank was right, and that we should be putting ourselves in the wrong if we were so secret. Then he offered to give us a chance of talking to Lord St. Simon alone, and so we came right away round to his rooms at once. Now, Robert, you have heard it all, and I am very sorry if I have given you pain, and I hope that you do not think very meanly of me.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002409868130 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA250'></a>
+<div id='block.289.1.0.box.188.172.1089.1797.q.60' class='gtxt_body'>
+<a id='GBS.PA250.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.1.box.201.524.1074.138.q.60'>Lord St. Simon had by no means relaxed his rigid attitude, but had listened with a frowning brow and a compressed lip to this long narrative.</p>
+<a id='GBS.PA250.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.2.box.202.674.1071.89.q.50'>&quot; Excuse me,&quot; he said, &quot; but it is not my custom to discuss my most intimate personal affairs in this public manner.&quot;</p>
+<a id='GBS.PA250.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.3.box.199.774.1073.88.q.60'>&quot; Then you won&#39;t forgive me ? You won&#39;t shake hands before I go ?&quot;</p>
+<a id='GBS.PA250.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.4.box.199.874.1073.129.q.50'>&quot; Oh, certainly, if it would give you any pleasure.&quot; He put out his hand and coldly grasped that which she extended to him.</p>
+<a id='GBS.PA250.w.1.5.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.5.box.197.1026.1073.89.q.60'>&quot;I had hoped,&quot; suggested Holmes, &quot;that you would have joined us in a friendly supper.&quot;</p>
+<a id='GBS.PA250.w.1.6.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.6.box.194.1127.1074.279.q.60'>&quot; I think that there you ask a little too much,&quot; responded his lordship. &quot; I may be forced to acquiesce in these recent developments, but I can hardly be expected to make merry over them. I think that, with your permision, I will now wish you all a very good-night.&quot; He included us all in a sweeping bow and stalked out of the room.</p>
+<a id='GBS.PA250.w.1.7.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.7.box.191.1427.1072.387.q.60'>&quot; Then I trust that you at least will honor me with your company,&quot; said Sherlock Holmes. &quot;It is always a joy to meet an American, Mr. Moulton, for I am one of those who believe that the folly of a monarch and the blundering of a minister in far-gone years will not prevent our children from being some day citizens of the same world-wide country under a flag which shall be a quartering of the Union Jack with the Stars and Stripes.&quot;</p>
+<a id='GBS.PA250.w.1.8.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.289.1.8.box.188.1876.1067.93.q.60'>&quot; The case has been an interesting one,&quot; remarked Holmes, when our visitors had left us, &quot; because it serves to show very</p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002410880913 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA250-IA1'></a>
+<div id='block.290.0.0.box.120.408.1080.1360.q.101' class='gimg_graphic'>
+<img src='../data/epubfile-0036.jpg' width='100%' alt='[graphic]' /></div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002411148280 -->
+<div class='flow' style=''>
+</div>
+<!-- Content from Google Book Search, generated at 1262002411410694 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA251'></a>
+<div id='block.292.1.0.box.65.158.1090.1795.q.60' class='gtxt_body'>
+<a id='GBS.PA251.w.1.0.0'></a>
+<p class='gtxt_body' id='para.292.1.0.box.65.158.1090.1696.q.60'>clearly how simple the explanation may be of an affair which at first sight seems to be almost inexplicable. Nothing could be more natural than the sequence of events as narrated by this lady, and nothing stranger than the result when viewed, for instance, by Mr. Lestrade, of Scotland Yard.&quot; &quot; You were not yourself at fault at all, then ?&quot; &quot; From the first, two facts were very obvious to me, the one that the lady had been quite willing to undergo the wedding ceremony, the other that she had repented of it within a few minutes of returning home. Obviously something had occurred during the morning, then, to cause her to change her mind. What could that something be ? She could not have spoken to any one when she was out, for she had been in the company of the bridegroom. Had she seen some one, then ? If she had, it must be some one from America, because she had spent so short a time in this country that she could hardly have allowed any one to acquire so deep an influence over her that the mere sight of him would induce her to change her plans so completely. You see we have already arrived, by a process of exclusion, at the idea that she might have seen an American. Then who could this American be, and why should he possess so much influence over her ? It might be a lover; it might be a husband. Her young womanhood had, I knew, been spent in rough scenes and under strange conditions. So far I had got before I ever heard Lord St. Simon&#39;s narrative, When he told us of a man in a pew, of the change in the bride&#39;s manner, of so transparent a device for obtaining a note as the dropping of a bouquet, of her resort to her confidential maid, and of her very significant allusion to claim-jumping &#8212;which in miners&#39; parlance means taking possession of that which another person has a prior claim to&#8212;the whole situation became absolutely clear. She had gone off with a man, and the man was either a lover or was a previous husband&#8212;the chances being in favor of the latter.&quot;</p>
+<a id='GBS.PA251.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.292.1.1.box.125.1865.774.38.q.70'>&quot; And how in the world did you find them ?&quot;</p>
+<a id='GBS.PA251.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.292.1.2.box.125.1913.1028.40.q.60'>&quot; It might have been difficult, but friend Lestrade held in<a id='GBS.PA252.w.1.0.0'></a>
+<span class='gtxt_body' id='para.293.1.0.box.196.164.1078.180.q.60'>formation in his hands the value of which he did not himself know. The initials were of course of the highest importance, but more valuable still was it to know that within a week he had settled his bill at one of the most select London hotels.&quot;</span></p>
+</div>
+</div>
+<!-- Content from Google Book Search, generated at 1262002411629141 -->
+<div class='flow' style=''>
+<a class='page'  id='GBS.PA252'></a>
+<div id='block.293.1.0.box.190.164.1084.1541.q.60' class='gtxt_body'>
+<a id='GBS.PA252.w.1.1.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.293.1.1.box.238.365.604.39.q.60'>&quot; How did you deduce the select ?&quot;</p>
+<a id='GBS.PA252.w.1.2.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.293.1.2.box.192.414.1082.790.q.60'>&quot; By the select prices. Eight shillings for a bed and eightpence for a glass of sherry pointed to one of the most expensive hotels. There are not many in London which charge at that rate. In the second one which I visited in Northumberland Avenue, I learned by an inspection of the book that Francis H. Moulton, an American gentleman, had left only the day before, and on looking over the entries against him, I came upon the very items which I had seen in the duplicate bill. His letters were to be forwarded to 226 Gordon Square; so thither I travelled, and being fortunate enough to find the loving couple at home, I ventured to give them some paternal advice, and to point out to them that it would be better in every way that they should make their position a little clearer both to the general public and to Lord St. Simon in particular. I invited them to meet him here, and, as you see, I made him keep the appointment.&quot;</p>
+<a id='GBS.PA252.w.1.3.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.293.1.3.box.192.1215.1076.90.q.60'>&quot; But with no very good result,&quot; I remarked. &quot; His conduct was certainly not very gracious.&quot;</p>
+<a id='GBS.PA252.w.1.4.0'></a>
+<p class='gtxt_body' style='text-indent:1em;' id='para.293.1.4.box.190.1316.1076.389.q.60'>&quot;Ah, Watson,&quot; said Holmes, smiling, &quot;perhaps you would not be very gracious either, if, after all the trouble of wooing and wedding, you found yourself deprived in an instant of wife and of fortune. I think that we may judge Lord St. Simon very mercifully, and thank our stars that we are never likely to find ourselves in the same position. Draw your chair up, and hand me my violin, for the only problem we have still to solve is how to while away these bleak autumnal evenings.&quot;</p>
+</div>
+</div>
+
+</body>
+</html>

@@ -238,13 +238,15 @@ Carlyle.Book = function (bookData) {
     for (var i = partsInComponent.length - 1; i >= 0; --i) {
       var part = partsInComponent[i];
       var target = document.getElementById(part.fragment);
-      while (target.parentNode != div) { target = target.parentNode; }
-      target.scrollIntoView();
-      cData.chapters.push({
-        id: part.fragment,
-        title: part.title,
-        page: (div.parentNode.scrollLeft / newDims.width) + 1
-      });
+      while (target && target.parentNode != div) { target = target.parentNode; }
+      if (target) {
+        target.scrollIntoView();
+        cData.chapters.push({
+          id: part.fragment,
+          title: part.title,
+          page: (div.parentNode.scrollLeft / newDims.width) + 1
+        });
+      }
     }
     div.parentNode.scrollTop = 0;
 
@@ -417,8 +419,8 @@ Carlyle.Reader = function (node, bookData) {
   function setBook(bk) {
     book = bk;
     spin();
-    setRunningHead(pageDivs[0].header, { right: bk.getMetaData('title') });
-    setRunningHead(pageDivs[1].header, { right: bk.getMetaData('title') });
+    setRunningHead(pageDivs[0].header, { left: bk.getMetaData('title') });
+    setRunningHead(pageDivs[1].header, { left: bk.getMetaData('title') });
     calcDimensions();
     spun();
     return book;
