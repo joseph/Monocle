@@ -1,0 +1,128 @@
+
+Specification of the data object
+--------------------------------
+
+The book data object should provide certain required properties and methods.
+
+Properties:
+
+* components: the total number of linear components (ie, slabs of content)
+    for the book
+* metaDataKeys: the names of the keys for which there may be metadata for
+    this book
+
+Methods:
+
+* getContents: a function that returns an array of nested objects. Each object
+    responds to `title` (a string), and `component` (a number). Any such object
+    may also respond to `fragment` (a html anchor id), and `children`, which is
+    an array of child objects responding to the same properties. For example,
+    this is an example of a contents structure with one top-level section
+    containing two sub-sections.
+
+    [
+      {
+        title: "I: A curious incident",
+        component: '1',
+        children: [
+          {
+            title: "I. a. Part the first",
+            component: '1',
+            fragment: "part-the-first"
+          },
+          {
+            title: "I. a. Part the second",
+            component: '3',
+            fragment: "part-the-second"
+           }
+         ]
+       }
+    ]
+
+* getComponent(n): a function that takes an integer (between 0 and
+    this.components-1) and returns the body text of the corresponding
+    component.
+    Q: should it also return the stylesheet rules?
+
+* getMetaData(key): a function that takes a string (matching a key in
+    this.metaDataKeys) and returns the value of that metadata for this book.
+
+Note that if these methods retrieve any data from a server using AJAX
+techniques, it should be a synchronous operation, because the clients of the
+book data object expect the result to be return from the method itself
+(not via a callback).
+
+
+Example use
+-----------
+
+  var bookData = {
+    components: [
+      'part1.xhtml',
+      'part2.xhtml',
+      'part3.xhtml',
+      'part4.xhtml'
+    ],
+    getContents: function () {
+      return [
+        {
+          title: "Chapter 1",
+          component: 'part1.xhtml'
+        },
+        {
+          title: "Chapter 2",
+          component: 'part3.xhtml',
+          fragment: "chapter-2"
+        }
+      ]
+    },
+    getComponent: function (componentId) {
+      return {
+        'part1.xhtml': '<h1>Chapter 1</h1><p>Hello world</p>',
+        'part2.xhtml': '<p>Chapter 1 continued.</p>',
+        'part3.xhtml': '<p>Chapter 1 continued again.</p>' +
+          '<h1 id="chapter-2">Chapter 2</h1>' +
+          '<p>Hello from the second chapter.</p>',
+        'part4.xhtml': '<p>THE END.</p>'
+      ][componentId];
+    },
+    getMetaData: function(key) {
+      return {
+        title: "A book",
+        creator: "Inventive Labs"
+      }[key];
+    }
+  }
+
+  // Initialize the reader element.
+  var reader = Carlyle.Reader('bookBox');
+
+  // Initialize a book object.
+  var book = Carlyle.Book(bookData);
+
+  // Assign the book to the reader and go to the 14th page.
+  reader.setBook(book);
+  reader.goToPage(14);
+
+
+Public API
+----------
+
+Carlyle.Book(bookData) - constructor
+
+  Instance methods:
+
+  * preparePageFor(content_div, page_number, component_id)
+
+Carlyle.Reader(node) - constructor. Node can be a string of the id of the
+  element, or the element itself.
+
+  Instance methods:
+
+  * setBook(book)
+  * getBook
+  * goToPage(page_number, component_id)
+  * goToFragment(fragment_id, component_id)
+  * resized -- call when the node changes dimensions
+  * spin -- show loading graphic / and spun -- hide loading graphic
+

@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
+    <title>Carlyle Ajax example</title>
+
+    <script type="text/javascript" src="../../src/carlyle.js"></script>
+
+    <style type="text/css">
+      #bookBox {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #999;
+      }
+    </style>
+
+    <script type="text/javascript">
+      (function () {
+
+        var bookData = {
+          components: [
+            'part1.xhtml',
+            'part2.xhtml',
+            'part3.xhtml',
+            'part4.xhtml',
+            'part5.xhtml',
+            'part6.xhtml'
+          ],
+          getContents: function () {
+            return [];
+          },
+          getComponent: function (componentId) {
+            return this.getViaAjax(componentId);
+          },
+          getMetaData: function(key) {
+            return {
+              title: "Walden",
+              creator: "Henry David Thoreau"
+            }[key];
+          },
+          getViaAjax: function (path) {
+            var ajReq = new XMLHttpRequest();
+            ajReq.open("GET", path, false);
+            ajReq.send(null);
+            return ajReq.responseText;
+          }
+        }
+
+        // Initialize the reader element.
+        window.addEventListener(
+          'load',
+          function () {
+            var box = document.getElementById('bookBox');
+            window.reader = Carlyle.Reader(box, bookData);
+            window.addEventListener('resize', reader.resized, false);
+
+            // Check the cookie for a previous location and go to it.
+            if (document.cookie) {
+              var lastComp = document.cookie.match(/component=(.+?)(;|$)/);
+              var lastPage = document.cookie.match(/page=(\d+?)(;|$)/);
+              if (lastComp && lastComp[1] && lastPage && lastPage[1]) {
+                lastPage = parseInt(lastPage[1]);
+                lastComp = lastComp[1];
+                console.log("Going to page "+lastPage+" of "+lastComp);
+                reader.goToPage(lastPage, lastComp);
+              }
+            }
+
+            // Register an event to store the current location in a cookie.
+            box.addEventListener(
+              'pageturn',
+              function () {
+                var loc = reader.getLocation();
+                document.cookie = "component="+encodeURIComponent(loc.component);
+                document.cookie = "page="+loc.page;
+              },
+              true
+            );
+
+
+          },
+          false
+        );
+      })();
+    </script>
+
+  </head>
+
+  <body id="bookBox"></body>
+</html>
