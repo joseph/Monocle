@@ -135,14 +135,54 @@
   }
 
 
+  function createScrubber() {
+    var scrubberDiv = document.createElement('div');
+    var scrubberRange = document.createElement('input');
+    scrubberRange.type = "range";
+    scrubberRange.setAttribute('min', 1);
+    var scrubberInfo = document.createElement('span');
+    scrubberDiv.appendChild(scrubberRange);
+    scrubberDiv.appendChild(scrubberInfo);
+    document.body.appendChild(scrubberDiv);
+
+    var updateScrubber = function () {
+      var loc = reader.getLocation();
+      if (loc.lastPage == 1) {
+        scrubberDiv.style.display = "none";
+      } else {
+        scrubberDiv.style.display = "block";
+      }
+      scrubberRange.setAttribute('max', loc.lastPage);
+      scrubberRange.value = loc.page;
+      if (loc.chapter) {
+        scrubberInfo.innerHTML = loc.chapter + " &#8212; ";
+      } else {
+        scrubberInfo.innerHTML = "";
+      }
+      scrubberInfo.innerHTML += loc.page + "/" + loc.lastPage;
+    }
+
+    updateScrubber();
+    var box = document.getElementById('bookBox');
+    box.addEventListener('carlyle:turn', updateScrubber);
+
+    scrubberRange.addEventListener(
+      'change',
+      function () {
+        reader.goToPage(parseInt(scrubberRange.value));
+      }
+    );
+  }
+
+
   // Initialize the reader element and set up event listeners.
   //
   function init() {
     var box = document.getElementById('bookBox');
     window.reader = Carlyle.Reader(box, bookData);
-    window.addEventListener('resize', reader.resized, false);
     restorePositionFromCookie();
     box.addEventListener('carlyle:turn', savePositionToCookie, false);
+    createScrubber();
     createTocDropdown();
   }
 

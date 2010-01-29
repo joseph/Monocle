@@ -1,6 +1,12 @@
 Carlyle = {};
 
 
+Carlyle.DEBUG = true;
+Carlyle.log = function (msg) {
+  if (Carlyle.DEBUG) { console.log(msg); }
+}
+
+
 
 /* BOOK */
 Carlyle.Book = function (bookData) {
@@ -116,7 +122,42 @@ Carlyle.Book = function (bookData) {
       pageN += contentDiv.componentData.lastPageNumber;
     }
 
+    cData = contentDiv.componentData;
+    for (var i = 0; i < cData.chunks.length; ++i) {
+      var chunk = cData.chunks[i];
+      if (chunk.firstPageNumber - 1 <= pageN) {
+        appendChunk(contentDiv, chunk);
+      } else {
+        detachChunk(contentDiv, chunk);
+      }
+    }
+
     return pageN;
+  }
+
+
+  function appendChunk(div, chunk) {
+    var elems = div.componentData.elements[div.pageDiv.pageIndex];
+    var slice = elems.slice(chunk.firstElementIndex, chunk.lastElementIndex);
+    if (slice[0].parentNode == div) { return; }
+    Carlyle.log(
+      "Appending chunk for client(" + div.pageDiv.pageIndex + "): " +
+        chunk.firstElementIndex + " - " + chunk.lastElementIndex +
+        " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
+    );
+    addElementsTo(div, slice);
+  }
+
+  function detachChunk(div, chunk) {
+    var elems = div.componentData.elements[div.pageDiv.pageIndex];
+    var slice = elems.slice(chunk.firstElementIndex, chunk.lastElementIndex);
+    if (slice[0].parentNode != div) { return; }
+    Carlyle.log(
+      "Detaching chunk for client(" + div.pageDiv.pageIndex + "): " +
+        chunk.firstElementIndex + " - " + chunk.lastElementIndex +
+        " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
+    );
+    removeElementsFrom(div, slice);
   }
 
 
@@ -155,7 +196,7 @@ Carlyle.Book = function (bookData) {
     //
     // So once that is implemented, we'd move this below the recalculation
     // check on parentDimensions.
-    removeAllChildrenFrom(div);
+    removeElementsFrom(div);
 
     // FIXME: this copy seems a bit haphazard...
     var index = div.pageDiv.pageIndex;
@@ -175,6 +216,7 @@ Carlyle.Book = function (bookData) {
       cData.parentDimensions.width == newDims.width &&
       cData.parentDimensions.height == newDims.height
     ) {
+      removeElementsFrom(div);
       div.lastPageNumber = cData.lastPageNumber;
       return;
     } else {
@@ -239,20 +281,54 @@ Carlyle.Book = function (bookData) {
     cData.chapters = [];
     for (var i = partsInComponent.length - 1; i >= 0; --i) {
       var part = partsInComponent[i];
-      var target = document.getElementById(part.fragment);
-      while (target && target.parentNode != div) { target = target.parentNode; }
-      if (target) {
-        target.scrollIntoView();
+      if (!part.fragment) {
         cData.chapters.push({
-          id: part.fragment,
           title: part.title,
-          page: (div.parentNode.scrollLeft / newDims.width) + 1
+          page: 1
         });
+      } else {
+        var target = document.getElementById(part.fragment);
+        while (target && target.parentNode != div) {
+          target = target.parentNode;
+        }
+        if (target) {
+          target.scrollIntoView();
+          cData.chapters.push({
+            id: part.fragment,
+            title: part.title,
+            page: (div.parentNode.scrollLeft / newDims.width) + 1
+          });
+        }
       }
     }
     div.parentNode.scrollTop = 0;
 
-    // TODO: calculating chunks
+    // Calculating chunks.
+    var elements = cData.elements[div.pageDiv.pageIndex];
+    // .. average 1 chunk every 4 pages.
+    var chunkSize = Math.ceil(elements.length / (cData.lastPageNumber / 4));
+    Carlyle.log("Chunking - elements per chunk: " + chunkSize);
+    cData.chunks = [];
+    var count = Math.ceil(elements.length / chunkSize);
+    Carlyle.log("Chunking - number of chunks: " + count);
+    var pagesRemaining = cData.lastPageNumber;
+    Carlyle.log("Chunking - number of pages in component: " + pagesRemaining);
+
+    var totalJ = 0;
+    for (var i = 0; i < count; ++i) {
+      for (var j = 0; j < chunkSize && div.hasChildNodes(); ++j, ++totalJ) {
+        div.removeChild(div.firstChild);
+      }
+      var newPR = Math.floor(div.parentNode.scrollWidth / newDims.width);
+      cData.chunks.push({
+        firstElementIndex: totalJ - j,
+        lastElementIndex: totalJ,
+        firstPageNumber: (cData.lastPageNumber - pagesRemaining) + 1,
+        lastPageNumber: (cData.lastPageNumber - newPR) + 1
+      });
+      pagesRemaining = newPR;
+    }
+    Carlyle.log(cData.chunks)
   }
 
 
@@ -297,7 +373,7 @@ Carlyle.Book = function (bookData) {
       var node = tmpDiv.removeChild(tmpDiv.firstChild);
       if (node.nodeType == 1) {
         elementArray.push(node);
-      } else if (node.nodeType = 3 && !node.nodeValue.match(/^\s+$/)) {
+      } else if (node.nodeType == 3 && !node.nodeValue.match(/^\s+$/)) {
         var elem = document.createElement('div');
         elem.appendChild(node)
         elementArray.push(elem);
@@ -309,17 +385,24 @@ Carlyle.Book = function (bookData) {
   }
 
 
-  function removeAllChildrenFrom(element) {
-    while (element.hasChildNodes()) {
-      element.removeChild(element.firstChild);
-    }
-  }
-
-
   function addElementsTo(element, elementArray) {
     var len = elementArray.length;
     for (var i = 0; i < len; ++i) {
       element.appendChild(elementArray[i]);
+    }
+  }
+
+
+  function removeElementsFrom(element, elementArray) {
+    if (elementArray) {
+      var len = elementArray.length;
+      for (var i = 0; i < len; ++i) {
+        element.removeChild(elementArray[i]);
+      }
+    } else {
+      while (element.hasChildNodes()) {
+        element.removeChild(element.firstChild);
+      }
     }
   }
 
@@ -942,7 +1025,6 @@ Carlyle.Styles = {
     "bottom": "1.4em",
     "left": "1em",
     "right": "1em",
-    "-webkit-transform-style": "preserve-3d",
     "word-wrap": "break-word",
     "overflow": "hidden"
   },
@@ -955,8 +1037,7 @@ Carlyle.Styles = {
     "font-size": "13pt",
     "-webkit-text-size-adjust": "none",
     "-webkit-column-gap": 0,
-    "-webkit-column-fill": "auto",
-    "-webkit-transform-style": "preserve-3d"
+    "-webkit-column-fill": "auto"
   },
 
   spinner: {
