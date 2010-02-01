@@ -1,10 +1,17 @@
 #bookBox {
   position: relative;
-  width: 280px;
-  height: 420px;
+  width: 360px;
+  height: 500px;
   margin: 0;
   padding: 0;
   background-color: #999;
+}
+
+#bookBox img {
+  -webkit-column-break-before: always;
+  float: left;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 

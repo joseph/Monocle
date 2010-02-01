@@ -90,7 +90,7 @@
   function savePositionToCookie() {
     var l = reader.getLocation();
     document.cookie = "component="+encodeURIComponent(l.component);
-    document.cookie = "page="+l.page;
+    document.cookie = "percent="+l.percentageThrough;
   }
 
 
@@ -100,12 +100,12 @@
       return;
     }
     var lastComp = document.cookie.match(/component=(.+?)(;|$)/);
-    var lastPage = document.cookie.match(/page=(\d+?)(;|$)/);
-    if (lastComp && lastComp[1] && lastPage && lastPage[1]) {
-      lastPage = parseInt(lastPage[1]);
+    var lastPercent = document.cookie.match(/percent=(.+?)(;|$)/);
+    if (lastComp && lastComp[1] && lastPercent && lastPercent[1]) {
+      lastPercent = parseFloat(lastPercent[1]);
       lastComp = decodeURIComponent(lastComp[1]);
-      console.log("Going to page "+lastPage+" of "+lastComp);
-      reader.goToPage(lastPage, lastComp);
+      console.log("Going to "+lastPercent+"% of "+lastComp);
+      reader.goToPercentageThrough(lastPercent, lastComp);
     }
   }
 
