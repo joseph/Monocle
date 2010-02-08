@@ -85,7 +85,7 @@ Carlyle.Reader = function (node, bookData) {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(
       function () {
-        Carlyle.log('Recalculating dimensions after resize.')
+        console.log('Recalculating dimensions after resize.')
         containerDiv.style.display = "block";
         calcDimensions();
         spun();
@@ -106,94 +106,69 @@ Carlyle.Reader = function (node, bookData) {
       pageDivs[i].content.style.webkitColumnWidth = colWidth + "px";
     }
 
-    pageDivs[0].content.dirty = true;
-    pageDivs[1].content.dirty = true;
-
-    goToPage(pageDivs[0].pageNumber || 1);
+    moveToPage(pageDivs[0].pageNumber || 1);
     setX(pageDivs[1], 0 - (pageWidth + 10), 'now');
   }
 
 
-  // Goes to the given page within the component. If pageN is greater than
-  // the number of pages in this component, overflows into subsequent
-  // components.
+  // Returns the current "place" in the book -- ie, the page number, chapter
+  // title, etc.
   //
-  function goToPage(pageN, componentId) {
-    setPage(pageDivs[0], pageN, componentId);
-    setPage(pageDivs[1], pageN, componentId);
+  function getPlace() {
+    book.placeFor(pageDivs[0].contentDiv);
+  }
+
+
+  // Flips to the given page within the current component. If pageN is
+  // greater than the number of pages in this component, overflows into
+  // subsequent components.
+  //
+  function moveToPage(pageN) {
+    setPage(pageDivs[0], pageN);
+    setPage(pageDivs[1], pageN);
     completedTurn();
   }
 
 
-  // Goes to the given id within the component. If a blank id is given, just
-  // goes to the first page of the component.
-  //
-  function goToChapter(chapterId, componentId) {
-    if (!setPage(pageDivs[0], 1, componentId)) {
-      return;
-    }
-
-    var pageN = 1;
-    if (chapterId) {
-      var chaps = pageDivs[0].content.componentData.chapters;
-      for (var i = chaps.length - 1; i <= 0; --i) {
-        if (chaps[i].id == chapterId) {
-          pageN = chaps[i].page;
-          break;
-        }
-      }
-    }
-
-    setPage(pageDivs[1], pageN, componentId);
-    if (pageN != 1) {
-      setPage(pageDivs[0], pageN, componentId);
-    }
-    completedTurn();
-  }
-
-
-  // Goes to the page approximately 'percent' of the way
+  // Flips to the page approximately 'percent' of the way
   // through the component. Percent, contrary to expectations perhaps,
   // should be a float, where 0.0 is the first page and 1.0 is the last page
   // of the component.
   //
-  function goToPercentageThrough(percent, componentId) {
-    if (percent <= 0) {
-      return goToPage(1, componentId);
+  function moveToPercentageThrough(percent) {
+    if (percent == 0) {
+      return moveToPage(1);
     }
 
-    if (!setPage(pageDivs[0], 1, componentId)) {
-      return;
-    }
-
-    var cData = pageDivs[0].content.componentData;
-    var pageN = Math.ceil(percent * cData.lastPageNumber);
-
-    setPage(pageDivs[1], pageN, componentId);
-    if (pageN != 1) {
-      setPage(pageDivs[0], pageN, componentId);
-    }
+    moveToPage(getPlace().pageAtPercentageThrough(percent));
     completedTurn();
   }
 
 
-  function getLocation() {
-    var ct = pageDivs[0].content;
-    var pageN = pageDivs[0].pageNumber;
-    var chapter = null;
-    for (var i = 0; i < ct.componentData.chapters.length; ++i) {
-      if (pageN >= ct.componentData.chapters[i].page) {
-        chapter = ct.componentData.chapters[i].title;
-        break;
+  // Moves to the relevant element in the relevant component.
+  //
+  function skipToChapter(src) {
+    // TODO
+    completedTurn();
+  }
+
+
+
+  // Private method that tells the book to update the given pageElement to
+  // the given page.
+  function setPage(pageElement, pageN, componentId) {
+    pageN = book.preparePageFor(pageElement.content, pageN, componentId);
+    if (!pageN) { return false; } // Book may disallow movement to this page.
+    pageElement.pageNumber = pageN;
+    pageElement.bodyText.scrollLeft = (pageN - 1) * colWidth;
+    setRunningHead(
+      pageElement.footer,
+      {
+        left: 'foo', //getLocation().chapter,
+        right: pageN
       }
-    }
-    return {
-      component: ct.componentData.componentId,
-      page: pageN,
-      lastPage: ct.lastPageNumber,
-      percentageThrough: pageN / ct.lastPageNumber,
-      chapter: chapter
-    }
+    );
+    return pageN;
   }
 
 
@@ -345,7 +320,6 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-
   function setX(elem, x, options, callback) {
     if (typeof(x) == "number") { x = x + "px"; }
     elem.style.webkitTransform = 'translateX('+x+')';
@@ -410,22 +384,6 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function setPage(pageElement, pageN, componentId) {
-    pageN = book.preparePageFor(pageElement.content, pageN, componentId);
-    if (!pageN) { return false; } // Book may disallow movement to this page.
-    pageElement.pageNumber = pageN;
-    pageElement.bodyText.scrollLeft = (pageN - 1) * colWidth;
-    setRunningHead(
-      pageElement.footer,
-      {
-        left: getLocation().chapter,
-        right: pageN
-      }
-    );
-    return pageN;
-  }
-
-
   function spin() {
     if (spinnerCanvas) { return; }
     spinnerCanvas = document.createElement("canvas");
@@ -478,13 +436,10 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function listenForInteraction() {
-
-
     // Listeners
-    // FIXME: a better way to detect whether touch events are supported?
-    // FIXME: should everything be register with useCapture false?
-    var mob = navigator.userAgent.toLowerCase().search(/webkit.* mobile/) > 0;
-    if (!mob) {
+    // FIXME: should everything be registered with useCapture false?
+    var receivesTouchEvents = (typeof Touch == "object");
+    if (!receivesTouchEvents) {
       containerDiv.addEventListener(
         'mousedown',
         function (evt) {
@@ -575,10 +530,10 @@ Carlyle.Reader = function (node, bookData) {
     constructor: Carlyle.Reader,
     setBook: setBook,
     getBook: getBook,
-    goToPage: goToPage,
-    goToChapter: goToChapter,
-    goToPercentageThrough: goToPercentageThrough,
-    getLocation: getLocation,
+    getPlace: getPlace,
+    moveToPage: moveToPage,
+    moveToPercentageThrough: moveToPercentageThrough,
+    skipToChapter: skipToChapter,
     resized: resized,
     spin: spin,
     spun: spun

@@ -2,6 +2,7 @@
 
 /* Arguments:
  *
+ *  book: a back-reference to PublicAPI of the book that owns this component
  *  id: the string that represents this component in the book's component array
  *  index: the position in the book's components array of this component
  *  chapters: (see below)
@@ -26,12 +27,8 @@
 //
 
 
-Carlyle.Component = function (id, index, chapters, html) {
+Carlyle.Component = function (book, id, index, chapters, html) {
   if (Carlyle == this) { return new Carlyle.Book(dataSource); }
-
-  // A back-reference to the book that owns this component.
-  // FIXME: how does this work with PublicAPI?
-  var book;
 
   // An array of elements that will hold the elements of this component.
   //
@@ -115,8 +112,6 @@ Carlyle.Component = function (id, index, chapters, html) {
   // this node.
   //
   function prepareNode(node, pageN) {
-    clean(node);
-
     for (var i = 0; i < chunks.length; ++i) {
       if (chunks[i].firstPageNumber - 1 <= pageN) {
         appendChunk(node, chunks[i]);
@@ -127,8 +122,30 @@ Carlyle.Component = function (id, index, chapters, html) {
   }
 
 
+  function chapterForPage(pageN) {
+    for (var i = 0; i < chapters.length; ++i) {
+      if (pageN >= chapters[i]) {
+        return chapters[i];
+      }
+    }
+  }
+
+
+  function pageForChapter(fragment) {
+    if (!fragment) {
+      return 1;
+    }
+    for (var i = 0; i < chapters.length; ++i) {
+      if (chapters[i].fragment == fragment) {
+        return chapters[i].page;
+      }
+    }
+    return null;
+  }
+
+
   function appendChunk(node, chunk) {
-    var slice = elementsForClient(
+    var slice = elementsForClient[nodeIndex(node)].slice(
       chunk.firstElementIndex,
       chunk.lastElementIndex
     );
@@ -137,7 +154,7 @@ Carlyle.Component = function (id, index, chapters, html) {
       return;
     }
 
-    Carlyle.log(
+    console.log(
       "Appending chunk for client (" + nodeIndex(node) + "): " +
         chunk.firstElementIndex + " - " + chunk.lastElementIndex +
         " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
@@ -148,16 +165,16 @@ Carlyle.Component = function (id, index, chapters, html) {
 
 
   function detachChunk(node, chunk) {
-    var slice = elementsForClient(
+    var slice = elementsForClient[nodeIndex(node)].slice(
       chunk.firstElementIndex,
       chunk.lastElementIndex
     );
 
-    if (slice[0].parentNode == node) {
+    if (slice[0].parentNode != node) {
       return;
     }
 
-    Carlyle.log(
+    console.log(
       "Detaching chunk for client (" + nodeIndex(node) + "): " +
         chunk.firstElementIndex + " - " + chunk.lastElementIndex +
         " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
@@ -167,10 +184,14 @@ Carlyle.Component = function (id, index, chapters, html) {
   }
 
 
-  function clean(node) {
-    if (nodeIndex(node) == -1) {
-      registerClient(node);
-    }
+  function applyTo(node) {
+    registerClient(node);
+    removeElementsFrom(node);
+  }
+
+
+  function updateDimensions(node) {
+    registerClient(node);
 
     if (haveDimensionsChanged(node)) {
       removeElementsFrom(node);
@@ -179,6 +200,9 @@ Carlyle.Component = function (id, index, chapters, html) {
       locateChapters(node);
       primeChunks(node);
       removeElementsFrom(node);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -199,6 +223,7 @@ Carlyle.Component = function (id, index, chapters, html) {
       }
     }
   }
+
 
   // Returns true or false.
   function haveDimensionsChanged(node) {
@@ -254,14 +279,14 @@ Carlyle.Component = function (id, index, chapters, html) {
     var elements = elementsForClient[nodeIndex(node)];
     // .. average 1 chunk every 4 pages.
     var pagesRemaining = clientDimensions.pages;
-    Carlyle.log("Chunking " + id + " - number of pages: " + pagesRemaining);
+    console.log("Chunking " + id + " - number of pages: " + pagesRemaining);
     var chunkSize = Math.ceil(elements.length / (pagesRemaining / 4));
-    Carlyle.log("Chunking " + id + " - elements per chunk: " + chunkSize);
+    console.log("Chunking " + id + " - elements per chunk: " + chunkSize);
     var chunkCount = Math.ceil(elements.length / chunkSize);
-    Carlyle.log("Chunking " + id + " - number of chunks: " + chunkCount);
+    console.log("Chunking " + id + " - number of chunks: " + chunkCount);
 
     var elemCount = 0;
-    for (var i = 0; i < count; ++i) {
+    for (var i = 0; i < chunkCount; ++i) {
       for (var j = 0; j < chunkSize && node.hasChildNodes(); ++j, ++elemCount) {
         node.removeChild(node.firstChild);
       }
@@ -276,7 +301,6 @@ Carlyle.Component = function (id, index, chapters, html) {
       });
       pagesRemaining = newPagesRemaining;
     }
-    Carlyle.log(chunks);
 
     return chunks;
   }
@@ -296,14 +320,14 @@ Carlyle.Component = function (id, index, chapters, html) {
     if (elementArray) {
       len = elementArray.length;
       for (var i = 0; i < len; ++i) {
-        element.removeChild(elementArray[i]);
+        node.removeChild(elementArray[i]);
       }
       return len;
     }
 
-    len = element.childNodes.length;
-    while (element.hasChildNodes()) {
-      element.removeChild(element.firstChild);
+    len = node.childNodes.length;
+    while (node.hasChildNodes()) {
+      node.removeChild(node.firstChild);
     }
     return len;
   }
@@ -312,8 +336,12 @@ Carlyle.Component = function (id, index, chapters, html) {
   var PublicAPI = {
     id: id,
     index: index,
-    lastPageNumber: lastPageNumber,
-    prepareNode: prepareNode
+    lastPageNumber: function () { return clientDimensions ? clientDimensions.pages : null }, // FIXME: messy!
+    applyTo: applyTo,
+    updateDimensions: updateDimensions,
+    prepareNode: prepareNode,
+    chapterForPage: chapterForPage,
+    pageForChapter: pageForChapter
   }
 
 

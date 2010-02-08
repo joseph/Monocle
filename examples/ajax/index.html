@@ -12,6 +12,11 @@
     <title>Carlyle Ajax example</title>
 
     <script type="text/javascript" src="../../src/carlyle.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
 
     <style type="text/css">
       #bookBox {
@@ -71,6 +76,7 @@
             window.addEventListener('resize', reader.resized, false);
 
             // Check the cookie for a previous location and go to it.
+            /*
             if (document.cookie) {
               var lastComp = document.cookie.match(/component=(.+?)(;|$)/);
               var lastPage = document.cookie.match(/page=(\d+?)(;|$)/);
@@ -92,6 +98,7 @@
               },
               true
             );
+            */
 
 
           },

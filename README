@@ -20,17 +20,15 @@ Methods:
     [
       {
         title: "I: A curious incident",
-        component: '1',
+        src: "component1.xhtml",
         children: [
           {
             title: "I. a. Part the first",
-            component: '1',
-            fragment: "part-the-first"
+            src: 'component1.xhtml#part-the-first'
           },
           {
             title: "I. a. Part the second",
-            component: '3',
-            fragment: "part-the-second"
+            src: 'component3.xhtml#part-the-second'
            }
          ]
        }
@@ -60,33 +58,36 @@ Example use
   var bookData = {
     getComponents: function () {
       return [
-        'part1.xhtml',
-        'part2.xhtml',
-        'part3.xhtml',
-        'part4.xhtml'
+        'component1.xhtml',
+        'component2.xhtml',
+        'component3.xhtml',
+        'component4.xhtml'
       ];
     },
     getContents: function () {
       return [
         {
           title: "Chapter 1",
-          component: 'part1.xhtml'
+          src: "component1.xhtml"
         },
         {
           title: "Chapter 2",
-          component: 'part3.xhtml',
-          fragment: "chapter-2"
+          src: "component3.xhtml#chapter-2"
         }
       ]
     },
     getComponent: function (componentId) {
       return {
-        'part1.xhtml': '<h1>Chapter 1</h1><p>Hello world</p>',
-        'part2.xhtml': '<p>Chapter 1 continued.</p>',
-        'part3.xhtml': '<p>Chapter 1 continued again.</p>' +
+        'component1.xhtml':
+          '<h1>Chapter 1</h1><p>Hello world</p>',
+        'component2.xhtml':
+          '<p>Chapter 1 continued.</p>',
+        'component3.xhtml':
+          '<p>Chapter 1 continued again.</p>' +
           '<h1 id="chapter-2">Chapter 2</h1>' +
           '<p>Hello from the second chapter.</p>',
-        'part4.xhtml': '<p>THE END.</p>'
+        'component4.xhtml':
+          '<p>THE END.</p>'
       ][componentId];
     },
     getMetaData: function(key) {
