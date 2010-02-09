@@ -321,9 +321,6 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function setX(elem, x, options, callback) {
-    if (typeof(x) == "number") { x = x + "px"; }
-    elem.style.webkitTransform = 'translateX('+x+')';
-
     var transition;
     var duration;
 
@@ -345,11 +342,29 @@ Carlyle.Reader = function (node, bookData) {
       transition += ' ' + (options['delay'] || 0) + 'ms';
     }
     elem.style.webkitTransition = transition;
+
+    if (typeof(x) == "number") { x = x + "px"; }
+    elem.style.webkitTransform = 'translateX('+x+')';
+
     if (elem.setXTransitionCallback) {
-      clearTimeout(elem.setXTransitionCallback);
+      elem.removeEventListener(
+        'webkitTransitionEnd',
+        elem.setXTransitionCallback,
+        false
+      );
+      elem.setXTransitionCallback = null;
     }
     if (callback) {
-      elem.setXTransitionCallback = setTimeout(callback, duration + 1);
+      if (transition == 'none') {
+        callback();
+      } else {
+        elem.setXTransitionCallback = callback;
+        elem.addEventListener(
+          'webkitTransitionEnd',
+          elem.setXTransitionCallback,
+          false
+        );
+      }
     }
   }
 
