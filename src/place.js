@@ -3,23 +3,28 @@
 Carlyle.Place = function (node) {
 
   var component;
-  var pageNumber;
+  var percent;
   var chapter;
 
   function setPlace(cmpt, pageN) {
     component = cmpt;
-    pageNumber = pageN;
+    percent = pageN / cmpt.pages;
     chapter = null;
   }
 
 
-  function pageAtPercentageThrough(percent) {
-    return Math.ceil(component.pages * percent);
+  function percentageThrough() {
+    return percent;
   }
 
 
-  function percentageThrough() {
-    return pageNumber / component.pages;
+  function pageAtPercentageThrough(pc) {
+    return Math.ceil(component.pages * pc);
+  }
+
+
+  function pageNumber() {
+    return pageAtPercentageThrough(percent);
   }
 
 

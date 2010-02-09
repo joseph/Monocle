@@ -198,44 +198,20 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  // Returns an x value (ready for the translateX() CSS function) that will
-  // hide a page element.
-  //
-  // FIXME: Maybe a little inefficient as a method - can/ probably be
-  // a property that is recalculated in calcDimensions?
-  //
-  function outOfSight() {
-    return (0 - (pageWidth + 10)) + "px";
-  }
-
-
-  // Return an x value (ready for the translateX() CSS function) that will
-  // show the entire page in the boxDiv. This is hardcoded to 0px, but
-  // the method name makes code a bit more self-documenting.
-  //
-  // FIXME: Maybe a little inefficient as a method - can/ probably be
-  // a property that is recalculated in calcDimensions?
-  //
-  function inFullView() {
-    return "0px";
-  }
-
-
   function lift(boxPointX) {
     if (turnData.direction) { return; }
     if (inForwardZone(boxPointX)) {
-      pageDivs[1].style.opacity = 1;
+      showOverPage();
       if (setPage(pageDivs[0], pageDivs[0].pageNumber + 1)) {
         turnData.direction = FORWARDS;
       }
     } else if (inBackwardZone(boxPointX)) {
-      setX(pageDivs[1], outOfSight(), 'now');
-      pageDivs[1].style.opacity = 1;
       if (setPage(pageDivs[1], pageDivs[0].pageNumber - 1)) {
+        jumpOut();
+        // NB: we'll leave the opacity adjustment of overPage to turning/turn.
+        // Otherwise we get a flicker in some 3D-enhanced user agents.
         turnData.direction = BACKWARDS;
-      } else {
-        setX(pageDivs[1], inFullView(), 'now');
-      };
+      }
     }
   }
 
@@ -253,7 +229,10 @@ Carlyle.Reader = function (node, bookData) {
     if (turnData.stamp && stamp - turnData.stamp < 80) { return; }
     turnData.stamp = stamp;
 
-    setX(pageDivs[1], boxPointX - pageWidth, { duration: 100 });
+    if (turnData.direction == BACKWARDS) {
+      showOverPage();
+    }
+    slideToCursor(boxPointX);
   }
 
 
@@ -261,53 +240,20 @@ Carlyle.Reader = function (node, bookData) {
     turnData.completing = true;
     if (turnData.direction == FORWARDS) {
       if (turnData.cancellable && inForwardZone(boxPointX)) {
-        // Cancelling forward turn...
-        setX(
-          pageDivs[1],
-          inFullView(),
-          'slide',
-          function () {
-            setPage(pageDivs[0], pageDivs[0].pageNumber - 1);
-            setX(pageDivs[1], outOfSight(), 'now') ;
-            completedTurn();
-          }
-        );
+        // Cancelling forward turn
+        slideIn();
       } else {
-        // Completing forward turn...
-        setX(
-          pageDivs[1],
-          outOfSight(),
-          'slide',
-          function () {
-            setPage(pageDivs[1], pageDivs[1].pageNumber + 1);
-            completedTurn();
-          }
-        );
+        // Completing forward turn
+        slideOut();
       }
     } else if (turnData.direction == BACKWARDS) {
+      showOverPage();
       if (turnData.cancellable && inBackwardZone(boxPointX)) {
-        // Cancelling backward turn...
-        setX(
-          pageDivs[1],
-          outOfSight(),
-          'slide',
-          function () {
-            setPage(pageDivs[1], pageDivs[1].pageNumber + 1);
-            completedTurn();
-          }
-        );
+        // Cancelling backward turn
+        slideOut();
       } else {
-        // Completing backward turn...
-        setX(
-          pageDivs[1],
-          inFullView(),
-          'slide',
-          function () {
-            setPage(pageDivs[0], pageDivs[0].pageNumber - 1);
-            setX(pageDivs[1], outOfSight(), 'now');
-            completedTurn();
-          }
-        );
+        // Completing backward turn
+        slideIn();
       }
     }
   }
@@ -319,7 +265,7 @@ Carlyle.Reader = function (node, bookData) {
     turnEvt.initEvent("carlyle:turn", false, true);
     boxDiv.dispatchEvent(turnEvt);
     pageDivs[1].style.opacity = 0.01;
-    setX(pageDivs[1], inFullView(), 'now');
+    jumpIn();
   }
 
 
@@ -368,6 +314,53 @@ Carlyle.Reader = function (node, bookData) {
           false
         );
       }
+    }
+  }
+
+
+  function jumpIn() {
+    setX(pageDivs[1], 0, 'now');
+  }
+
+
+  function jumpOut() {
+    setX(pageDivs[1], '-100%', 'now');
+  }
+
+
+  function slideIn() {
+    var retreatFn = function () {
+      setPage(pageDivs[0], pageDivs[0].pageNumber - 1);
+      completedTurn();
+    }
+    setX(pageDivs[1], 0, 'slide', retreatFn);
+  }
+
+
+  function slideOut() {
+    var advanceFn = function () {
+      setPage(pageDivs[1], pageDivs[1].pageNumber + 1);
+      completedTurn();
+    }
+    setX(pageDivs[1], "-100%", 'slide', advanceFn);
+  }
+
+
+  function slideToCursor(cursorX) {
+    setX(pageDivs[1], cursorX - pageWidth, { duration: 100 });
+  }
+
+
+  function showOverPage() {
+    if (pageDivs[1].style.opacity != 1) {
+      pageDivs[1].style.opacity = 1;
+    }
+  }
+
+
+  function hideOverPage() {
+    if (pageDivs[1].style.opacity != 0.01) {
+      pageDivs[1].style.opacity = 0.01;
     }
   }
 
