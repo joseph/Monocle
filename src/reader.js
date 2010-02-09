@@ -107,7 +107,6 @@ Carlyle.Reader = function (node, bookData) {
     }
 
     moveToPage(pageDivs[0].pageNumber || 1);
-    setX(pageDivs[1], 0 - (pageWidth + 10), 'now');
   }
 
 
@@ -225,16 +224,18 @@ Carlyle.Reader = function (node, bookData) {
   function lift(boxPointX) {
     if (turnData.direction) { return; }
     if (inForwardZone(boxPointX)) {
-      setX(pageDivs[1], inFullView(), 'now');
+      pageDivs[1].style.opacity = 1;
       if (setPage(pageDivs[0], pageDivs[0].pageNumber + 1)) {
         turnData.direction = FORWARDS;
-      } else {
-        setX(pageDivs[1], outOfSight(), 'now');
-      };
-    } else if (inBackwardZone(boxPointX)) {
-      if (setPage(pageDivs[1], pageDivs[1].pageNumber - 1)) {
-        turnData.direction = BACKWARDS;
       }
+    } else if (inBackwardZone(boxPointX)) {
+      setX(pageDivs[1], outOfSight(), 'now');
+      pageDivs[1].style.opacity = 1;
+      if (setPage(pageDivs[1], pageDivs[0].pageNumber - 1)) {
+        turnData.direction = BACKWARDS;
+      } else {
+        setX(pageDivs[1], inFullView(), 'now');
+      };
     }
   }
 
@@ -317,6 +318,8 @@ Carlyle.Reader = function (node, bookData) {
     var turnEvt = document.createEvent("Events");
     turnEvt.initEvent("carlyle:turn", false, true);
     boxDiv.dispatchEvent(turnEvt);
+    pageDivs[1].style.opacity = 0.01;
+    setX(pageDivs[1], inFullView(), 'now');
   }
 
 

@@ -26,13 +26,12 @@ Carlyle.Styles = {
     "right": "5px",
     "background": "#FFF",
     "cursor": "pointer",
-    "-webkit-box-shadow": "2px 0 3px #777",
-    "z-index": "1"
+    "-webkit-box-shadow": "2px 0 3px #777"
   },
 
   overPage: {
-    "-webkit-transform": "translateX(-110%)",
-    "-webkit-transform-style": "preserve-3d"
+    "-webkit-transform-style": "preserve-3d",
+    "opacity": 0.01
   },
 
   header: {
