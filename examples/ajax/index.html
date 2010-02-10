@@ -11,12 +11,7 @@
     <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
     <title>Carlyle Ajax example</title>
 
-    <script type="text/javascript" src="../../src/carlyle.js"></script>
-    <script type="text/javascript" src="../../src/reader.js"></script>
-    <script type="text/javascript" src="../../src/book.js"></script>
-    <script type="text/javascript" src="../../src/place.js"></script>
-    <script type="text/javascript" src="../../src/component.js"></script>
-    <script type="text/javascript" src="../../src/styles.js"></script>
+    <script type="text/javascript" src="../../dist/carlyle-min.js"></script>
 
     <style type="text/css">
       #bookBox {
@@ -51,7 +46,14 @@
             return [];
           },
           getComponent: function (componentId) {
-            return this.getViaAjax(componentId);
+            if (window.reader) {
+              window.reader.spin();
+            }
+            var out = this.getViaAjax(componentId);
+            if (window.reader) {
+              window.reader.spun();
+            }
+            return out;
           },
           getMetaData: function(key) {
             return {

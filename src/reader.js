@@ -6,7 +6,6 @@ Carlyle.Reader = function (node, bookData) {
 
   var boxDiv;
   var containerDiv;
-  var spinnerCanvas;
   var pageDivs = [];
   var pageWidth = 0, colWidth = 0;
   var book;
@@ -400,53 +399,22 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function spin() {
-    if (spinnerCanvas) { return; }
-    spinnerCanvas = document.createElement("canvas");
-    boxDiv.appendChild(spinnerCanvas);
-    containerDiv.style.visibility = "hidden";
-    spinnerCanvas.style.cssText = Carlyle.Styles.ruleText('spinner');
-
-    var ctx = spinnerCanvas.getContext("2d");
-    var w = spinnerCanvas.clientWidth, h = spinnerCanvas.clientHeight;
-    var currentOffset = 0;
-    var bars = 10;
-    var innerRadius = w * 0.4;
-    var size = { width: w * 0.16, height: w * 0.4 };
-    var framerate = 1000 / 10;
-
-    spinnerCanvas.tick = setInterval(
-      function () {
-        currentOffset = (currentOffset + 1) % bars;
-        ctx.save();
-        ctx.scale(1.5, 0.75);
-        ctx.clearRect(0, 0, w*2, h*2);
-        ctx.translate(w, h);
-        for(var i = 0; i < bars; ++i){
-          var curbar = (currentOffset+i) % bars;
-          var angle = 2 * curbar * Math.PI / bars;
-          ctx.save();
-          ctx.translate(
-            innerRadius * Math.sin(-angle),
-            innerRadius * Math.cos(-angle)
-          );
-          ctx.rotate(angle);
-          ctx.fillStyle = "rgba(0,12,48,"+(bars+1-i)/(bars+1)+")";
-          ctx.fillRect(-2, 0, size.width, size.height);
-          ctx.restore();
-        }
-        ctx.restore();
-      },
-      framerate
-    );
+    for (var i = 0; i < containerDiv.childNodes.length; ++i) {
+      containerDiv.childNodes[i].style.visibility = "hidden";
+    }
+    if (Carlyle.Spinner) {
+      Carlyle.Spinner.spin(containerDiv);
+    }
   }
 
 
   function spun() {
-    if (!spinnerCanvas) { return; }
-    containerDiv.style.visibility = "visible";
-    clearTimeout(spinnerCanvas.tick);
-    boxDiv.removeChild(spinnerCanvas);
-    spinnerCanvas = null;
+    for (var i = 0; i < containerDiv.childNodes.length; ++i) {
+      containerDiv.childNodes[i].style.visibility = "visible";
+    }
+    if (Carlyle.Spinner) {
+      Carlyle.Spinner.spun(containerDiv);
+    }
   }
 
 
