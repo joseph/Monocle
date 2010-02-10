@@ -12,6 +12,7 @@ Carlyle.Reader = function (node, bookData) {
   var book;
   var turnData = {};
   var resizeTimer = null;
+  var slideSpeedDivisor = 1.5;
 
   // Sets up the container and internal elements.
   //
@@ -241,19 +242,19 @@ Carlyle.Reader = function (node, bookData) {
     if (turnData.direction == FORWARDS) {
       if (turnData.cancellable && inForwardZone(boxPointX)) {
         // Cancelling forward turn
-        slideIn();
+        slideIn(boxPointX);
       } else {
         // Completing forward turn
-        slideOut();
+        slideOut(boxPointX);
       }
     } else if (turnData.direction == BACKWARDS) {
       showOverPage();
       if (turnData.cancellable && inBackwardZone(boxPointX)) {
         // Cancelling backward turn
-        slideOut();
+        slideOut(boxPointX);
       } else {
         // Completing backward turn
-        slideIn();
+        slideIn(boxPointX);
       }
     }
   }
@@ -273,18 +274,11 @@ Carlyle.Reader = function (node, bookData) {
     var transition;
     var duration;
 
-    // Shorthand for common configurations.
-    if (options == "slide") {
-      options = {};
-    } else if (options == 'now') {
-      options = { duration: 0 };
-    }
-
-    if (options['duration'] == 0) {
+    if (!options['duration']) {
       duration = 0;
       transition = 'none';
     } else {
-      duration = parseInt(options['duration']) || 200; // FIXME: Magic 200!
+      duration = parseInt(options['duration']);
       transition = '-webkit-transform';
       transition += ' ' + duration + "ms";
       transition += ' ' + (options['timing'] || 'linear');
@@ -319,30 +313,38 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function jumpIn() {
-    setX(pageDivs[1], 0, 'now');
+    setX(pageDivs[1], 0, { duration: 0 });
   }
 
 
   function jumpOut() {
-    setX(pageDivs[1], '-100%', 'now');
+    setX(pageDivs[1], 0 - (pageWidth + 10), { duration: 0 });
   }
 
 
-  function slideIn() {
+  function slideIn(cursorX) {
     var retreatFn = function () {
       setPage(pageDivs[0], pageDivs[0].pageNumber - 1);
       completedTurn();
     }
-    setX(pageDivs[1], 0, 'slide', retreatFn);
+    var slideOpts = {
+      duration: (pageWidth - cursorX) * slideSpeedDivisor,
+      timing: 'ease-in'
+    };
+    setX(pageDivs[1], 0, slideOpts, retreatFn);
   }
 
 
-  function slideOut() {
+  function slideOut(cursorX) {
     var advanceFn = function () {
       setPage(pageDivs[1], pageDivs[1].pageNumber + 1);
       completedTurn();
     }
-    setX(pageDivs[1], "-100%", 'slide', advanceFn);
+    var slideOpts = {
+      duration: cursorX * slideSpeedDivisor,
+      timing: 'ease-in'
+    };
+    setX(pageDivs[1], 0 - (pageWidth + 10), slideOpts, advanceFn);
   }
 
 
