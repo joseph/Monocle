@@ -69,7 +69,7 @@ Carlyle.Styles = {
     "width": "50%"
   },
 
-  bodyText: {
+  scroller: {
     "position": "absolute",
     "top": "1.4em",
     "bottom": "1.4em",

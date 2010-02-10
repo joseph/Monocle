@@ -201,7 +201,13 @@ Carlyle.Component = function (book, id, index, chapters, html) {
       locateChapters(node);
       //tmpLocateOcclusions(node);
       primeChunks(node);
-      removeElementsFrom(node);
+
+      // Remove elements from all client nodes, because they'll need to
+      // be re-applied with the new chunks.
+      for (var i = 0; i < clientNodes.length; ++i) {
+        removeElementsFrom(clientNodes[i]);
+      }
+
       return true;
     } else {
       return false;
@@ -374,7 +380,9 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     if (elementArray) {
       len = elementArray.length;
       for (var i = 0; i < len; ++i) {
-        node.removeChild(elementArray[i]);
+        if (elementArray[i].parentNode == node) {
+          node.removeChild(elementArray[i]);
+        }
       }
       return len;
     }

@@ -8,7 +8,7 @@ Carlyle.Place = function (node) {
 
   function setPlace(cmpt, pageN) {
     component = cmpt;
-    percent = pageN / cmpt.pages;
+    percent = pageN / cmpt.lastPageNumber();
     chapter = null;
   }
 
@@ -19,7 +19,7 @@ Carlyle.Place = function (node) {
 
 
   function pageAtPercentageThrough(pc) {
-    return Math.ceil(component.pages * pc);
+    return Math.ceil(component.lastPageNumber() * pc);
   }
 
 

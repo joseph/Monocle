@@ -11,7 +11,10 @@ Carlyle.Reader = function (node, bookData) {
   var book;
   var turnData = {};
   var resizeTimer = null;
-  var slideSpeedDivisor = 1.5;
+  //var slideSpeedDivisor = 1.5;
+  var slideDuration = 240;
+  var followCursorDuration = 100;
+  var spinner;
 
   // Sets up the container and internal elements.
   //
@@ -46,14 +49,13 @@ Carlyle.Reader = function (node, bookData) {
       createRunningHead(pageDivs[i], 'header');
       createRunningHead(pageDivs[i], 'footer');
 
-      pageDivs[i].bodyText = document.createElement('div');
-      pageDivs[i].bodyText.style.cssText = Carlyle.Styles.ruleText('bodyText');
-      pageDivs[i].appendChild(pageDivs[i].bodyText);
+      pageDivs[i].scrollerDiv = document.createElement('div');
+      pageDivs[i].scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
+      pageDivs[i].appendChild(pageDivs[i].scrollerDiv);
 
-      pageDivs[i].content = document.createElement('div');
-      pageDivs[i].content.pageDiv = pageDivs[i];
-      pageDivs[i].content.style.cssText = Carlyle.Styles.ruleText('content');
-      pageDivs[i].bodyText.appendChild(pageDivs[i].content);
+      pageDivs[i].contentDiv = document.createElement('div');
+      pageDivs[i].contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
+      pageDivs[i].scrollerDiv.appendChild(pageDivs[i].contentDiv);
     }
     pageDivs[1].style.cssText += Carlyle.Styles.ruleText('overPage');
 
@@ -101,12 +103,20 @@ Carlyle.Reader = function (node, bookData) {
     do { boxDiv.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
 
     pageWidth = pageDivs[0].offsetWidth;
-    colWidth = pageDivs[0].bodyText.offsetWidth;
+    colWidth = pageDivs[0].scrollerDiv.offsetWidth;
     for (var i = 0; i < pageDivs.length; ++i) {
-      pageDivs[i].content.style.webkitColumnWidth = colWidth + "px";
+      pageDivs[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
 
-    moveToPage(pageDivs[0].pageNumber || 1);
+    console.log("Moving both pages to " + pageNumber());
+    moveToPage(pageNumber());
+  }
+
+
+  function pageNumber(options) {
+    options = options || { div: 0 }
+    var place = book.placeFor(pageDivs[options.div].contentDiv);
+    return place ? (place.pageNumber() || 1) : 1;
   }
 
 
@@ -114,7 +124,7 @@ Carlyle.Reader = function (node, bookData) {
   // title, etc.
   //
   function getPlace() {
-    book.placeFor(pageDivs[0].contentDiv);
+    return book.placeFor(pageDivs[0].contentDiv);
   }
 
 
@@ -123,8 +133,8 @@ Carlyle.Reader = function (node, bookData) {
   // subsequent components.
   //
   function moveToPage(pageN) {
-    setPage(pageDivs[0], pageN);
-    setPage(pageDivs[1], pageN);
+    pageN = setPage(pageDivs[0], pageN);
+    setPage(pageDivs[1], pageN, getPlace().component().id);
     completedTurn();
   }
 
@@ -156,10 +166,9 @@ Carlyle.Reader = function (node, bookData) {
   // Private method that tells the book to update the given pageElement to
   // the given page.
   function setPage(pageElement, pageN, componentId) {
-    pageN = book.preparePageFor(pageElement.content, pageN, componentId);
+    pageN = book.preparePageFor(pageElement.contentDiv, pageN, componentId);
     if (!pageN) { return false; } // Book may disallow movement to this page.
-    pageElement.pageNumber = pageN;
-    pageElement.bodyText.scrollLeft = (pageN - 1) * colWidth;
+    pageElement.scrollerDiv.scrollLeft = (pageN - 1) * colWidth;
     setRunningHead(
       pageElement.footer,
       {
@@ -202,11 +211,11 @@ Carlyle.Reader = function (node, bookData) {
     if (turnData.direction) { return; }
     if (inForwardZone(boxPointX)) {
       showOverPage();
-      if (setPage(pageDivs[0], pageDivs[0].pageNumber + 1)) {
+      if (setPage(pageDivs[0], pageNumber() + 1)) {
         turnData.direction = FORWARDS;
       }
     } else if (inBackwardZone(boxPointX)) {
-      if (setPage(pageDivs[1], pageDivs[0].pageNumber - 1)) {
+      if (setPage(pageDivs[1], pageNumber() - 1)) {
         jumpOut();
         // NB: we'll leave the opacity adjustment of overPage to turning/turn.
         // Otherwise we get a flicker in some 3D-enhanced user agents.
@@ -224,9 +233,10 @@ Carlyle.Reader = function (node, bookData) {
       turnData.cancellable = true;
     }
 
-    // For speed reasons, we constrain movements to ~12.5 per second at most.
+    // For speed reasons, we constrain movements to a constant number per second.
     var stamp = (new Date()).getTime();
-    if (turnData.stamp && stamp - turnData.stamp < 80) { return; }
+    var followInterval = followCursorDuration * 0.75;
+    if (turnData.stamp && stamp - turnData.stamp < followInterval) { return; }
     turnData.stamp = stamp;
 
     if (turnData.direction == BACKWARDS) {
@@ -324,11 +334,11 @@ Carlyle.Reader = function (node, bookData) {
 
   function slideIn(cursorX) {
     var retreatFn = function () {
-      setPage(pageDivs[0], pageDivs[0].pageNumber - 1);
+      setPage(pageDivs[0], pageNumber() - 1);
       completedTurn();
     }
     var slideOpts = {
-      duration: (pageWidth - cursorX) * slideSpeedDivisor,
+      duration: slideDuration, //(pageWidth - cursorX) * slideSpeedDivisor,
       timing: 'ease-in'
     };
     setX(pageDivs[1], 0, slideOpts, retreatFn);
@@ -337,11 +347,11 @@ Carlyle.Reader = function (node, bookData) {
 
   function slideOut(cursorX) {
     var advanceFn = function () {
-      setPage(pageDivs[1], pageDivs[1].pageNumber + 1);
+      setPage(pageDivs[1], pageNumber({ div: 1 }) + 1);
       completedTurn();
     }
     var slideOpts = {
-      duration: cursorX * slideSpeedDivisor,
+      duration: slideDuration, //cursorX * slideSpeedDivisor,
       timing: 'ease-in'
     };
     // FIXME: the 10 is magic, and needs to be sensitive to style changes.
@@ -350,7 +360,7 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function slideToCursor(cursorX) {
-    setX(pageDivs[1], cursorX - pageWidth, { duration: 100 });
+    setX(pageDivs[1], cursorX - pageWidth, { duration: followCursorDuration });
   }
 
 
@@ -399,21 +409,16 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function spin() {
-    for (var i = 0; i < containerDiv.childNodes.length; ++i) {
-      containerDiv.childNodes[i].style.visibility = "hidden";
-    }
-    if (Carlyle.Spinner) {
-      Carlyle.Spinner.spin(containerDiv);
+    if (Carlyle.Spinner && !spinner) {
+      spinner = new Carlyle.Spinner(boxDiv);
     }
   }
 
 
   function spun() {
-    for (var i = 0; i < containerDiv.childNodes.length; ++i) {
-      containerDiv.childNodes[i].style.visibility = "visible";
-    }
-    if (Carlyle.Spinner) {
-      Carlyle.Spinner.spun(containerDiv);
+    if (spinner) {
+      spinner.stop();
+      spinner = null;
     }
   }
 
@@ -524,4 +529,3 @@ Carlyle.Reader = function (node, bookData) {
 
   return PublicAPI;
 }
-

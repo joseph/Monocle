@@ -1,4 +1,20 @@
-Carlyle.Spinner = {};
+Carlyle.Spinner = function (node) {
+  this.stop = function () {
+    node.removeChild(this.elem);
+  }
+
+  this.elem = document.createElement('div');
+  this.elem.style.cssText = Carlyle.Spinner.Style;
+  this.elem.style.backgroundImage = "url("+ Carlyle.Spinner.imgURI +")";
+  node.appendChild(this.elem);
+}
+
+
+Carlyle.Spinner.Style = "position:absolute; width: 100%; height: 100%;" +
+  "background-color: #FFF; background-repeat: no-repeat;" +
+  "background-position: center center;"
+
+
 Carlyle.Spinner.imgURI = "data:image/gif;base64," +
   "R0lGODlhEAAQAPIAAP%2F%2F%2FwAAAMLCwoKCggAAAAAAAAAAAAAAACH%2BGkNyZWF0ZW" +
   "Qgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAA" +
@@ -11,17 +27,3 @@ Carlyle.Spinner.imgURI = "data:image/gif;base64," +
   "pJ6xSDDDEz0dMnduJwZZulrmzbJAAh%2BQQACgAHACwAAAAAEAAQAAADGwi63P4wRjHIEB" +
   "JUYjP%2F2dZJlIVlaKqubOuyCQAh%2BQQACgAIACwAAAAAEAAQAAADHAi63A5ikCEek2Ta" +
   "lftWmPZFU%2FWdaKqubOu%2BbwIAOwAAAAAAAAAAAA%3D%3D";
-
-
-Carlyle.Spinner.spin = function (node) {
-  node.oldBackground = node.style.background;
-  node.style.background = "#FFF url(" +
-    Carlyle.Spinner.imgURI +
-    ") no-repeat center center";
-  console.log(node.style.background);
-}
-
-
-Carlyle.Spinner.spun = function (node) {
-  node.style.background = node.oldBackground;
-}

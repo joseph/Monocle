@@ -59,7 +59,10 @@ Carlyle.Book = function (dataSource) {
     var oldCmptLPN = component.lastPageNumber();
     var changedDims = component.updateDimensions(contentDiv);
     if (changedDims && parseInt(oldCmptLPN)) {
-      pageN = Math.floor(component.lastPageNumber() * (pageN / oldCmptLPN));
+      pageN = Math.max(
+        Math.floor(component.lastPageNumber() * (pageN / oldCmptLPN)),
+        1
+      );
     }
 
     // Determine whether we need to apply a new component to the div, and
