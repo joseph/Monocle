@@ -318,6 +318,7 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function jumpOut() {
+    // FIXME: the 10 is magic, and needs to be sensitive to style changes.
     setX(pageDivs[1], 0 - (pageWidth + 10), { duration: 0 });
   }
 
@@ -344,6 +345,7 @@ Carlyle.Reader = function (node, bookData) {
       duration: cursorX * slideSpeedDivisor,
       timing: 'ease-in'
     };
+    // FIXME: the 10 is magic, and needs to be sensitive to style changes.
     setX(pageDivs[1], 0 - (pageWidth + 10), slideOpts, advanceFn);
   }
 

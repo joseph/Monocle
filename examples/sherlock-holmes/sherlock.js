@@ -180,10 +180,10 @@
   function init() {
     var box = document.getElementById('bookBox');
     window.reader = Carlyle.Reader(box, bookData);
-    restorePositionFromCookie();
-    box.addEventListener('carlyle:turn', savePositionToCookie, false);
-    createScrubber();
-    createTocDropdown();
+    //restorePositionFromCookie();
+    //box.addEventListener('carlyle:turn', savePositionToCookie, false);
+    //createScrubber();
+    //createTocDropdown();
   }
 
   window.addEventListener('load', init, false);

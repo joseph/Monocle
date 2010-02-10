@@ -196,8 +196,10 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     if (haveDimensionsChanged(node)) {
       removeElementsFrom(node);
       addElementsTo(node, elementsForClient[nodeIndex(node)]);
+      positionImages(node);
       measureDimensions(node);
       locateChapters(node);
+      //tmpLocateOcclusions(node);
       primeChunks(node);
       removeElementsFrom(node);
       return true;
@@ -230,6 +232,28 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     return (!clientDimensions) ||
       (clientDimensions.width != node.parentNode.offsetWidth) ||
       (clientDimensions.height != node.parentNode.offsetHeight);
+  }
+
+
+  function positionImages(node) {
+    if (!node.getBoundingClientRect) {
+      console.log('Image positioning not supported');
+      return;
+    } else {
+      console.log('Positioning images to top of pages');
+    }
+    var cRect = node.getBoundingClientRect();
+    var imgs = node.getElementsByTagName('img');
+    for (var i = 0; i < imgs.length; ++i) {
+      var iRect = imgs[i].getBoundingClientRect();
+      console.log([cRect, iRect]);
+      if (iRect.top == cRect.top) {
+        imgs[i].style.marginTop = 0;
+      } else {
+        imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top)) + "px";
+        console.log("Image offset by: " + imgs[i].style.marginTop);
+      }
+    }
   }
 
 
@@ -271,6 +295,36 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     }
 
     return chapters;
+  }
+
+
+  function tmpLocateOcclusions(node) {
+    if (!node.getBoundingClientRect) {
+      console.log('Occlusion not supported');
+      return;
+    } else {
+      console.log('Locating occlusions');
+    }
+
+    var topElems = [];
+    var cRect = node.getBoundingClientRect();
+    for (var i = 0; i < node.childNodes.length; ++i) {
+      var elem = node.childNodes[i];
+      var prevElem = node.childNodes[i - 1];
+      if (!prevElem) {
+        topElems.push(elem);
+      } else {
+        var nRect = elem.getBoundingClientRect();
+        var pRect = prevElem.getBoundingClientRect();
+        if (pRect.bottom <= cRect.bottom && nRect.top <= pRect.top) {
+          topElems.push(elem);
+        }
+      }
+    }
+
+    for (i = 0; i < topElems.length; ++i) {
+      topElems[i].style.color = "#F0F";
+    }
   }
 
 
