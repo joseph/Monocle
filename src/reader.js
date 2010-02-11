@@ -37,31 +37,54 @@ Carlyle.Reader = function (node, bookData) {
     }
 
     containerDiv = document.createElement('div');
-    containerDiv.style.cssText += Carlyle.Styles.ruleText('container');
     boxDiv.appendChild(containerDiv);
 
     for (var i = 0; i < 2; ++i) {
       pageDivs[i] = document.createElement('div');
       pageDivs[i].pageIndex = i;
-      pageDivs[i].style.cssText = Carlyle.Styles.ruleText('page');
       containerDiv.appendChild(pageDivs[i]);
 
       createRunningHead(pageDivs[i], 'header');
       createRunningHead(pageDivs[i], 'footer');
 
       pageDivs[i].scrollerDiv = document.createElement('div');
-      pageDivs[i].scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
       pageDivs[i].appendChild(pageDivs[i].scrollerDiv);
 
       pageDivs[i].contentDiv = document.createElement('div');
-      pageDivs[i].contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
       pageDivs[i].scrollerDiv.appendChild(pageDivs[i].contentDiv);
     }
-    pageDivs[1].style.cssText += Carlyle.Styles.ruleText('overPage');
+
+    applyStyles();
 
     setBook(bk);
 
     listenForInteraction();
+  }
+
+
+  function applyStyles() {
+    containerDiv.style.cssText += Carlyle.Styles.ruleText('container');
+    for (var i = 0; i < 2; ++i) {
+      pageDivs[i].style.cssText = Carlyle.Styles.ruleText('page');
+      pageDivs[i].scrollerDiv.style.cssText =Carlyle.Styles.ruleText('scroller');
+      pageDivs[i].contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
+
+      pageDivs[i].header.style.cssText = Carlyle.Styles.ruleText('header');
+      pageDivs[i].footer.style.cssText = Carlyle.Styles.ruleText('footer');
+      pageDivs[i].header.left.style.cssText =
+        pageDivs[i].footer.left.style.cssText =
+          Carlyle.Styles.ruleText('runnerLeft');
+      pageDivs[i].header.right.style.cssText =
+        pageDivs[i].footer.right.style.cssText =
+          Carlyle.Styles.ruleText('runnerRight');
+    }
+    pageDivs[1].style.cssText += Carlyle.Styles.ruleText('overPage');
+  }
+
+
+  function reapplyStyles() {
+    applyStyles();
+    calcDimensions();
   }
 
 
@@ -167,13 +190,8 @@ Carlyle.Reader = function (node, bookData) {
   function setPage(pageElement, pageN, componentId) {
     pageN = book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!pageN) { return false; } // Book may disallow movement to this page.
-    setRunningHead(
-      pageElement.footer,
-      {
-        left: getPlace().chapterTitle() || '',
-        right: pageN
-      }
-    );
+    var foot = { left: getPlace().chapterTitle() || '', right: pageN }
+    setRunningHead(pageElement.footer, foot);
     return pageN;
   }
 
@@ -378,16 +396,14 @@ Carlyle.Reader = function (node, bookData) {
 
   function createRunningHead(page, name) {
     var runner = page[name] = document.createElement('div');
-    runner.style.cssText = Carlyle.Styles.ruleText(name);
     page.appendChild(runner);
 
-    var createRunnerPart = function (name, styleName) {
+    var createRunnerPart = function (name) {
       var part = runner[name] = document.createElement('div');
-      part.style.cssText = Carlyle.Styles.ruleText(styleName);
       runner.appendChild(part);
     }
-    createRunnerPart('left', 'runnerLeft');
-    createRunnerPart('right', 'runnerRight');
+    createRunnerPart('left');
+    createRunnerPart('right');
   }
 
 
@@ -516,6 +532,7 @@ Carlyle.Reader = function (node, bookData) {
     constructor: Carlyle.Reader,
     setBook: setBook,
     getBook: getBook,
+    reapplyStyles: reapplyStyles,
     getPlace: getPlace,
     moveToPage: moveToPage,
     moveToPercentageThrough: moveToPercentageThrough,

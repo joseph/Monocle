@@ -29,7 +29,7 @@
         display: none;
       }
 
-      #reader {
+      #reader, #readerCntr {
         position: absolute;
         width: 100%;
         height: 100%;
@@ -92,6 +92,36 @@
       }
       #readerBg {
         background-color: #000;
+      }
+
+
+      #fontWidget {
+        cursor: pointer;
+        position: absolute;
+        right: 40px;
+        top: 4px;
+        padding: 2px;
+        color: #632;
+      }
+
+      #fontWidget span {
+      }
+
+      #fontWidget span.large {
+        font-size: 18px;
+      }
+
+      #fontWidget span.small {
+        font-size: 11px;
+        opacity: 0.3;
+      }
+
+      #fontWidget.smaller span.large {
+        opacity: 0.3;
+      }
+
+      #fontWidget.smaller span.small {
+        opacity: 1;
       }
     </style>
 
@@ -203,6 +233,24 @@
               function () { window.reader.resized() },
               false
             );
+
+            var fontWidget = document.createElement('div');
+            fontWidget.innerHTML = '<span class="small">A</span>' +
+              '<span class="large">A</span>';
+            fontWidget.id = "fontWidget";
+            document.getElementById('readerCntr').appendChild(fontWidget);
+            fontWidget.onclick = function () {
+              var s = Carlyle.Styles.content;
+              if (!s['font-size'] || s['font-size'] == "100%") {
+                s['font-size'] = "92%";
+                fontWidget.className = "smaller";
+              } else {
+                s['font-size'] = "100%";
+                fontWidget.className = "";
+              }
+              window.reader.reapplyStyles();
+            }
+
           },
           false
         );
@@ -222,7 +270,9 @@
       <div class="dummyPage"></div>
     </div>
 
-    <div id="reader"></div>
+    <div id="readerCntr">
+      <div id="reader"></div>
+    </div>
 
     <div id="components">
       <div id="part1">

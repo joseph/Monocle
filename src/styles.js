@@ -84,7 +84,6 @@ Carlyle.Styles = {
     "top": 0,
     "bottom": 0,
     "min-width": "200%",
-    "font-size": "13pt",
     "-webkit-text-size-adjust": "none",
     "-webkit-column-gap": 0,
     "-webkit-column-fill": "auto"

@@ -236,7 +236,8 @@ Carlyle.Component = function (book, id, index, chapters, html) {
   function haveDimensionsChanged(node) {
     return (!clientDimensions) ||
       (clientDimensions.width != node.parentNode.offsetWidth) ||
-      (clientDimensions.height != node.parentNode.offsetHeight);
+      (clientDimensions.height != node.parentNode.offsetHeight) ||
+      (clientDimensions.fontSize != node.style.fontSize);
   }
 
 
@@ -266,7 +267,8 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     clientDimensions = {
       width: node.parentNode.offsetWidth,
       height: node.parentNode.offsetHeight,
-      scrollWidth: node.parentNode.scrollWidth
+      scrollWidth: node.parentNode.scrollWidth,
+      fontSize: node.style.fontSize
     }
 
     if (clientDimensions.scrollWidth == clientDimensions.width * 2) {
