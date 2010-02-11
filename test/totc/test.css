@@ -1,0 +1,154 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  -webkit-user-select: none;
+  -webkit-text-size-adjust: none;
+}
+#components {
+  display: none;
+}
+
+#reader, #readerBg, #readerCntr {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+#reader div pre {
+  white-space: normal;
+  font: normal 100% serif;
+}
+
+/* from smallest and outermost to largest and innermost */
+.dummyPage {
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  right: 15px;
+  background-color: #FCF6F0;
+  -webkit-box-shadow: 2px 2px 4px #CBA;
+}
+.dummyPage + .dummyPage {
+  top: 14px;
+  bottom: 14px;
+  right: 16px;
+  -webkit-box-shadow: 1px 0 2px #A99;
+}
+.dummyPage + .dummyPage + .dummyPage {
+  top: 11px;
+  bottom: 11px;
+  right: 18px;
+  background-color: #FFF9F4;
+}
+.dummyPage + .dummyPage + .dummyPage + .dummyPage {
+  top: 8px;
+  bottom: 8px;
+  right: 21px;
+}
+.dummyPage + .dummyPage + .dummyPage + .dummyPage + .dummyPage {
+  top: 6px;
+  bottom: 6px;
+  right: 25px;
+}
+.jacket {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  right: 2px;
+  left: 65%;
+  -webkit-box-shadow: -3px 0 3px #654;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  background: -webkit-gradient(linear, left top, right bottom, from(#F6F0E6), to(#E0D3CB));
+}
+.board {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  width: 90%;
+  background-color: #974;
+  border: 1px solid #852;
+}
+#readerBg {
+  background-color: #000;
+}
+
+
+#fontWidget {
+  cursor: pointer;
+  position: absolute;
+  right: 40px;
+  top: 4px;
+  padding: 2px;
+  color: #632;
+}
+
+#fontWidget span {
+}
+
+#fontWidget span.large {
+  font-size: 18px;
+}
+
+#fontWidget span.small {
+  font-size: 11px;
+  opacity: 0.3;
+}
+
+#fontWidget.smaller span.large {
+  opacity: 0.3;
+}
+
+#fontWidget.smaller span.small {
+  opacity: 1;
+}
+
+#tocWidget {
+  cursor: pointer;
+  position: absolute;
+  right: 70px;
+  top: 4px;
+  padding: 2px;
+  color: #632;
+}
+
+#toc {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 8%;
+  right: 8%;
+  background: #E0D3C0;
+  -webkit-box-shadow: 1px 1px 12px #652;
+  -webkit-border-radius: 10px;
+  overflow-y: auto;
+  color: #976;
+  font: 11pt Helvetica, Arial, sans-serif;
+  text-shadow: 1px 1px #EEE6D0;
+  border: 1px solid #EED;
+}
+
+#toc li {
+  list-style: none;
+  line-height: 220%;
+  padding-left: 1em;
+  border-bottom: 2px groove #FFF6E9;
+  cursor: pointer;
+}
+
+#toc li span {
+  display: block;
+}
+
+#toc ul li:last-child {
+  border-bottom: none;
+}
+
+#toc ul {
+  margin: 0;
+  padding: 0;
+}
+#toc ul.root {
+  border-top: none;
+}

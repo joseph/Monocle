@@ -186,10 +186,12 @@ Carlyle.Reader = function (node, bookData) {
   // Moves to the relevant element in the relevant component.
   //
   function skipToChapter(src) {
-    // TODO
+    console.log("Skipping to chapter: " + src);
+    var place = book.placeOfChapter(pageDivs[0].contentDiv, src);
+    var pageN = setPage(pageDivs[0], place.pageNumber(), place.component().id);
+    setPage(pageDivs[0], pageN, place.component().id);
     completedTurn();
   }
-
 
 
   // Private method that tells the book to update the given pageElement to

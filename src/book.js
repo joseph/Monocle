@@ -161,11 +161,36 @@ Carlyle.Book = function (dataSource) {
   }
 
 
+  function placeOfChapter(contentDiv, src) {
+    var matcher = new RegExp('^(.+?)(#(.*))?$');
+    var matches = src.match(matcher);
+    console.log(matches);
+    if (matches) {
+      var cmptId = matches[1];
+      var fragment = matches[3] || null;
+      var cIndex = dataSource.getComponents().indexOf(cmptId);
+      var component = componentAt(cIndex);
+      component.updateDimensions(contentDiv); // FIXME: means no-going-back
+      var place = new Carlyle.Place(contentDiv);
+      if (fragment) {
+        console.log("Looking for fragment '" + fragment + "' in '" + cmptId + "'");
+        place.setPlace(component, component.pageForChapter(fragment));
+      } else {
+        console.log("Looking for start of '" + cmptId + "'");
+        place.setPlace(component, 1);
+      }
+      return place;
+    }
+    return null;
+  }
+
+
   var PublicAPI = {
     constructor: Carlyle.Book,
     changePage: changePage,
     getMetaData: dataSource.getMetaData,
-    placeFor: placeFor
+    placeFor: placeFor,
+    placeOfChapter: placeOfChapter
   }
 
   return PublicAPI;
