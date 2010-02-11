@@ -36,7 +36,7 @@ Carlyle.Styles = {
 
   header: {
     "position": "absolute",
-    "top": "4px",
+    "top": "8px",
     "left": "1em",
     "right": "1em",
     "color": "#AAA",
@@ -45,7 +45,7 @@ Carlyle.Styles = {
 
   footer: {
     "position": "absolute",
-    "bottom": "4px",
+    "bottom": "8px",
     "left": "1em",
     "right": "1em",
     "color": "#AAA",
@@ -71,8 +71,8 @@ Carlyle.Styles = {
 
   scroller: {
     "position": "absolute",
-    "top": "1.4em",
-    "bottom": "1.4em",
+    "top": "1.8em",
+    "bottom": "1.8em",
     "left": "1em",
     "right": "1em",
     "word-wrap": "break-word",

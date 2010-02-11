@@ -30,32 +30,33 @@
       /* from smallest and outermost to largest and innermost */
       .dummyPage {
         position: absolute;
-        width: 97%;
-        height: 93%;
-        margin-top: 3.5%;
+        left: 0;
+        top: 18px;
+        bottom: 18px;
+        right: 15px;
         background-color: #FCF6F0;
         -webkit-box-shadow: 1px 0 2px #A99;
       }
       .dummyPage + .dummyPage {
-        width: 96.5%;
-        height: 94.8%;
-        margin-top: 2.5%;
+        top: 14px;
+        bottom: 14px;
+        right: 16px;
       }
       .dummyPage + .dummyPage + .dummyPage {
-        width: 95.8%;
-        height: 96%;
-        margin-top: 2%;
+        top: 11px;
+        bottom: 11px;
+        right: 18px;
         background-color: #FFF9F4;
       }
       .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-        width: 94.7%;
-        height: 97%;
-        margin-top: 1.5%;
+        top: 8px;
+        bottom: 8px;
+        right: 21px;
       }
       .dummyPage + .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-        width: 93.7%;
-        height: 98%;
-        margin-top: 1%;
+        top: 6px;
+        bottom: 6px;
+        right: 25px;
       }
       .jacket {
         position: absolute;
@@ -64,10 +65,10 @@
         bottom: 1px;
         right: 4px;
         left: 65%;
-        -webkit-box-shadow: -2px 0 2px #654;
+        -webkit-box-shadow: -3px 0 3px #654;
         -webkit-border-top-right-radius: 3px;
         -webkit-border-bottom-right-radius: 3px;
-        background: -webkit-gradient(linear, left top, right top, to(#F6F0E6), from(#E6D9D0));
+        background: -webkit-gradient(linear, left top, right bottom, from(#F6F0E6), to(#E0D3CB));
       }
       .board {
         position: absolute;
@@ -75,6 +76,7 @@
         bottom: 1px;
         width: 90%;
         background-color: #974;
+        border: 1px solid #852;
       }
       #readerBg {
         background-color: #000;
@@ -86,7 +88,9 @@
 
         with (Carlyle.Styles) {
           container.background = "none";
-          container.width = "94%";
+          container.right = "24px";
+          container.left = '0';
+          container.width = 'auto';
           page.background = "#FFFBF6";
           page.top = "4px";
           page.bottom = "4px";
@@ -94,6 +98,7 @@
           content.color = "#310";
           content["font-family"] = "Palatino, serif";
           content["line-height"] = "130%";
+          header.color = footer.color = "#976";
         }
 
 
