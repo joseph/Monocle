@@ -14,22 +14,88 @@
     <script type="text/javascript" src="../../dist/carlyle-min.js"></script>
 
     <style type="text/css">
-      #bookBox {
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #reader, #readerBg {
         position: absolute;
         width: 100%;
         height: 100%;
-        margin: 0;
-        padding: 0;
-        background-color: #999;
       }
-      #bookBox div pre {
+      #reader div pre {
         white-space: normal;
         font: normal 100% serif;
+      }
+      /* from smallest and outermost to largest and innermost */
+      .dummyPage {
+        position: absolute;
+        width: 97%;
+        height: 93%;
+        margin-top: 3.5%;
+        background-color: #FCF6F0;
+        -webkit-box-shadow: 1px 0 2px #A99;
+      }
+      .dummyPage + .dummyPage {
+        width: 96.5%;
+        height: 94.8%;
+        margin-top: 2.5%;
+      }
+      .dummyPage + .dummyPage + .dummyPage {
+        width: 95.8%;
+        height: 96%;
+        margin-top: 2%;
+        background-color: #FFF9F4;
+      }
+      .dummyPage + .dummyPage + .dummyPage + .dummyPage {
+        width: 94.7%;
+        height: 97%;
+        margin-top: 1.5%;
+      }
+      .dummyPage + .dummyPage + .dummyPage + .dummyPage + .dummyPage {
+        width: 93.7%;
+        height: 98%;
+        margin-top: 1%;
+      }
+      .jacket {
+        position: absolute;
+        background-color: #F9F9EE;
+        top: 1px;
+        bottom: 1px;
+        right: 4px;
+        left: 65%;
+        -webkit-box-shadow: -2px 0 2px #654;
+        -webkit-border-top-right-radius: 3px;
+        -webkit-border-bottom-right-radius: 3px;
+        background: -webkit-gradient(linear, left top, right top, to(#F6F0E6), from(#E6D9D0));
+      }
+      .board {
+        position: absolute;
+        top: 1px;
+        bottom: 1px;
+        width: 90%;
+        background-color: #974;
+      }
+      #readerBg {
+        background-color: #000;
       }
     </style>
 
     <script type="text/javascript">
       (function () {
+
+        with (Carlyle.Styles) {
+          container.background = "none";
+          container.width = "94%";
+          page.background = "#FFFBF6";
+          page.top = "4px";
+          page.bottom = "4px";
+          page["-webkit-box-shadow"] = "1px 0 2px #997";
+          content.color = "#310";
+          content["font-family"] = "Palatino, serif";
+          content["line-height"] = "130%";
+        }
+
 
         var bookData = {
           getComponents: function () {
@@ -46,13 +112,16 @@
             return [];
           },
           getComponent: function (componentId) {
+                          /*
             if (window.reader) {
               window.reader.spin();
             }
+            */
             var out = this.getViaAjax(componentId);
+            /*
             if (window.reader) {
               window.reader.spun();
-            }
+            }*/
             return out;
           },
           getMetaData: function(key) {
@@ -73,7 +142,7 @@
         window.addEventListener(
           'load',
           function () {
-            var box = document.getElementById('bookBox');
+            var box = document.getElementById('reader');
             window.reader = Carlyle.Reader(box, bookData);
             window.addEventListener('resize', reader.resized, false);
 
@@ -111,5 +180,16 @@
 
   </head>
 
-  <body id="bookBox"></body>
+  <body>
+    <div id="readerBg">
+      <div class="board"></div>
+      <div class="jacket"></div>
+      <div class="dummyPage"></div>
+      <div class="dummyPage"></div>
+      <div class="dummyPage"></div>
+      <div class="dummyPage"></div>
+      <div class="dummyPage"></div>
+    </div>
+    <div id="reader"></div>
+  </body>
 </html>

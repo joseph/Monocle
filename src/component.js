@@ -106,11 +106,6 @@ Carlyle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  // Called by book.preparePageFor - checks that the node is registered.
-  //
-  // If the node has different dimensions, it will be recalculated using
-  // this node.
-  //
   function prepareNode(node, pageN) {
     for (var i = 0; i < chunks.length; ++i) {
       if (chunks[i].firstPageNumber - 1 <= pageN) {
@@ -331,10 +326,11 @@ Carlyle.Component = function (book, id, index, chapters, html) {
           topElems.push(elem);
         }
       }
+      elem.style.color = "#000"; // FOR DEBUGGING
     }
 
     for (i = 0; i < topElems.length; ++i) {
-      topElems[i].style.color = "#F0F";
+      topElems[i].style.color = "#F0F"; // FOR DEBUGGING
     }
   }
 
