@@ -123,11 +123,15 @@ Carlyle.Component = function (book, id, index, chapters, html) {
 
 
   function chapterForPage(pageN) {
+    var cand = null;
     for (var i = 0; i < chapters.length; ++i) {
-      if (pageN >= chapters[i]) {
-        return chapters[i];
+      if (pageN >= chapters[i].page) {
+        cand = chapters[i];
+      } else {
+        return cand;
       }
     }
+    return cand;
   }
 
 
@@ -300,6 +304,7 @@ Carlyle.Component = function (book, id, index, chapters, html) {
       }
     }
 
+    console.log(chapters);
     return chapters;
   }
 

@@ -7,7 +7,7 @@ Carlyle.Reader = function (node, bookData) {
   var boxDiv;
   var containerDiv;
   var pageDivs = [];
-  var pageWidth = 0, colWidth = 0;
+  var pageWidth = 0;
   var book;
   var turnData = {};
   var resizeTimer = null;
@@ -103,18 +103,17 @@ Carlyle.Reader = function (node, bookData) {
     do { boxDiv.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
 
     pageWidth = pageDivs[0].offsetWidth;
-    colWidth = pageDivs[0].scrollerDiv.offsetWidth;
+    var colWidth = pageDivs[0].scrollerDiv.offsetWidth;
     for (var i = 0; i < pageDivs.length; ++i) {
       pageDivs[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
 
-    console.log("Moving both pages to " + pageNumber());
     moveToPage(pageNumber());
   }
 
 
   function pageNumber(options) {
-    options = options || { div: 0 }
+    options = options || { div: 0 };
     var place = book.placeFor(pageDivs[options.div].contentDiv);
     return place ? (place.pageNumber() || 1) : 1;
   }
@@ -166,13 +165,12 @@ Carlyle.Reader = function (node, bookData) {
   // Private method that tells the book to update the given pageElement to
   // the given page.
   function setPage(pageElement, pageN, componentId) {
-    pageN = book.preparePageFor(pageElement.contentDiv, pageN, componentId);
+    pageN = book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!pageN) { return false; } // Book may disallow movement to this page.
-    pageElement.scrollerDiv.scrollLeft = (pageN - 1) * colWidth;
     setRunningHead(
       pageElement.footer,
       {
-        left: 'foo', //getLocation().chapter,
+        left: getPlace().chapterTitle() || '',
         right: pageN
       }
     );

@@ -32,12 +32,13 @@ Carlyle.Place = function (node) {
     if (chapter) {
       return chapter;
     }
-    return chapter = component.chapterForPage(pageNumber);
+    return chapter = component.chapterForPage(pageNumber());
   }
 
 
   function chapterTitle() {
-    return chapterInfo().title;
+    var chp = chapterInfo();
+    return chp ? chp.title : null;
   }
 
 

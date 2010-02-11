@@ -33,7 +33,7 @@ Carlyle.Book = function (dataSource) {
   // The Reader should call this method before turning any pageDiv to a new
   // page number.
   //
-  function preparePageFor(contentDiv, pageN, componentId) {
+  function changePage(contentDiv, pageN, componentId) {
     var place = placeFor(contentDiv) ||
       setPlaceFor(contentDiv, componentAt(0), 1);
 
@@ -80,15 +80,18 @@ Carlyle.Book = function (dataSource) {
       // Moving to next component.
       pageN -= component.lastPageNumber();
       component = componentAt(cIndex + 1);
-      return preparePageFor(contentDiv, pageN, component.id);
+      return changePage(contentDiv, pageN, component.id);
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
       pageN += component.lastPageNumber();
-      return preparePageFor(contentDiv, pageN, component.id);
+      return changePage(contentDiv, pageN, component.id);
     }
 
+    // Do it.
     component.prepareNode(contentDiv, pageN)
+    var scroller = contentDiv.parentNode;
+    scroller.scrollLeft = (pageN - 1) * scroller.offsetWidth;
     setPlaceFor(contentDiv, component, pageN);
 
     return pageN;
@@ -118,13 +121,13 @@ Carlyle.Book = function (dataSource) {
 
   function componentAt(index) {
     if (!components[index]) {
-      name = dataSource.getComponents()[index];
-      html = dataSource.getComponent(name);
+      var src = dataSource.getComponents()[index];
+      var html = dataSource.getComponent(src);
       components[index] = new Carlyle.Component(
         PublicAPI,
-        name,
+        src,
         index,
-        {}, // TODO
+        chaptersForComponent(src),
         html
       )
     }
@@ -132,16 +135,41 @@ Carlyle.Book = function (dataSource) {
   }
 
 
+  function chaptersForComponent(src) {
+    var chapters = [];
+    var matcher = new RegExp('^'+src+"(\#(.+)|$)");
+    var matches;
+    var recurser = function (chp) {
+      if (matches = chp.src.match(matcher)) {
+        chapters.push({
+          title: chp.title,
+          fragment: matches[2] || null
+        });
+      }
+      if (chp.children) {
+        for (var i = 0; i < chp.children.length; ++i) {
+          recurser(chp.children[i]);
+        }
+      }
+    }
+
+    var sourceData = dataSource.getContents();
+    for (var i = 0; i < sourceData.length; ++i) {
+      recurser(sourceData[i]);
+    }
+    return chapters;
+  }
+
+
   var PublicAPI = {
     constructor: Carlyle.Book,
-    preparePageFor: preparePageFor,
+    changePage: changePage,
     getMetaData: dataSource.getMetaData,
     placeFor: placeFor
   }
 
   return PublicAPI;
 }
-
 
 
 Carlyle.Book.fromHTML = function (html) {
