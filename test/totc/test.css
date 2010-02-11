@@ -23,32 +23,32 @@ body {
 .dummyPage {
   position: absolute;
   left: 0;
-  top: 18px;
-  bottom: 18px;
+  top: 20px;
+  bottom: 20px;
   right: 15px;
   background-color: #FCF6F0;
   -webkit-box-shadow: 2px 2px 4px #CBA;
 }
 .dummyPage + .dummyPage {
-  top: 14px;
-  bottom: 14px;
+  top: 16px;
+  bottom: 16px;
   right: 16px;
   -webkit-box-shadow: 1px 0 2px #A99;
 }
 .dummyPage + .dummyPage + .dummyPage {
-  top: 11px;
-  bottom: 11px;
+  top: 13px;
+  bottom: 13px;
   right: 18px;
   background-color: #FFF9F4;
 }
 .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-  top: 8px;
-  bottom: 8px;
+  top: 10px;
+  bottom: 10px;
   right: 21px;
 }
 .dummyPage + .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-  top: 6px;
-  bottom: 6px;
+  top: 8px;
+  bottom: 8px;
   right: 25px;
 }
 .jacket {
@@ -111,6 +111,7 @@ body {
   top: 4px;
   padding: 2px;
   color: #632;
+  font-size: 18px;
 }
 
 #toc {

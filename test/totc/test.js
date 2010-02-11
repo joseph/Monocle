@@ -6,8 +6,8 @@
     container.left = '0';
     container.width = 'auto';
     page.background = "#FFFBF6";
-    page.top = "4px";
-    page.bottom = "4px";
+    page.top = "6px";
+    page.bottom = "6px";
     page["-webkit-box-shadow"] = "1px 0 2px #997";
     content.color = "#310";
     content["font-family"] = "Palatino, serif";
@@ -119,7 +119,7 @@
   function createTOCWidget() {
     var controlLayer = document.getElementById('readerCntr');
     var tocWidget = document.createElement('div');
-    tocWidget.innerHTML = "ToC";
+    tocWidget.innerHTML = "Contents";
     tocWidget.id = "tocWidget";
     controlLayer.appendChild(tocWidget);
 
@@ -149,10 +149,16 @@
     }
 
     tocWidget.onclick = function () {
-      var toc = document.createElement('div');
-      toc.id = "toc";
-      toc.appendChild(tocList);
-      controlLayer.appendChild(toc);
+      if (!tocWidget.menu) {
+        tocWidget.menu = document.createElement('div');
+        tocWidget.menu.id = "toc";
+        tocWidget.menu.appendChild(tocList);
+      }
+      if (tocWidget.menu.parentNode) {
+        controlLayer.removeChild(tocWidget.menu);
+      } else {
+        controlLayer.appendChild(tocWidget.menu);
+      }
     }
   }
 
