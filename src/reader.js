@@ -166,12 +166,17 @@ Carlyle.Reader = function (node, bookData) {
   // should be a float, where 0.0 is the first page and 1.0 is the last page
   // of the component.
   //
-  function moveToPercentageThrough(percent) {
+  function moveToPercentageThrough(percent, componentId) {
     if (percent == 0) {
       return moveToPage(1);
     }
 
-    moveToPage(getPlace().pageAtPercentageThrough(percent));
+    setPage(pageDivs[0], 1, componentId || getPlace().component().id);
+
+    var pageN = getPlace().pageAtPercentageThrough(percent);
+
+    console.log(pageN);
+    moveToPage(pageN);
     completedTurn();
   }
 
@@ -190,8 +195,13 @@ Carlyle.Reader = function (node, bookData) {
   function setPage(pageElement, pageN, componentId) {
     pageN = book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!pageN) { return false; } // Book may disallow movement to this page.
-    var foot = { left: getPlace().chapterTitle() || '', right: pageN }
-    setRunningHead(pageElement.footer, foot);
+    setRunningHead(
+      pageElement.footer,
+      {
+        left: book.placeFor(pageElement.contentDiv).chapterTitle() || '',
+        right: pageN
+      }
+    );
     return pageN;
   }
 
@@ -376,7 +386,11 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function slideToCursor(cursorX) {
-    setX(pageDivs[1], cursorX - pageWidth, { duration: followCursorDuration });
+    setX(
+      pageDivs[1],
+      Math.min(0, cursorX - pageWidth),
+      { duration: followCursorDuration }
+    );
   }
 
 
@@ -439,7 +453,6 @@ Carlyle.Reader = function (node, bookData) {
 
   function listenForInteraction() {
     // Listeners
-    // FIXME: should everything be registered with useCapture false?
     var receivesTouchEvents = (typeof Touch == "object");
     if (!receivesTouchEvents) {
       containerDiv.addEventListener(
@@ -452,7 +465,7 @@ Carlyle.Reader = function (node, bookData) {
             turning(rebaseX(mmevt.pageX));
           }
         },
-        false
+        true
       );
       containerDiv.addEventListener(
         'mouseup',
@@ -462,7 +475,7 @@ Carlyle.Reader = function (node, bookData) {
           if (!turnData.direction) { return; }
           turn(rebaseX(evt.pageX));
         },
-        false
+        true
       );
       containerDiv.addEventListener(
         'mouseout',
@@ -475,7 +488,7 @@ Carlyle.Reader = function (node, bookData) {
           evt.preventDefault();
           turn(rebaseX(evt.pageX));
         },
-        false
+        true
       );
     } else {
       containerDiv.addEventListener(
@@ -485,7 +498,7 @@ Carlyle.Reader = function (node, bookData) {
           if (evt.targetTouches.length > 1) { return; }
           lift(rebaseX(evt.targetTouches[0].pageX));
         },
-        false
+        true
       );
       containerDiv.addEventListener(
         'touchmove',
@@ -501,7 +514,7 @@ Carlyle.Reader = function (node, bookData) {
             turning(rbX);
           }
         },
-        false
+        true
       );
       containerDiv.addEventListener(
         'touchend',
@@ -510,7 +523,7 @@ Carlyle.Reader = function (node, bookData) {
           if (!turnData.direction) { return; }
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
-        false
+        true
       );
       containerDiv.addEventListener(
         'touchcancel',
@@ -518,9 +531,10 @@ Carlyle.Reader = function (node, bookData) {
           if (!turnData.direction) { return; }
           evt.preventDefault();
           turn(rebaseX(evt.changedTouches[0].pageX));
-        }
+        },
+        true
       );
-      window.addEventListener('orientationchange', resized, false);
+      window.addEventListener('orientationchange', resized, true);
     }
   }
 

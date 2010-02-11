@@ -4,8 +4,8 @@
     getComponents: function () {
       return [
         "content/epubfile-0002.xml",
-        //"content/epubfile-0003.xml",
-        //"content/epubfile-0010.xml",
+        "content/epubfile-0003.xml",
+        "content/epubfile-0010.xml",
         "content/epubfile-0012.xml",
         "content/epubfile-0016.xml",
         "content/epubfile-0019.xml",
@@ -27,39 +27,39 @@
       return [
         {
           title: "A Scandal In Bohemia",
-          component: "content/epubfile-0012.xml"
+          src: "content/epubfile-0012.xml"
         },
         {
           title: "The Red-Headed League",
-          component: "content/epubfile-0016.xml"
+          src: "content/epubfile-0016.xml"
         },
         {
           title: "A Case Of Identity",
-          component: "content/epubfile-0019.xml"
+          src: "content/epubfile-0019.xml"
         },
         {
           title: "The Boscombe Valley Mystery",
-          component: "content/epubfile-0022.xml"
+          src: "content/epubfile-0022.xml"
         },
         {
           title: "The Five Orange Pips",
-          component: "content/epubfile-0024.xml"
+          src: "content/epubfile-0024.xml"
         },
         {
           title: "The Man With The Twisted Lip",
-          component: "content/epubfile-0027.xml"
+          src: "content/epubfile-0027.xml"
         },
         {
           title: "The Adventure Of The Speckled Band",
-          component: "content/epubfile-0032.xml"
+          src: "content/epubfile-0032.xml"
         },
         {
           title: "The Adventure Of The Engineer&#39;s Thumb",
-          component: "content/epubfile-0034.xml"
+          src: "content/epubfile-0034.xml"
         },
         {
           title: "The Adventure Of The Copper Beeches",
-          component: "content/epubfile-0042.xml"
+          src: "content/epubfile-0042.xml"
         }
       ];
     },
@@ -88,9 +88,9 @@
   // Note: you might want to scope this per book.
   //
   function savePositionToCookie() {
-    var l = reader.getLocation();
-    document.cookie = "component="+encodeURIComponent(l.component);
-    document.cookie = "percent="+l.percentageThrough;
+    var place = reader.getPlace();
+    document.cookie = "component="+encodeURIComponent(place.component().id);
+    document.cookie = "percent="+place.percentageThrough();
   }
 
 
@@ -99,13 +99,13 @@
     if (!document.cookie) {
       return;
     }
-    var lastComp = document.cookie.match(/component=(.+?)(;|$)/);
+    var lastCmpt = document.cookie.match(/cmptonent=(.+?)(;|$)/);
     var lastPercent = document.cookie.match(/percent=(.+?)(;|$)/);
-    if (lastComp && lastComp[1] && lastPercent && lastPercent[1]) {
+    if (lastCmpt && lastCmpt[1] && lastPercent && lastPercent[1]) {
       lastPercent = parseFloat(lastPercent[1]);
-      lastComp = decodeURIComponent(lastComp[1]);
-      console.log("Going to "+lastPercent+"% of "+lastComp);
-      reader.goToPercentageThrough(lastPercent, lastComp);
+      lastCmpt = decodeURICmptonent(lastCmpt[1]);
+      console.log("Moving to "+lastPercent+"% of "+lastCmpt);
+      reader.moveToPercentageThrough(lastPercent, lastCmpt);
     }
   }
 
@@ -146,20 +146,21 @@
     document.body.appendChild(scrubberDiv);
 
     var updateScrubber = function () {
-      var loc = reader.getLocation();
-      if (loc.lastPage == 1) {
+      var place = reader.getPlace();
+      var lpn = place.component().lastPageNumber();
+      if (lpn == 1) {
         scrubberDiv.style.display = "none";
       } else {
         scrubberDiv.style.display = "block";
       }
-      scrubberRange.setAttribute('max', loc.lastPage);
-      scrubberRange.value = loc.page;
-      if (loc.chapter) {
-        scrubberInfo.innerHTML = loc.chapter + " &#8212; ";
+      scrubberRange.setAttribute('max', lpn);
+      scrubberRange.value = place.pageNumber();
+      if (place.chapterTitle()) {
+        scrubberInfo.innerHTML = place.chapterTitle() + " &#8212; ";
       } else {
         scrubberInfo.innerHTML = "";
       }
-      scrubberInfo.innerHTML += loc.page + "/" + loc.lastPage;
+      scrubberInfo.innerHTML += place.pageNumber() + "/" + lpn;
     }
 
     updateScrubber();
@@ -169,7 +170,7 @@
     scrubberRange.addEventListener(
       'change',
       function () {
-        reader.goToPage(parseInt(scrubberRange.value));
+        reader.moveToPage(parseInt(scrubberRange.value));
       }
     );
   }
@@ -180,9 +181,9 @@
   function init() {
     var box = document.getElementById('bookBox');
     window.reader = Carlyle.Reader(box, bookData);
-    //restorePositionFromCookie();
-    //box.addEventListener('carlyle:turn', savePositionToCookie, false);
-    //createScrubber();
+    restorePositionFromCookie();
+    box.addEventListener('carlyle:turn', savePositionToCookie, false);
+    createScrubber();
     //createTocDropdown();
   }
 

@@ -44,6 +44,8 @@ Carlyle.Place = function (node) {
 
   var PublicAPI = {
     setPlace: setPlace,
+    percentageThrough: percentageThrough,
+    pageAtPercentageThrough: pageAtPercentageThrough,
     pageNumber: pageNumber,
     chapterInfo: chapterInfo,
     chapterTitle: chapterTitle,
