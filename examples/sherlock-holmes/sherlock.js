@@ -99,11 +99,11 @@
     if (!document.cookie) {
       return;
     }
-    var lastCmpt = document.cookie.match(/cmptonent=(.+?)(;|$)/);
+    var lastCmpt = document.cookie.match(/component=(.+?)(;|$)/);
     var lastPercent = document.cookie.match(/percent=(.+?)(;|$)/);
     if (lastCmpt && lastCmpt[1] && lastPercent && lastPercent[1]) {
       lastPercent = parseFloat(lastPercent[1]);
-      lastCmpt = decodeURICmptonent(lastCmpt[1]);
+      lastCmpt = decodeURIComponent(lastCmpt[1]);
       console.log("Moving to "+lastPercent+"% of "+lastCmpt);
       reader.moveToPercentageThrough(lastPercent, lastCmpt);
     }

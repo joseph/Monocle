@@ -170,13 +170,15 @@ Carlyle.Reader = function (node, bookData) {
     if (percent == 0) {
       return moveToPage(1);
     }
+    componentId = componentId || getPlace().component().id;
 
+    // Move to the component.
     setPage(pageDivs[0], 1, componentId || getPlace().component().id);
 
+    // Calculate the page based on this component.
     var pageN = getPlace().pageAtPercentageThrough(percent);
-
-    console.log(pageN);
-    moveToPage(pageN);
+    pageN = setPage(pageDivs[0], pageN, componentId);
+    setPage(pageDivs[1], pageN, componentId);
     completedTurn();
   }
 

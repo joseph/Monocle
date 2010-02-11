@@ -252,7 +252,6 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     var imgs = node.getElementsByTagName('img');
     for (var i = 0; i < imgs.length; ++i) {
       var iRect = imgs[i].getBoundingClientRect();
-      console.log([cRect, iRect]);
       if (iRect.top == cRect.top) {
         imgs[i].style.marginTop = 0;
       } else {
@@ -301,7 +300,6 @@ Carlyle.Component = function (book, id, index, chapters, html) {
       }
     }
 
-    console.log(chapters);
     return chapters;
   }
 
