@@ -105,8 +105,8 @@
     fontWidget.onclick = function () {
       var s = Carlyle.Styles.content;
       if (!s['font-size'] || s['font-size'] == "100%") {
-        s['font-size'] = "92%";
-        fontWidget.className = "smaller";
+        s['font-size'] = "110%";
+        fontWidget.className = "larger";
       } else {
         s['font-size'] = "100%";
         fontWidget.className = "";

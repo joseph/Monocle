@@ -1,38 +1,58 @@
 /* PLACE */
 
 Carlyle.Place = function (node) {
+  if (Carlyle == this) { return new Carlyle.Place(node); }
 
-  var component;
-  var percent;
-  var chapter;
+  // Constants.
+  var k = {
+  }
+
+  // Properties.
+  var p = {
+    component: null,
+    percent: null
+  }
+
+  // Methods and properties available to external code.
+  var API = {
+    constructor: Carlyle.Place,
+    constants: k,
+    properties: p
+  }
+
 
   function setPlace(cmpt, pageN) {
-    component = cmpt;
-    percent = pageN / cmpt.lastPageNumber();
-    chapter = null;
+    p.component = cmpt;
+    p.percent = pageN / cmpt.lastPageNumber();
+    p.chapter = null;
+  }
+
+
+  function componentId() {
+    return p.component.properties.id;
   }
 
 
   function percentageThrough() {
-    return percent;
+    return p.percent;
   }
 
 
   function pageAtPercentageThrough(pc) {
-    return Math.ceil(component.lastPageNumber() * pc);
+    return Math.ceil(p.component.lastPageNumber() * pc);
   }
 
 
   function pageNumber() {
-    return pageAtPercentageThrough(percent);
+    return pageAtPercentageThrough(p.percent);
   }
 
 
   function chapterInfo() {
-    if (chapter) {
-      return chapter;
+    if (p.chapter) {
+      return p.chapter;
     }
-    return chapter = component.chapterForPage(pageNumber());
+    return p.chapter = p.component.chapterForPage(pageNumber());
   }
 
 
@@ -42,15 +62,13 @@ Carlyle.Place = function (node) {
   }
 
 
-  var PublicAPI = {
-    setPlace: setPlace,
-    percentageThrough: percentageThrough,
-    pageAtPercentageThrough: pageAtPercentageThrough,
-    pageNumber: pageNumber,
-    chapterInfo: chapterInfo,
-    chapterTitle: chapterTitle,
-    component: function () { return component; }
-  }
+  API.setPlace = setPlace;
+  API.componentId = componentId;
+  API.percentageThrough = percentageThrough;
+  API.pageAtPercentageThrough = pageAtPercentageThrough;
+  API.pageNumber = pageNumber;
+  API.chapterInfo = chapterInfo;
+  API.chapterTitle = chapterTitle;
 
-  return PublicAPI;
+  return API;
 }

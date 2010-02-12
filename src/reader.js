@@ -2,56 +2,104 @@
 Carlyle.Reader = function (node, bookData) {
   if (Carlyle == this) { return new Carlyle.Reader(node, bookData); }
 
-  var FORWARDS = 1, BACKWARDS = -1;
+  // Constants.
+  var k = {
+    FORWARDS: 1,
+    BACKWARDS: -1,
+    durations: {
+      SLIDE: 240,
+      FOLLOW_CURSOR: 100,
+      RESIZE_DELAY: 100
+    },
+    opacities: {
+      VISIBLE: 1,
+      HIDDEN: 0.01
+    },
+    OFF_SCREEN_GAP: 10
+  }
 
-  var boxDiv;
-  var containerDiv;
-  var pageDivs = [];
-  var pageWidth = 0;
-  var book;
-  var turnData = {};
-  var resizeTimer = null;
-  //var slideSpeedDivisor = 1.5;
-  var slideDuration = 240;
-  var followCursorDuration = 100;
-  var spinner;
+
+  // Properties.
+  var p = {
+    // Divs only stores the box, the container and the two pages. But the full
+    // hierarchy (at this time) is:
+    //
+    //   box
+    //    -> container
+    //      -> pages (2)
+    //        -> running-heads (*)
+    //        -> scroller
+    //          -> content
+    //
+    divs: {
+      box: null,
+      container: null,
+      pages: []
+    },
+
+    // The current width of the page.
+    pageWidth: 0,
+
+    // The active book.
+    book: null,
+
+    // Properties relating to the current page turn interaction.
+    turnData: {},
+
+    // A resettable timer which must expire before dimensions are recalculated
+    // after the reader has been resized.
+    //
+    resizeTimer: null,
+
+    // The animation showing that Carlyle is processing something.
+    spinner: null
+  }
+
+
+  // Methods and properties available to external code.
+  var API = {
+    constructor: Carlyle.Reader,
+    properties: p,
+    constants: k
+  }
+
 
   // Sets up the container and internal elements.
   //
   function initialize(node, bookData) {
-    boxDiv = typeof(node) == "string" ? document.getElementById(node) : node;
+    p.divs.box = typeof(node) == "string" ? document.getElementById(node) : node;
 
     var bk;
     if (bookData) {
       bk = new Carlyle.Book(bookData);
     } else {
-      bk = Carlyle.Book.fromHTML(boxDiv.innerHTML);
+      bk = Carlyle.Book.fromHTML(p.divs.box.innerHTML);
     }
-    boxDiv.innerHTML = "";
+    p.divs.box.innerHTML = "";
 
-    // Make sure the boxDiv is absolutely or relatively positioned.
-    var currStyle = document.defaultView.getComputedStyle(boxDiv, null);
+    // Make sure the box div is absolutely or relatively positioned.
+    var currStyle = document.defaultView.getComputedStyle(p.divs.box, null);
     var currPosVal = currStyle.getPropertyValue('position');
     if (["absolute", "relative"].indexOf(currPosVal) == -1) {
-      boxDiv.style.position = "relative";
+      p.divs.box.style.position = "relative";
     }
 
-    containerDiv = document.createElement('div');
-    boxDiv.appendChild(containerDiv);
+    p.divs.container = document.createElement('div');
+    p.divs.box.appendChild(p.divs.container);
 
     for (var i = 0; i < 2; ++i) {
-      pageDivs[i] = document.createElement('div');
-      pageDivs[i].pageIndex = i;
-      containerDiv.appendChild(pageDivs[i]);
+      p.divs.pages[i] = document.createElement('div');
+      p.divs.pages[i].pageIndex = i;
+      p.divs.container.appendChild(p.divs.pages[i]);
 
-      createRunningHead(pageDivs[i], 'header');
-      createRunningHead(pageDivs[i], 'footer');
+      createRunningHead(p.divs.pages[i], 'header');
+      createRunningHead(p.divs.pages[i], 'footer');
 
-      pageDivs[i].scrollerDiv = document.createElement('div');
-      pageDivs[i].appendChild(pageDivs[i].scrollerDiv);
+      p.divs.pages[i].scrollerDiv = document.createElement('div');
+      p.divs.pages[i].appendChild(p.divs.pages[i].scrollerDiv);
 
-      pageDivs[i].contentDiv = document.createElement('div');
-      pageDivs[i].scrollerDiv.appendChild(pageDivs[i].contentDiv);
+      p.divs.pages[i].contentDiv = document.createElement('div');
+      p.divs.pages[i].scrollerDiv.appendChild(p.divs.pages[i].contentDiv);
     }
 
     applyStyles();
@@ -63,22 +111,23 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function applyStyles() {
-    containerDiv.style.cssText += Carlyle.Styles.ruleText('container');
+    p.divs.container.style.cssText = Carlyle.Styles.ruleText('container');
     for (var i = 0; i < 2; ++i) {
-      pageDivs[i].style.cssText = Carlyle.Styles.ruleText('page');
-      pageDivs[i].scrollerDiv.style.cssText =Carlyle.Styles.ruleText('scroller');
-      pageDivs[i].contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
+      var page = p.divs.pages[i];
+      page.style.cssText = Carlyle.Styles.ruleText('page');
+      page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
+      page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
 
-      pageDivs[i].header.style.cssText = Carlyle.Styles.ruleText('header');
-      pageDivs[i].footer.style.cssText = Carlyle.Styles.ruleText('footer');
-      pageDivs[i].header.left.style.cssText =
-        pageDivs[i].footer.left.style.cssText =
+      page.header.style.cssText = Carlyle.Styles.ruleText('header');
+      page.footer.style.cssText = Carlyle.Styles.ruleText('footer');
+      page.header.left.style.cssText =
+        page.footer.left.style.cssText =
           Carlyle.Styles.ruleText('runnerLeft');
-      pageDivs[i].header.right.style.cssText =
-        pageDivs[i].footer.right.style.cssText =
+      page.header.right.style.cssText =
+        page.footer.right.style.cssText =
           Carlyle.Styles.ruleText('runnerRight');
     }
-    pageDivs[1].style.cssText += Carlyle.Styles.ruleText('overPage');
+    p.divs.pages[1].style.cssText += Carlyle.Styles.ruleText('overPage');
   }
 
 
@@ -89,46 +138,46 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function setBook(bk) {
-    book = bk;
+    p.book = bk;
     spin();
-    setRunningHead(pageDivs[0].header, { left: bk.getMetaData('title') });
-    setRunningHead(pageDivs[1].header, { left: bk.getMetaData('title') });
+    setRunningHead(p.divs.pages[0].header, { left: bk.getMetaData('title') });
+    setRunningHead(p.divs.pages[1].header, { left: bk.getMetaData('title') });
     calcDimensions();
     spun();
-    return book;
+    return p.book;
   }
 
 
   function getBook() {
-    return book;
+    return p.book;
   }
 
 
   function resized() {
     spin();
-    containerDiv.style.display = "none";
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(
+    p.divs.container.style.display = "none";
+    clearTimeout(p.resizeTimer);
+    p.resizeTimer = setTimeout(
       function () {
         console.log('Recalculating dimensions after resize.')
-        containerDiv.style.display = "block";
+        p.divs.container.style.display = "block";
         calcDimensions();
         spun();
       },
-      100
+      k.durations.RESIZE_DELAY
     );
   }
 
 
   function calcDimensions() {
-    boxDiv.cumulativeLeft = 0;
-    var o = boxDiv;
-    do { boxDiv.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
+    p.divs.box.cumulativeLeft = 0;
+    var o = p.divs.box;
+    do { p.divs.box.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
 
-    pageWidth = pageDivs[0].offsetWidth;
-    var colWidth = pageDivs[0].scrollerDiv.offsetWidth;
-    for (var i = 0; i < pageDivs.length; ++i) {
-      pageDivs[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
+    p.pageWidth = p.divs.pages[0].offsetWidth;
+    var colWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      p.divs.pages[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
 
     moveToPage(pageNumber());
@@ -137,7 +186,7 @@ Carlyle.Reader = function (node, bookData) {
 
   function pageNumber(options) {
     options = options || { div: 0 };
-    var place = book.placeFor(pageDivs[options.div].contentDiv);
+    var place = p.book.placeFor(p.divs.pages[options.div].contentDiv);
     return place ? (place.pageNumber() || 1) : 1;
   }
 
@@ -146,7 +195,7 @@ Carlyle.Reader = function (node, bookData) {
   // title, etc.
   //
   function getPlace() {
-    return book.placeFor(pageDivs[0].contentDiv);
+    return p.book.placeFor(p.divs.pages[0].contentDiv);
   }
 
 
@@ -154,9 +203,19 @@ Carlyle.Reader = function (node, bookData) {
   // greater than the number of pages in this component, overflows into
   // subsequent components.
   //
-  function moveToPage(pageN) {
-    pageN = setPage(pageDivs[0], pageN);
-    setPage(pageDivs[1], pageN, getPlace().component().id);
+  // The componentId is optional, defaults to the current component for page-0.
+  //
+  function moveToPage(pageN, componentId) {
+    if (!componentId) {
+      var place = getPlace();
+      if (place) {
+        componentId = place.componentId();
+      } else {
+        componentId = null;
+      }
+    }
+    pageN = setPage(p.divs.pages[0], pageN, componentId);
+    setPage(p.divs.pages[1], pageN, getPlace().componentId());
     completedTurn();
   }
 
@@ -166,19 +225,19 @@ Carlyle.Reader = function (node, bookData) {
   // should be a float, where 0.0 is the first page and 1.0 is the last page
   // of the component.
   //
+  // The componentId is optional, defaults to the current component for page-0.
+  //
   function moveToPercentageThrough(percent, componentId) {
     if (percent == 0) {
       return moveToPage(1);
     }
-    componentId = componentId || getPlace().component().id;
 
     // Move to the component.
-    setPage(pageDivs[0], 1, componentId || getPlace().component().id);
+    setPage(p.divs.pages[0], 1, componentId || getPlace().componentId());
 
     // Calculate the page based on this component.
     var pageN = getPlace().pageAtPercentageThrough(percent);
-    pageN = setPage(pageDivs[0], pageN, componentId);
-    setPage(pageDivs[1], pageN, componentId);
+    moveToPage(pageN);
     completedTurn();
   }
 
@@ -187,9 +246,8 @@ Carlyle.Reader = function (node, bookData) {
   //
   function skipToChapter(src) {
     console.log("Skipping to chapter: " + src);
-    var place = book.placeOfChapter(pageDivs[0].contentDiv, src);
-    var pageN = setPage(pageDivs[0], place.pageNumber(), place.component().id);
-    setPage(pageDivs[0], pageN, place.component().id);
+    var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
+    moveToPage(place.pageNumber(), place.componentId());
     completedTurn();
   }
 
@@ -197,12 +255,12 @@ Carlyle.Reader = function (node, bookData) {
   // Private method that tells the book to update the given pageElement to
   // the given page.
   function setPage(pageElement, pageN, componentId) {
-    pageN = book.changePage(pageElement.contentDiv, pageN, componentId);
+    pageN = p.book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!pageN) { return false; } // Book may disallow movement to this page.
     setRunningHead(
       pageElement.footer,
       {
-        left: book.placeFor(pageElement.contentDiv).chapterTitle() || '',
+        left: p.book.placeFor(pageElement.contentDiv).chapterTitle() || '',
         right: pageN
       }
     );
@@ -211,65 +269,82 @@ Carlyle.Reader = function (node, bookData) {
 
 
   // Takes an x point for the entire page, and finds the x point relative
-  // to the left of the boxDiv.
+  // to the left of the box div.
   //
   function rebaseX(x) {
     return Math.max(
-      Math.min(boxDiv.offsetWidth, x - boxDiv.cumulativeLeft),
+      Math.min(p.divs.box.offsetWidth, x - p.divs.box.cumulativeLeft),
       0
     );
   }
 
 
-  // Returns to if the boxDiv-based x point is in the "Go forward" zone for
+  // Returns to if the box-based x point is in the "Go forward" zone for
   // user turning a page.
   //
   function inForwardZone(x) {
-    return x > pageWidth * 0.5;
+    return x > p.pageWidth * 0.5;
   }
 
 
-  // Returns to if the boxDiv-based x point is in the "Go backward" zone for
+  // Returns to if the box-based x point is in the "Go backward" zone for
   // user turning a page.
   //
   function inBackwardZone(x) {
-    return x < pageWidth * 0.5;
+    return x < p.pageWidth * 0.5;
   }
 
 
   function lift(boxPointX) {
-    if (turnData.direction) { return; }
+    if (p.turnData.direction) {
+      return;
+    }
+
     if (inForwardZone(boxPointX)) {
       showOverPage();
-      if (setPage(pageDivs[0], pageNumber() + 1)) {
-        turnData.direction = FORWARDS;
+      if (setPage(p.divs.pages[0], pageNumber() + 1)) {
+        p.turnData.direction = k.FORWARDS;
       }
     } else if (inBackwardZone(boxPointX)) {
-      if (setPage(pageDivs[1], pageNumber() - 1)) {
+      if (setPage(p.divs.pages[1], pageNumber() - 1)) {
         jumpOut();
         // NB: we'll leave the opacity adjustment of overPage to turning/turn.
         // Otherwise we get a flicker in some 3D-enhanced user agents.
-        turnData.direction = BACKWARDS;
+        p.turnData.direction = k.BACKWARDS;
       }
     }
   }
 
 
   function turning(boxPointX) {
-    if (!turnData.direction || turnData.completing) { return; }
-    if (turnData.direction == FORWARDS && !inForwardZone(boxPointX)) {
-      turnData.cancellable = true;
-    } else if (turnData.direction == BACKWARDS && !inBackwardZone(boxPointX)) {
-      turnData.cancellable = true;
+    if (!p.turnData.direction || p.turnData.completing) {
+      return;
+    }
+
+    if (
+      p.turnData.direction == k.FORWARDS &&
+      !inForwardZone(boxPointX)
+    ) {
+      p.turnData.cancellable = true;
+    } else if (
+      p.turnData.direction == k.BACKWARDS &&
+      !inBackwardZone(boxPointX)
+    ) {
+      p.turnData.cancellable = true;
     }
 
     // For speed reasons, we constrain movements to a constant number per second.
     var stamp = (new Date()).getTime();
-    var followInterval = followCursorDuration * 0.75;
-    if (turnData.stamp && stamp - turnData.stamp < followInterval) { return; }
-    turnData.stamp = stamp;
+    var followInterval = k.durations.FOLLOW_CURSOR * 0.75;
+    if (
+      p.turnData.stamp &&
+      stamp - p.turnData.stamp < followInterval
+    ) {
+      return;
+    }
+    p.turnData.stamp = stamp;
 
-    if (turnData.direction == BACKWARDS) {
+    if (p.turnData.direction == k.BACKWARDS) {
       showOverPage();
     }
     slideToCursor(boxPointX);
@@ -277,18 +352,18 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function turn(boxPointX) {
-    turnData.completing = true;
-    if (turnData.direction == FORWARDS) {
-      if (turnData.cancellable && inForwardZone(boxPointX)) {
+    p.turnData.completing = true;
+    if (p.turnData.direction == k.FORWARDS) {
+      if (p.turnData.cancellable && inForwardZone(boxPointX)) {
         // Cancelling forward turn
         slideIn(boxPointX);
       } else {
         // Completing forward turn
         slideOut(boxPointX);
       }
-    } else if (turnData.direction == BACKWARDS) {
+    } else if (p.turnData.direction == k.BACKWARDS) {
       showOverPage();
-      if (turnData.cancellable && inBackwardZone(boxPointX)) {
+      if (p.turnData.cancellable && inBackwardZone(boxPointX)) {
         // Cancelling backward turn
         slideOut(boxPointX);
       } else {
@@ -300,11 +375,11 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function completedTurn() {
-    turnData = {};
+    p.turnData = {};
     var turnEvt = document.createEvent("Events");
     turnEvt.initEvent("carlyle:turn", false, true);
-    boxDiv.dispatchEvent(turnEvt);
-    pageDivs[1].style.opacity = 0.01;
+    p.divs.box.dispatchEvent(turnEvt);
+    p.divs.pages[1].style.opacity = k.opacities.HIDDEN;
     jumpIn();
   }
 
@@ -352,62 +427,69 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function jumpIn() {
-    setX(pageDivs[1], 0, { duration: 0 });
+    setX(p.divs.pages[1], 0, { duration: 0 });
   }
 
 
   function jumpOut() {
-    // FIXME: the 10 is magic, and needs to be sensitive to style changes.
-    setX(pageDivs[1], 0 - (pageWidth + 10), { duration: 0 });
+    setX(
+      p.divs.pages[1],
+      0 - (p.pageWidth + k.OFF_SCREEN_GAP),
+      { duration: 0 }
+    );
   }
 
 
   function slideIn(cursorX) {
     var retreatFn = function () {
-      setPage(pageDivs[0], pageNumber() - 1);
+      setPage(p.divs.pages[0], pageNumber() - 1);
       completedTurn();
     }
     var slideOpts = {
-      duration: slideDuration, //(pageWidth - cursorX) * slideSpeedDivisor,
+      duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(pageDivs[1], 0, slideOpts, retreatFn);
+    setX(p.divs.pages[1], 0, slideOpts, retreatFn);
   }
 
 
   function slideOut(cursorX) {
     var advanceFn = function () {
-      setPage(pageDivs[1], pageNumber({ div: 1 }) + 1);
+      setPage(p.divs.pages[1], pageNumber({ div: 1 }) + 1);
       completedTurn();
     }
     var slideOpts = {
-      duration: slideDuration, //cursorX * slideSpeedDivisor,
+      duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    // FIXME: the 10 is magic, and needs to be sensitive to style changes.
-    setX(pageDivs[1], 0 - (pageWidth + 10), slideOpts, advanceFn);
+    setX(
+      p.divs.pages[1],
+      0 - (p.pageWidth + k.OFF_SCREEN_GAP),
+      slideOpts,
+      advanceFn
+    );
   }
 
 
   function slideToCursor(cursorX) {
     setX(
-      pageDivs[1],
-      Math.min(0, cursorX - pageWidth),
-      { duration: followCursorDuration }
+      p.divs.pages[1],
+      Math.min(0, cursorX - p.pageWidth),
+      { duration: k.durations.FOLLOW_CURSOR }
     );
   }
 
 
   function showOverPage() {
-    if (pageDivs[1].style.opacity != 1) {
-      pageDivs[1].style.opacity = 1;
+    if (p.divs.pages[1].style.opacity != k.opacities.VISIBLE) {
+      p.divs.pages[1].style.opacity = k.opacities.VISIBLE;
     }
   }
 
 
   function hideOverPage() {
-    if (pageDivs[1].style.opacity != 0.01) {
-      pageDivs[1].style.opacity = 0.01;
+    if (p.divs.pages[1].style.opacity != k.opacities.HIDDEN) {
+      p.divs.pages[1].style.opacity = k.opacities.HIDDEN;
     }
   }
 
@@ -441,16 +523,16 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function spin() {
-    if (Carlyle.Spinner && !spinner) {
-      spinner = new Carlyle.Spinner(boxDiv);
+    if (Carlyle.Spinner && !p.spinner) {
+      p.spinner = new Carlyle.Spinner(p.divs.box);
     }
   }
 
 
   function spun() {
-    if (spinner) {
-      spinner.stop();
-      spinner = null;
+    if (p.spinner) {
+      p.spinner.stop();
+      p.spinner = null;
     }
   }
 
@@ -459,35 +541,35 @@ Carlyle.Reader = function (node, bookData) {
     // Listeners
     var receivesTouchEvents = (typeof Touch == "object");
     if (!receivesTouchEvents) {
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'mousedown',
         function (evt) {
           evt.preventDefault();
           lift(rebaseX(evt.pageX));
-          containerDiv.onmousemove = function (mmevt) {
+          p.divs.container.onmousemove = function (mmevt) {
             mmevt.preventDefault();
             turning(rebaseX(mmevt.pageX));
           }
         },
         true
       );
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'mouseup',
         function (evt) {
           evt.preventDefault();
-          containerDiv.onmousemove = null;
-          if (!turnData.direction) { return; }
+          p.divs.container.onmousemove = null;
+          if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.pageX));
         },
         true
       );
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'mouseout',
         function (evt) {
-          if (!turnData.direction) { return; }
+          if (!p.turnData.direction) { return; }
           obj = evt.relatedTarget;
           while (obj && (obj = obj.parentNode)) {
-            if (obj == containerDiv) { return; }
+            if (obj == p.divs.container) { return; }
           }
           evt.preventDefault();
           turn(rebaseX(evt.pageX));
@@ -495,7 +577,7 @@ Carlyle.Reader = function (node, bookData) {
         true
       );
     } else {
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'touchstart',
         function (evt) {
           evt.preventDefault();
@@ -504,15 +586,15 @@ Carlyle.Reader = function (node, bookData) {
         },
         true
       );
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'touchmove',
         function (evt) {
           evt.preventDefault();
-          if (!turnData.direction) { return; }
+          if (!p.turnData.direction) { return; }
           if (evt.targetTouches.length > 1) { return; }
-          var rawX = evt.targetTouches[0].pageX - boxDiv.cumulativeLeft;
+          var rawX = evt.targetTouches[0].pageX - p.divs.box.cumulativeLeft;
           var rbX = rebaseX(evt.targetTouches[0].pageX);
-          if (rawX < 0 || rawX > boxDiv.offsetWidth) {
+          if (rawX < 0 || rawX > p.divs.box.offsetWidth) {
             turn(rbX);
           } else {
             turning(rbX);
@@ -520,19 +602,19 @@ Carlyle.Reader = function (node, bookData) {
         },
         true
       );
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'touchend',
         function (evt) {
           evt.preventDefault();
-          if (!turnData.direction) { return; }
+          if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
         true
       );
-      containerDiv.addEventListener(
+      p.divs.container.addEventListener(
         'touchcancel',
         function (evt) {
-          if (!turnData.direction) { return; }
+          if (!p.turnData.direction) { return; }
           evt.preventDefault();
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
@@ -542,23 +624,18 @@ Carlyle.Reader = function (node, bookData) {
     }
   }
 
+  API.setBook = setBook;
+  API.getBook = getBook;
+  API.reapplyStyles = reapplyStyles;
+  API.getPlace = getPlace;
+  API.moveToPage = moveToPage;
+  API.moveToPercentageThrough = moveToPercentageThrough;
+  API.skipToChapter = skipToChapter;
+  API.resized = resized;
+  API.spin = spin;
+  API.spun = spun;
 
   initialize(node, bookData);
 
-
-  var PublicAPI = {
-    constructor: Carlyle.Reader,
-    setBook: setBook,
-    getBook: getBook,
-    reapplyStyles: reapplyStyles,
-    getPlace: getPlace,
-    moveToPage: moveToPage,
-    moveToPercentageThrough: moveToPercentageThrough,
-    skipToChapter: skipToChapter,
-    resized: resized,
-    spin: spin,
-    spun: spun
-  }
-
-  return PublicAPI;
+  return API;
 }

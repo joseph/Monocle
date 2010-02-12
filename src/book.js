@@ -9,47 +9,52 @@
  * It should set and know the place of each page node too.
  *
  */
-
 Carlyle.Book = function (dataSource) {
   if (Carlyle == this) { return new Carlyle.Book(dataSource); }
 
-  var components = [];
-  var places = [];
+  // Constants
+  var k = {
+  }
 
-  // NB: we could also do chunking on the following:
-  //
-  //  - start of a section
-  //  - print media - pagebreak CSS?
+  // Properties.
+  var p = {
+    components: [],
+    places: []
+  }
+
+  // Methods and properties available to external code.
+  var API = {
+    constructor: Carlyle.Book,
+    constants: k,
+    properties: p
+  }
 
 
   // This method must return the actual page number WITHIN THE COMPONENT that
   // will result from the page being turned to 'pageN'. That is, it constrains
   // and corrects the value of pageN.
   //
-  // In this process, it should load a new component if required, any new
-  // chunks as required, remove old components or chunks, and whatever other
-  // steps are useful to optimise the speed of page turning.
+  // In this process, it should load a new component if required. It should
+  // recurse if pageN overflows the first or last pages of the given component.
   //
-  // The Reader should call this method before turning any pageDiv to a new
-  // page number.
+  // The `componentId` is optional -- if it is not provided (or it is invalid),
+  // we default to the currently active component, and if that doesn't exist,
+  // we default to the very first component.
   //
-  function changePage(contentDiv, pageN, componentId) {
-    var place = placeFor(contentDiv) ||
-      setPlaceFor(contentDiv, componentAt(0), 1);
+  function changePage(node, pageN, componentId) {
+    // Find the place of the node in the book, or create one.
+    var place = placeFor(node) || setPlaceFor(node, componentAt(0), 1);
 
-    // The componentId is optional -- if it is not provided (or it is invalid),
-    // we default to the currently active component, and if that doesn't exist,
-    // we default to the very first component.
     var cIndex = dataSource.getComponents().indexOf(componentId);
     var component;
     if (cIndex == -1) {
-      component = place.component();
+      component = place.properties.component;
     } else {
       component = componentAt(cIndex);
     }
 
-    if (component != place.component()) {
-      component.applyTo(contentDiv);
+    if (component != place.properties.component) {
+      component.applyTo(node);
     }
 
     // If the dimensions of the node have changed, we should multiply the
@@ -57,7 +62,7 @@ Carlyle.Book = function (dataSource) {
     // component and the new number of pages in the component.
     //
     var oldCmptLPN = component.lastPageNumber();
-    var changedDims = component.updateDimensions(contentDiv);
+    var changedDims = component.updateDimensions(node);
     if (changedDims && parseInt(oldCmptLPN)) {
       pageN = Math.max(
         Math.round(component.lastPageNumber() * (pageN / oldCmptLPN)),
@@ -67,7 +72,7 @@ Carlyle.Book = function (dataSource) {
 
     // Determine whether we need to apply a new component to the div, and
     // adjust the pageN accordingly.
-    cIndex = component.index;
+    cIndex = component.properties.index;
     var lpn = component.lastPageNumber();
     var finalCIndex = dataSource.getComponents().length - 1; // FIXME: cache it
     if (cIndex == 0 && pageN < 1) {
@@ -80,39 +85,39 @@ Carlyle.Book = function (dataSource) {
       // Moving to next component.
       pageN -= component.lastPageNumber();
       component = componentAt(cIndex + 1);
-      return changePage(contentDiv, pageN, component.id);
+      return changePage(node, pageN, component.properties.id);
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
       pageN += component.lastPageNumber();
-      return changePage(contentDiv, pageN, component.id);
+      return changePage(node, pageN, component.properties.id);
     }
 
     // Do it.
-    component.prepareNode(contentDiv, pageN)
-    var scroller = contentDiv.parentNode;
+    component.prepareNode(node, pageN)
+    var scroller = node.parentNode;
     scroller.scrollLeft = (pageN - 1) * scroller.offsetWidth;
-    setPlaceFor(contentDiv, component, pageN);
+    setPlaceFor(node, component, pageN);
 
     return pageN;
   }
 
 
-  function placeFor(contentDiv) {
-    for (var i = places.length - 1; i >= 0; --i) {
-      if (places[i][0] == contentDiv) {
-        return places[i][1];
+  function placeFor(node) {
+    for (var i = p.places.length - 1; i >= 0; --i) {
+      if (p.places[i][0] == node) {
+        return p.places[i][1];
       }
     }
     return null;
   }
 
 
-  function setPlaceFor(contentDiv, component, pageN) {
-    var place = placeFor(contentDiv);
+  function setPlaceFor(node, component, pageN) {
+    var place = placeFor(node);
     if (!place) {
-      place = new Carlyle.Place(contentDiv);
-      places[places.length] = [contentDiv, place];
+      place = new Carlyle.Place(node);
+      p.places[p.places.length] = [node, place];
     }
     place.setPlace(component, pageN);
     return place;
@@ -120,18 +125,18 @@ Carlyle.Book = function (dataSource) {
 
 
   function componentAt(index) {
-    if (!components[index]) {
+    if (!p.components[index]) {
       var src = dataSource.getComponents()[index];
       var html = dataSource.getComponent(src);
-      components[index] = new Carlyle.Component(
-        PublicAPI,
+      p.components[index] = new Carlyle.Component(
+        API,
         src,
         index,
         chaptersForComponent(src),
         html
-      )
+      );
     }
-    return components[index];
+    return p.components[index];
   }
 
 
@@ -161,22 +166,21 @@ Carlyle.Book = function (dataSource) {
   }
 
 
-  function placeOfChapter(contentDiv, src) {
+  function placeOfChapter(node, src) {
     var matcher = new RegExp('^(.+?)(#(.*))?$');
     var matches = src.match(matcher);
-    console.log(matches);
     if (matches) {
       var cmptId = matches[1];
       var fragment = matches[3] || null;
       var cIndex = dataSource.getComponents().indexOf(cmptId);
       var component = componentAt(cIndex);
-      component.updateDimensions(contentDiv); // FIXME: means no-going-back
-      var place = new Carlyle.Place(contentDiv);
+      component.updateDimensions(node); // FIXME: means no-going-back
+      var place = new Carlyle.Place(node);
       if (fragment) {
-        console.log("Looking for fragment '" + fragment + "' in '" + cmptId + "'");
+        console.log("Looking for fragment '"+fragment+"' in '"+cmptId+"'");
         place.setPlace(component, component.pageForChapter(fragment));
       } else {
-        console.log("Looking for start of '" + cmptId + "'");
+        console.log("Looking for start of '"+cmptId+"'");
         place.setPlace(component, 1);
       }
       return place;
@@ -185,15 +189,12 @@ Carlyle.Book = function (dataSource) {
   }
 
 
-  var PublicAPI = {
-    constructor: Carlyle.Book,
-    changePage: changePage,
-    getMetaData: dataSource.getMetaData,
-    placeFor: placeFor,
-    placeOfChapter: placeOfChapter
-  }
+  API.getMetaData = dataSource.getMetaData;
+  API.changePage = changePage;
+  API.placeFor = placeFor;
+  API.placeOfChapter = placeOfChapter;
 
-  return PublicAPI;
+  return API;
 }
 
 

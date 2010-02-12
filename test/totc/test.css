@@ -89,18 +89,18 @@ body {
 
 #fontWidget span.large {
   font-size: 18px;
+  opacity: 0.3;
 }
 
 #fontWidget span.small {
   font-size: 11px;
+}
+
+#fontWidget.larger span.small {
   opacity: 0.3;
 }
 
-#fontWidget.smaller span.large {
-  opacity: 0.3;
-}
-
-#fontWidget.smaller span.small {
+#fontWidget.larger span.large {
   opacity: 1;
 }
 
