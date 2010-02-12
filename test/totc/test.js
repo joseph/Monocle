@@ -175,6 +175,11 @@
       );
       createFontWidget();
       createTOCWidget();
+      var placeSaver = new Carlyle.Controls.PlaceSaver(reader);
+      var lastPlace = placeSaver.savedPlace();
+      if (lastPlace && confirm("Return to last position?")) {
+        placeSaver.restorePlace();
+      }
     },
     false
   );

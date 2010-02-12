@@ -6,3 +6,5 @@ Carlyle = {};
 //= require <component>
 //= require <styles>
 //= require <spinner>
+
+Carlyle.Controls = {};
