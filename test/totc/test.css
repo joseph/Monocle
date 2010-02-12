@@ -74,36 +74,6 @@ body {
   background-color: #000;
 }
 
-
-#fontWidget {
-  cursor: pointer;
-  position: absolute;
-  right: 40px;
-  top: 4px;
-  padding: 2px;
-  color: #632;
-}
-
-#fontWidget span {
-}
-
-#fontWidget span.large {
-  font-size: 18px;
-  opacity: 0.3;
-}
-
-#fontWidget span.small {
-  font-size: 11px;
-}
-
-#fontWidget.larger span.small {
-  opacity: 0.3;
-}
-
-#fontWidget.larger span.large {
-  opacity: 1;
-}
-
 #tocWidget {
   cursor: pointer;
   position: absolute;

@@ -52,7 +52,10 @@ Carlyle.Reader = function (node, bookData) {
     resizeTimer: null,
 
     // The animation showing that Carlyle is processing something.
-    spinner: null
+    spinner: null,
+
+    // Controls registered to this reader instance.
+    controls: []
   }
 
 
@@ -551,7 +554,7 @@ Carlyle.Reader = function (node, bookData) {
             turning(rebaseX(mmevt.pageX));
           }
         },
-        true
+        false
       );
       p.divs.container.addEventListener(
         'mouseup',
@@ -561,7 +564,7 @@ Carlyle.Reader = function (node, bookData) {
           if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.pageX));
         },
-        true
+        false
       );
       p.divs.container.addEventListener(
         'mouseout',
@@ -574,7 +577,7 @@ Carlyle.Reader = function (node, bookData) {
           evt.preventDefault();
           turn(rebaseX(evt.pageX));
         },
-        true
+        false
       );
     } else {
       p.divs.container.addEventListener(
@@ -584,7 +587,7 @@ Carlyle.Reader = function (node, bookData) {
           if (evt.targetTouches.length > 1) { return; }
           lift(rebaseX(evt.targetTouches[0].pageX));
         },
-        true
+        false
       );
       p.divs.container.addEventListener(
         'touchmove',
@@ -600,7 +603,7 @@ Carlyle.Reader = function (node, bookData) {
             turning(rbX);
           }
         },
-        true
+        false
       );
       p.divs.container.addEventListener(
         'touchend',
@@ -609,7 +612,7 @@ Carlyle.Reader = function (node, bookData) {
           if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
-        true
+        false
       );
       p.divs.container.addEventListener(
         'touchcancel',
@@ -618,11 +621,20 @@ Carlyle.Reader = function (node, bookData) {
           evt.preventDefault();
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
-        true
+        false
       );
       window.addEventListener('orientationchange', resized, true);
     }
   }
+
+
+  function registerPageControl(control) {
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      var page = p.divs.pages[i];
+      page.header.right.appendChild(control.createControlElements());
+    }
+  }
+
 
   API.setBook = setBook;
   API.getBook = getBook;
@@ -634,6 +646,7 @@ Carlyle.Reader = function (node, bookData) {
   API.resized = resized;
   API.spin = spin;
   API.spun = spun;
+  API.registerPageControl = registerPageControl;
 
   initialize(node, bookData);
 

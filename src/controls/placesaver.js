@@ -3,21 +3,25 @@ Carlyle.Controls.PlaceSaver = function (reader) {
     return new Carlyle.Controls.PlaceSaver(reader);
   }
 
+  var k = {
+    COOKIE_NAMESPACE: "carlyle.controls.placesaver."
+  }
+
   // Properties.
   var p = {
   }
 
-
   // Public methods and properties.
   var API = {
     constructor: Carlyle.Controls.PlaceSaver,
+    constants: k,
     properties: p
   }
 
 
   function initialize() {
     var box = reader.properties.divs.box;
-    p.prefix = "carlyle.controls.placesaver." + box.id + ".";
+    p.prefix = k.COOKIE_NAMESPACE + box.id + ".";
     box.addEventListener('carlyle:turn', savePlaceToCookie, true);
   }
 

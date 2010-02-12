@@ -1,10 +1,14 @@
 /* STYLES */
 Carlyle.Styles = {
   ruleText: function(rule) {
-    if (!this[rule]) { return ""; }
+    if (typeof rule == "string") {
+      rule = this[rule];
+    }
+    if (!rule) { return ""; }
+
     var parts = [];
-    for (var declaration in this[rule]) {
-      parts.push(declaration + ": " + this[rule][declaration] + ";")
+    for (var declaration in rule) {
+      parts.push(declaration + ": " + rule[declaration] + ";")
     }
     return parts.join(" ");
   },
@@ -95,5 +99,10 @@ Carlyle.Styles = {
     "position": "relative",
     "display": "block",
     "margin": "auto"
+  },
+
+  Controls: {
+    // A separate namespace for optional control styles, populated by those
+    // optional scripts.
   }
 }

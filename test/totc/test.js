@@ -13,6 +13,7 @@
     content["font-family"] = "Palatino, serif";
     content["line-height"] = "130%";
     header.color = footer.color = "#976";
+    Controls.Magnifier.button.color = "#632";
   }
 
 
@@ -96,26 +97,6 @@
   }
 
 
-  function createFontWidget() {
-    var fontWidget = document.createElement('div');
-    fontWidget.innerHTML = '<span class="small">A</span>' +
-      '<span class="large">A</span>';
-    fontWidget.id = "fontWidget";
-    document.getElementById('readerCntr').appendChild(fontWidget);
-    fontWidget.onclick = function () {
-      var s = Carlyle.Styles.content;
-      if (!s['font-size'] || s['font-size'] == "100%") {
-        s['font-size'] = "110%";
-        fontWidget.className = "larger";
-      } else {
-        s['font-size'] = "100%";
-        fontWidget.className = "";
-      }
-      window.reader.reapplyStyles();
-    }
-  }
-
-
   function createTOCWidget() {
     var controlLayer = document.getElementById('readerCntr');
     var tocWidget = document.createElement('div');
@@ -173,11 +154,14 @@
         function () { window.reader.resized() },
         false
       );
-      createFontWidget();
+
       createTOCWidget();
+
+      var magnifier = new Carlyle.Controls.Magnifier(reader);
+
       var placeSaver = new Carlyle.Controls.PlaceSaver(reader);
       var lastPlace = placeSaver.savedPlace();
-      if (lastPlace && confirm("Return to last position?")) {
+      if (lastPlace) { // && confirm("Return to last position?")) {
         placeSaver.restorePlace();
       }
     },
