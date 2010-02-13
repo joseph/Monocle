@@ -9,7 +9,7 @@ body {
   display: none;
 }
 
-#reader, #readerBg, #readerCntr {
+#reader, #readerBg {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -70,6 +70,31 @@ body {
   background-color: #974;
   border: 1px solid #852;
 }
+
+.runner {
+  color: #976;
+  text-transform: uppercase;
+  font-size: 82%;
+}
+
+.bookTitle {
+  position: absolute;
+  top: 8px;
+  left: 1em;
+}
+
+.chapterTitle {
+  position: absolute;
+  bottom: 8px;
+  left: 1em;
+}
+
+.pageNumber {
+  position: absolute;
+  bottom: 8px;
+  right: 1em;
+}
+
 #readerBg {
   background-color: #000;
 }

@@ -43,7 +43,8 @@ Carlyle.Controls.Magnifier = function (reader) {
     btn.largeA.innerHTML = btn.smallA.innerHTML = "A";
     btn.appendChild(btn.largeA);
 
-    btn.addEventListener('mousedown', toggleMagnification, true);
+    var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
+    btn.addEventListener(evtType, toggleMagnification, true);
 
     p.buttons.push(btn);
     return btn;
@@ -81,7 +82,11 @@ Carlyle.Controls.Magnifier = function (reader) {
 Carlyle.Styles.Controls.Magnifier = {
   button: {
     "cursor": "pointer",
-    "color": "#555"
+    "color": "#555",
+    "position": "absolute",
+    "top": "2px",
+    "right": "10px",
+    "padding": "0 2px"
   },
   largeA: {
     "font-size": "18px",

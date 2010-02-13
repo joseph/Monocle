@@ -12,7 +12,6 @@
     content.color = "#310";
     content["font-family"] = "Palatino, serif";
     content["line-height"] = "130%";
-    header.color = footer.color = "#976";
     Controls.Magnifier.button.color = "#632";
   }
 
@@ -155,15 +154,88 @@
         false
       );
 
-      createTOCWidget();
 
-      var magnifier = new Carlyle.Controls.Magnifier(reader);
-
+      /* PLACE SAVER */
       var placeSaver = new Carlyle.Controls.PlaceSaver(reader);
       var lastPlace = placeSaver.savedPlace();
+
       if (lastPlace) { // && confirm("Return to last position?")) {
         placeSaver.restorePlace();
       }
+
+
+      /* MAGNIFIER CONTROL */
+      new Carlyle.Controls.Magnifier(reader);
+
+
+      /* BOOK TITLE RUNNING HEAD */
+      var bookTitle = {
+        createControlElements: function () {
+          var cntr = document.createElement('div');
+          cntr.className = "bookTitle";
+          var runner = document.createElement('div');
+          runner.className = "runner";
+          runner.innerHTML = reader.getBook().getMetaData('title');
+          cntr.appendChild(runner);
+          return cntr;
+        }
+      }
+      reader.registerPageControl(bookTitle);
+
+
+      /* CHAPTER TITLE RUNNING HEAD */
+      var chapterTitle = {
+        runners: [],
+        createControlElements: function () {
+          var cntr = document.createElement('div');
+          cntr.className = "chapterTitle";
+          var runner = document.createElement('div');
+          runner.className = "runner";
+          cntr.appendChild(runner);
+          this.runners.push(runner);
+          return cntr;
+        },
+        update: function () {
+          for (var i = 0; i < this.runners.length; ++i) {
+            var place = reader.getPlace({ div: i });
+            this.runners[i].innerHTML = place.chapterTitle();
+          }
+        }
+      }
+      reader.registerPageControl(chapterTitle);
+      chapterTitle.update();
+      reader.addEventListener(
+        'carlyle:pagechange',
+        function () { chapterTitle.update(); }
+      );
+
+
+      /* PAGE NUMBER RUNNING HEAD */
+      var pageNumber = {
+        runners: [],
+        createControlElements: function () {
+          var cntr = document.createElement('div');
+          cntr.className = "pageNumber";
+          var runner = document.createElement('div');
+          runner.className = "runner";
+          cntr.appendChild(runner);
+          this.runners.push(runner);
+          return cntr;
+        },
+        update: function () {
+          for (var i = 0; i < this.runners.length; ++i) {
+            var place = reader.getPlace({ div: i });
+            this.runners[i].innerHTML = place.pageNumber();
+          }
+        }
+      }
+      reader.registerPageControl(pageNumber);
+      pageNumber.update();
+      reader.addEventListener(
+        'carlyle:pagechange',
+        function () { pageNumber.update() }
+      );
+
     },
     false
   );

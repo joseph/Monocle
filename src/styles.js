@@ -30,7 +30,8 @@ Carlyle.Styles = {
     "right": "5px",
     "background": "#FFF",
     "cursor": "pointer",
-    "-webkit-box-shadow": "2px 0 3px #777"
+    "-webkit-box-shadow": "2px 0 3px #777",
+    "z-index": 1
   },
 
   overPage: {
@@ -38,39 +39,18 @@ Carlyle.Styles = {
     "opacity": 0.01
   },
 
-  header: {
+  bookTitleRunner: {
     "position": "absolute",
     "top": "8px",
     "left": "1em",
     "right": "1em",
     "color": "#AAA",
-    "text-transform": "uppercase"
-  },
-
-  footer: {
-    "position": "absolute",
-    "bottom": "8px",
-    "left": "1em",
-    "right": "1em",
-    "color": "#AAA",
-    "text-transform": "uppercase"
-  },
-
-  runnerLeft: {
-    "float": "left",
     "font-size": "80%",
     "white-space": "nowrap",
     "text-overflow": "ellipsis",
     "overflow": "hidden",
-    "width": "50%"
-  },
-
-  runnerRight: {
-    "float": "right",
-    "font-size": "80%",
-    "text-align": "right",
-    "white-space": "nowrap",
-    "width": "50%"
+    "text-transform": "uppercase",
+    "display": "none"
   },
 
   scroller: {
