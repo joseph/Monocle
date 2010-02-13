@@ -135,6 +135,7 @@ Carlyle.Reader = function (node, bookData) {
     spin();
     calcDimensions();
     spun();
+    dispatchEvent("carlyle:bookchange");
     return p.book;
   }
 
@@ -298,6 +299,7 @@ Carlyle.Reader = function (node, bookData) {
           if (setPage(p.divs.pages[0], pageNumber() + 1)) {
             p.turnData.direction = k.FORWARDS;
           } else {
+            p.turnData.animating = false;
             hideOverPage();
           }
           setTimeout(
@@ -314,9 +316,6 @@ Carlyle.Reader = function (node, bookData) {
       //
       // Unfortunately this still doesn't work. There is an occasional flicker
       // on showOverPage(), no matter how long we wait beforehand.
-
-      //moveToPage(pageNumber() - 1);
-      //return;
 
       if (setPage(p.divs.pages[1], pageNumber() - 1)) {
         p.turnData.direction = k.BACKWARDS;
@@ -336,6 +335,8 @@ Carlyle.Reader = function (node, bookData) {
           },
           k.durations.ANTI_FLICKER_DELAY
         );
+      } else {
+        p.turnData.animating = false;
       }
     }
   }
@@ -467,6 +468,7 @@ Carlyle.Reader = function (node, bookData) {
     );
   }
 
+
   function slideIn(cursorX) {
     var retreatFn = function () {
       setPage(p.divs.pages[0], pageNumber() - 1);
@@ -537,7 +539,6 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function listenForInteraction() {
-    // Listeners
     var receivesTouchEvents = (typeof Touch == "object");
     if (!receivesTouchEvents) {
       p.divs.container.addEventListener(

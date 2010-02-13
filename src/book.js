@@ -89,6 +89,7 @@ Carlyle.Book = function (dataSource) {
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
+      component.updateDimensions(node); // FIXME: no going back
       pageN += component.lastPageNumber();
       return changePage(node, pageN, component.properties.id);
     }

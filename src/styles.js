@@ -30,8 +30,7 @@ Carlyle.Styles = {
     "right": "5px",
     "background": "#FFF",
     "cursor": "pointer",
-    "-webkit-box-shadow": "2px 0 3px #777",
-    "z-index": 1
+    "-webkit-box-shadow": "2px 0 3px #777"
   },
 
   overPage: {
