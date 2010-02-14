@@ -14,7 +14,7 @@ Carlyle.Reader = function (node, bookData) {
       ANTI_FLICKER_DELAY: 10
     },
     opacities: {
-      VISIBLE: 1,
+      VISIBLE: 1.0,
       HIDDEN: 0.01
     },
     OFF_SCREEN_GAP: 10
@@ -29,7 +29,6 @@ Carlyle.Reader = function (node, bookData) {
     //   box
     //    -> container
     //      -> pages (2)
-    //        -> scroller
     //          -> content
     //
     divs: {
@@ -97,11 +96,8 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.pages[i].pageIndex = i;
       p.divs.container.appendChild(p.divs.pages[i]);
 
-      p.divs.pages[i].scrollerDiv = document.createElement('div');
-      p.divs.pages[i].appendChild(p.divs.pages[i].scrollerDiv);
-
       p.divs.pages[i].contentDiv = document.createElement('div');
-      p.divs.pages[i].scrollerDiv.appendChild(p.divs.pages[i].contentDiv);
+      p.divs.pages[i].appendChild(p.divs.pages[i].contentDiv);
     }
 
     applyStyles();
@@ -117,7 +113,6 @@ Carlyle.Reader = function (node, bookData) {
     for (var i = 0; i < 2; ++i) {
       var page = p.divs.pages[i];
       page.style.cssText = Carlyle.Styles.ruleText('page');
-      page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
       page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
     }
     p.divs.pages[1].style.cssText += Carlyle.Styles.ruleText('overPage');
@@ -167,7 +162,7 @@ Carlyle.Reader = function (node, bookData) {
     do { p.divs.box.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
 
     p.pageWidth = p.divs.pages[0].offsetWidth;
-    var colWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
+    var colWidth = p.divs.pages[0].offsetWidth;
     for (var i = 0; i < p.divs.pages.length; ++i) {
       p.divs.pages[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
@@ -248,10 +243,15 @@ Carlyle.Reader = function (node, bookData) {
   // Private method that tells the book to update the given pageElement to
   // the given page.
   function setPage(pageElement, pageN, componentId) {
-    pageN = p.book.changePage(pageElement.contentDiv, pageN, componentId);
-    if (!pageN) { return false; } // Book may disallow movement to this page.
+    var rslt = p.book.changePage(pageElement.contentDiv, pageN, componentId);
+    if (!rslt) { return false; } // Book may disallow movement to this page.
+    pageElement.scrollLeft = 0;
+    setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 0 });
+    // Now force a redraw.
+    pageElement.className += '';
+
     dispatchEvent("carlyle:pagechange");
-    return pageN;
+    return rslt.page;
   }
 
 
@@ -282,68 +282,69 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
+  function deferredCall(fn) {
+    setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
+  }
+
+
+  function liftAnimationFinished(boxPointX) {
+    p.turnData.animating = false;
+    if (p.turnData.turned) {
+      turn(boxPointX);
+    }
+  }
+
+
   function lift(boxPointX) {
-    if (p.turnData.direction || p.turnData.animating) {
+    if (p.turnData.animating || p.turnData.direction) {
       return;
     }
 
-    p.turnData.animating = true;
-
     if (inForwardZone(boxPointX)) {
-      // Show the overpage, then wait for that to take effect, then
-      // scroll the underpage to the next page, then wait for that to take
-      // effect.
+      p.turnData.animating = true;
       showOverPage();
-      setTimeout(
+      deferredCall(
         function () {
           if (setPage(p.divs.pages[0], pageNumber() + 1)) {
-            p.turnData.direction = k.FORWARDS;
+            deferredCall(
+              function () {
+                p.turnData.direction = k.FORWARDS;
+                slideToCursor(boxPointX);
+                liftAnimationFinished(boxPointX);
+              }
+            );
           } else {
-            p.turnData.animating = false;
             hideOverPage();
+            liftAnimationFinished(boxPointX);
           }
-          setTimeout(
-            function () { p.turnData.animating = false; },
-            k.durations.ANTI_FLICKER_DELAY
-          );
-        },
-        k.durations.ANTI_FLICKER_DELAY
+        }
       );
     } else if (inBackwardZone(boxPointX)) {
-      // Scroll the overpage, wait for that to take effect, move the overPage
-      // off the screen, wait for that to take effect, show the over page,
-      // wait for that to take effect.
-      //
-      // Unfortunately this still doesn't work. There is an occasional flicker
-      // on showOverPage(), no matter how long we wait beforehand.
-
+      p.turnData.animating = true;
+      jumpOut();
       if (setPage(p.divs.pages[1], pageNumber() - 1)) {
         p.turnData.direction = k.BACKWARDS;
-        setTimeout(
+        deferredCall(
           function () {
-            jumpOut();
-            setTimeout(
+            showOverPage();
+            deferredCall(
               function () {
-                showOverPage();
-                setTimeout(
-                  function () { p.turnData.animating = false; },
-                  k.durations.ANTI_FLICKER_DELAY
-                );
-              },
-              k.durations.ANTI_FLICKER_DELAY
+                slideToCursor(boxPointX);
+                liftAnimationFinished(boxPointX);
+              }
             );
-          },
-          k.durations.ANTI_FLICKER_DELAY
+          }
         );
       } else {
-        p.turnData.animating = false;
+        jumpIn();
+        liftAnimationFinished(boxPointX);
       }
     }
   }
 
 
   function turning(boxPointX) {
-    if (!p.turnData.direction || p.turnData.animating) {
+    if (p.turnData.animating || !p.turnData.direction) {
       return;
     }
 
@@ -361,7 +362,7 @@ Carlyle.Reader = function (node, bookData) {
 
     // For speed reasons, we constrain movements to a constant number per second.
     var stamp = (new Date()).getTime();
-    var followInterval = k.durations.FOLLOW_CURSOR * 0.75;
+    var followInterval = k.durations.FOLLOW_CURSOR * 1;
     if (
       p.turnData.stamp &&
       stamp - p.turnData.stamp < followInterval
@@ -375,6 +376,13 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function turn(boxPointX) {
+    if (p.turnData.animating) {
+      p.turnData.turned = true;
+      return;
+    }
+    if (!p.turnData.direction) {
+      return;
+    }
     if (p.turnData.direction == k.FORWARDS) {
       if (p.turnData.cancellable && inForwardZone(boxPointX)) {
         // Cancelling forward turn
@@ -447,7 +455,9 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function jumpIn() {
-    setX(p.divs.pages[1], 0, { duration: 0 });
+    // Values should be zero, but Saf 4.0.4 on 10.6 delays the render, causing
+    // a detectable flicker when advancing.
+    setX(p.divs.pages[1], -4, { duration: 1 });
   }
 
 
@@ -472,7 +482,7 @@ Carlyle.Reader = function (node, bookData) {
   function slideIn(cursorX) {
     var retreatFn = function () {
       setPage(p.divs.pages[0], pageNumber() - 1);
-      setTimeout(completedTurn, k.durations.ANTI_FLICKER_DELAY)
+      setTimeout(completedTurn, k.durations.ANTI_FLICKER_DELAY);
     }
     var slideOpts = {
       duration: k.durations.SLIDE,
@@ -484,8 +494,8 @@ Carlyle.Reader = function (node, bookData) {
 
   function slideOut(cursorX) {
     var advanceFn = function () {
+      completedTurn();
       setPage(p.divs.pages[1], pageNumber({ div: 1 }) + 1);
-      setTimeout(completedTurn, k.durations.ANTI_FLICKER_DELAY);
     }
     var slideOpts = {
       duration: k.durations.SLIDE,
@@ -558,7 +568,6 @@ Carlyle.Reader = function (node, bookData) {
         function (evt) {
           evt.preventDefault();
           p.divs.container.onmousemove = null;
-          if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.pageX));
         },
         false
@@ -566,7 +575,6 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.container.addEventListener(
         'mouseout',
         function (evt) {
-          if (!p.turnData.direction) { return; }
           obj = evt.relatedTarget;
           while (obj && (obj = obj.parentNode)) {
             if (obj == p.divs.container) { return; }
@@ -590,7 +598,6 @@ Carlyle.Reader = function (node, bookData) {
         'touchmove',
         function (evt) {
           evt.preventDefault();
-          if (!p.turnData.direction) { return; }
           if (evt.targetTouches.length > 1) { return; }
           var rawX = evt.targetTouches[0].pageX - p.divs.box.cumulativeLeft;
           var rbX = rebaseX(evt.targetTouches[0].pageX);
@@ -606,7 +613,6 @@ Carlyle.Reader = function (node, bookData) {
         'touchend',
         function (evt) {
           evt.preventDefault();
-          if (!p.turnData.direction) { return; }
           turn(rebaseX(evt.changedTouches[0].pageX));
         },
         false
@@ -614,7 +620,6 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.container.addEventListener(
         'touchcancel',
         function (evt) {
-          if (!p.turnData.direction) { return; }
           evt.preventDefault();
           turn(rebaseX(evt.changedTouches[0].pageX));
         },

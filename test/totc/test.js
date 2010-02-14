@@ -160,7 +160,7 @@
       var lastPlace = placeSaver.savedPlace();
 
       if (lastPlace) { // && confirm("Return to last position?")) {
-        placeSaver.restorePlace();
+        //placeSaver.restorePlace();
       }
 
 

@@ -96,11 +96,9 @@ Carlyle.Book = function (dataSource) {
 
     // Do it.
     component.prepareNode(node, pageN)
-    var scroller = node.parentNode;
-    scroller.scrollLeft = (pageN - 1) * scroller.offsetWidth;
     setPlaceFor(node, component, pageN);
 
-    return pageN;
+    return { page: pageN, offset: (pageN - 1) * node.parentNode.offsetWidth };
   }
 
 
