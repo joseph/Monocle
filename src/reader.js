@@ -71,7 +71,9 @@ Carlyle.Reader = function (node, bookData) {
   // Sets up the container and internal elements.
   //
   function initialize(node, bookData) {
-    p.divs.box = typeof(node) == "string" ? document.getElementById(node) : node;
+    p.divs.box = typeof(node) == "string" ?
+      document.getElementById(node) :
+      node;
 
     var bk;
     if (bookData) {
@@ -96,8 +98,11 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.pages[i].pageIndex = i;
       p.divs.container.appendChild(p.divs.pages[i]);
 
+      p.divs.pages[i].scrollerDiv = document.createElement('div');
+      p.divs.pages[i].appendChild(p.divs.pages[i].scrollerDiv);
+
       p.divs.pages[i].contentDiv = document.createElement('div');
-      p.divs.pages[i].appendChild(p.divs.pages[i].contentDiv);
+      p.divs.pages[i].scrollerDiv.appendChild(p.divs.pages[i].contentDiv);
     }
 
     applyStyles();
@@ -113,6 +118,7 @@ Carlyle.Reader = function (node, bookData) {
     for (var i = 0; i < 2; ++i) {
       var page = p.divs.pages[i];
       page.style.cssText = Carlyle.Styles.ruleText('page');
+      page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
       page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
     }
     p.divs.pages[1].style.cssText += Carlyle.Styles.ruleText('overPage');
@@ -159,10 +165,12 @@ Carlyle.Reader = function (node, bookData) {
   function calcDimensions() {
     p.divs.box.cumulativeLeft = 0;
     var o = p.divs.box;
-    do { p.divs.box.cumulativeLeft += o.offsetLeft; } while (o = o.offsetParent);
+    do {
+      p.divs.box.cumulativeLeft += o.offsetLeft;
+    } while (o = o.offsetParent);
 
     p.pageWidth = p.divs.pages[0].offsetWidth;
-    var colWidth = p.divs.pages[0].offsetWidth;
+    var colWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
     for (var i = 0; i < p.divs.pages.length; ++i) {
       p.divs.pages[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
@@ -245,10 +253,13 @@ Carlyle.Reader = function (node, bookData) {
   function setPage(pageElement, pageN, componentId) {
     var rslt = p.book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!rslt) { return false; } // Book may disallow movement to this page.
-    pageElement.scrollLeft = 0;
+
+    // Move the contentDiv so that the current active page is visible.
     setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 0 });
-    // Now force a redraw.
-    pageElement.className += '';
+
+    // Touch the translateX value of the parent div, so that Webkit picks
+    // up the change (otherwise there is tearing on OSX 10.6).
+    setX(pageElement.scrollerDiv, 0, { duration: 0 });
 
     dispatchEvent("carlyle:pagechange");
     return rslt.page;

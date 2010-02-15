@@ -18,7 +18,7 @@
         margin: 0;
         padding: 0;
       }
-      #reader, #readerBg {
+      #reader {
         position: absolute;
         width: 100%;
         height: 100%;
@@ -27,79 +27,10 @@
         white-space: normal;
         font: normal 100% serif;
       }
-      /* from smallest and outermost to largest and innermost */
-      .dummyPage {
-        position: absolute;
-        left: 0;
-        top: 18px;
-        bottom: 18px;
-        right: 15px;
-        background-color: #FCF6F0;
-        -webkit-box-shadow: 1px 0 2px #A99;
-      }
-      .dummyPage + .dummyPage {
-        top: 14px;
-        bottom: 14px;
-        right: 16px;
-      }
-      .dummyPage + .dummyPage + .dummyPage {
-        top: 11px;
-        bottom: 11px;
-        right: 18px;
-        background-color: #FFF9F4;
-      }
-      .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-        top: 8px;
-        bottom: 8px;
-        right: 21px;
-      }
-      .dummyPage + .dummyPage + .dummyPage + .dummyPage + .dummyPage {
-        top: 6px;
-        bottom: 6px;
-        right: 25px;
-      }
-      .jacket {
-        position: absolute;
-        background-color: #F9F9EE;
-        top: 1px;
-        bottom: 1px;
-        right: 4px;
-        left: 65%;
-        -webkit-box-shadow: -3px 0 3px #654;
-        -webkit-border-top-right-radius: 3px;
-        -webkit-border-bottom-right-radius: 3px;
-        background: -webkit-gradient(linear, left top, right bottom, from(#F6F0E6), to(#E0D3CB));
-      }
-      .board {
-        position: absolute;
-        top: 1px;
-        bottom: 1px;
-        width: 90%;
-        background-color: #974;
-        border: 1px solid #852;
-      }
-      #readerBg {
-        background-color: #000;
-      }
     </style>
 
     <script type="text/javascript">
       (function () {
-
-        with (Carlyle.Styles) {
-          container.background = "none";
-          container.right = "24px";
-          container.left = '0';
-          container.width = 'auto';
-          page.background = "#FFFBF6";
-          page.top = "4px";
-          page.bottom = "4px";
-          page["-webkit-box-shadow"] = "1px 0 2px #997";
-          content.color = "#310";
-          content["font-family"] = "Palatino, serif";
-          content["line-height"] = "130%";
-        }
-
 
         var bookData = {
           getComponents: function () {
@@ -116,16 +47,13 @@
             return [];
           },
           getComponent: function (componentId) {
-                          /*
-            if (window.reader) {
-              window.reader.spin();
+            if (window.theReader) {
+              window.theReader.spin();
             }
-            */
             var out = this.getViaAjax(componentId);
-            /*
-            if (window.reader) {
-              window.reader.spun();
-            }*/
+            if (window.theReader) {
+              window.theReader.spun();
+            }
             return out;
           },
           getMetaData: function(key) {
@@ -147,35 +75,8 @@
           'load',
           function () {
             var box = document.getElementById('reader');
-            window.reader = Carlyle.Reader(box, bookData);
-            window.addEventListener('resize', reader.resized, false);
-
-            // Check the cookie for a previous location and go to it.
-            /*
-            if (document.cookie) {
-              var lastComp = document.cookie.match(/component=(.+?)(;|$)/);
-              var lastPage = document.cookie.match(/page=(\d+?)(;|$)/);
-              if (lastComp && lastComp[1] && lastPage && lastPage[1]) {
-                lastPage = parseInt(lastPage[1]);
-                lastComp = lastComp[1];
-                console.log("Going to page "+lastPage+" of "+lastComp);
-                reader.goToPage(lastPage, lastComp);
-              }
-            }
-
-            // Register an event to store the current location in a cookie.
-            box.addEventListener(
-              'pageturn',
-              function () {
-                var loc = reader.getLocation();
-                document.cookie = "component="+encodeURIComponent(loc.component);
-                document.cookie = "page="+loc.page;
-              },
-              true
-            );
-            */
-
-
+            window.theReader = Carlyle.Reader(box, bookData);
+            window.addEventListener('resize', theReader.resized, false);
           },
           false
         );
@@ -185,15 +86,6 @@
   </head>
 
   <body>
-    <div id="readerBg">
-      <div class="board"></div>
-      <div class="jacket"></div>
-      <div class="dummyPage"></div>
-      <div class="dummyPage"></div>
-      <div class="dummyPage"></div>
-      <div class="dummyPage"></div>
-      <div class="dummyPage"></div>
-    </div>
     <div id="reader"></div>
   </body>
 </html>

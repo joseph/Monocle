@@ -5,12 +5,17 @@
     container.right = "24px";
     container.left = '0';
     container.width = 'auto';
-    page.background = "#FFFBF6";
-    page.top = "6px";
-    page.bottom = "6px";
+    page.top = page.bottom = "6px";
     page["-webkit-box-shadow"] = "1px 0 2px #997";
+    page["-webkit-border-top-left-radius"] = "13px 3px";
+    page["-webkit-border-bottom-left-radius"] = "13px 3px";
+    page.background = "#FFFBF6 " +
+      "-webkit-gradient(linear, 0 0, 10 0, from(#DDD6CF), to(#FFFBF6))";
+    scroller.top = scroller.bottom = "2.5em";
+    scroller.left = "1em";
+    scroller.right = "1.5em";
     content.color = "#310";
-    content["font-family"] = "Palatino, serif";
+    content["font-family"] = "Palatino, Georgia, serif";
     content["line-height"] = "130%";
     Controls.Magnifier.button.color = "#632";
   }

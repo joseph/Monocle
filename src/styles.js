@@ -27,7 +27,6 @@ Carlyle.Styles = {
     "left": "0",
     "bottom": "3px",
     "right": "5px",
-    "overflow": "hidden",
     "background": "#FFF",
     "cursor": "pointer",
     "-webkit-box-shadow": "2px 0 2px #999"
@@ -38,7 +37,17 @@ Carlyle.Styles = {
     "-webkit-transform-style": "preserve-3d"
   },
 
+  scroller: {
+    "position": "absolute",
+    "top": "2em",
+    "bottom": "2em",
+    "left": "1em",
+    "right": "1em",
+    "overflow": "hidden"
+  },
+
   content: {
+    //"-webkit-transform-style": "preserve-3d", // FASTER, BUT UGLIER.
     "position": "absolute",
     "top": "0",
     "bottom": "0",

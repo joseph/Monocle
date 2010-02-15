@@ -318,6 +318,7 @@ Carlyle.Component = function (book, id, index, chapters, html) {
         }
       }
     }
+    node.parentNode.scrollLeft = 0;
 
     return p.chapters;
   }
