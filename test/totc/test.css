@@ -27,9 +27,9 @@ body {
   bottom: 20px;
   right: 15px;
   background-color: #FCF6F0;
-  -webkit-box-shadow: 2px 2px 4px #CBA;
-  -webkit-border-top-left-radius: 13px 3px;
-  -webkit-border-top-right-radius: 13px 3px;
+  -webkit-box-shadow: 2px 2px 4px #754;
+  -webkit-border-top-left-radius: 26px 6px;
+  -webkit-border-bottom-left-radius: 26px 6px;
 }
 .dummyPage + .dummyPage {
   top: 16px;
@@ -57,12 +57,12 @@ body {
   position: absolute;
   top: 1px;
   bottom: 1px;
-  right: 2px;
+  right: 3px;
   left: 65%;
-  -webkit-box-shadow: -3px 0 3px #654;
+  -webkit-box-shadow: -3px 0 3px #311;
   -webkit-border-top-right-radius: 3px;
   -webkit-border-bottom-right-radius: 3px;
-  background: -webkit-gradient(linear, left top, right bottom, from(#F6F0E6), to(#E0D3CB));
+  background: -webkit-gradient(linear, left top, right bottom, from(#FFF), to(#F7F7F7));
 }
 .board {
   position: absolute;
@@ -82,13 +82,13 @@ body {
 .bookTitle {
   position: absolute;
   top: 10px;
-  left: 1em;
+  left: 2em;
 }
 
 .chapterTitle {
   position: absolute;
   bottom: 10px;
-  left: 1em;
+  left: 2em;
 }
 
 .pageNumber {

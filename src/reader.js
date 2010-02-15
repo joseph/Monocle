@@ -468,7 +468,7 @@ Carlyle.Reader = function (node, bookData) {
   function jumpIn() {
     // Values should be zero, but Saf 4.0.4 on 10.6 delays the render, causing
     // a detectable flicker when advancing.
-    setX(p.divs.pages[1], -4, { duration: 1 });
+    setX(p.divs.pages[1], -1, { duration: 1 });
   }
 
 

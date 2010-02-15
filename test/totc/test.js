@@ -7,12 +7,12 @@
     container.width = 'auto';
     page.top = page.bottom = "6px";
     page["-webkit-box-shadow"] = "1px 0 2px #997";
-    page["-webkit-border-top-left-radius"] = "13px 3px";
-    page["-webkit-border-bottom-left-radius"] = "13px 3px";
+    page["-webkit-border-top-left-radius"] = "26px 4px";
+    page["-webkit-border-bottom-left-radius"] = "26px 4px";
     page.background = "#FFFBF6 " +
-      "-webkit-gradient(linear, 0 0, 10 0, from(#DDD6CF), to(#FFFBF6))";
+      "-webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFEFC))";
     scroller.top = scroller.bottom = "2.5em";
-    scroller.left = "1em";
+    scroller.left = "2em";
     scroller.right = "1.5em";
     content.color = "#310";
     content["font-family"] = "Palatino, Georgia, serif";
