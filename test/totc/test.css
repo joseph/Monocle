@@ -83,6 +83,8 @@ body {
   position: absolute;
   top: 10px;
   left: 2em;
+  cursor: pointer;
+  background: #FFF;
 }
 
 .chapterTitle {
@@ -101,36 +103,39 @@ body {
   background-color: #000;
 }
 
-#tocWidget {
-  cursor: pointer;
+#toc ul.root {
   position: absolute;
-  right: 70px;
-  top: 4px;
-  padding: 2px;
-  color: #632;
-  font-size: 18px;
-}
-
-#toc {
-  position: absolute;
-  top: 10%;
-  bottom: 10%;
+  top: 44px;
   left: 8%;
-  right: 8%;
+  max-height: 80%;
+  max-width: 80%;
   background: #E0D3C0;
-  -webkit-box-shadow: 1px 1px 12px #652;
+  -webkit-box-shadow: 1px 2px 2px #652;
   -webkit-border-radius: 10px;
   overflow-y: auto;
   color: #642;
-  font: 11pt Helvetica, Arial, sans-serif;
+  font: 11pt Georgia, serif;
   text-shadow: 1px 1px #EEE6D0;
   border: 1px solid #EED;
+  z-index: 2;
+}
+
+.tocArrow {
+  position: absolute;
+  top: 34px;
+  left: 16%;
+  width: 20px;
+  height: 20px;
+  -webkit-transform: rotateZ(45deg);
+  background: #E0D3C0;
+  z-index: 1;
 }
 
 #toc li {
   list-style: none;
   line-height: 220%;
   padding-left: 1em;
+  padding-right: 2em;
   border-bottom: 2px groove #FFF6E9;
   cursor: pointer;
 }

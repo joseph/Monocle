@@ -101,12 +101,10 @@
   }
 
 
-  function createTOCWidget() {
+  function createToC(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
     var controlLayer = document.getElementById('readerCntr');
-    var tocWidget = document.createElement('div');
-    tocWidget.innerHTML = "Contents";
-    tocWidget.id = "tocWidget";
-    controlLayer.appendChild(tocWidget);
 
     tocList = document.createElement('ul');
     tocList.className = 'root';
@@ -118,7 +116,7 @@
       span.innerHTML = chp.title;
       li.onclick = function () {
         window.reader.skipToChapter(chp.src);
-        tocList.parentNode.parentNode.removeChild(tocList.parentNode);
+        controlLayer.removeChild(controlLayer.tocMenu);
       }
       tocList.appendChild(li);
       if (chp.children) {
@@ -133,17 +131,18 @@
       listBuilder(contents[i], 0);
     }
 
-    tocWidget.onclick = function () {
-      if (!tocWidget.menu) {
-        tocWidget.menu = document.createElement('div');
-        tocWidget.menu.id = "toc";
-        tocWidget.menu.appendChild(tocList);
-      }
-      if (tocWidget.menu.parentNode) {
-        controlLayer.removeChild(tocWidget.menu);
-      } else {
-        controlLayer.appendChild(tocWidget.menu);
-      }
+    if (!controlLayer.tocMenu) {
+      controlLayer.tocMenu = document.createElement('div');
+      controlLayer.tocMenu.id = "toc";
+      controlLayer.tocMenu.appendChild(tocList);
+      var arrow = document.createElement('div');
+      arrow.className = "tocArrow";
+      controlLayer.tocMenu.appendChild(arrow);
+    }
+    if (controlLayer.tocMenu.parentNode) {
+      controlLayer.removeChild(controlLayer.tocMenu);
+    } else {
+      controlLayer.appendChild(controlLayer.tocMenu);
     }
   }
 
@@ -165,7 +164,7 @@
       var lastPlace = placeSaver.savedPlace();
 
       if (lastPlace) { // && confirm("Return to last position?")) {
-        //placeSaver.restorePlace();
+        placeSaver.restorePlace();
       }
 
 
@@ -182,6 +181,8 @@
           runner.className = "runner";
           runner.innerHTML = reader.getBook().getMetaData('title');
           cntr.appendChild(runner);
+          var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
+          cntr.addEventListener(evtType, createToC, false);
           return cntr;
         }
       }
