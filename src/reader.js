@@ -10,8 +10,8 @@ Carlyle.Reader = function (node, bookData) {
     durations: {
       SLIDE: 240,
       FOLLOW_CURSOR: 100,
-      RESIZE_DELAY: 100//,
-      //ANTI_FLICKER_DELAY: 20
+      RESIZE_DELAY: 500,
+      ANTI_FLICKER_DELAY: 20
     },
     OFF_SCREEN_GAP: 10
   }
@@ -25,7 +25,11 @@ Carlyle.Reader = function (node, bookData) {
     //   box
     //    -> container
     //      -> pages (2)
+    //        -> scroller
     //          -> content
+    //        -> page controls
+    //      -> overlay controls
+    //      -> modal controls?
     //
     divs: {
       box: null,
@@ -208,7 +212,6 @@ Carlyle.Reader = function (node, bookData) {
       }
     }
     pageN = setPage(upperPage(), pageN, componentId);
-    setPage(lowerPage(), pageN + 1, getPlace().componentId());
     completedTurn();
   }
 
@@ -230,7 +233,9 @@ Carlyle.Reader = function (node, bookData) {
 
     // Calculate the page based on this component.
     var pageN = getPlace().pageAtPercentageThrough(percent);
-    moveToPage(pageN);
+    if (pageN != 1) {
+      setPage(upperPage(), pageN);
+    }
     completedTurn();
   }
 
@@ -241,7 +246,6 @@ Carlyle.Reader = function (node, bookData) {
     console.log("Skipping to chapter: " + src);
     var place = p.book.placeOfChapter(upperPage().contentDiv, src);
     moveToPage(place.pageNumber(), place.componentId());
-    completedTurn();
   }
 
 
@@ -295,9 +299,11 @@ Carlyle.Reader = function (node, bookData) {
     return p.divs.pages[p.activeIndex];
   }
 
+
   function lowerPage() {
     return p.divs.pages[(p.activeIndex + 1) % 2];
   }
+
 
   function flipPages() {
     upperPage().style.zIndex = 1;
@@ -305,29 +311,31 @@ Carlyle.Reader = function (node, bookData) {
     return p.activeIndex = (p.activeIndex + 1) % 2;
   }
 
-  /*
+
   function deferredCall(fn) {
     setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
   }
-  */
 
 
   function liftAnimationFinished(boxPointX) {
     p.turnData.animating = false;
-    if (p.turnData.turned) {
-      turn(boxPointX);
+    if (p.turnData.dropped) {
+      drop(boxPointX);
+      p.turnData.dropped -= 1;
     }
   }
 
 
   function lift(boxPointX) {
     if (p.turnData.animating || p.turnData.direction) {
+      p.turnData.lifted = boxPointX;
       return;
     }
 
     if (inForwardZone(boxPointX)) {
       p.turnData.direction = k.FORWARDS;
       slideToCursor(boxPointX);
+      liftAnimationFinished();
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
@@ -339,13 +347,12 @@ Carlyle.Reader = function (node, bookData) {
           p.turnData.direction = k.BACKWARDS;
           jumpOut(
             function () {
-              setTimeout(
+              deferredCall(
                 function () {
                   flipPages();
                   slideToCursor(boxPointX);
                   liftAnimationFinished(boxPointX);
-                },
-                50
+                }
               );
             }
           );
@@ -391,9 +398,9 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function turn(boxPointX) {
+  function drop(boxPointX) {
     if (p.turnData.animating) {
-      p.turnData.turned = true;
+      p.turnData.dropped = (p.turnData.dropped || 0) + 1;
       return;
     }
     if (!p.turnData.direction) {
@@ -430,7 +437,15 @@ Carlyle.Reader = function (node, bookData) {
           place.componentId(),
           function () {
             dispatchEvent("carlyle:turn");
-            p.turnData = {};
+            var liftedPoint = p.turnData.lifted;
+            if (liftedPoint) {
+              p.turnData = {
+                dropped: p.turnData.dropped
+              }
+              lift(liftedPoint);
+            } else {
+              p.turnData = {}
+            }
           }
         );
       }
@@ -579,7 +594,7 @@ Carlyle.Reader = function (node, bookData) {
         function (evt) {
           evt.preventDefault();
           p.divs.container.onmousemove = null;
-          turn(rebaseX(evt.pageX));
+          drop(rebaseX(evt.pageX));
         },
         false
       );
@@ -591,7 +606,7 @@ Carlyle.Reader = function (node, bookData) {
             if (obj == p.divs.container) { return; }
           }
           evt.preventDefault();
-          turn(rebaseX(evt.pageX));
+          drop(rebaseX(evt.pageX));
         },
         false
       );
@@ -613,7 +628,7 @@ Carlyle.Reader = function (node, bookData) {
           var rawX = evt.targetTouches[0].pageX - p.divs.box.cumulativeLeft;
           var rbX = rebaseX(evt.targetTouches[0].pageX);
           if (rawX < 0 || rawX > p.divs.box.offsetWidth) {
-            turn(rbX);
+            drop(rbX);
           } else {
             turning(rbX);
           }
@@ -624,7 +639,7 @@ Carlyle.Reader = function (node, bookData) {
         'touchend',
         function (evt) {
           evt.preventDefault();
-          turn(rebaseX(evt.changedTouches[0].pageX));
+          drop(rebaseX(evt.changedTouches[0].pageX));
         },
         false
       );
@@ -632,7 +647,7 @@ Carlyle.Reader = function (node, bookData) {
         'touchcancel',
         function (evt) {
           evt.preventDefault();
-          turn(rebaseX(evt.changedTouches[0].pageX));
+          drop(rebaseX(evt.changedTouches[0].pageX));
         },
         false
       );
