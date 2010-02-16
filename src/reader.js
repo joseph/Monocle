@@ -10,8 +10,8 @@ Carlyle.Reader = function (node, bookData) {
     durations: {
       SLIDE: 240,
       FOLLOW_CURSOR: 100,
-      RESIZE_DELAY: 100,
-      ANTI_FLICKER_DELAY: 20
+      RESIZE_DELAY: 100//,
+      //ANTI_FLICKER_DELAY: 20
     },
     OFF_SCREEN_GAP: 10
   }
@@ -247,16 +247,17 @@ Carlyle.Reader = function (node, bookData) {
 
   // Private method that tells the book to update the given pageElement to
   // the given page.
-  function setPage(pageElement, pageN, componentId) {
+  function setPage(pageElement, pageN, componentId, callback) {
     var rslt = p.book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!rslt) { return false; } // Book may disallow movement to this page.
 
     // Move the contentDiv so that the current active page is visible.
-    setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 0 });
+    // The slight duration prevents 3d-renderer tearing artefacts.
+    setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 1 }, callback);
 
     // Touch the translateX value of the parent div, so that Webkit picks
     // up the change (otherwise there is tearing on OSX 10.6).
-    setX(pageElement.scrollerDiv, 0, { duration: 0 });
+    setX(pageElement.scrollerDiv, 0, { duration: 2 });
 
     dispatchEvent("carlyle:pagechange");
     return rslt.page;
@@ -304,9 +305,11 @@ Carlyle.Reader = function (node, bookData) {
     return p.activeIndex = (p.activeIndex + 1) % 2;
   }
 
+  /*
   function deferredCall(fn) {
     setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
   }
+  */
 
 
   function liftAnimationFinished(boxPointX) {
@@ -327,19 +330,29 @@ Carlyle.Reader = function (node, bookData) {
       slideToCursor(boxPointX);
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
-      if (setPage(lowerPage(), pageNumber() - 1)) {
-        p.turnData.direction = k.BACKWARDS;
-        deferredCall(
-          function () {
-            jumpOut();
-            deferredCall(function () {
-              flipPages();
-              slideToCursor(boxPointX);
-              liftAnimationFinished(boxPointX);
-            });
-          }
-        );
-      } else {
+      var place = getPlace();
+      var success = setPage(
+        lowerPage(),
+        place.pageNumber() - 1,
+        place.componentId(),
+        function () {
+          p.turnData.direction = k.BACKWARDS;
+          jumpOut(
+            function () {
+              setTimeout(
+                function () {
+                  flipPages();
+                  slideToCursor(boxPointX);
+                  liftAnimationFinished(boxPointX);
+                },
+                50
+              );
+            }
+          );
+        }
+      );
+
+      if (!success) {
         p.turnData.animating = false;
       }
     }
@@ -408,10 +421,20 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function completedTurn() {
-    jumpIn();
-    setPage(lowerPage(), pageNumber() + 1);
-    deferredCall(function () { p.turnData = {}; });
-    dispatchEvent("carlyle:turn");
+    jumpIn(
+      function () {
+        var place = getPlace();
+        setPage(
+          lowerPage(),
+          place.pageNumber() + 1,
+          place.componentId(),
+          function () {
+            dispatchEvent("carlyle:turn");
+            p.turnData = {};
+          }
+        );
+      }
+    );
   }
 
 
@@ -434,52 +457,51 @@ Carlyle.Reader = function (node, bookData) {
     if (typeof(x) == "number") { x = x + "px"; }
     elem.style.webkitTransform = 'translateX('+x+')';
 
-    if (elem.setXTransitionCallback) {
-      elem.removeEventListener(
-        'webkitTransitionEnd',
-        elem.setXTransitionCallback,
-        false
-      );
-      elem.setXTransitionCallback = null;
+    if (elem.setXTCB) {
+      elem.removeEventListener('webkitTransitionEnd', elem.setXTCB, false);
+      elem.setXTCB = null;
     }
     if (callback) {
-      if (transition == 'none') {
+      if (transition == "none" || getX(elem) == parseInt(x)) {
         callback();
       } else {
-        elem.setXTransitionCallback = callback;
-        elem.addEventListener(
-          'webkitTransitionEnd',
-          elem.setXTransitionCallback,
-          false
-        );
+        elem.setXTCB = callback;
+        elem.addEventListener('webkitTransitionEnd', elem.setXTCB, false);
       }
     }
   }
 
 
-  /* NB: Jumps are always done by the hidden lower page. */
-
-  function jumpIn() {
-    // Values should be zero, but Saf 4.0.4 on 10.6 delays the render, causing
-    // a detectable flicker when advancing.
-    setX(lowerPage(), -1, { duration: 1 });
+  function getX(elem) {
+    var matrix = window.getComputedStyle(elem).webkitTransform;
+		matrix = new WebKitCSSMatrix(matrix);
+    return matrix.m41;
   }
 
 
-  function jumpOut() {
+  /* NB: Jumps are always done by the hidden lower page. */
+
+  function jumpIn(callback) {
+    setX(lowerPage(), 0, { duration: 0 }, callback);
+  }
+
+
+  function jumpOut(callback) {
     setX(
       lowerPage(),
       0 - (p.pageWidth + k.OFF_SCREEN_GAP),
-      { duration: 0 }
+      { duration: 0 },
+      callback
     );
   }
 
 
-  function jumpToCursor(cursorX) {
+  function jumpToCursor(cursorX, callback) {
     setX(
       lowerPage(),
       Math.min(0, cursorX - p.pageWidth),
-      { duration: 0 }
+      { duration: 0 },
+      callback
     );
   }
 
@@ -512,11 +534,12 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function slideToCursor(cursorX) {
+  function slideToCursor(cursorX, callback) {
     setX(
       upperPage(),
       Math.min(0, cursorX - p.pageWidth),
-      { duration: k.durations.FOLLOW_CURSOR }
+      { duration: k.durations.FOLLOW_CURSOR },
+      callback
     );
   }
 
