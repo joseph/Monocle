@@ -131,6 +131,38 @@
       listBuilder(contents[i], 0);
     }
 
+    /*
+    tocList.addEventListener(
+      'touchstart',
+      function (evt) {
+        tocList.moveStart = evt.touches[0].pageY;
+        tocList.scrollStart = tocList.scrollTop;
+        evt.preventDefault();
+      }
+    );
+
+    tocList.addEventListener(
+      'touchmove',
+      function (evt) {
+        evt.preventDefault();
+        var dist = evt.touches[0].pageY - tocList.moveStart;
+        if (dist) {
+          tocList.scrollTop = tocList.scrollStart - dist;
+        }
+      }
+    );
+
+    tocList.addEventListener(
+      'touchend',
+      function () {
+        if (tocList.moveStart == evt.touches[0].pageY) {
+          tocList.moveStart = null;
+          tocList.scrollStart = null;
+        }
+      }
+    );
+    */
+
     if (!controlLayer.tocMenu) {
       controlLayer.tocMenu = document.createElement('div');
       controlLayer.tocMenu.id = "toc";

@@ -117,7 +117,7 @@ body {
   font: 11pt Georgia, serif;
   text-shadow: 1px 1px #EEE6D0;
   border: 1px solid #EED;
-  z-index: 2;
+  z-index: 9;
 }
 
 .tocArrow {
@@ -128,7 +128,7 @@ body {
   height: 20px;
   -webkit-transform: rotateZ(45deg);
   background: #E0D3C0;
-  z-index: 1;
+  z-index: 8;
 }
 
 #toc li {

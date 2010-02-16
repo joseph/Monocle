@@ -11,11 +11,7 @@ Carlyle.Reader = function (node, bookData) {
       SLIDE: 240,
       FOLLOW_CURSOR: 100,
       RESIZE_DELAY: 100,
-      ANTI_FLICKER_DELAY: 10
-    },
-    opacities: {
-      VISIBLE: 1.0,
-      HIDDEN: 0.01
+      ANTI_FLICKER_DELAY: 20
     },
     OFF_SCREEN_GAP: 10
   }
@@ -56,7 +52,9 @@ Carlyle.Reader = function (node, bookData) {
     spinner: null,
 
     // Controls registered to this reader instance.
-    controls: []
+    controls: [],
+
+    activeIndex: 1
   }
 
 
@@ -94,15 +92,15 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.box.appendChild(p.divs.container);
 
     for (var i = 0; i < 2; ++i) {
-      p.divs.pages[i] = document.createElement('div');
-      p.divs.pages[i].pageIndex = i;
-      p.divs.container.appendChild(p.divs.pages[i]);
+      var page = p.divs.pages[i] = document.createElement('div');
+      page.pageIndex = i;
+      p.divs.container.appendChild(page);
 
-      p.divs.pages[i].scrollerDiv = document.createElement('div');
-      p.divs.pages[i].appendChild(p.divs.pages[i].scrollerDiv);
+      page.scrollerDiv = document.createElement('div');
+      page.appendChild(page.scrollerDiv);
 
-      p.divs.pages[i].contentDiv = document.createElement('div');
-      p.divs.pages[i].scrollerDiv.appendChild(p.divs.pages[i].contentDiv);
+      page.contentDiv = document.createElement('div');
+      page.scrollerDiv.appendChild(page.contentDiv);
     }
 
     applyStyles();
@@ -121,7 +119,6 @@ Carlyle.Reader = function (node, bookData) {
       page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
       page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
     }
-    p.divs.pages[1].style.cssText += Carlyle.Styles.ruleText('overPage');
   }
 
 
@@ -169,8 +166,8 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.box.cumulativeLeft += o.offsetLeft;
     } while (o = o.offsetParent);
 
-    p.pageWidth = p.divs.pages[0].offsetWidth;
-    var colWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
+    p.pageWidth = upperPage().offsetWidth;
+    var colWidth = upperPage().scrollerDiv.offsetWidth;
     for (var i = 0; i < p.divs.pages.length; ++i) {
       p.divs.pages[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
     }
@@ -180,7 +177,7 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function pageNumber(options) {
-    options = options || { div: 0 };
+    options = options || { div: p.activeIndex };
     var place = p.book.placeFor(p.divs.pages[options.div].contentDiv);
     return place ? (place.pageNumber() || 1) : 1;
   }
@@ -190,7 +187,7 @@ Carlyle.Reader = function (node, bookData) {
   // title, etc.
   //
   function getPlace(options) {
-    options = options || { div: 0 };
+    options = options || { div: p.activeIndex };
     return p.book.placeFor(p.divs.pages[options.div].contentDiv);
   }
 
@@ -210,8 +207,8 @@ Carlyle.Reader = function (node, bookData) {
         componentId = null;
       }
     }
-    pageN = setPage(p.divs.pages[0], pageN, componentId);
-    setPage(p.divs.pages[1], pageN, getPlace().componentId());
+    pageN = setPage(upperPage(), pageN, componentId);
+    setPage(lowerPage(), pageN + 1, getPlace().componentId());
     completedTurn();
   }
 
@@ -229,7 +226,7 @@ Carlyle.Reader = function (node, bookData) {
     }
 
     // Move to the component.
-    setPage(p.divs.pages[0], 1, componentId || getPlace().componentId());
+    setPage(upperPage(), 1, componentId || getPlace().componentId());
 
     // Calculate the page based on this component.
     var pageN = getPlace().pageAtPercentageThrough(percent);
@@ -242,7 +239,7 @@ Carlyle.Reader = function (node, bookData) {
   //
   function skipToChapter(src) {
     console.log("Skipping to chapter: " + src);
-    var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
+    var place = p.book.placeOfChapter(upperPage().contentDiv, src);
     moveToPage(place.pageNumber(), place.componentId());
     completedTurn();
   }
@@ -293,6 +290,20 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
+  function upperPage() {
+    return p.divs.pages[p.activeIndex];
+  }
+
+  function lowerPage() {
+    return p.divs.pages[(p.activeIndex + 1) % 2];
+  }
+
+  function flipPages() {
+    upperPage().style.zIndex = 1;
+    lowerPage().style.zIndex = 2;
+    return p.activeIndex = (p.activeIndex + 1) % 2;
+  }
+
   function deferredCall(fn) {
     setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
   }
@@ -312,43 +323,24 @@ Carlyle.Reader = function (node, bookData) {
     }
 
     if (inForwardZone(boxPointX)) {
-      p.turnData.animating = true;
-      showOverPage();
-      deferredCall(
-        function () {
-          if (setPage(p.divs.pages[0], pageNumber() + 1)) {
-            deferredCall(
-              function () {
-                p.turnData.direction = k.FORWARDS;
-                slideToCursor(boxPointX);
-                liftAnimationFinished(boxPointX);
-              }
-            );
-          } else {
-            hideOverPage();
-            liftAnimationFinished(boxPointX);
-          }
-        }
-      );
+      p.turnData.direction = k.FORWARDS;
+      slideToCursor(boxPointX);
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
-      jumpOut();
-      if (setPage(p.divs.pages[1], pageNumber() - 1)) {
+      if (setPage(lowerPage(), pageNumber() - 1)) {
         p.turnData.direction = k.BACKWARDS;
         deferredCall(
           function () {
-            showOverPage();
-            deferredCall(
-              function () {
-                slideToCursor(boxPointX);
-                liftAnimationFinished(boxPointX);
-              }
-            );
+            jumpOut();
+            deferredCall(function () {
+              flipPages();
+              slideToCursor(boxPointX);
+              liftAnimationFinished(boxPointX);
+            });
           }
         );
       } else {
-        jumpIn();
-        liftAnimationFinished(boxPointX);
+        p.turnData.animating = false;
       }
     }
   }
@@ -371,7 +363,7 @@ Carlyle.Reader = function (node, bookData) {
       p.turnData.cancellable = true;
     }
 
-    // For speed reasons, we constrain movements to a constant number per second.
+    // For speed reasons, we constrain motions to a constant number per second.
     var stamp = (new Date()).getTime();
     var followInterval = k.durations.FOLLOW_CURSOR * 1;
     if (
@@ -397,18 +389,18 @@ Carlyle.Reader = function (node, bookData) {
     if (p.turnData.direction == k.FORWARDS) {
       if (p.turnData.cancellable && inForwardZone(boxPointX)) {
         // Cancelling forward turn
-        slideIn(boxPointX);
+        slideIn();
       } else {
         // Completing forward turn
-        slideOut(boxPointX);
+        slideOut(flipPages);
       }
     } else if (p.turnData.direction == k.BACKWARDS) {
       if (p.turnData.cancellable && inBackwardZone(boxPointX)) {
         // Cancelling backward turn
-        slideOut(boxPointX);
+        slideOut(flipPages);
       } else {
         // Completing backward turn
-        slideIn(boxPointX);
+        slideIn();
       }
     }
     p.turnData.animating = true;
@@ -416,10 +408,10 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function completedTurn() {
-    dispatchEvent("carlyle:turn");
-    hideOverPage();
     jumpIn();
-    p.turnData = {};
+    setPage(lowerPage(), pageNumber() + 1);
+    deferredCall(function () { p.turnData = {}; });
+    dispatchEvent("carlyle:turn");
   }
 
 
@@ -465,16 +457,18 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
+  /* NB: Jumps are always done by the hidden lower page. */
+
   function jumpIn() {
     // Values should be zero, but Saf 4.0.4 on 10.6 delays the render, causing
     // a detectable flicker when advancing.
-    setX(p.divs.pages[1], -1, { duration: 1 });
+    setX(lowerPage(), -1, { duration: 1 });
   }
 
 
   function jumpOut() {
     setX(
-      p.divs.pages[1],
+      lowerPage(),
       0 - (p.pageWidth + k.OFF_SCREEN_GAP),
       { duration: 0 }
     );
@@ -483,64 +477,47 @@ Carlyle.Reader = function (node, bookData) {
 
   function jumpToCursor(cursorX) {
     setX(
-      p.divs.pages[1],
+      lowerPage(),
       Math.min(0, cursorX - p.pageWidth),
       { duration: 0 }
     );
   }
 
 
-  function slideIn(cursorX) {
-    var retreatFn = function () {
-      setPage(p.divs.pages[0], pageNumber() - 1);
-      setTimeout(completedTurn, k.durations.ANTI_FLICKER_DELAY);
-    }
+  /* NB: Slides are always done by the visible upper page. */
+
+  function slideIn(callback) {
     var slideOpts = {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(p.divs.pages[1], 0, slideOpts, retreatFn);
+    var cb = completedTurn;
+    if (callback && callback != completedTurn) {
+      cb = function () { callback(); completedTurn(); }
+    }
+    setX(upperPage(), 0, slideOpts, cb);
   }
 
 
-  function slideOut(cursorX) {
-    var advanceFn = function () {
-      completedTurn();
-      setPage(p.divs.pages[1], pageNumber({ div: 1 }) + 1);
-    }
+  function slideOut(callback) {
     var slideOpts = {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(
-      p.divs.pages[1],
-      0 - (p.pageWidth + k.OFF_SCREEN_GAP),
-      slideOpts,
-      advanceFn
-    );
+    var cb = completedTurn;
+    if (callback && callback != completedTurn) {
+      cb = function () { callback(); completedTurn(); }
+    }
+    setX(upperPage(), 0 - (p.pageWidth + k.OFF_SCREEN_GAP), slideOpts, cb);
   }
 
 
   function slideToCursor(cursorX) {
     setX(
-      p.divs.pages[1],
+      upperPage(),
       Math.min(0, cursorX - p.pageWidth),
       { duration: k.durations.FOLLOW_CURSOR }
     );
-  }
-
-
-  function showOverPage() {
-    if (p.divs.pages[1].style.opacity != k.opacities.VISIBLE) {
-      p.divs.pages[1].style.opacity = k.opacities.VISIBLE;
-    }
-  }
-
-
-  function hideOverPage() {
-    if (p.divs.pages[1].style.opacity != k.opacities.HIDDEN) {
-      p.divs.pages[1].style.opacity = k.opacities.HIDDEN;
-    }
   }
 
 
