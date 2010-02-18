@@ -260,11 +260,12 @@ Carlyle.Reader = function (node, bookData) {
 
     // Move the contentDiv so that the current active page is visible.
     // The slight duration prevents 3d-renderer tearing artefacts.
-    setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 1 }, callback);
+    //setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 1 }, callback);
+    pageElement.scrollerDiv.scrollLeft = rslt.offset;
 
     // Touch the translateX value of the parent div, so that Webkit picks
     // up the change (otherwise there is tearing on OSX 10.6).
-    setX(pageElement.scrollerDiv, 0, { duration: 2 });
+    setX(pageElement.scrollerDiv, 0, { duration: 2 }, callback);
 
     dispatchEvent("carlyle:pagechange");
     return rslt.page;
@@ -347,11 +348,13 @@ Carlyle.Reader = function (node, bookData) {
         place.componentId(),
         function () {
           p.turnData.direction = k.BACKWARDS;
+          lowerPage().style.opacity = 0.01;
           jumpOut(
             function () {
+              flipPages();
+              upperPage().style.opacity = 1;
               deferredCall(
                 function () {
-                  flipPages();
                   slideToCursor(boxPointX);
                   liftAnimationFinished(boxPointX);
                 }
@@ -362,7 +365,8 @@ Carlyle.Reader = function (node, bookData) {
       );
 
       if (!pageSetSuccessfully) {
-        p.turnData.animating = false;
+        lowerPage().style.opacity = 1;
+        p.turnData = {};
       }
     }
   }
@@ -465,7 +469,7 @@ Carlyle.Reader = function (node, bookData) {
     var transition;
     var duration;
 
-    if (!options['duration']) {
+    if (!options.duration) {
       duration = 0;
       transition = 'none';
     } else {
