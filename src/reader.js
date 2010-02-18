@@ -12,8 +12,7 @@ Carlyle.Reader = function (node, bookData) {
       FOLLOW_CURSOR: 100,
       RESIZE_DELAY: 500,
       ANTI_FLICKER_DELAY: 20
-    },
-    OFF_SCREEN_GAP: 10
+    }
   }
 
 
@@ -59,6 +58,10 @@ Carlyle.Reader = function (node, bookData) {
     controls: [],
 
     activeIndex: 1
+  }
+
+  var profiling = {
+    completingTurns: []
   }
 
 
@@ -328,7 +331,6 @@ Carlyle.Reader = function (node, bookData) {
 
   function lift(boxPointX) {
     if (p.turnData.animating || p.turnData.direction) {
-      p.turnData.lifted = boxPointX;
       return;
     }
 
@@ -339,7 +341,7 @@ Carlyle.Reader = function (node, bookData) {
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
-      var success = setPage(
+      var pageSetSuccessfully = setPage(
         lowerPage(),
         place.pageNumber() - 1,
         place.componentId(),
@@ -359,7 +361,7 @@ Carlyle.Reader = function (node, bookData) {
         }
       );
 
-      if (!success) {
+      if (!pageSetSuccessfully) {
         p.turnData.animating = false;
       }
     }
@@ -400,7 +402,7 @@ Carlyle.Reader = function (node, bookData) {
 
   function drop(boxPointX) {
     if (p.turnData.animating) {
-      p.turnData.dropped = (p.turnData.dropped || 0) + 1;
+      p.turnData.dropped = true;
       return;
     }
     if (!p.turnData.direction) {
@@ -428,24 +430,30 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function completedTurn() {
-    jumpIn(
+    var tStart = (new Date()).getTime();
+
+    var place = getPlace();
+    setPage(
+      lowerPage(),
+      place.pageNumber() + 1,
+      place.componentId(),
       function () {
-        var place = getPlace();
-        setPage(
-          lowerPage(),
-          place.pageNumber() + 1,
-          place.componentId(),
+        jumpIn(
           function () {
             dispatchEvent("carlyle:turn");
-            var liftedPoint = p.turnData.lifted;
-            if (liftedPoint) {
-              p.turnData = {
-                dropped: p.turnData.dropped
-              }
-              lift(liftedPoint);
-            } else {
-              p.turnData = {}
+            p.turnData = {};
+
+            // Profiling guff
+            var tTime = parseInt((new Date()).getTime()) - parseInt(tStart);
+            profiling.completingTurns.push(tTime);
+            var tTot = 0;
+            for (var i = 0; i < profiling.completingTurns.length; ++i) {
+              tTot += profiling.completingTurns[i];
             }
+            console.log(
+              "Completing turn took: " + tTime + ". Average: " +
+              (tTot / profiling.completingTurns.length)
+            );
           }
         );
       }
@@ -504,7 +512,7 @@ Carlyle.Reader = function (node, bookData) {
   function jumpOut(callback) {
     setX(
       lowerPage(),
-      0 - (p.pageWidth + k.OFF_SCREEN_GAP),
+      0 - p.pageWidth,
       { duration: 0 },
       callback
     );
@@ -545,7 +553,7 @@ Carlyle.Reader = function (node, bookData) {
     if (callback && callback != completedTurn) {
       cb = function () { callback(); completedTurn(); }
     }
-    setX(upperPage(), 0 - (p.pageWidth + k.OFF_SCREEN_GAP), slideOpts, cb);
+    setX(upperPage(), 0 - p.pageWidth, slideOpts, cb);
   }
 
 

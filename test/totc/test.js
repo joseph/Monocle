@@ -18,6 +18,10 @@
     content["font-family"] = "Palatino, Georgia, serif";
     content["line-height"] = "130%";
     Controls.Magnifier.button.color = "#632";
+    Controls.Magnifier.button.padding = "3px 6px";
+    Controls.Magnifier.button['border-radius'] = "3px";
+    Controls.Magnifier.button.background = "#FFF";
+    Controls.Magnifier.button.top = "8px";
   }
 
 
@@ -273,6 +277,10 @@
         'carlyle:pagechange',
         function () { pageNumber.update() }
       );
+
+
+      /* Scrubber */
+      var scrubber = new Carlyle.Controls.Scrubber(reader);
 
     },
     false

@@ -40,11 +40,10 @@ Carlyle.Styles = {
     "bottom": "2em",
     "left": "1em",
     "right": "1em",
-    "overflow": "hidden"
+    "overflow": "hidden",
   },
 
   content: {
-    //"-webkit-transform-style": "preserve-3d", // FASTER, BUT UGLIER.
     "position": "absolute",
     "top": "0",
     "bottom": "0",

@@ -18,6 +18,7 @@ Carlyle.Book = function (dataSource) {
 
   // Properties.
   var p = {
+    dataSource: dataSource,
     components: [],
     places: []
   }
@@ -27,6 +28,11 @@ Carlyle.Book = function (dataSource) {
     constructor: Carlyle.Book,
     constants: k,
     properties: p
+  }
+
+
+  function initialize() {
+    p.componentIds = dataSource.getComponents();
   }
 
 
@@ -45,7 +51,7 @@ Carlyle.Book = function (dataSource) {
     // Find the place of the node in the book, or create one.
     var place = placeFor(node) || setPlaceFor(node, componentAt(0), 1);
 
-    var cIndex = dataSource.getComponents().indexOf(componentId);
+    var cIndex = p.componentIds.indexOf(componentId);
     var component;
     if (cIndex == -1) {
       component = place.properties.component;
@@ -74,7 +80,7 @@ Carlyle.Book = function (dataSource) {
     // adjust the pageN accordingly.
     cIndex = component.properties.index;
     var lpn = component.lastPageNumber();
-    var finalCIndex = dataSource.getComponents().length - 1; // FIXME: cache it
+    var finalCIndex = p.componentIds.length - 1; // FIXME: cache it
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
       return false;
@@ -125,8 +131,8 @@ Carlyle.Book = function (dataSource) {
 
   function componentAt(index) {
     if (!p.components[index]) {
-      var src = dataSource.getComponents()[index];
-      var html = dataSource.getComponent(src);
+      var src = p.componentIds[index];
+      var html = p.dataSource.getComponent(src);
       p.components[index] = new Carlyle.Component(
         API,
         src,
@@ -171,7 +177,7 @@ Carlyle.Book = function (dataSource) {
     if (matches) {
       var cmptId = matches[1];
       var fragment = matches[3] || null;
-      var cIndex = dataSource.getComponents().indexOf(cmptId);
+      var cIndex = p.componentIds.indexOf(cmptId);
       var component = componentAt(cIndex);
       component.updateDimensions(node); // FIXME: means no-going-back
       var place = new Carlyle.Place(node);
@@ -192,6 +198,8 @@ Carlyle.Book = function (dataSource) {
   API.changePage = changePage;
   API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
+
+  initialize();
 
   return API;
 }

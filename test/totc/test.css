@@ -84,7 +84,6 @@ body {
   top: 10px;
   left: 2em;
   cursor: pointer;
-  background: #FFF;
 }
 
 .chapterTitle {
@@ -99,15 +98,26 @@ body {
   right: 1.5em;
 }
 
+.pageNumber, .bookTitle {
+  background: #FFF;
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+}
+
+.bookTitle:hover, .pageNumber:hover {
+  border: 1px solid #EED;
+}
+
 #readerBg {
   background-color: #000;
 }
 
 #toc ul.root {
   position: absolute;
-  top: 44px;
+  top: 50px;
   left: 8%;
-  max-height: 80%;
+  max-height: 75%;
   max-width: 80%;
   background: #E0D3C0;
   -webkit-box-shadow: 1px 2px 2px #652;
@@ -122,7 +132,7 @@ body {
 
 .tocArrow {
   position: absolute;
-  top: 34px;
+  top: 40px;
   left: 16%;
   width: 20px;
   height: 20px;
