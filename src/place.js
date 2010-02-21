@@ -1,7 +1,7 @@
 /* PLACE */
 
-Carlyle.Place = function (node) {
-  if (Carlyle == this) { return new Carlyle.Place(node); }
+Carlyle.Place = function () {
+  if (Carlyle == this) { return new Carlyle.Place(); }
 
   // Constants.
   var k = {
@@ -24,6 +24,13 @@ Carlyle.Place = function (node) {
   function setPlace(cmpt, pageN) {
     p.component = cmpt;
     p.percent = pageN / cmpt.lastPageNumber();
+    p.chapter = null;
+  }
+
+
+  function setPercentageThrough(cmpt, percent) {
+    p.component = cmpt;
+    p.percent = percent;
     p.chapter = null;
   }
 
@@ -63,6 +70,7 @@ Carlyle.Place = function (node) {
 
 
   API.setPlace = setPlace;
+  API.setPercentageThrough = setPercentageThrough;
   API.componentId = componentId;
   API.percentageThrough = percentageThrough;
   API.pageAtPercentageThrough = pageAtPercentageThrough;
@@ -71,4 +79,17 @@ Carlyle.Place = function (node) {
   API.chapterTitle = chapterTitle;
 
   return API;
+}
+
+
+Carlyle.Place.FromPageNumber = function (component, pageNumber) {
+  var place = new Carlyle.Place();
+  place.setPlace(component, pageNumber);
+  return place;
+}
+
+Carlyle.Place.FromPercentageThrough = function (component, percent) {
+  var place = new Carlyle.Place();
+  place.setPercentageThrough(component, percent);
+  return place;
 }

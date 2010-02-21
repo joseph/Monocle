@@ -9,17 +9,17 @@
     page["-webkit-box-shadow"] = "1px 0 2px #997";
     page["-webkit-border-top-left-radius"] = "26px 4px";
     page["-webkit-border-bottom-left-radius"] = "26px 4px";
-    page.background = "#FFFBF6 " +
+    page.background =
       "-webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFEFC))";
     scroller.top = scroller.bottom = "2.5em";
-    scroller.left = "2em";
-    scroller.right = "1.5em";
+    scroller.left = "1em";
+    scroller.right = "1em";
     content.color = "#310";
     content["font-family"] = "Palatino, Georgia, serif";
     content["line-height"] = "130%";
     Controls.Magnifier.button.color = "#632";
     Controls.Magnifier.button.padding = "3px 6px";
-    Controls.Magnifier.button['border-radius'] = "3px";
+    Controls.Magnifier.button['-webkit-border-radius'] = "3px";
     Controls.Magnifier.button.background = "#FFF";
     Controls.Magnifier.button.top = "8px";
   }
@@ -281,6 +281,25 @@
 
       /* Scrubber */
       var scrubber = new Carlyle.Controls.Scrubber(reader);
+      scrubber.hide();
+      showEvtFn = function (evt) {
+        evt.stopPropagation();
+        scrubber.show();
+      }
+      for (var i = 0; i < 2; ++i) {
+        chapterTitle.runners[i].parentNode.addEventListener(
+          typeof(Touch) == "object" ? "touchstart" : "mousedown",
+          showEvtFn
+        );
+        pageNumber.runners[i].parentNode.addEventListener(
+          typeof(Touch) == "object" ? "touchstart" : "mousedown",
+          showEvtFn
+        );
+      }
+      var hideScrubber = function () { scrubber.hide(); }
+      reader.addEventListener('carlyle:lift:forward', hideScrubber);
+      reader.addEventListener('carlyle:lift:backward', hideScrubber);
+      reader.addEventListener('carlyle:lift:center', hideScrubber);
 
     },
     false

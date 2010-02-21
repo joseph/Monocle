@@ -20,7 +20,8 @@ Carlyle.Book = function (dataSource) {
   var p = {
     dataSource: dataSource,
     components: [],
-    places: []
+    places: [],
+    chapters: {} // flat arrays of chapters per component
   }
 
   // Methods and properties available to external code.
@@ -146,12 +147,15 @@ Carlyle.Book = function (dataSource) {
 
 
   function chaptersForComponent(src) {
-    var chapters = [];
+    if (p.chapters[src]) {
+      return p.chapters[src];
+    }
+    p.chapters[src] = [];
     var matcher = new RegExp('^'+src+"(\#(.+)|$)");
     var matches;
     var recurser = function (chp) {
       if (matches = chp.src.match(matcher)) {
-        chapters.push({
+        p.chapters[src].push({
           title: chp.title,
           fragment: matches[2] || null
         });
@@ -167,7 +171,7 @@ Carlyle.Book = function (dataSource) {
     for (var i = 0; i < sourceData.length; ++i) {
       recurser(sourceData[i]);
     }
-    return chapters;
+    return p.chapters[src];
   }
 
 
@@ -196,6 +200,7 @@ Carlyle.Book = function (dataSource) {
 
   API.getMetaData = dataSource.getMetaData;
   API.changePage = changePage;
+  API.chaptersForComponent = chaptersForComponent;
   API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
 
