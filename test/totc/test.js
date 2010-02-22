@@ -30,11 +30,6 @@
     Controls.Magnifier.button.top = "8px";
   }
 
-  // A little hack for the Gecko bug with translate & box-shadow.
-  if (typeof WebKitCSSMatrix != "object") {
-    Carlyle.Styles.page['border-right'] = '1px solid #DCB';
-  }
-
   var bookData = {
     getComponents: function () {
       var componentDiv = document.getElementById('components');
