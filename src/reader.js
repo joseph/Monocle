@@ -502,7 +502,7 @@ Carlyle.Reader = function (node, bookData) {
       transition += ' ' + (options['delay'] || 0) + 'ms';
     }
 
-    if (typeof WebKitTransitionEvent == "object") {
+    if (typeof WebKitTransitionEvent != "undefined") {
       elem.style.webkitTransition = transition;
       elem.style.webkitTransform = "translateX("+x+")";
     } else if (transition != "none") {
