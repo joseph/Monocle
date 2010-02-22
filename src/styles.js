@@ -31,13 +31,14 @@ Carlyle.Styles = {
     "cursor": "pointer",
     "z-index": "1",
     "-webkit-box-shadow": "2px 0 2px #999",
+    "-moz-box-shadow": "2px 0 2px #999",
     "-webkit-transform-style": "preserve-3d"
   },
 
   scroller: {
     "position": "absolute",
-    "top": "2em",
-    "bottom": "2em",
+    "top": "1em",
+    "bottom": "1em",
     "left": "1em",
     "right": "1em",
     "overflow": "hidden",
@@ -50,7 +51,9 @@ Carlyle.Styles = {
     "min-width": "200%",
     "-webkit-text-size-adjust": "none",
     "-webkit-column-gap": "0",
-    "-webkit-column-fill": "auto"
+    "-webkit-column-fill": "auto",
+    "-moz-column-gap": "0",
+    "-moz-column-fill": "auto"
   },
 
   spinner: {

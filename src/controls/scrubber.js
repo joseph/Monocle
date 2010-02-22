@@ -126,7 +126,9 @@ Carlyle.Controls.Scrubber = function (reader) {
   function setX(node, x) {
     x = Math.min(p.divs.container[0].offsetWidth - node.offsetWidth, x);
     x = Math.max(x, 0);
-    node.style.webkitTransform = "translateX(" + x + "px)";
+    node.style.webkitTransform =
+      node.style.MozTransform =
+        "translateX(" + x + "px)";
   }
 
 
@@ -178,7 +180,8 @@ Carlyle.Controls.Scrubber = function (reader) {
         moveEvt(evt);
         cntr.addEventListener(eventType('move'), moveEvt, false);
         document.body.addEventListener(eventType("end"), endEvt, false);
-      }
+      },
+      false
     );
 
     return cntr;
@@ -238,7 +241,9 @@ Carlyle.Styles.Controls.Scrubber = {
     "bottom": "2.5em",
     "background": "rgba(0, 0, 0, 0.9)",
     "-webkit-box-shadow": "2px 2px 8px #000",
+    //"-moz-box-shadow": "2px 2px 8px #000",
     "-webkit-border-radius": "10px",
+    "-moz-border-radius": "10px",
     "padding": "12px",
     "display": "none",
     "font": "bold 12px Lucida Grande, Helvetica, sans-serif",

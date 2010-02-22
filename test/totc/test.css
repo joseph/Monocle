@@ -28,14 +28,18 @@ body {
   right: 15px;
   background-color: #FCF6F0;
   -webkit-box-shadow: 2px 2px 4px #754;
+  -moz-box-shadow: 2px 2px 4px #754;
   -webkit-border-top-left-radius: 26px 6px;
   -webkit-border-bottom-left-radius: 26px 6px;
+  -moz-border-radius-topleft: 26px 6px;
+  -moz-border-radius-bottomleft: 26px 6px;
 }
 .dummyPage + .dummyPage {
   top: 16px;
   bottom: 16px;
   right: 16px;
   -webkit-box-shadow: 1px 0 2px #A99;
+  -moz-box-shadow: 1px 0 2px #A99;
 }
 .dummyPage + .dummyPage + .dummyPage {
   top: 13px;
@@ -60,8 +64,12 @@ body {
   right: 3px;
   left: 65%;
   -webkit-box-shadow: -3px 0 3px #311;
+  -moz-box-shadow: -3px 0 3px #311;
   -webkit-border-top-right-radius: 3px;
   -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-topright: 3px;
+  -moz-border-radius-bottomright: 3px;
+  background-color: #F7F7F7;
   background: -webkit-gradient(linear, left top, right bottom, from(#FFF), to(#F7F7F7));
 }
 .board {
@@ -82,6 +90,7 @@ body {
 .pageNumber, .bookTitle, .chapterTitle {
   padding: 6px 12px;
   -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border: 1px solid #FFFEFC;
 }
 
@@ -117,7 +126,9 @@ body {
   max-width: 80%;
   background: #E0D3C0;
   -webkit-box-shadow: 1px 2px 2px #652;
+  -moz-box-shadow: 1px 2px 2px #652;
   -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
   overflow-y: auto;
   color: #642;
   font: 11pt Georgia, serif;

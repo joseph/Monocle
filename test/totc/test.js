@@ -7,8 +7,14 @@
     container.width = 'auto';
     page.top = page.bottom = "6px";
     page["-webkit-box-shadow"] = "1px 0 2px #997";
+    page["-moz-box-shadow"] = "1px 0 2px #997";
     page["-webkit-border-top-left-radius"] = "26px 4px";
     page["-webkit-border-bottom-left-radius"] = "26px 4px";
+    page["-moz-border-radius-topleft"] = "26px 4px";
+    page["-moz-border-radius-bottomleft"] = "26px 4px";
+    page['background-color'] = "#FFFEFC";
+    page['background-image'] =
+      "-moz-linear-gradient(0deg, #EDEAE8 0px, #FFFEFC 24px)";
     page.background =
       "-webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFEFC))";
     scroller.top = scroller.bottom = "2.5em";
@@ -24,6 +30,10 @@
     Controls.Magnifier.button.top = "8px";
   }
 
+  // A little hack for the Gecko bug with translate & box-shadow.
+  if (typeof WebKitCSSMatrix != "object") {
+    Carlyle.Styles.page['border-right'] = '1px solid #DCB';
+  }
 
   var bookData = {
     getComponents: function () {
@@ -289,11 +299,13 @@
       for (var i = 0; i < 2; ++i) {
         chapterTitle.runners[i].parentNode.addEventListener(
           typeof(Touch) == "object" ? "touchstart" : "mousedown",
-          showEvtFn
+          showEvtFn,
+          false
         );
         pageNumber.runners[i].parentNode.addEventListener(
           typeof(Touch) == "object" ? "touchstart" : "mousedown",
-          showEvtFn
+          showEvtFn,
+          false
         );
       }
       var hideScrubber = function () { scrubber.hide(); }

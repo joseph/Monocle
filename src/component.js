@@ -214,7 +214,7 @@ Carlyle.Component = function (book, id, index, chapters, html) {
     if (haveDimensionsChanged(node)) {
       removeElementsFrom(node);
       addElementsTo(node, p.elementsForClient[nodeIndex(node)]);
-      positionImages(node);
+      //positionImages(node);
       measureDimensions(node);
       locateChapters(node);
       //tmpLocateOcclusions(node);

@@ -176,7 +176,8 @@ Carlyle.Reader = function (node, bookData) {
     p.pageWidth = upperPage().offsetWidth;
     var colWidth = upperPage().scrollerDiv.offsetWidth;
     for (var i = 0; i < p.divs.pages.length; ++i) {
-      p.divs.pages[i].contentDiv.style.webkitColumnWidth = colWidth + "px";
+      var cDiv = p.divs.pages[i].contentDiv;
+      cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = colWidth+"px";
     }
 
     moveToPage(pageNumber());
@@ -287,7 +288,7 @@ Carlyle.Reader = function (node, bookData) {
   // user turning a page.
   //
   function inForwardZone(x) {
-    return x > p.pageWidth * 0.7;
+    return x > p.pageWidth * 0.6;
   }
 
 
@@ -295,7 +296,7 @@ Carlyle.Reader = function (node, bookData) {
   // user turning a page.
   //
   function inBackwardZone(x) {
-    return x < p.pageWidth * 0.3;
+    return x < p.pageWidth * 0.4;
   }
 
 
@@ -417,8 +418,10 @@ Carlyle.Reader = function (node, bookData) {
 
     p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
 
+    p.turnData.animating = true;
+
     if (p.turnData.direction == k.FORWARDS) {
-      if (p.turnData.points.tap || !inForwardZone(boxPointX)) {
+      if (p.turnData.points.tap || p.turnData.points.start - boxPointX > 60) {
         // Completing forward turn
         slideOut(flipPages);
       } else {
@@ -426,7 +429,7 @@ Carlyle.Reader = function (node, bookData) {
         slideIn();
       }
     } else if (p.turnData.direction == k.BACKWARDS) {
-      if (p.turnData.points.tap || !inBackwardZone(boxPointX)) {
+      if (p.turnData.points.tap || boxPointX - p.turnData.points.start > 60) {
         // Completing backward turn
         slideIn();
       } else {
@@ -434,7 +437,6 @@ Carlyle.Reader = function (node, bookData) {
         slideOut(flipPages);
       }
     }
-    p.turnData.animating = true;
   }
 
 
@@ -487,6 +489,8 @@ Carlyle.Reader = function (node, bookData) {
     var transition;
     var duration;
 
+    if (typeof(x) == "number") { x = x + "px"; }
+
     if (!options.duration) {
       duration = 0;
       transition = 'none';
@@ -497,10 +501,44 @@ Carlyle.Reader = function (node, bookData) {
       transition += ' ' + (options['timing'] || 'linear');
       transition += ' ' + (options['delay'] || 0) + 'ms';
     }
-    elem.style.webkitTransition = transition;
 
-    if (typeof(x) == "number") { x = x + "px"; }
-    elem.style.webkitTransform = 'translateX('+x+')';
+    if (typeof WebKitTransitionEvent == "object") {
+      elem.style.webkitTransition = transition;
+      elem.style.webkitTransform = "translateX("+x+")";
+    } else if (transition != "none") {
+      // Exit any existing transition loop.
+      clearTimeout(elem.setXTransitionInterval)
+
+      // FIXME: this is rather naive. We need to ensure that the duration is
+      // constant, probably by multiplying step against the ACTUAL interval,
+      // rather than the scheduled one (because on slower machines, the
+      // interval may be much longer).
+      var stamp = (new Date()).getTime();
+      var frameRate = 40;
+      var finalX = parseInt(x);
+      var currX = getX(elem);
+      var step = (finalX - currX) * (frameRate / duration);
+      var stepFn = function () {
+        var destX = currX + step;
+        if (
+          (new Date()).getTime() - stamp > duration ||
+          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
+        ) {
+          clearTimeout(elem.setXTransitionInterval)
+          elem.style.MozTransform = "translateX(" + finalX + "px)";
+          if (elem.setXTCB) {
+            elem.setXTCB();
+          }
+        } else {
+          elem.style.MozTransform = "translateX(" + destX + "px)";
+          currX = destX;
+        }
+      }
+
+      elem.setXTransitionInterval = setInterval(stepFn, frameRate);
+    } else {
+      elem.style.MozTransform = "translateX("+x+")";
+    }
 
     if (elem.setXTCB) {
       elem.removeEventListener('webkitTransitionEnd', elem.setXTCB, false);
@@ -518,9 +556,15 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function getX(elem) {
-    var matrix = window.getComputedStyle(elem).webkitTransform;
-		matrix = new WebKitCSSMatrix(matrix);
-    return matrix.m41;
+    if (typeof WebKitCSSMatrix == "object") {
+      var matrix = window.getComputedStyle(elem).webkitTransform;
+      matrix = new WebKitCSSMatrix(matrix);
+      return matrix.m41;
+    } else {
+      var prop = elem.style.MozTransform;
+      if (!prop || prop == "") { return 0; }
+      return parseFloat((/translateX\((\-?.*)px\)/).exec(prop)[1]) || 0;
+    }
   }
 
 
