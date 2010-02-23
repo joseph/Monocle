@@ -571,7 +571,8 @@ Carlyle.Reader = function (node, bookData) {
   /* NB: Jumps are always done by the hidden lower page. */
 
   function jumpIn(callback) {
-    setX(lowerPage(), 0, { duration: 0 }, callback);
+    // Duration should be 0, but is set to 1 to address a 10.6 Safari bug.
+    setX(lowerPage(), 0, { duration: 1 }, callback);
   }
 
 
