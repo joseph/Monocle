@@ -46,7 +46,7 @@ Carlyle.Place = function () {
 
 
   function pageAtPercentageThrough(pc) {
-    return Math.ceil(p.component.lastPageNumber() * pc);
+    return Math.round(p.component.lastPageNumber() * pc);
   }
 
 

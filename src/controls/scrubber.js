@@ -155,7 +155,9 @@ Carlyle.Controls.Scrubber = function (reader) {
         chp = actualPlace.chapterInfo() || chp;
       }
 
-      bubble.innerHTML = chp.title;
+      if (chp) {
+        bubble.innerHTML = chp.title;
+      }
       setX(bubble, x - bubble.offsetWidth / 2);
 
       p.lastX = x;
