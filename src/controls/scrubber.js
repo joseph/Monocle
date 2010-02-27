@@ -23,7 +23,6 @@ Carlyle.Controls.Scrubber = function (reader) {
   function initialize() {
     p.reader = reader;
     p.book = p.reader.getBook();
-    p.reader.registerPageControl(API);
     p.reader.addEventListener('carlyle:turn', updateNeedles);
     updateNeedles();
   }
@@ -78,7 +77,7 @@ Carlyle.Controls.Scrubber = function (reader) {
 
 
   function updateNeedles() {
-    if (p.hidden) {
+    if (p.hidden || !p.divs.container) {
       return;
     }
     var place = p.reader.getPlace();
@@ -189,25 +188,8 @@ Carlyle.Controls.Scrubber = function (reader) {
     return cntr;
   }
 
-
-  function hide() {
-    for (var i = 0; i < p.divs.container.length; ++i) {
-      p.divs.container[i].style.display = "none";
-    }
-    p.hidden = true;
-  }
-
-  function show() {
-    for (var i = 0; i < p.divs.container.length; ++i) {
-      p.divs.container[i].style.display = "block";
-    }
-    p.hidden = false;
-    updateNeedles();
-  }
-
   API.createControlElements = createControlElements;
-  API.hide = hide;
-  API.show = show;
+  API.updateNeedles = updateNeedles;
 
   initialize();
 

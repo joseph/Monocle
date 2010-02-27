@@ -4,7 +4,8 @@ Carlyle.Controls.PlaceSaver = function (reader) {
   }
 
   var k = {
-    COOKIE_NAMESPACE: "carlyle.controls.placesaver."
+    COOKIE_NAMESPACE: "carlyle.controls.placesaver.",
+    COOKIE_EXPIRES_IN_DAYS: 7 // Set to 0 for session-based expiry.
   }
 
   // Properties.
@@ -26,8 +27,15 @@ Carlyle.Controls.PlaceSaver = function (reader) {
   }
 
 
-  function setCookie(key, value) {
-    document.cookie = p.prefix + key + " = " + value;
+  function setCookie(key, value, days) {
+    var expires = "";
+    if (days) {
+      var d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires="+d.toGMTString();
+    }
+    var path = "; path=/";
+    document.cookie = p.prefix + key + " = " + value + expires + path;
     return value;
   }
 
@@ -48,8 +56,16 @@ Carlyle.Controls.PlaceSaver = function (reader) {
 
   function savePlaceToCookie() {
     var place = reader.getPlace();
-    setCookie("component", encodeURIComponent(place.componentId()));
-    setCookie("percent", place.percentageThrough());
+    setCookie(
+      "component",
+      encodeURIComponent(place.componentId()),
+      k.COOKIE_EXPIRES_IN_DAYS
+    );
+    setCookie(
+      "percent",
+      place.percentageThrough(),
+      k.COOKIE_EXPIRES_IN_DAYS
+    );
   }
 
 

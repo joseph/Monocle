@@ -21,6 +21,14 @@ Carlyle.Styles = {
     "-webkit-text-size-adjust": "none"
   },
 
+  overlay: {
+    "position": "absolute",
+    "display": "none",
+    "width": "100%",
+    "height": "100%",
+    "z-index": "100"
+  },
+
   page: {
     "position": "absolute",
     "top": "0",
@@ -62,6 +70,10 @@ Carlyle.Styles = {
     "position": "relative",
     "display": "block",
     "margin": "auto"
+  },
+
+  control: {
+    "z-index": "100"
   },
 
   Controls: {

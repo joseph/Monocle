@@ -202,15 +202,16 @@
 
       /* PLACE SAVER */
       var placeSaver = new Carlyle.Controls.PlaceSaver(reader);
+      reader.addControl(placeSaver, 'invisible');
       var lastPlace = placeSaver.savedPlace();
-
-      if (lastPlace) { // && confirm("Return to last position?")) {
+      if (lastPlace) {
         placeSaver.restorePlace();
       }
 
 
       /* MAGNIFIER CONTROL */
-      new Carlyle.Controls.Magnifier(reader);
+      var magnifier = new Carlyle.Controls.Magnifier(reader);
+      reader.addControl(magnifier, 'standard');
 
 
       /* BOOK TITLE RUNNING HEAD */
@@ -227,7 +228,7 @@
           return cntr;
         }
       }
-      reader.registerPageControl(bookTitle);
+      reader.addControl(bookTitle, 'page');
 
 
       /* CHAPTER TITLE RUNNING HEAD */
@@ -249,7 +250,7 @@
           }
         }
       }
-      reader.registerPageControl(chapterTitle);
+      reader.addControl(chapterTitle, 'page');
       chapterTitle.update();
       reader.addEventListener(
         'carlyle:pagechange',
@@ -276,7 +277,7 @@
           }
         }
       }
-      reader.registerPageControl(pageNumber);
+      reader.addControl(pageNumber, 'page');
       pageNumber.update();
       reader.addEventListener(
         'carlyle:pagechange',
@@ -286,24 +287,21 @@
 
       /* Scrubber */
       var scrubber = new Carlyle.Controls.Scrubber(reader);
-      scrubber.hide();
-      showEvtFn = function (evt) {
+      reader.addControl(scrubber, 'page', { hidden: true });
+      var showFn = function (evt) {
         evt.stopPropagation();
-        scrubber.show();
+        reader.showControl(scrubber);
+        scrubber.updateNeedles();
       }
+      var eT = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
       for (var i = 0; i < 2; ++i) {
-        chapterTitle.runners[i].parentNode.addEventListener(
-          typeof(Touch) == "object" ? "touchstart" : "mousedown",
-          showEvtFn,
-          false
-        );
-        pageNumber.runners[i].parentNode.addEventListener(
-          typeof(Touch) == "object" ? "touchstart" : "mousedown",
-          showEvtFn,
-          false
-        );
+        chapterTitle.runners[i].parentNode.addEventListener(eT, showFn, false);
+        pageNumber.runners[i].parentNode.addEventListener(eT, showFn, false);
       }
-      var hideScrubber = function () { scrubber.hide(); }
+      var hideScrubber = function (evt) {
+        evt.stopPropagation();
+        reader.hideControl(scrubber);
+      }
       reader.addEventListener('carlyle:lift:forward', hideScrubber);
       reader.addEventListener('carlyle:lift:backward', hideScrubber);
       reader.addEventListener('carlyle:lift:center', hideScrubber);

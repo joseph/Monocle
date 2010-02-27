@@ -27,15 +27,24 @@ Carlyle.Reader = function (node, bookData) {
     //        -> scroller
     //          -> content
     //        -> page controls
-    //      -> overlay controls
-    //      -> modal controls?
+    //      -> overlay
+    //        -> modal/popover controls
+    //      -> standard controls
     //
     divs: {
       box: null,
       container: null,
-      pages: [],
-      runners: []
+      overlay: null,
+      pages: []
     },
+
+    // Registered control objects (see addControl). Hashes of the form:
+    //   {
+    //     control: <control instance>,
+    //     elements: <array of topmost elements created by control>,
+    //     controlType: <standard, page, modal, popover, invisible, etc>
+    //   }
+    controls: [],
 
     // The current width of the page.
     pageWidth: 0,
@@ -110,6 +119,9 @@ Carlyle.Reader = function (node, bookData) {
       page.scrollerDiv.appendChild(page.contentDiv);
     }
 
+    p.divs.overlay = document.createElement('div');
+    p.divs.container.appendChild(p.divs.overlay);
+
     applyStyles();
 
     setBook(bk);
@@ -126,6 +138,7 @@ Carlyle.Reader = function (node, bookData) {
       page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
       page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
     }
+    p.divs.overlay.style.cssText = Carlyle.Styles.ruleText('overlay');
   }
 
 
@@ -416,12 +429,16 @@ Carlyle.Reader = function (node, bookData) {
       return;
     }
 
-    p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
-
     p.turnData.animating = true;
 
+    p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
+
     if (p.turnData.direction == k.FORWARDS) {
-      if (p.turnData.points.tap || p.turnData.points.start - boxPointX > 60) {
+      if (
+        p.turnData.points.tap ||
+        p.turnData.points.start - boxPointX > 60 ||
+        p.turnData.points.min >= boxPointX
+      ) {
         // Completing forward turn
         slideOut(flipPages);
       } else {
@@ -429,7 +446,11 @@ Carlyle.Reader = function (node, bookData) {
         slideIn();
       }
     } else if (p.turnData.direction == k.BACKWARDS) {
-      if (p.turnData.points.tap || boxPointX - p.turnData.points.start > 60) {
+      if (
+        p.turnData.points.tap ||
+        boxPointX - p.turnData.points.start > 60 ||
+        p.turnData.points.max <= boxPointX
+      ) {
         // Completing backward turn
         slideIn();
       } else {
@@ -731,12 +752,90 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function registerPageControl(control) {
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      var page = p.divs.pages[i];
-      var runner = control.createControlElements();
-      page.appendChild(runner);
-      p.divs.runners.push(runner);
+  /* Valid types:
+   *  - page
+   *  - overlay
+   *  - modal (overlay where click-away does nothing)
+   *  - popover (overlay where click-away removes the ctrl elements)
+   *  - invisible
+   *
+   * Options:
+   *  - hidden -- creates and hides the ctrl elements;
+   *              use showControl to show them
+   */
+  function addControl(ctrl, cType, options) {
+    if (p.controls.indexOf(ctrl) != -1) {
+      console.log("Already added control: " + ctrl);
+      return;
+    }
+
+    options = options || {};
+
+    var ctrlData = {
+      control: ctrl,
+      elements: [],
+      controlType: cType
+    }
+    p.controls.push(ctrlData);
+
+    if (!cType || cType == "standard") {
+      var ctrlElem = ctrl.createControlElements();
+      p.divs.container.appendChild(ctrlElem);
+      ctrlData.elements.push(ctrlElem);
+    } else if (cType == "page") {
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        var page = p.divs.pages[i];
+        var runner = ctrl.createControlElements();
+        page.appendChild(runner);
+        ctrlData.elements.push(runner);
+      }
+    } else if (cType == "modal" || cType == "popover") {
+      var ctrlElem = ctrl.createControlElements();
+      p.divs.overlay.appendChild(ctrlElem);
+      p.divs.overlay.cssText += "width: 100%; height: 100%";
+      ctrlData.elements.push(ctrlElem);
+    } else if (cType == "invisible") {
+      // Nothing to do, really.
+    } else {
+      console.log("Unknown control type: " + cType);
+    }
+
+    for (var i = 0; i < ctrlData.elements.length; ++i) {
+      ctrlData.elements[i].style.cssText += Carlyle.Styles.ruleText('control');
+    }
+
+    if (options.hidden) {
+      hideControl(ctrl);
+    }
+
+    return ctrl;
+  }
+
+
+  function hideControl(ctrl) {
+    for (var i = 0; i < p.controls.length; ++i) {
+      if (p.controls[i].control == ctrl) {
+        for (var j = 0; j < p.controls[i].elements.length; ++j) {
+          p.controls[i].elements[j].style.display = "none";
+        }
+      }
+    }
+    if (ctrl.properties) {
+      ctrl.properties.hidden = true;
+    }
+  }
+
+
+  function showControl(ctrl) {
+    for (var i = 0; i < p.controls.length; ++i) {
+      if (p.controls[i].control == ctrl) {
+        for (var j = 0; j < p.controls[i].elements.length; ++j) {
+          p.controls[i].elements[j].style.display = "block";
+        }
+      }
+    }
+    if (ctrl.properties) {
+      ctrl.properties.hidden = false;
     }
   }
 
@@ -763,7 +862,9 @@ Carlyle.Reader = function (node, bookData) {
   API.resized = resized;
   API.spin = spin;
   API.spun = spun;
-  API.registerPageControl = registerPageControl;
+  API.addControl = addControl;
+  API.hideControl = hideControl;
+  API.showControl = showControl;
   API.addEventListener = addEventListener;
 
   initialize(node, bookData);

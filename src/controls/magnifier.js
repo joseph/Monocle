@@ -22,7 +22,6 @@ Carlyle.Controls.Magnifier = function (reader) {
 
   function initialize() {
     p.reader = reader;
-    p.reader.registerPageControl(API);
   }
 
 
