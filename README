@@ -121,7 +121,7 @@ you need to.
 * carlyle:loading
 * carlyle:loaded
 * carlyle:resizing (c)
-* carlyle:resized
+* carlyle:resize
 * carlyle:bookchanging (c)
 * carlyle:bookchange
 * carlyle:pagechanging (c)
