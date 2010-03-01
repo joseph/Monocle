@@ -128,12 +128,12 @@ you need to.
 * carlyle:pagechange
 -* carlyle:flipperchanging (c)
 -* carlyle:flipperchange
-* carlyle:lift:forward (c)
-* carlyle:lift:backward (c)
-* carlyle:lift:unhandled
--* carlyle:drop:forward (c)
--* carlyle:drop:backward (c)
--* carlyle:drop:unhandled
+* carlyle:contact:start (c)
+* carlyle:contact:move (c)
+* carlyle:contact:end (c)
+* carlyle:contact:start:unhandled (c)
+* carlyle:contact:move:unhandled (c)
+* carlyle:contact:end:unhandled (c)
 * carlyle:turn
 
 

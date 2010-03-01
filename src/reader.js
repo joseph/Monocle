@@ -54,6 +54,9 @@ Carlyle.Reader = function (node, bookData) {
     // Properties relating to the current page turn interaction.
     turnData: {},
 
+    // Properties relating to the input events.
+    interactionData: {},
+
     // A resettable timer which must expire before dimensions are recalculated
     // after the reader has been resized.
     //
@@ -102,12 +105,17 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.box.style.position = "relative";
     }
 
+    // Create the essential DOM elements.
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    for (var i = 0; i < 2; ++i) {
+    p.flipper = new Carlyle.Flippers.Standard(API); // FIXME: detect?
+    p.activeIndex = p.flipper.pageCount - 1;
+
+    for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
       page.pageIndex = i;
+      p.flipper.addPage(page);
       p.divs.container.appendChild(page);
 
       page.scrollerDiv = document.createElement('div');
@@ -134,7 +142,7 @@ Carlyle.Reader = function (node, bookData) {
 
   function applyStyles() {
     p.divs.container.style.cssText = Carlyle.Styles.ruleText('container');
-    for (var i = 0; i < 2; ++i) {
+    for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i];
       page.style.cssText = Carlyle.Styles.ruleText('page');
       page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
@@ -183,17 +191,27 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function calcDimensions() {
-    p.divs.box.cumulativeLeft = 0;
+    p.boxDimensions = {
+      left: 0,
+      top: 0,
+      width: p.divs.box.offsetWidth,
+      height: p.divs.box.offsetHeight
+    }
     var o = p.divs.box;
     do {
-      p.divs.box.cumulativeLeft += o.offsetLeft;
+      p.boxDimensions.left += o.offsetLeft;
+      p.boxDimensions.top += o.offsetTop;
     } while (o = o.offsetParent);
 
-    p.pageWidth = upperPage().offsetWidth;
-    var colWidth = upperPage().scrollerDiv.offsetWidth;
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      var cDiv = p.divs.pages[i].contentDiv;
-      cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = colWidth+"px";
+    if (typeof(p.flipper.overrideDimensions) != 'function') {
+      p.pageWidth = upperPage().offsetWidth;
+      var cWidth = upperPage().scrollerDiv.offsetWidth;
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        var cDiv = p.divs.pages[i].contentDiv;
+        cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = cWidth+"px";
+      }
+    } else {
+      p.flipper.overrideDimensions();
     }
 
     moveToPage(pageNumber());
@@ -290,17 +308,6 @@ Carlyle.Reader = function (node, bookData) {
 
     dispatchEvent("carlyle:pagechange");
     return rslt.page;
-  }
-
-
-  // Takes an x point for the entire page, and finds the x point relative
-  // to the left of the box div.
-  //
-  function rebaseX(x) {
-    return Math.max(
-      Math.min(p.divs.box.offsetWidth, x - p.divs.box.cumulativeLeft),
-      0
-    );
   }
 
 
@@ -664,37 +671,50 @@ Carlyle.Reader = function (node, bookData) {
 
   function listenForInteraction() {
     var receivesTouchEvents = (typeof Touch == "object");
+
     if (!receivesTouchEvents) {
       p.divs.container.addEventListener(
         'mousedown',
         function (evt) {
-          evt.preventDefault();
-          lift(rebaseX(evt.pageX));
-          p.divs.container.onmousemove = function (mmevt) {
-            mmevt.preventDefault();
-            turning(rebaseX(mmevt.pageX));
+          if (evt.button != 0) {
+            return;
           }
+          p.interactionData.mouseDown = true;
+          contactEvent(evt, "start", evt);
+        },
+        false
+      );
+      p.divs.container.addEventListener(
+        'mousemove',
+        function (evt) {
+          if (!p.interactionData.mouseDown) {
+            return false;
+          }
+          contactEvent(evt, "move", evt);
         },
         false
       );
       p.divs.container.addEventListener(
         'mouseup',
         function (evt) {
-          evt.preventDefault();
-          p.divs.container.onmousemove = null;
-          drop(rebaseX(evt.pageX));
+          if (!p.interactionData.mouseDown) {
+            return false;
+          }
+          contactEvent(evt, "end", evt);
         },
         false
       );
       p.divs.container.addEventListener(
         'mouseout',
         function (evt) {
+          if (!p.interactionData.mouseDown) {
+            return false;
+          }
           obj = evt.relatedTarget;
           while (obj && (obj = obj.parentNode)) {
             if (obj == p.divs.container) { return; }
           }
-          evt.preventDefault();
-          drop(rebaseX(evt.pageX));
+          contactEvent(evt, 'end', evt);
         },
         false
       );
@@ -702,23 +722,25 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.container.addEventListener(
         'touchstart',
         function (evt) {
-          evt.preventDefault();
           if (evt.targetTouches.length > 1) { return; }
-          lift(rebaseX(evt.targetTouches[0].pageX));
+          contactEvent(evt, 'start', evt.targetTouches[0]);
         },
         false
       );
       p.divs.container.addEventListener(
         'touchmove',
         function (evt) {
-          evt.preventDefault();
           if (evt.targetTouches.length > 1) { return; }
-          var rawX = evt.targetTouches[0].pageX - p.divs.box.cumulativeLeft;
-          var rbX = rebaseX(evt.targetTouches[0].pageX);
-          if (rawX < 0 || rawX > p.divs.box.offsetWidth) {
-            drop(rbX);
+          var raw = {
+            x: evt.targetTouches[0].pageX - p.boxDimensions.left,
+            y: evt.targetTouches[0].pageY - p.boxDimensions.top,
+            w: p.boxDimensions.width,
+            h: p.boxDimensions.height
+          }
+          if (raw.x < 0 || raw.y < 0 || raw.x >= raw.w || raw.y >= raw.h) {
+            contactEvent(evt, "end", evt.targetTouches[0]);
           } else {
-            turning(rbX);
+            contactEvent(evt, "move", evt.targetTouches[0]);
           }
         },
         false
@@ -726,27 +748,77 @@ Carlyle.Reader = function (node, bookData) {
       p.divs.container.addEventListener(
         'touchend',
         function (evt) {
-          evt.preventDefault();
-          drop(rebaseX(evt.changedTouches[0].pageX));
+          contactEvent(evt, "end", evt.changedTouches[0]);
         },
         false
       );
       p.divs.container.addEventListener(
         'touchcancel',
         function (evt) {
-          evt.preventDefault();
-          drop(rebaseX(evt.changedTouches[0].pageX));
+          contactEvent(evt, "end", evt.changedTouches[0]);
         },
         false
       );
       window.addEventListener('orientationchange', resized, true);
     }
+
+    // TO BE MOVED TO FLIPPER:
+    addEventListener(
+      "carlyle:contact:start",
+      function (evt) {
+        evt.preventDefault();
+        lift(evt.carlyleData.contactX);
+      }
+    );
+    addEventListener(
+      "carlyle:contact:move",
+      function (evt) {
+        evt.preventDefault();
+        turning(evt.carlyleData.contactX);
+      }
+    );
+    addEventListener(
+      "carlyle:contact:end",
+      function (evt) {
+        evt.preventDefault();
+        drop(evt.carlyleData.contactX);
+      }
+    );
+  }
+
+
+  // In general, flippers will listen for the basic contact events, and
+  // preventDefault if they use them. Controls should listen for unhandled
+  // contact events, which are triggered if the flipper does not
+  // preventDefault the event.
+  //
+  function contactEvent(evt, eType, cursorInfo) {
+    cData = {
+      contactX: Math.min(
+        p.boxDimensions.width,
+        Math.max(0, cursorInfo.pageX - p.boxDimensions.left)
+      ),
+      contactY: Math.min(
+        p.boxDimensions.height,
+        Math.max(0, cursorInfo.pageY - p.boxDimensions.top)
+      )
+    };
+    if (
+      !dispatchEvent("carlyle:contact:"+eType, cData) ||
+      !dispatchEvent("carlyle:contact:"+eType+":unhandled", cData)
+    ) {
+      evt.preventDefault();
+    }
+
+    if (eType == "end") {
+      p.interactionData = {};
+    }
   }
 
 
   /* Valid types:
-   *  - page
-   *  - overlay
+   *  - standard (an overlay above the pages)
+   *  - page (within the page)
    *  - modal (overlay where click-away does nothing)
    *  - popover (overlay where click-away removes the ctrl elements)
    *  - invisible
@@ -832,9 +904,10 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function dispatchEvent(evtType) {
+  function dispatchEvent(evtType, data) {
     var turnEvt = document.createEvent("Events");
     turnEvt.initEvent(evtType, false, true);
+    turnEvt.carlyleData = data;
     return p.divs.box.dispatchEvent(turnEvt);
   }
 

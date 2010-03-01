@@ -7,6 +7,7 @@ Carlyle = {};
 //= require <styles>
 //= require <spinner>
 
+Carlyle.Flippers = {};
 Carlyle.Controls = {};
 
 // A little console stub if not initialized in a console-equipped browser.
