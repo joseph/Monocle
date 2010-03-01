@@ -85,6 +85,8 @@ Carlyle.Reader = function (node, bookData) {
   // Sets up the container and internal elements.
   //
   function initialize(node, bookData) {
+    dispatchEvent("carlyle:initializing");
+
     p.divs.box = typeof(node) == "string" ?
       document.getElementById(node) :
       node;
@@ -122,11 +124,15 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.overlay = document.createElement('div');
     p.divs.container.appendChild(p.divs.overlay);
 
+    dispatchEvent("carlyle:loading");
+
     applyStyles();
 
     setBook(bk);
 
     listenForInteraction();
+
+    dispatchEvent("carlyle:loaded")
   }
 
 
@@ -149,10 +155,11 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function setBook(bk) {
+    if (!dispatchEvent("carlyle:bookchanging")) {
+      return;
+    }
     p.book = bk;
-    spin();
     calcDimensions();
-    spun();
     dispatchEvent("carlyle:bookchange");
     return p.book;
   }
@@ -164,7 +171,9 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function resized() {
-    spin();
+    if (!dispatchEvent("carlyle:resizing")) {
+      return;
+    }
     p.divs.container.style.display = "none";
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
@@ -172,7 +181,7 @@ Carlyle.Reader = function (node, bookData) {
         console.log('Recalculating dimensions after resize.')
         p.divs.container.style.display = "block";
         calcDimensions();
-        spun();
+        dispatchEvent("carlyle:resized");
       },
       k.durations.RESIZE_DELAY
     );
@@ -269,6 +278,10 @@ Carlyle.Reader = function (node, bookData) {
   // Private method that tells the book to update the given pageElement to
   // the given page.
   function setPage(pageElement, pageN, componentId, callback) {
+    if (!dispatchEvent("carlyle:pagechanging")) {
+      return;
+    }
+
     var rslt = p.book.changePage(pageElement.contentDiv, pageN, componentId);
     if (!rslt) { return false; } // Book may disallow movement to this page.
 
@@ -392,7 +405,7 @@ Carlyle.Reader = function (node, bookData) {
         }
       }
     } else {
-      dispatchEvent('carlyle:lift:center');
+      dispatchEvent('carlyle:lift:unhandled');
     }
   }
 

@@ -111,6 +111,44 @@ Example use
   reader.moveToPage(14);
 
 
+Reader Events
+-------------
+
+Events marked with (c) are cancellable -- call preventDefault() on them if
+you need to.
+
+* carlyle:initializing (NB: too early to call addControl)
+* carlyle:loading
+* carlyle:loaded
+* carlyle:resizing (c)
+* carlyle:resized
+* carlyle:bookchanging (c)
+* carlyle:bookchange
+* carlyle:pagechanging (c)
+* carlyle:pagechange
+-* carlyle:flipperchanging (c)
+-* carlyle:flipperchange
+* carlyle:lift:forward (c)
+* carlyle:lift:backward (c)
+* carlyle:lift:unhandled
+-* carlyle:drop:forward (c)
+-* carlyle:drop:backward (c)
+-* carlyle:drop:unhandled
+* carlyle:turn
+
+
+Adding controls
+---------------
+
+!TODO!
+
+
+Alternative page flipping mechanisms
+------------------------------------
+
+!TODO!
+
+
 Javascript Object Style
 -----------------------
 
