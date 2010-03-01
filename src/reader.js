@@ -15,7 +15,6 @@ Carlyle.Reader = function (node, bookData) {
     }
   }
 
-
   // Properties.
   var p = {
     // Divs only stores the box, the container and the two pages. But the full
@@ -60,9 +59,6 @@ Carlyle.Reader = function (node, bookData) {
     //
     resizeTimer: null,
 
-    // The animation showing that Carlyle is processing something.
-    spinner: null,
-
     // Controls registered to this reader instance.
     controls: [],
 
@@ -85,11 +81,11 @@ Carlyle.Reader = function (node, bookData) {
   // Sets up the container and internal elements.
   //
   function initialize(node, bookData) {
-    dispatchEvent("carlyle:initializing");
-
     p.divs.box = typeof(node) == "string" ?
       document.getElementById(node) :
       node;
+
+    dispatchEvent("carlyle:initializing");
 
     var bk;
     if (bookData) {
@@ -174,14 +170,12 @@ Carlyle.Reader = function (node, bookData) {
     if (!dispatchEvent("carlyle:resizing")) {
       return;
     }
-    p.divs.container.style.display = "none";
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
       function () {
         console.log('Recalculating dimensions after resize.')
-        p.divs.container.style.display = "block";
         calcDimensions();
-        dispatchEvent("carlyle:resized");
+        dispatchEvent("carlyle:resize");
       },
       k.durations.RESIZE_DELAY
     );
@@ -668,21 +662,6 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function spin() {
-    if (Carlyle.Spinner && !p.spinner) {
-      p.spinner = new Carlyle.Spinner(p.divs.box);
-    }
-  }
-
-
-  function spun() {
-    if (p.spinner) {
-      p.spinner.stop();
-      p.spinner = null;
-    }
-  }
-
-
   function listenForInteraction() {
     var receivesTouchEvents = (typeof Touch == "object");
     if (!receivesTouchEvents) {
@@ -873,8 +852,6 @@ Carlyle.Reader = function (node, bookData) {
   API.moveToPercentageThrough = moveToPercentageThrough;
   API.skipToChapter = skipToChapter;
   API.resized = resized;
-  API.spin = spin;
-  API.spun = spun;
   API.addControl = addControl;
   API.hideControl = hideControl;
   API.showControl = showControl;

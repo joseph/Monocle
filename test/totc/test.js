@@ -192,12 +192,22 @@
   window.addEventListener(
     'load',
     function () {
+      /* Initialize the reader */
       window.reader = Carlyle.Reader('reader', bookData);
+
+      /* Because the 'reader' element changes size on window resize,
+       * we should notify it of this event. */
       window.addEventListener(
         'resize',
         function () { window.reader.resized() },
         false
       );
+
+
+      /* SPINNER */
+      var spinner = Carlyle.Controls.Spinner(window.reader);
+      window.reader.addControl(spinner, 'page', { hidden: true });
+      spinner.listenForUsualDelays();
 
 
       /* PLACE SAVER */
@@ -211,7 +221,7 @@
 
       /* MAGNIFIER CONTROL */
       var magnifier = new Carlyle.Controls.Magnifier(reader);
-      reader.addControl(magnifier, 'standard');
+      reader.addControl(magnifier, 'page');
 
 
       /* BOOK TITLE RUNNING HEAD */
