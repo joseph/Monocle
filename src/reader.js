@@ -5,13 +5,8 @@ Carlyle.Reader = function (node, bookData) {
 
   // Constants.
   var k = {
-    FORWARDS: 1,
-    BACKWARDS: -1,
     durations: {
-      SLIDE: 240,
-      FOLLOW_CURSOR: 100,
-      RESIZE_DELAY: 500,
-      ANTI_FLICKER_DELAY: 20
+      RESIZE_DELAY: 500
     }
   }
 
@@ -51,9 +46,6 @@ Carlyle.Reader = function (node, bookData) {
     // The active book.
     book: null,
 
-    // Properties relating to the current page turn interaction.
-    turnData: {},
-
     // Properties relating to the input events.
     interactionData: {},
 
@@ -63,15 +55,8 @@ Carlyle.Reader = function (node, bookData) {
     resizeTimer: null,
 
     // Controls registered to this reader instance.
-    controls: [],
-
-    activeIndex: 1
+    controls: []
   }
-
-  var profiling = {
-    completingTurns: []
-  }
-
 
   // Methods and properties available to external code.
   var API = {
@@ -109,8 +94,7 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    p.flipper = new Carlyle.Flippers.Standard(API); // FIXME: detect?
-    p.activeIndex = p.flipper.pageCount - 1;
+    p.flipper = new Carlyle.Flippers.Standard(API, setPage); // FIXME: detect?
 
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
@@ -204,8 +188,9 @@ Carlyle.Reader = function (node, bookData) {
     } while (o = o.offsetParent);
 
     if (typeof(p.flipper.overrideDimensions) != 'function') {
-      p.pageWidth = upperPage().offsetWidth;
-      var cWidth = upperPage().scrollerDiv.offsetWidth;
+      //FIXME: SHOULD BE ACTIVE PAGE?
+      p.pageWidth = p.divs.pages[0].offsetWidth;
+      var cWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
       for (var i = 0; i < p.divs.pages.length; ++i) {
         var cDiv = p.divs.pages[i].contentDiv;
         cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = cWidth+"px";
@@ -218,9 +203,13 @@ Carlyle.Reader = function (node, bookData) {
   }
 
 
-  function pageNumber(options) {
-    options = options || { div: p.activeIndex };
-    var place = p.book.placeFor(p.divs.pages[options.div].contentDiv);
+  // Returns the current page number in the book.
+  //
+  // The pageDiv argument is optional - typically defaults to whatever the
+  // flipper thinks is the "active" page.
+  //
+  function pageNumber(pageDiv) {
+    var place = p.flipper.getPlace(pageDiv);
     return place ? (place.pageNumber() || 1) : 1;
   }
 
@@ -228,9 +217,11 @@ Carlyle.Reader = function (node, bookData) {
   // Returns the current "place" in the book -- ie, the page number, chapter
   // title, etc.
   //
-  function getPlace(options) {
-    options = options || { div: p.activeIndex };
-    return p.book.placeFor(p.divs.pages[options.div].contentDiv);
+  // The pageDiv argument is optional - typically defaults to whatever the
+  // flipper thinks is the "active" page.
+  //
+  function getPlace(pageDiv) {
+    return p.flipper.getPlace(pageDiv);
   }
 
 
@@ -241,6 +232,7 @@ Carlyle.Reader = function (node, bookData) {
   // The componentId is optional, defaults to the current component for page-0.
   //
   function moveToPage(pageN, componentId) {
+    /*
     if (!componentId) {
       var place = getPlace();
       if (place) {
@@ -251,6 +243,13 @@ Carlyle.Reader = function (node, bookData) {
     }
     pageN = setPage(upperPage(), pageN, componentId);
     completedTurn();
+    */
+
+    // FIXME!! HOW TO GENERATE THE PLACE?
+    var place = getPlace();
+
+    // TODO: generate a place, then:
+    p.flipper.setPlace(place);
   }
 
 
@@ -262,8 +261,9 @@ Carlyle.Reader = function (node, bookData) {
   // The componentId is optional, defaults to the current component for page-0.
   //
   function moveToPercentageThrough(percent, componentId) {
+    /*
     if (percent == 0) {
-      return moveToPage(1);
+      return moveToPage(1, componentId);
     }
 
     // Move to the component.
@@ -275,6 +275,12 @@ Carlyle.Reader = function (node, bookData) {
       setPage(upperPage(), pageN);
     }
     completedTurn();
+    */
+    // FIXME!! HOW TO GENERATE THE PLACE?
+    var place = getPlace();
+
+    // TODO: generate a place, then:
+    p.flipper.setPlace(place);
   }
 
 
@@ -282,390 +288,43 @@ Carlyle.Reader = function (node, bookData) {
   //
   function skipToChapter(src) {
     console.log("Skipping to chapter: " + src);
-    var place = p.book.placeOfChapter(upperPage().contentDiv, src);
-    moveToPage(place.pageNumber(), place.componentId());
+    //FIXME: SHOULD BE ACTIVE PAGE?
+    var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
+    //moveToPage(place.pageNumber(), place.componentId());
+    p.flipper.setPlace(place);
   }
 
 
   // Private method that tells the book to update the given pageElement to
   // the given page.
-  function setPage(pageElement, pageN, componentId, callback) {
-    if (!dispatchEvent("carlyle:pagechanging")) {
+  //
+  // This method is handed over to the flipper, which calls it with a
+  // callback to do the actual display change.
+  //
+  function setPage(pageDiv, pageN, componentId, callback) {
+    var eData = { page: pageDiv, pageNumber: pageN, componentId: componentId }
+
+    // Other things may disallow page change.
+    if (!dispatchEvent('carlyle:pagechanging', eData)) {
       return;
     }
 
-    var rslt = p.book.changePage(pageElement.contentDiv, pageN, componentId);
-    if (!rslt) { return false; } // Book may disallow movement to this page.
+    var rslt = p.book.changePage(pageDiv.contentDiv, pageN, componentId);
 
-    // Move the contentDiv so that the current active page is visible.
-    // The slight duration prevents 3d-renderer tearing artefacts.
-    //setX(pageElement.contentDiv, 0 - rslt.offset, { duration: 1 }, callback);
-    pageElement.scrollerDiv.scrollLeft = rslt.offset;
+    // The book may disallow changing to the given page.
+    if (!rslt) {
+      return false;
+    }
 
-    // Touch the translateX value of the parent div, so that Webkit picks
-    // up the change (otherwise there is tearing on OSX 10.6).
-    setX(pageElement.scrollerDiv, 0, { duration: 2 }, callback);
+    if (typeof callback == "function") {
+      callback(rslt.offset);
+    }
 
-    dispatchEvent("carlyle:pagechange");
+    eData.pageNumber = rslt.page;
+    eData.componentId = rslt.componentId;
+    dispatchEvent("carlyle:pagechange", eData);
+
     return rslt.page;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go forward" zone for
-  // user turning a page.
-  //
-  function inForwardZone(x) {
-    return x > p.pageWidth * 0.6;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go backward" zone for
-  // user turning a page.
-  //
-  function inBackwardZone(x) {
-    return x < p.pageWidth * 0.4;
-  }
-
-
-  function upperPage() {
-    return p.divs.pages[p.activeIndex];
-  }
-
-
-  function lowerPage() {
-    return p.divs.pages[(p.activeIndex + 1) % 2];
-  }
-
-
-  function flipPages() {
-    upperPage().style.zIndex = 1;
-    lowerPage().style.zIndex = 2;
-    return p.activeIndex = (p.activeIndex + 1) % 2;
-  }
-
-
-  function deferredCall(fn) {
-    setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
-  }
-
-
-  function liftAnimationFinished(boxPointX) {
-    p.turnData.animating = false;
-    if (p.turnData.dropped) {
-      drop(boxPointX);
-      p.turnData.dropped -= 1;
-    }
-  }
-
-
-  function lift(boxPointX) {
-    if (p.turnData.animating || p.turnData.direction) {
-      return;
-    }
-
-    p.turnData.points = {
-      start: boxPointX,
-      min: boxPointX,
-      max: boxPointX
-    }
-
-    if (inForwardZone(boxPointX)) {
-      // At the end of the book, both page numbers are the same. So this is
-      // a way to test that we can advance one page.
-      if (dispatchEvent('carlyle:lift:forward')) {
-        if (pageNumber({div: 0}) != pageNumber({div: 1})) {
-          p.turnData.direction = k.FORWARDS;
-          slideToCursor(boxPointX);
-          liftAnimationFinished();
-        }
-      }
-    } else if (inBackwardZone(boxPointX)) {
-      if (dispatchEvent('carlyle:lift:backward')) {
-        p.turnData.animating = true;
-        var place = getPlace();
-        var pageSetSuccessfully = setPage(
-          lowerPage(),
-          place.pageNumber() - 1,
-          place.componentId(),
-          function () {
-            p.turnData.direction = k.BACKWARDS;
-            deferredCall(function() {
-              jumpOut(function () {
-                deferredCall(function () {
-                  flipPages();
-                  slideToCursor(boxPointX);
-                  liftAnimationFinished(boxPointX);
-                });
-              });
-            });
-          }
-        );
-
-        if (!pageSetSuccessfully) {
-          p.turnData = {};
-        }
-      }
-    } else {
-      dispatchEvent('carlyle:lift:unhandled');
-    }
-  }
-
-
-  function turning(boxPointX) {
-    if (p.turnData.animating || !p.turnData.direction) {
-      return;
-    }
-
-    p.turnData.points.min = Math.min(p.turnData.points.min, boxPointX);
-    p.turnData.points.max = Math.max(p.turnData.points.max, boxPointX);
-
-    // For speed reasons, we constrain motions to a constant number per second.
-    var stamp = (new Date()).getTime();
-    var followInterval = k.durations.FOLLOW_CURSOR * 1;
-    if (
-      p.turnData.stamp &&
-      stamp - p.turnData.stamp < followInterval
-    ) {
-      return;
-    }
-    p.turnData.stamp = stamp;
-
-    slideToCursor(boxPointX);
-  }
-
-
-  function drop(boxPointX) {
-    if (p.turnData.animating) {
-      p.turnData.dropped = true;
-      return;
-    }
-    if (!p.turnData.direction) {
-      return;
-    }
-
-    p.turnData.animating = true;
-
-    p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
-
-    if (p.turnData.direction == k.FORWARDS) {
-      if (
-        p.turnData.points.tap ||
-        p.turnData.points.start - boxPointX > 60 ||
-        p.turnData.points.min >= boxPointX
-      ) {
-        // Completing forward turn
-        slideOut(flipPages);
-      } else {
-        // Cancelling forward turn
-        slideIn();
-      }
-    } else if (p.turnData.direction == k.BACKWARDS) {
-      if (
-        p.turnData.points.tap ||
-        boxPointX - p.turnData.points.start > 60 ||
-        p.turnData.points.max <= boxPointX
-      ) {
-        // Completing backward turn
-        slideIn();
-      } else {
-        // Cancelling backward turn
-        slideOut(flipPages);
-      }
-    }
-  }
-
-
-  function completedTurn() {
-    //var tStart = (new Date()).getTime();
-
-    var place = getPlace();
-    var resetTurn = function () {
-      dispatchEvent("carlyle:turn");
-      p.turnData = {};
-
-      // Profiling guff
-      /*
-      var tTime = parseInt((new Date()).getTime()) - parseInt(tStart);
-      profiling.completingTurns.push(tTime);
-      var tTot = 0;
-      for (var i = 0; i < profiling.completingTurns.length; ++i) {
-        tTot += profiling.completingTurns[i];
-      }
-      console.log(
-        "Completing turn took: " + tTime + ". Average: " +
-        (tTot / profiling.completingTurns.length)
-      );
-      */
-    }
-
-    if (
-      !setPage(
-        lowerPage(),
-        place.pageNumber() + 1,
-        place.componentId(),
-        function () {
-          jumpIn(resetTurn);
-        }
-      )
-    ) {
-      setPage(
-        lowerPage(),
-        place.pageNumber(),
-        place.componentId(),
-        function () {
-          jumpIn(resetTurn);
-        }
-      );
-    }
-  }
-
-
-  function setX(elem, x, options, callback) {
-    var transition;
-    var duration;
-
-    if (typeof(x) == "number") { x = x + "px"; }
-
-    if (!options.duration) {
-      duration = 0;
-      transition = 'none';
-    } else {
-      duration = parseInt(options['duration']);
-      transition = '-webkit-transform';
-      transition += ' ' + duration + "ms";
-      transition += ' ' + (options['timing'] || 'linear');
-      transition += ' ' + (options['delay'] || 0) + 'ms';
-    }
-
-    if (typeof WebKitTransitionEvent != "undefined") {
-      elem.style.webkitTransition = transition;
-      elem.style.webkitTransform = "translateX("+x+")";
-    } else if (transition != "none") {
-      // Exit any existing transition loop.
-      clearTimeout(elem.setXTransitionInterval)
-
-      // FIXME: this is rather naive. We need to ensure that the duration is
-      // constant, probably by multiplying step against the ACTUAL interval,
-      // rather than the scheduled one (because on slower machines, the
-      // interval may be much longer).
-      var stamp = (new Date()).getTime();
-      var frameRate = 40;
-      var finalX = parseInt(x);
-      var currX = getX(elem);
-      var step = (finalX - currX) * (frameRate / duration);
-      var stepFn = function () {
-        var destX = currX + step;
-        if (
-          (new Date()).getTime() - stamp > duration ||
-          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
-        ) {
-          clearTimeout(elem.setXTransitionInterval)
-          elem.style.MozTransform = "translateX(" + finalX + "px)";
-          if (elem.setXTCB) {
-            elem.setXTCB();
-          }
-        } else {
-          elem.style.MozTransform = "translateX(" + destX + "px)";
-          currX = destX;
-        }
-      }
-
-      elem.setXTransitionInterval = setInterval(stepFn, frameRate);
-    } else {
-      elem.style.MozTransform = "translateX("+x+")";
-    }
-
-    if (elem.setXTCB) {
-      elem.removeEventListener('webkitTransitionEnd', elem.setXTCB, false);
-      elem.setXTCB = null;
-    }
-    if (callback) {
-      if (transition == "none" || getX(elem) == parseInt(x)) {
-        callback();
-      } else {
-        elem.setXTCB = callback;
-        elem.addEventListener('webkitTransitionEnd', elem.setXTCB, false);
-      }
-    }
-  }
-
-
-  function getX(elem) {
-    if (typeof WebKitCSSMatrix == "object") {
-      var matrix = window.getComputedStyle(elem).webkitTransform;
-      matrix = new WebKitCSSMatrix(matrix);
-      return matrix.m41;
-    } else {
-      var prop = elem.style.MozTransform;
-      if (!prop || prop == "") { return 0; }
-      return parseFloat((/translateX\((\-?.*)px\)/).exec(prop)[1]) || 0;
-    }
-  }
-
-
-  /* NB: Jumps are always done by the hidden lower page. */
-
-  function jumpIn(callback) {
-    // Duration should be 0, but is set to 1 to address a 10.6 Safari bug.
-    setX(lowerPage(), 0, { duration: 1 }, callback);
-  }
-
-
-  function jumpOut(callback) {
-    setX(
-      lowerPage(),
-      0 - p.pageWidth,
-      { duration: 0 },
-      callback
-    );
-  }
-
-
-  function jumpToCursor(cursorX, callback) {
-    setX(
-      lowerPage(),
-      Math.min(0, cursorX - p.pageWidth),
-      { duration: 0 },
-      callback
-    );
-  }
-
-
-  /* NB: Slides are always done by the visible upper page. */
-
-  function slideIn(callback) {
-    var slideOpts = {
-      duration: k.durations.SLIDE,
-      timing: 'ease-in'
-    };
-    var cb = completedTurn;
-    if (callback && callback != completedTurn) {
-      cb = function () { callback(); completedTurn(); }
-    }
-    setX(upperPage(), 0, slideOpts, cb);
-  }
-
-
-  function slideOut(callback) {
-    var slideOpts = {
-      duration: k.durations.SLIDE,
-      timing: 'ease-in'
-    };
-    var cb = completedTurn;
-    if (callback && callback != completedTurn) {
-      cb = function () { callback(); completedTurn(); }
-    }
-    setX(upperPage(), 0 - p.pageWidth, slideOpts, cb);
-  }
-
-
-  function slideToCursor(cursorX, callback) {
-    setX(
-      upperPage(),
-      Math.min(0, cursorX - p.pageWidth),
-      { duration: k.durations.FOLLOW_CURSOR },
-      callback
-    );
   }
 
 
@@ -761,29 +420,7 @@ Carlyle.Reader = function (node, bookData) {
       );
       window.addEventListener('orientationchange', resized, true);
     }
-
-    // TO BE MOVED TO FLIPPER:
-    addEventListener(
-      "carlyle:contact:start",
-      function (evt) {
-        evt.preventDefault();
-        lift(evt.carlyleData.contactX);
-      }
-    );
-    addEventListener(
-      "carlyle:contact:move",
-      function (evt) {
-        evt.preventDefault();
-        turning(evt.carlyleData.contactX);
-      }
-    );
-    addEventListener(
-      "carlyle:contact:end",
-      function (evt) {
-        evt.preventDefault();
-        drop(evt.carlyleData.contactX);
-      }
-    );
+    p.flipper.listenForInteraction();
   }
 
 
@@ -905,10 +542,11 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function dispatchEvent(evtType, data) {
-    var turnEvt = document.createEvent("Events");
-    turnEvt.initEvent(evtType, false, true);
-    turnEvt.carlyleData = data;
-    return p.divs.box.dispatchEvent(turnEvt);
+    var evt = document.createEvent("Events");
+    // FIXME: should take cancellable value from args?
+    evt.initEvent(evtType, false, true);
+    evt.carlyleData = data;
+    return p.divs.box.dispatchEvent(evt);
   }
 
 

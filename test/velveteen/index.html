@@ -17,7 +17,7 @@
     <script type="text/javascript" src="../../src/component.js"></script>
     <script type="text/javascript" src="../../src/place.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
-    <script type="text/javascript" src="../../src/spinner.js"></script>
+    <script type="text/javascript" src="../../src/flippers/standard.js"></script>
     <script type="text/javascript" src="../../src/controls/scrubber.js"></script>
 
     <style type="text/css">
@@ -68,7 +68,7 @@
         function () {
           window.reader = Carlyle.Reader('rabbit');
           var scrubber = new Carlyle.Controls.Scrubber(reader);
-          reader.addControl(scrubber, 'overlay');
+          reader.addControl(scrubber, 'standard');
         },
         false
       );

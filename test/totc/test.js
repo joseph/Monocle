@@ -256,7 +256,8 @@
         update: function () {
           for (var i = 0; i < this.runners.length; ++i) {
             var place = reader.getPlace({ div: i });
-            this.runners[i].innerHTML = place.chapterTitle();
+            //this.runners[i].innerHTML = place.chapterTitle();
+            this.runners[i].innerHTML = "FIXME";
           }
         }
       }
@@ -283,7 +284,8 @@
         update: function () {
           for (var i = 0; i < this.runners.length; ++i) {
             var place = reader.getPlace({ div: i });
-            this.runners[i].innerHTML = place.pageNumber();
+            //this.runners[i].innerHTML = place.pageNumber();
+            this.runners[i].innerHTML = "FIXME";
           }
         }
       }
@@ -304,7 +306,7 @@
         scrubber.updateNeedles();
       }
       var eT = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
-      for (var i = 0; i < 2; ++i) {
+      for (var i = 0; i < chapterTitle.runners.length; ++i) {
         chapterTitle.runners[i].parentNode.addEventListener(eT, showFn, false);
         pageNumber.runners[i].parentNode.addEventListener(eT, showFn, false);
       }
@@ -312,10 +314,7 @@
         evt.stopPropagation();
         reader.hideControl(scrubber);
       }
-      reader.addEventListener('carlyle:lift:forward', hideScrubber);
-      reader.addEventListener('carlyle:lift:backward', hideScrubber);
-      reader.addEventListener('carlyle:lift:center', hideScrubber);
-
+      reader.addEventListener('carlyle:contact:start', hideScrubber);
     },
     false
   );

@@ -105,7 +105,11 @@ Carlyle.Book = function (dataSource) {
     component.prepareNode(node, pageN)
     setPlaceFor(node, component, pageN);
 
-    return { page: pageN, offset: (pageN - 1) * node.parentNode.offsetWidth };
+    return {
+      componentId: component.properties.id,
+      page: pageN,
+      offset: (pageN - 1) * node.parentNode.offsetWidth
+    }
   }
 
 
