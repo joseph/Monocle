@@ -229,26 +229,20 @@ Carlyle.Reader = function (node, bookData) {
   // greater than the number of pages in this component, overflows into
   // subsequent components.
   //
-  // The componentId is optional, defaults to the current component for page-0.
+  // The componentId is optional, defaults to the current component.
   //
   function moveToPage(pageN, componentId) {
-    /*
     if (!componentId) {
-      var place = getPlace();
-      if (place) {
-        componentId = place.componentId();
+      var currPlace = getPlace();
+      if (currPlace) {
+        componentId = currPlace.componentId();
       } else {
         componentId = null;
       }
     }
-    pageN = setPage(upperPage(), pageN, componentId);
-    completedTurn();
-    */
 
-    // FIXME!! HOW TO GENERATE THE PLACE?
-    var place = getPlace();
-
-    // TODO: generate a place, then:
+    //var place = p.book.placeAt(componentId, { 'page': pageN });
+    var place = null; // FIXME
     p.flipper.setPlace(place);
   }
 
@@ -258,28 +252,21 @@ Carlyle.Reader = function (node, bookData) {
   // should be a float, where 0.0 is the first page and 1.0 is the last page
   // of the component.
   //
-  // The componentId is optional, defaults to the current component for page-0.
+  // The componentId is optional, defaults to the current component.
   //
   function moveToPercentageThrough(percent, componentId) {
-    /*
-    if (percent == 0) {
-      return moveToPage(1, componentId);
+    if (!componentId) {
+      var currPlace = getPlace();
+      if (currPlace) {
+        componentId = currPlace.componentId();
+      } else {
+        componentId = null;
+      }
     }
 
-    // Move to the component.
-    setPage(upperPage(), 1, componentId || getPlace().componentId());
+    //var place = p.book.placeAt(componentId, { 'percent': percent });
+    var place = null; // FIXME
 
-    // Calculate the page based on this component.
-    var pageN = getPlace().pageAtPercentageThrough(percent);
-    if (pageN != 1) {
-      setPage(upperPage(), pageN);
-    }
-    completedTurn();
-    */
-    // FIXME!! HOW TO GENERATE THE PLACE?
-    var place = getPlace();
-
-    // TODO: generate a place, then:
     p.flipper.setPlace(place);
   }
 

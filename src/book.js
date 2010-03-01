@@ -126,7 +126,7 @@ Carlyle.Book = function (dataSource) {
   function setPlaceFor(node, component, pageN) {
     var place = placeFor(node);
     if (!place) {
-      place = new Carlyle.Place(node);
+      place = new Carlyle.Place();
       p.places[p.places.length] = [node, place];
     }
     place.setPlace(component, pageN);
@@ -202,9 +202,29 @@ Carlyle.Book = function (dataSource) {
   }
 
 
+  function placeAt(componentId, options) {
+    console.log(options);
+    var place = Carlyle.Place();
+    var cIndex = p.componentIds.indexOf(componentId);
+    if (cIndex < 0) {
+      cIndex = 0;
+    }
+    var component = componentAt(cIndex);
+    if (options.page) {
+      place.setPlace(component, options.page);
+    } else if (typeof(options.percent) == "number") {
+      place.setPercentageThrough(component, options.percent);
+    } else {
+      console.log("Invalid option.");
+    }
+    return place;
+  }
+
+
   API.getMetaData = dataSource.getMetaData;
   API.changePage = changePage;
   API.chaptersForComponent = chaptersForComponent;
+  API.placeAt = placeAt;
   API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
 
