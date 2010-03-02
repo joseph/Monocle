@@ -253,19 +253,19 @@
           this.runners.push(runner);
           return cntr;
         },
-        update: function () {
-          for (var i = 0; i < this.runners.length; ++i) {
-            var place = reader.getPlace({ div: i });
-            //this.runners[i].innerHTML = place.chapterTitle();
-            this.runners[i].innerHTML = "FIXME";
-          }
+        update: function (page) {
+          var place = reader.getPlace(page);
+          this.runners[page.pageIndex].innerHTML = place.chapterTitle();
         }
       }
       reader.addControl(chapterTitle, 'page');
-      chapterTitle.update();
+      // FIXME: a bit nasty...
+      for (var i = 0; i < reader.properties.divs.pages.length; ++i) {
+        chapterTitle.update(reader.properties.divs.pages[i]);
+      }
       reader.addEventListener(
         'carlyle:pagechange',
-        function () { chapterTitle.update(); }
+        function (evt) { chapterTitle.update(evt.carlyleData.page); }
       );
 
 
@@ -281,19 +281,18 @@
           this.runners.push(runner);
           return cntr;
         },
-        update: function () {
-          for (var i = 0; i < this.runners.length; ++i) {
-            var place = reader.getPlace({ div: i });
-            //this.runners[i].innerHTML = place.pageNumber();
-            this.runners[i].innerHTML = "FIXME";
-          }
+        update: function (page) {
+          var place = reader.getPlace(page);
+          this.runners[page.pageIndex].innerHTML = place.pageNumber();
         }
       }
       reader.addControl(pageNumber, 'page');
-      pageNumber.update();
+      for (var i = 0; i < reader.properties.divs.pages.length; ++i) {
+        pageNumber.update(reader.properties.divs.pages[i]);
+      }
       reader.addEventListener(
         'carlyle:pagechange',
-        function () { pageNumber.update() }
+        function (evt) { pageNumber.update(evt.carlyleData.page) }
       );
 
 
