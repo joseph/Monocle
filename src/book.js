@@ -34,6 +34,7 @@ Carlyle.Book = function (dataSource) {
 
   function initialize() {
     p.componentIds = dataSource.getComponents();
+    p.lastCIndex = p.componentIds.length - 1;
   }
 
 
@@ -44,11 +45,19 @@ Carlyle.Book = function (dataSource) {
   // In this process, it should load a new component if required. It should
   // recurse if pageN overflows the first or last pages of the given component.
   //
+  // The locus argument is required, and is an object that responds to one of:
+  //
+  //  - page: integer
+  //  - percent: float
+  //  - direction: integer relative to the current page number for this node
+  //  - anchor: string, one of "start" or "end", moves to corresponding point
+  //      in the given component
+  //
   // The `componentId` is optional -- if it is not provided (or it is invalid),
   // we default to the currently active component, and if that doesn't exist,
   // we default to the very first component.
   //
-  function changePage(node, pageN, componentId) {
+  function changePage(node, locus, componentId) {
     // Find the place of the node in the book, or create one.
     var place = placeFor(node) || setPlaceFor(node, componentAt(0), 1);
 
@@ -64,12 +73,33 @@ Carlyle.Book = function (dataSource) {
       component.applyTo(node);
     }
 
+    var oldCmptLPN = component.lastPageNumber();
+    var changedDims = component.updateDimensions(node);
+
+    // Now that the component has been activated within the node, we can
+    // deduce the page number for the given locus.
+    var pageN = 1;
+    if (typeof(locus.page) == "number") {
+      pageN = locus.page;
+    } else if (typeof(locus.percent) == "number") {
+      place = setPlaceFor(node, component, 1);
+      pageN = place.pageAtPercentageThrough(locus.percent);
+    } else if (typeof(locus.direction) == "number") {
+      pageN = place.pageNumber();
+      pageN += locus.direction;
+    } else if (typeof(locus.anchor) == "string") {
+      if (locus.anchor == "start") {
+        pageN = 1;
+      } else if (locus.anchor == "end") {
+        pageN = component.lastPageNumber();
+      }
+    } else {
+      console.log("Unrecognised locus: " + locus);
+    }
+
     // If the dimensions of the node have changed, we should multiply the
     // pageN against the difference between the old number of pages in the
     // component and the new number of pages in the component.
-    //
-    var oldCmptLPN = component.lastPageNumber();
-    var changedDims = component.updateDimensions(node);
     if (changedDims && parseInt(oldCmptLPN)) {
       pageN = Math.max(
         Math.round(component.lastPageNumber() * (pageN / oldCmptLPN)),
@@ -81,24 +111,23 @@ Carlyle.Book = function (dataSource) {
     // adjust the pageN accordingly.
     cIndex = component.properties.index;
     var lpn = component.lastPageNumber();
-    var finalCIndex = p.componentIds.length - 1; // FIXME: cache it
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
       return false;
-    } else if (cIndex == finalCIndex && pageN > component.lastPageNumber()) {
+    } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
       // After last page of book. Disallow.
       return false;
     } else if (pageN > component.lastPageNumber()) {
       // Moving to next component.
       pageN -= component.lastPageNumber();
       component = componentAt(cIndex + 1);
-      return changePage(node, pageN, component.properties.id);
+      return changePage(node, { page: pageN }, component.properties.id);
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
       component.updateDimensions(node); // FIXME: no going back
       pageN += component.lastPageNumber();
-      return changePage(node, pageN, component.properties.id);
+      return changePage(node, { page: pageN }, component.properties.id);
     }
 
     // Do it.
@@ -202,29 +231,9 @@ Carlyle.Book = function (dataSource) {
   }
 
 
-  function placeAt(componentId, options) {
-    console.log(options);
-    var place = Carlyle.Place();
-    var cIndex = p.componentIds.indexOf(componentId);
-    if (cIndex < 0) {
-      cIndex = 0;
-    }
-    var component = componentAt(cIndex);
-    if (options.page) {
-      place.setPlace(component, options.page);
-    } else if (typeof(options.percent) == "number") {
-      place.setPercentageThrough(component, options.percent);
-    } else {
-      console.log("Invalid option.");
-    }
-    return place;
-  }
-
-
   API.getMetaData = dataSource.getMetaData;
   API.changePage = changePage;
   API.chaptersForComponent = chaptersForComponent;
-  API.placeAt = placeAt;
   API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
 

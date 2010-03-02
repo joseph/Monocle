@@ -78,23 +78,18 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
   }
 
 
-  function setPlace(place) {
-    // FIXME! Place should never be null.
-    if (place) {
-      setPage(upperPage(), place.pageNumber(), place.componentId());
-    } else {
-      setPage(upperPage(), 1);
-    }
+  function moveTo(locus, componentId) {
+    setPage(upperPage(), locus, componentId);
     completedTurn();
   }
 
 
-  function setPage(pageDiv, pageN, componentId, callback) {
+  function setPage(pageDiv, locus, componentId, callback) {
     var spCallback = function (offset) {
       pageDiv.scrollerDiv.scrollLeft = offset;
       setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);
     }
-    return p.setPageFn(pageDiv, pageN, componentId, spCallback);
+    return p.setPageFn(pageDiv, locus, componentId, spCallback);
   }
 
 
@@ -161,6 +156,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
       // a way to test that we can advance one page.
       var upperPlace = getPlace(upperPage());
       var lowerPlace = getPlace(lowerPage());
+      // FIXME:
       if (!upperPlace || !lowerPlace || upperPlace.pageNumber() != lowerPlace.pageNumber()) {
         p.turnData.direction = k.FORWARDS;
         slideToCursor(boxPointX);
@@ -172,7 +168,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
       var place = getPlace();
       var pageSetSuccessfully = setPage(
         lowerPage(),
-        place.pageNumber() - 1,
+        { page: place.pageNumber() - 1 },
         place.componentId(),
         function () {
           p.turnData.direction = k.BACKWARDS;
@@ -280,7 +276,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
     if (
       !setPage(
         lowerPage(),
-        place.pageNumber() + 1,
+        { page: place.pageNumber() + 1 },
         place.componentId(),
         function () {
           jumpIn(resetTurn);
@@ -289,7 +285,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
     ) {
       setPage(
         lowerPage(),
-        place.pageNumber(),
+        { page: place.pageNumber() + 1 },
         place.componentId(),
         function () {
           jumpIn(resetTurn);
@@ -452,7 +448,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
   API.pageCount = p.pageCount;
   API.addPage = addPage;
   API.getPlace = getPlace;
-  API.setPlace = setPlace;
+  API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
 
   initialize();

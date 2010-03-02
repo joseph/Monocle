@@ -94,7 +94,7 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    p.flipper = new Carlyle.Flippers.Standard(API, setPage); // FIXME: detect?
+    p.flipper = new Carlyle.Flippers.Instant(API, setPage); // FIXME: detect?
 
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
@@ -241,9 +241,7 @@ Carlyle.Reader = function (node, bookData) {
       }
     }
 
-    //var place = p.book.placeAt(componentId, { 'page': pageN });
-    var place = null; // FIXME
-    p.flipper.setPlace(place);
+    p.flipper.moveTo({ page: pageN }, componentId);
   }
 
 
@@ -264,10 +262,7 @@ Carlyle.Reader = function (node, bookData) {
       }
     }
 
-    //var place = p.book.placeAt(componentId, { 'percent': percent });
-    var place = null; // FIXME
-
-    p.flipper.setPlace(place);
+    p.flipper.moveTo({ percent: percent }, componentId);
   }
 
 
@@ -277,8 +272,7 @@ Carlyle.Reader = function (node, bookData) {
     console.log("Skipping to chapter: " + src);
     //FIXME: SHOULD BE ACTIVE PAGE?
     var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
-    //moveToPage(place.pageNumber(), place.componentId());
-    p.flipper.setPlace(place);
+    p.flipper.moveTo({ page: place.pageNumber() }, place.componentId());
   }
 
 
@@ -288,15 +282,15 @@ Carlyle.Reader = function (node, bookData) {
   // This method is handed over to the flipper, which calls it with a
   // callback to do the actual display change.
   //
-  function setPage(pageDiv, pageN, componentId, callback) {
-    var eData = { page: pageDiv, pageNumber: pageN, componentId: componentId }
+  function setPage(pageDiv, locus, componentId, callback) {
+    var eData = { page: pageDiv, locus: locus, componentId: componentId }
 
     // Other things may disallow page change.
     if (!dispatchEvent('carlyle:pagechanging', eData)) {
       return;
     }
 
-    var rslt = p.book.changePage(pageDiv.contentDiv, pageN, componentId);
+    var rslt = p.book.changePage(pageDiv.contentDiv, locus, componentId);
 
     // The book may disallow changing to the given page.
     if (!rslt) {

@@ -36,13 +36,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
   }
 
 
-  function setPlace(place) {
-    // FIXME! Place should never be null.
-    if (place) {
-      return p.setPageFn(p.page, place.pageNumber(), place.componentId());
-    } else {
-      return p.setPageFn(p.page, 1);
-    }
+  function moveTo(locus, componentId) {
+    return p.setPageFn(p.page, locus, componentId);
   }
 
 
@@ -68,7 +63,7 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
   API.pageCount = p.pageCount;
   API.addPage = addPage;
   API.getPlace = getPlace;
-  API.setPlace = setPlace;
+  API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
   API.overrideDimensions = overrideDimensions;
 

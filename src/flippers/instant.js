@@ -48,27 +48,22 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   }
 
 
-  function setPlace(place) {
-    // FIXME! Place should never be null.
-    if (place) {
-      return p.setPageFn(p.page, place.pageNumber(), place.componentId());
-    } else {
-      return p.setPageFn(p.page, 1);
+  function moveTo(locus, componentId) {
+    var spCallback = function (offset) {
+      p.page.scrollerDiv.scrollLeft = offset;
+      // FIXME: a hack for webkit rendering artefacts.
+      var x = Math.random() / 1000 + 1.0;
+      p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
     }
+    return p.setPageFn(p.page, locus, componentId, spCallback);
   }
 
 
   function turn(boxPointX) {
-    var spCallback = function (offset) {
-      p.page.scrollerDiv.scrollLeft = offset;
-      // FIXME: a stupid hack for webkit rendering artefacts.
-      var x = Math.random() / 1000 + 1.0;
-      p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
-    }
     if (inForwardZone(boxPointX)) {
-      return p.setPageFn(p.page, getPlace().pageNumber() + 1, null, spCallback);
+      moveTo({ page: getPlace().pageNumber() + 1});
     } else if (inBackwardZone(boxPointX)) {
-      return p.setPageFn(p.page, getPlace().pageNumber() - 1, null, spCallback);
+      moveTo({ page: getPlace().pageNumber() - 1});
     }
   }
 
@@ -93,7 +88,7 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   API.pageCount = p.pageCount;
   API.addPage = addPage;
   API.getPlace = getPlace;
-  API.setPlace = setPlace;
+  API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
 
   initialize();
