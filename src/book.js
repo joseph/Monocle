@@ -50,7 +50,7 @@ Carlyle.Book = function (dataSource) {
   //  - page: integer
   //  - percent: float
   //  - direction: integer relative to the current page number for this node
-  //  - anchor: string, one of "start" or "end", moves to corresponding point
+  //  - position: string, one of "start" or "end", moves to corresponding point
   //      in the given component
   //
   // The `componentId` is optional -- if it is not provided (or it is invalid),
@@ -88,9 +88,9 @@ Carlyle.Book = function (dataSource) {
       pageN = place.pageNumber();
       pageN += locus.direction;
     } else if (typeof(locus.anchor) == "string") {
-      if (locus.anchor == "start") {
+      if (locus.position == "start") {
         pageN = 1;
-      } else if (locus.anchor == "end") {
+      } else if (locus.position == "end") {
         pageN = component.lastPageNumber();
       }
     } else {

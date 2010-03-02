@@ -1,6 +1,6 @@
-Carlyle.Flippers.Standard = function (reader, setPageFn) {
+Carlyle.Flippers.Slider = function (reader, setPageFn) {
   if (Carlyle.Flippers == this) {
-    return new Carlyle.Flippers.Standard(reader, setPageFn);
+    return new Carlyle.Flippers.Slider(reader, setPageFn);
   }
 
   // Constants
@@ -27,7 +27,7 @@ Carlyle.Flippers.Standard = function (reader, setPageFn) {
   }
 
   var API = {
-    constructor: Carlyle.Flippers.Standard,
+    constructor: Carlyle.Flippers.Slider,
     properties: p,
     constants: k
   }

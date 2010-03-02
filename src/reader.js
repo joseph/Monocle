@@ -94,7 +94,7 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    p.flipper = new Carlyle.Flippers.Instant(API, setPage); // FIXME: detect?
+    p.flipper = new Carlyle.Flippers.Slider(API, setPage); // FIXME: detect?
 
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
