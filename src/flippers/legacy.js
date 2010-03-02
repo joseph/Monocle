@@ -46,6 +46,12 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function overrideDimensions() {
+    p.page.scrollerDiv.style.right = "0";
+    p.page.scrollerDiv.style.overflow = "auto";
+    p.page.contentDiv.style.position = "relative";
+    p.page.contentDiv.style.width = "auto";
+    p.page.contentDiv.style.minWidth = "auto";
+
     if (!p.divs.legacyMessage) {
       p.divs.legacyMessage = document.createElement('div');
       p.divs.legacyMessage.innerHTML = k.LEGACY_MESSAGE;
@@ -66,11 +72,6 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
       }
       p.page.scrollerDiv.appendChild(p.divs.nextButton);
     }
-    p.page.scrollerDiv.style.right = "0";
-    p.page.scrollerDiv.style.overflow = "auto";
-    p.page.contentDiv.style.position = "relative";
-    p.page.contentDiv.style.width = "100%";
-    p.page.contentDiv.style.minWidth = "100%";
   }
 
 

@@ -53,10 +53,7 @@ Carlyle.Reader = function (node, bookData) {
     // A resettable timer which must expire before dimensions are recalculated
     // after the reader has been resized.
     //
-    resizeTimer: null,
-
-    // Controls registered to this reader instance.
-    controls: []
+    resizeTimer: null
   }
 
   // Methods and properties available to external code.
@@ -445,9 +442,11 @@ Carlyle.Reader = function (node, bookData) {
    *              use showControl to show them
    */
   function addControl(ctrl, cType, options) {
-    if (p.controls.indexOf(ctrl) != -1) {
-      console.log("Already added control: " + ctrl);
-      return;
+    for (var i = 0; i < p.controls.length; ++i) {
+      if (p.controls[i].control == ctrl) {
+        console.log("Already added control: " + ctrl);
+        return;
+      }
     }
 
     options = options || {};
