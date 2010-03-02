@@ -49,7 +49,7 @@ Carlyle.Styles = {
     "bottom": "1em",
     "left": "1em",
     "right": "1em",
-    "overflow": "hidden",
+    "overflow": "hidden"
   },
 
   content: {
@@ -74,10 +74,14 @@ Carlyle.Styles = {
 
   control: {
     "z-index": "100"
-  },
-
-  Controls: {
-    // A separate namespace for optional control styles, populated by those
-    // optional scripts.
   }
+}
+
+Carlyle.Styles.Controls = {
+  // A separate namespace for optional control styles, populated by those
+  // optional scripts.
+}
+
+Carlyle.Styles.Flippers = {
+  // A separate namespace for flippers.
 }

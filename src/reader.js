@@ -7,7 +7,8 @@ Carlyle.Reader = function (node, bookData) {
   var k = {
     durations: {
       RESIZE_DELAY: 500
-    }
+    },
+    TOUCH_DEVICE: (typeof Touch == "object")
   }
 
   // Properties.
@@ -94,7 +95,7 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    p.flipper = new Carlyle.Flippers.Slider(API, setPage); // FIXME: detect?
+    p.flipper = new Carlyle.Flippers.Legacy(API, setPage); // FIXME: detect?
 
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
@@ -310,9 +311,7 @@ Carlyle.Reader = function (node, bookData) {
 
 
   function listenForInteraction() {
-    var receivesTouchEvents = (typeof Touch == "object");
-
-    if (!receivesTouchEvents) {
+    if (!k.TOUCH_DEVICE) {
       p.divs.container.addEventListener(
         'mousedown',
         function (evt) {

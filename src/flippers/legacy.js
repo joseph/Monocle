@@ -5,12 +5,15 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
   // Constants
   var k = {
+    LEGACY_MESSAGE: "Your browser doesn't support Monocle's full feature set." +
+      "You may want to upgrade to Firefox, Safari or Chrome.",
+    NEXT_BUTTON_TEXT: "Next part..."
   }
-
 
   // Properties
   var p = {
-    pageCount: 1
+    pageCount: 1,
+    divs: {}
   }
 
   var API = {
@@ -37,15 +40,32 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
+    // callback should hide nextbutton if on last component.
     return p.setPageFn(p.page, locus);
   }
 
 
   function overrideDimensions() {
-    var nextLink = document.createElement('a');
-    nextLink.innerHTML = "Next part...";
-    nextLink.onclick = function () { console.log("Not yet implemented..."); }
-    p.page.scrollerDiv.appendChild(nextLink);
+    if (!p.divs.legacyMessage) {
+      p.divs.legacyMessage = document.createElement('div');
+      p.divs.legacyMessage.innerHTML = k.LEGACY_MESSAGE;
+      p.divs.legacyMessage.style.cssText = Carlyle.Styles.ruleText(
+        Carlyle.Styles.Flippers.Legacy.message
+      );
+      p.page.scrollerDiv.insertBefore(p.divs.legacyMessage, p.page.contentDiv);
+    }
+
+    if (!p.divs.nextButton) {
+      p.divs.nextButton = document.createElement('div');
+      p.divs.nextButton.innerHTML = k.NEXT_BUTTON_TEXT;
+      p.divs.nextButton.style.cssText = Carlyle.Styles.ruleText(
+        Carlyle.Styles.Flippers.Legacy.next
+      );
+      p.divs.nextButton.onclick = function () {
+        p.reader.moveToPercentageThrough(1.5);
+      }
+      p.page.scrollerDiv.appendChild(p.divs.nextButton);
+    }
     p.page.scrollerDiv.style.right = "0";
     p.page.scrollerDiv.style.overflow = "auto";
     p.page.contentDiv.style.position = "relative";
@@ -70,4 +90,21 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
   initialize();
 
   return API;
+}
+
+
+Carlyle.Styles.Flippers.Legacy = {
+  message: {
+    "border": "1px solid #999",
+    "background": "#FFC",
+    "color": "#999",
+    "font-family": "sans-serif",
+    "font-size": "90%",
+    "margin-right": "3px",
+    "margin-bottom": "3px",
+    "padding": "0.5em 1em"
+  },
+  next: {
+    "background": "#F0F"
+  }
 }
