@@ -1,7 +1,7 @@
 /* READER */
 
-Carlyle.Reader = function (node, bookData) {
-  if (Carlyle == this) { return new Carlyle.Reader(node, bookData); }
+Carlyle.Reader = function (node, bookData, options) {
+  if (Carlyle == this) { return new Carlyle.Reader(node, bookData, options); }
 
   // Constants.
   var k = {
@@ -66,10 +66,12 @@ Carlyle.Reader = function (node, bookData) {
 
   // Sets up the container and internal elements.
   //
-  function initialize(node, bookData) {
+  function initialize(node, bookData, options) {
     p.divs.box = typeof(node) == "string" ?
       document.getElementById(node) :
       node;
+
+    options = options || {}
 
     dispatchEvent("carlyle:initializing");
 
@@ -92,7 +94,9 @@ Carlyle.Reader = function (node, bookData) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
 
-    p.flipper = new Carlyle.Flippers.Legacy(API, setPage); // FIXME: detect?
+    var flipperClass = options.flipper || Carlyle.Flippers.Slider;
+    // FIXME: detect legacy flipper?
+    p.flipper = new flipperClass(API, setPage);
 
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
@@ -547,7 +551,7 @@ Carlyle.Reader = function (node, bookData) {
   API.showControl = showControl;
   API.addEventListener = addEventListener;
 
-  initialize(node, bookData);
+  initialize(node, bookData, options);
 
   return API;
 }

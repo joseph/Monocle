@@ -49,8 +49,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
     p.page.scrollerDiv.style.right = "0";
     p.page.scrollerDiv.style.overflow = "auto";
     p.page.contentDiv.style.position = "relative";
-    p.page.contentDiv.style.width = "auto";
-    p.page.contentDiv.style.minWidth = "auto";
+    p.page.contentDiv.style.width = "100%";
+    p.page.contentDiv.style.minWidth = "0%";
 
     if (!p.divs.legacyMessage) {
       p.divs.legacyMessage = document.createElement('div');
@@ -96,9 +96,9 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 Carlyle.Styles.Flippers.Legacy = {
   message: {
-    "border": "1px solid #999",
+    "border": "1px solid #987",
     "background": "#FFC",
-    "color": "#999",
+    "color": "#666",
     "font-family": "sans-serif",
     "font-size": "90%",
     "margin-right": "3px",
