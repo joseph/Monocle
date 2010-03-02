@@ -53,15 +53,15 @@ Carlyle.Book = function (dataSource) {
   //  - position: string, one of "start" or "end", moves to corresponding point
   //      in the given component
   //
-  // The `componentId` is optional -- if it is not provided (or it is invalid),
-  // we default to the currently active component, and if that doesn't exist,
-  // we default to the very first component.
+  // The locus object can also specify a componentId. If it is not provided
+  // (or it is invalid), we default to the currently active component, and
+  // if that doesn't exist, we default to the very first component.
   //
-  function changePage(node, locus, componentId) {
+  function changePage(node, locus) {
     // Find the place of the node in the book, or create one.
     var place = placeFor(node) || setPlaceFor(node, componentAt(0), 1);
 
-    var cIndex = p.componentIds.indexOf(componentId);
+    var cIndex = p.componentIds.indexOf(locus.componentId);
     var component;
     if (cIndex == -1) {
       component = place.properties.component;
@@ -121,13 +121,19 @@ Carlyle.Book = function (dataSource) {
       // Moving to next component.
       pageN -= component.lastPageNumber();
       component = componentAt(cIndex + 1);
-      return changePage(node, { page: pageN }, component.properties.id);
+      return changePage(
+        node,
+        { page: pageN, componentId: component.properties.id }
+      );
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
       component.updateDimensions(node); // FIXME: no going back
       pageN += component.lastPageNumber();
-      return changePage(node, { page: pageN }, component.properties.id);
+      return changePage(
+        node,
+        { page: pageN, componentId: component.properties.id }
+      );
     }
 
     // Do it.

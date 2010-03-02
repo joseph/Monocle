@@ -78,18 +78,18 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function moveTo(locus, componentId) {
-    setPage(upperPage(), locus, componentId);
+  function moveTo(locus) {
+    setPage(upperPage(), locus);
     completedTurn();
   }
 
 
-  function setPage(pageDiv, locus, componentId, callback) {
+  function setPage(pageDiv, locus, callback) {
     var spCallback = function (offset) {
       pageDiv.scrollerDiv.scrollLeft = offset;
       setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);
     }
-    return p.setPageFn(pageDiv, locus, componentId, spCallback);
+    return p.setPageFn(pageDiv, locus, spCallback);
   }
 
 
@@ -168,8 +168,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
       var place = getPlace();
       var pageSetSuccessfully = setPage(
         lowerPage(),
-        { page: place.pageNumber() - 1 },
-        place.componentId(),
+        place.getLocus({ offset: -1 }),
         function () {
           p.turnData.direction = k.BACKWARDS;
           deferredCall(function() {
@@ -276,8 +275,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
     if (
       !setPage(
         lowerPage(),
-        { page: place.pageNumber() + 1 },
-        place.componentId(),
+        place.getLocus({ offset: 1 }),
         function () {
           jumpIn(resetTurn);
         }
@@ -285,8 +283,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
     ) {
       setPage(
         lowerPage(),
-        { page: place.pageNumber() + 1 },
-        place.componentId(),
+        place.getLocus(),
         function () {
           jumpIn(resetTurn);
         }

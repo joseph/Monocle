@@ -241,7 +241,7 @@ Carlyle.Reader = function (node, bookData) {
       }
     }
 
-    p.flipper.moveTo({ page: pageN }, componentId);
+    p.flipper.moveTo({ page: pageN, componentId: componentId});
   }
 
 
@@ -262,7 +262,7 @@ Carlyle.Reader = function (node, bookData) {
       }
     }
 
-    p.flipper.moveTo({ percent: percent }, componentId);
+    p.flipper.moveTo({ percent: percent, componentId: componentId});
   }
 
 
@@ -272,7 +272,7 @@ Carlyle.Reader = function (node, bookData) {
     console.log("Skipping to chapter: " + src);
     //FIXME: SHOULD BE ACTIVE PAGE?
     var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
-    p.flipper.moveTo({ page: place.pageNumber() }, place.componentId());
+    p.flipper.moveTo(place.getLocus());
   }
 
 
@@ -282,15 +282,15 @@ Carlyle.Reader = function (node, bookData) {
   // This method is handed over to the flipper, which calls it with a
   // callback to do the actual display change.
   //
-  function setPage(pageDiv, locus, componentId, callback) {
-    var eData = { page: pageDiv, locus: locus, componentId: componentId }
+  function setPage(pageDiv, locus, callback) {
+    var eData = { page: pageDiv, locus: locus }
 
     // Other things may disallow page change.
     if (!dispatchEvent('carlyle:pagechanging', eData)) {
       return;
     }
 
-    var rslt = p.book.changePage(pageDiv.contentDiv, locus, componentId);
+    var rslt = p.book.changePage(pageDiv.contentDiv, locus);
 
     // The book may disallow changing to the given page.
     if (!rslt) {

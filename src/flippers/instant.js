@@ -48,14 +48,14 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   }
 
 
-  function moveTo(locus, componentId) {
+  function moveTo(locus) {
     var spCallback = function (offset) {
       p.page.scrollerDiv.scrollLeft = offset;
       // FIXME: a hack for webkit rendering artefacts.
       var x = Math.random() / 1000 + 1.0;
       p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
     }
-    return p.setPageFn(p.page, locus, componentId, spCallback);
+    return p.setPageFn(p.page, locus, spCallback);
   }
 
 

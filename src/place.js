@@ -69,6 +69,19 @@ Carlyle.Place = function () {
   }
 
 
+  function getLocus(options) {
+    options = options || {};
+    var locus = {
+      page: pageNumber(),
+      componentId: componentId()
+    }
+    if (options.offset) {
+      locus.page += options.offset;
+    }
+    return locus;
+  }
+
+
   API.setPlace = setPlace;
   API.setPercentageThrough = setPercentageThrough;
   API.componentId = componentId;
@@ -77,6 +90,7 @@ Carlyle.Place = function () {
   API.pageNumber = pageNumber;
   API.chapterInfo = chapterInfo;
   API.chapterTitle = chapterTitle;
+  API.getLocus = getLocus;
 
   return API;
 }

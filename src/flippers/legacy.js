@@ -36,8 +36,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
   }
 
 
-  function moveTo(locus, componentId) {
-    return p.setPageFn(p.page, locus, componentId);
+  function moveTo(locus) {
+    return p.setPageFn(p.page, locus);
   }
 
 
