@@ -8,6 +8,13 @@ Carlyle.Reader = function (node, bookData, options) {
     durations: {
       RESIZE_DELAY: 500
     },
+    abortMessage: {
+      CLASSNAME: "monocleAbortMessage",
+      TEXT: "Your browser does not support this technology."
+    },
+    FLIPPER_LEGACY_CLASS: (typeof(Carlyle.Flippers.Legacy) == "undefined") ?
+      null :
+      Carlyle.Flippers.Legacy,
     TOUCH_DEVICE: (typeof Touch == "object")
   }
 
@@ -90,14 +97,12 @@ Carlyle.Reader = function (node, bookData, options) {
       p.divs.box.style.position = "relative";
     }
 
+    // Attach the page-flipping gadget.
+    attachFlipper(options.flipper);
+
     // Create the essential DOM elements.
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
-
-    var flipperClass = options.flipper || Carlyle.Flippers.Slider;
-    // FIXME: detect legacy flipper?
-    p.flipper = new flipperClass(API, setPage);
-
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
       page.pageIndex = i;
@@ -110,7 +115,6 @@ Carlyle.Reader = function (node, bookData, options) {
       page.contentDiv = document.createElement('div');
       page.scrollerDiv.appendChild(page.contentDiv);
     }
-
     p.divs.overlay = document.createElement('div');
     p.divs.container.appendChild(p.divs.overlay);
 
@@ -123,6 +127,23 @@ Carlyle.Reader = function (node, bookData, options) {
     listenForInteraction();
 
     dispatchEvent("carlyle:loaded")
+  }
+
+
+  function attachFlipper(flipperClass) {
+    if (navigator.product != "Gecko") { // FIXME: browser sniffing is a smell
+      if (!k.FLIPPER_LEGACY_CLASS) {
+        var abortMsg = document.createElement('div');
+        abortMsg.className = k.abortMessage.CLASSNAME;
+        abortMsg.innerHTML = k.abortMessage.TEXT;
+        p.divs.box.appendChild(abortMsg);
+        return;
+      }
+      flipperClass = k.FLIPPER_LEGACY_CLASS;
+    } else if (!flipperClass) {
+      flipperClass = Carlyle.Flippers.Slider;
+    }
+    p.flipper = new flipperClass(API, setPage);
   }
 
 
