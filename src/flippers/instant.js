@@ -60,7 +60,9 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
       var x = Math.random() / 1000 + 1.0;
       p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
     }
-    return p.setPageFn(p.page, locus, spCallback);
+    var rslt = p.setPageFn(p.page, locus, spCallback);
+    p.reader.dispatchEvent('carlyle:turn');
+    return rslt;
   }
 
 

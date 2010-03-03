@@ -45,8 +45,10 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    // callback should hide nextbutton if on last component.
-    return p.setPageFn(p.page, locus);
+    // FIXME: callback should hide nextbutton if on last component.
+    var rslt = p.setPageFn(p.page, locus);
+    p.reader.dispatchEvent('carlyle:turn');
+    return rslt;
   }
 
 

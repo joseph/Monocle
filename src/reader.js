@@ -166,7 +166,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function setBook(bk) {
-    if (!dispatchEvent("carlyle:bookchanging")) {
+    if (!dispatchEvent("carlyle:bookchanging", {}, true)) {
       return;
     }
     p.book = bk;
@@ -182,7 +182,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function resized() {
-    if (!dispatchEvent("carlyle:resizing")) {
+    if (!dispatchEvent("carlyle:resizing", {}, true)) {
       return;
     }
     clearTimeout(p.resizeTimer);
@@ -276,7 +276,7 @@ Carlyle.Reader = function (node, bookData, options) {
     var eData = { page: pageDiv, locus: locus }
 
     // Other things may disallow page change.
-    if (!dispatchEvent('carlyle:pagechanging', eData)) {
+    if (!dispatchEvent('carlyle:pagechanging', eData, true)) {
       return;
     }
 
@@ -410,8 +410,8 @@ Carlyle.Reader = function (node, bookData, options) {
       )
     };
     if (
-      !dispatchEvent("carlyle:contact:"+eType, cData) ||
-      !dispatchEvent("carlyle:contact:"+eType+":unhandled", cData)
+      !dispatchEvent("carlyle:contact:"+eType, cData, true) ||
+      !dispatchEvent("carlyle:contact:"+eType+":unhandled", cData, true)
     ) {
       evt.preventDefault();
     }
@@ -512,10 +512,10 @@ Carlyle.Reader = function (node, bookData, options) {
   }
 
 
-  function dispatchEvent(evtType, data) {
+  function dispatchEvent(evtType, data, cancelable) {
+    cancelable = cancelable || false;
     var evt = document.createEvent("Events");
-    // FIXME: should take cancellable value from args?
-    evt.initEvent(evtType, false, true);
+    evt.initEvent(evtType, false, cancelable);
     evt.carlyleData = data;
     return p.divs.box.dispatchEvent(evt);
   }
@@ -536,6 +536,7 @@ Carlyle.Reader = function (node, bookData, options) {
   API.addControl = addControl;
   API.hideControl = hideControl;
   API.showControl = showControl;
+  API.dispatchEvent = dispatchEvent;
   API.addEventListener = addEventListener;
 
   initialize(node, bookData, options);

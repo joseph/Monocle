@@ -98,7 +98,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  // Returns to if the box-based x point is in the "Go forward" zone for
+  // Returns true if the box-based x point is in the "Go forward" zone for
   // user turning a page.
   //
   function inForwardZone(x) {
@@ -106,7 +106,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  // Returns to if the box-based x point is in the "Go backward" zone for
+  // Returns true if the box-based x point is in the "Go backward" zone for
   // user turning a page.
   //
   function inBackwardZone(x) {
@@ -161,8 +161,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
       // a way to test that we can advance one page.
       var upperPlace = getPlace(upperPage());
       var lowerPlace = getPlace(lowerPage());
-      // FIXME:
-      if (!upperPlace || !lowerPlace || upperPlace.pageNumber() != lowerPlace.pageNumber()) {
+      if (upperPlace.pageNumber() != lowerPlace.pageNumber()) {
         p.turnData.direction = k.FORWARDS;
         slideToCursor(boxPointX);
         liftAnimationFinished();
@@ -270,10 +269,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   function completedTurn() {
     var place = getPlace();
     var resetTurn = function () {
-      // FIXME!
-      var evt = document.createEvent("Events");
-      evt.initEvent("carlyle:turn", false, true);
-      p.reader.properties.divs.box.dispatchEvent(evt);
+      p.reader.dispatchEvent('carlyle:turn');
       p.turnData = {};
     }
 
