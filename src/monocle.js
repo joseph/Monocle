@@ -9,3 +9,6 @@ Monocle = {};
 
 Monocle.Flippers = {};
 Monocle.Controls = {};
+
+//= require <flippers/legacy>
+//= require <flippers/slider>
