@@ -75,8 +75,8 @@ Carlyle.Place = function () {
       page: pageNumber(),
       componentId: componentId()
     }
-    if (options.offset) {
-      locus.page += options.offset;
+    if (options.direction) {
+      locus.page += options.direction;
     }
     return locus;
   }

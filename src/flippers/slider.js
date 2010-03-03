@@ -44,6 +44,11 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
+  function visiblePages() {
+    return [upperPage()];
+  }
+
+
   function listenForInteraction() {
     p.reader.addEventListener(
       "carlyle:contact:start",
@@ -168,7 +173,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
       var place = getPlace();
       var pageSetSuccessfully = setPage(
         lowerPage(),
-        place.getLocus({ offset: -1 }),
+        place.getLocus({ direction: k.BACKWARDS }),
         function () {
           p.turnData.direction = k.BACKWARDS;
           deferredCall(function() {
@@ -203,7 +208,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
 
     // For speed reasons, we constrain motions to a constant number per second.
     var stamp = (new Date()).getTime();
-    var followInterval = k.durations.FOLLOW_CURSOR * 1;
+    var followInterval = k.durations.FOLLOW_CURSOR;
     if (
       p.turnData.stamp &&
       stamp - p.turnData.stamp < followInterval
@@ -275,7 +280,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
     if (
       !setPage(
         lowerPage(),
-        place.getLocus({ offset: 1 }),
+        place.getLocus({ direction: k.FORWARDS }),
         function () {
           jumpIn(resetTurn);
         }
@@ -444,6 +449,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
   API.addPage = addPage;
+  API.visiblePages = visiblePages;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;

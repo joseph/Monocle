@@ -31,6 +31,11 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   }
 
 
+  function visiblePages() {
+    return [p.page];
+  }
+
+
   function listenForInteraction() {
     p.reader.addEventListener(
       "carlyle:contact:start",
@@ -87,6 +92,7 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
   API.addPage = addPage;
+  API.visiblePages = visiblePages;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;

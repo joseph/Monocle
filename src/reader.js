@@ -211,9 +211,9 @@ Carlyle.Reader = function (node, bookData, options) {
     } while (o = o.offsetParent);
 
     if (typeof(p.flipper.overrideDimensions) != 'function') {
-      //FIXME: SHOULD BE ACTIVE PAGE?
-      p.pageWidth = p.divs.pages[0].offsetWidth;
-      var cWidth = p.divs.pages[0].scrollerDiv.offsetWidth;
+      var measuringPage = p.flipper.visiblePages()[0];
+      p.pageWidth = measuringPage.offsetWidth;
+      var cWidth = measuringPage.scrollerDiv.offsetWidth;
       for (var i = 0; i < p.divs.pages.length; ++i) {
         var cDiv = p.divs.pages[i].contentDiv;
         cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = cWidth+"px";
@@ -260,8 +260,8 @@ Carlyle.Reader = function (node, bookData, options) {
   //
   function skipToChapter(src) {
     console.log("Skipping to chapter: " + src);
-    //FIXME: SHOULD BE ACTIVE PAGE?
-    var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
+    var page = p.flipper.visiblePages()[0];
+    var place = p.book.placeOfChapter(page.contentDiv, src);
     moveTo(place.getLocus());
   }
 
