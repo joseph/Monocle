@@ -28,6 +28,12 @@
     Controls.Magnifier.button['-webkit-border-radius'] = "3px";
     Controls.Magnifier.button.background = "#FFF";
     Controls.Magnifier.button.top = "8px";
+    Controls.Contents.container.background = "#E0D3C0";
+    Controls.Contents.container.border = "1px solid #EEd";
+    Controls.Contents.list.font = "11pt Georgia, serif";
+    Controls.Contents.list.color = "#642";
+    Controls.Contents.list['text-shadow'] = "1px 1px #FFF6E0";
+    Controls.Contents.chapter['border-bottom'] = "2px groove #FFF6E9";
   }
 
   var bookData = {
@@ -225,18 +231,30 @@
 
 
       /* BOOK TITLE RUNNING HEAD */
-      var bookTitle = {
-        createControlElements: function () {
-          var cntr = document.createElement('div');
-          cntr.className = "bookTitle";
-          var runner = document.createElement('div');
-          runner.className = "runner";
-          runner.innerHTML = reader.getBook().getMetaData('title');
-          cntr.appendChild(runner);
-          var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
-          cntr.addEventListener(evtType, createToC, false);
-          return cntr;
-        }
+      var bookTitle = {}
+      bookTitle.contentsMenu = Carlyle.Controls.Contents(reader);
+      reader.addControl(bookTitle.contentsMenu, 'popover', { hidden: true });
+      bookTitle.createControlElements = function () {
+        var cntr = document.createElement('div');
+        cntr.className = "bookTitle";
+        var runner = document.createElement('div');
+        runner.className = "runner";
+        runner.innerHTML = reader.getBook().getMetaData('title');
+        cntr.appendChild(runner);
+
+        var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
+        cntr.addEventListener(
+          evtType,
+          function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            reader.showControl(bookTitle.contentsMenu);
+          },
+          false
+        );
+
+        //cntr.addEventListener(evtType, createToC, false);
+        return cntr;
       }
       reader.addControl(bookTitle, 'page');
 

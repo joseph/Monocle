@@ -4,6 +4,7 @@ Carlyle.Controls.Contents = function (reader) {
   }
 
   var k = {
+    CHAPTER_INVOKE_EVENT: 'click'
   }
 
   var p = {
@@ -25,8 +26,9 @@ Carlyle.Controls.Contents = function (reader) {
   function createControlElements() {
     var div = document.createElement('div');
     p.divs.push(div);
-    // TODO: STYLE DIV
-    div.style.background = "#F0F";
+    div.style.cssText = Carlyle.Styles.ruleText(
+      Carlyle.Styles.Controls.Contents.container
+    );
     contentsForBook(div, reader.getBook());
     return div;
   }
@@ -36,7 +38,9 @@ Carlyle.Controls.Contents = function (reader) {
     div.innerHTML = ''; // FIXME
     var list = document.createElement('ul');
     div.appendChild(list);
-    // TODO: STYLE LIST
+    list.style.cssText = Carlyle.Styles.ruleText(
+      Carlyle.Styles.Controls.Contents.list
+    );
 
     // FIXME: don't circumvent the book!
     var contents = book.properties.dataSource.getContents();
@@ -47,25 +51,27 @@ Carlyle.Controls.Contents = function (reader) {
 
 
   function chapterBuilder(list, chp, padLvl) {
+    console.log(list);
     var li = document.createElement('li');
     var span = document.createElement('span');
     span.style.paddingLeft = padLvl + "em";
     span.innerHTML = chp.title;
     li.appendChild(span);
-    // FIXME: register the event properly.
     li.addEventListener(
-      'click',
+      k.CHAPTER_INVOKE_EVENT,
       function () {
-        alert('click');
         p.reader.skipToChapter(chp.src);
         p.reader.hideControl(API);
       },
       false
     );
+    li.style.cssText = Carlyle.Styles.ruleText(
+      Carlyle.Styles.Controls.Contents.chapter
+    );
     list.appendChild(li);
     if (chp.children) {
       for (var i = 0; i < chp.children.length; ++i) {
-        chapterBuilder(chp.children[i], padLvl + 1);
+        chapterBuilder(list, chp.children[i], padLvl + 1);
       }
     }
   }
@@ -76,4 +82,34 @@ Carlyle.Controls.Contents = function (reader) {
   initialize();
 
   return API;
+}
+
+
+Carlyle.Styles.Controls.Contents = {
+  container: {
+    "position": "relative",
+    "width": "75%",
+    "height": "75%",
+    "left": "12.5%",
+    "top": "12.5%",
+    "background": "#EEE",
+    "-moz-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
+    "-webkit-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
+    "border-radius": "9px",
+    "-moz-border-radius": "9px",
+    "border": "2px solid #F7F7F7",
+    "overflow-y": "auto"
+  },
+  list: {
+    "margin": "6px",
+    "padding": "0"
+  },
+  chapter: {
+    "list-style": "none",
+    "line-height": "220%",
+    "padding-left": "1em",
+    "padding-right": "2em",
+    "border-bottom": "2px groove #FEFEFE",
+    "cursor": "pointer"
+  }
 }
