@@ -452,8 +452,7 @@ Carlyle.Reader = function (node, bookData, options) {
     var ctrlData = {
       control: ctrl,
       elements: [],
-      controlType: cType,
-      hidden: false
+      controlType: cType
     }
     p.controls.push(ctrlData);
 
@@ -540,7 +539,7 @@ Carlyle.Reader = function (node, bookData, options) {
     if (!controlData) {
       throw("No data for control: " + ctrl);
     }
-    if (!controlData.hidden) {
+    if (controlData.hidden == false) {
       return;
     }
     for (var i = 0; i < controlData.elements.length; ++i) {

@@ -1,2 +1,0 @@
-Carlyle.TOC = function(book) {
-}

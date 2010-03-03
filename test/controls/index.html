@@ -25,6 +25,7 @@
     <script type="text/javascript" src="../../src/controls/magnifier.js"></script>
     <script type="text/javascript" src="../../src/controls/scrubber.js"></script>
     <script type="text/javascript" src="../../src/controls/spinner.js"></script>
+    <script type="text/javascript" src="../../src/controls/contents.js"></script>
 
     <style type="text/css">
       .readerInfo {
@@ -136,25 +137,8 @@
           );
 
           window.reader5 = Carlyle.Reader('toc', bookData);
-          var toc = {}
-          toc.createControlElements = function (overlay) {
-            var div = document.createElement('div');
-            div.style.position = "relative";
-            div.style.borderRadius = "9px";
-            div.style.padding = "9px";
-            div.style.width = "50%";
-            div.style.height = "50%";
-            div.style.left = "25%";
-            div.style.top = "25%";
-            div.style.backgroundColor = "#F0F";
-            div.style.color = "#FFF";
-            div.innerHTML = "popover";
-            div.onclick = function (evt) {
-              //reader5.hideControl(toc);
-            }
-            return div;
-          }
-          reader5.addControl(toc, 'popover', { hidden: true });
+          var toc = Carlyle.Controls.Contents(reader5);
+          reader5.addControl(toc, 'popover');
           reader5.addEventListener(
             'carlyle:contact:start:unhandled',
             function () {
