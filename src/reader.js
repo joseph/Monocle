@@ -32,9 +32,9 @@ Carlyle.Reader = function (node, bookData, options) {
     //        -> scroller
     //          -> content
     //        -> page controls
-    //      -> overlay
-    //        -> modal/popover controls
     //      -> standard controls
+    //    -> overlay
+    //      -> modal/popover controls
     //
     divs: {
       box: null,
@@ -119,7 +119,7 @@ Carlyle.Reader = function (node, bookData, options) {
       page.scrollerDiv.appendChild(page.contentDiv);
     }
     p.divs.overlay = document.createElement('div');
-    p.divs.container.appendChild(p.divs.overlay);
+    p.divs.box.appendChild(p.divs.overlay);
 
     dispatchEvent("carlyle:loading");
 
@@ -452,7 +452,8 @@ Carlyle.Reader = function (node, bookData, options) {
     var ctrlData = {
       control: ctrl,
       elements: [],
-      controlType: cType
+      controlType: cType,
+      hidden: false
     }
     p.controls.push(ctrlData);
 
@@ -469,17 +470,17 @@ Carlyle.Reader = function (node, bookData, options) {
         ctrlData.elements.push(runner);
       }
     } else if (cType == "modal" || cType == "popover") {
-      // FIXME!!!
       ctrlElem = ctrl.createControlElements(p.divs.overlay);
       p.divs.overlay.appendChild(ctrlElem);
-      p.divs.overlay.cssText += "width: 100%; height: 100%";
       ctrlData.elements.push(ctrlElem);
+      ctrlData.usesOverlay = true;
     } else if (cType == "invisible") {
-      if (typeof(ctrl.createControlElements) == "function") {
-        if (ctrlElem = ctrl.createControlElements(p.divs.container)) {
+      if (
+        typeof(ctrl.createControlElements) == "function" &&
+        (ctrlElem = ctrl.createControlElements(p.divs.container))
+      ) {
           p.divs.container.appendChild(ctrlElem);
           ctrlData.elements.push(ctrlElem);
-        }
       }
     } else {
       console.log("Unknown control type: " + cType);
@@ -491,21 +492,43 @@ Carlyle.Reader = function (node, bookData, options) {
 
     if (options.hidden) {
       hideControl(ctrl);
+    } else {
+      showControl(ctrl);
     }
 
     return ctrl;
   }
 
 
-  function hideControl(ctrl) {
-    // FIXME: don't hide if already hiding - inefficient
+  function dataForControl(ctrl) {
     for (var i = 0; i < p.controls.length; ++i) {
       if (p.controls[i].control == ctrl) {
-        for (var j = 0; j < p.controls[i].elements.length; ++j) {
-          p.controls[i].elements[j].style.display = "none";
-        }
+        return p.controls[i];
       }
     }
+  }
+
+
+  function hideControl(ctrl) {
+    var controlData = dataForControl(ctrl);
+    if (!controlData) {
+      throw("No data for control: " + ctrl);
+    }
+    if (controlData.hidden) {
+      return;
+    }
+    for (var i = 0; i < controlData.elements.length; ++i) {
+      controlData.elements[i].style.display = "none";
+    }
+    if (controlData.usesOverlay) {
+      p.divs.overlay.style.display = "none";
+      p.divs.overlay.removeEventListener(
+        'click',
+        p.divs.overlay.clickFn,
+        false
+      );
+    }
+    controlData.hidden = true;
     if (ctrl.properties) {
       ctrl.properties.hidden = true;
     }
@@ -513,14 +536,34 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function showControl(ctrl) {
-    // FIXME: don't show if already showing - inefficient
-    for (var i = 0; i < p.controls.length; ++i) {
-      if (p.controls[i].control == ctrl) {
-        for (var j = 0; j < p.controls[i].elements.length; ++j) {
-          p.controls[i].elements[j].style.display = "block";
-        }
-      }
+    var controlData = dataForControl(ctrl);
+    if (!controlData) {
+      throw("No data for control: " + ctrl);
     }
+    if (!controlData.hidden) {
+      return;
+    }
+    for (var i = 0; i < controlData.elements.length; ++i) {
+      controlData.elements[i].style.display = "block";
+    }
+    if (controlData.usesOverlay) {
+      p.divs.overlay.style.display = "block";
+    }
+    if (controlData.controlType == "popover") {
+      p.divs.overlay.clickFn = function (evt) {
+        obj = evt.target;
+        do {
+          if (obj == controlData.elements[0]) { return; }
+        } while (obj = obj.parentNode);
+        hideControl(ctrl);
+      }
+      p.divs.overlay.addEventListener(
+        'click',
+        p.divs.overlay.clickFn,
+        false
+      );
+    }
+    controlData.hidden = false;
     if (ctrl.properties) {
       ctrl.properties.hidden = false;
     }

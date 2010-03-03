@@ -120,9 +120,9 @@
 
           // SPINNER
           window.reader4 = Carlyle.Reader('spinner', bookData);
-          var spinner = Carlyle.Controls.Spinner(window.reader4);
-          window.reader4.addControl(spinner, 'page', { hidden: true });
-          window.reader4.addEventListener(
+          var spinner = Carlyle.Controls.Spinner(reader4);
+          reader4.addControl(spinner, 'page', { hidden: true });
+          reader4.addEventListener(
             'carlyle:contact:start:unhandled',
             function () {
               if (spinner.spinning) {
@@ -136,6 +136,31 @@
           );
 
           window.reader5 = Carlyle.Reader('toc', bookData);
+          var toc = {}
+          toc.createControlElements = function (overlay) {
+            var div = document.createElement('div');
+            div.style.position = "relative";
+            div.style.borderRadius = "9px";
+            div.style.padding = "9px";
+            div.style.width = "50%";
+            div.style.height = "50%";
+            div.style.left = "25%";
+            div.style.top = "25%";
+            div.style.backgroundColor = "#F0F";
+            div.style.color = "#FFF";
+            div.innerHTML = "popover";
+            div.onclick = function (evt) {
+              //reader5.hideControl(toc);
+            }
+            return div;
+          }
+          reader5.addControl(toc, 'popover', { hidden: true });
+          reader5.addEventListener(
+            'carlyle:contact:start:unhandled',
+            function () {
+              reader5.showControl(toc);
+            }
+          );
         },
         false
       );
@@ -149,6 +174,7 @@
       <h2>PlaceSaver</h2>
       <div class="reader" id="placesaver"></div>
       <p>
+        Turn to a page, then Shift-Refresh. Should be at same page.
       </p>
     </div>
 
@@ -156,6 +182,7 @@
       <h2>Font Magnifier</h2>
       <div class="reader" id="magnifier"></div>
       <p>
+        Tap the AA icon in the top right corner to toggle large/normal fonts.
       </p>
     </div>
 
@@ -163,6 +190,7 @@
       <h2>Scrubber</h2>
       <div class="reader" id="scrubber"></div>
       <p>
+        Drag along the white rectangle at the base of page to change location.
       </p>
     </div>
 
@@ -170,6 +198,7 @@
       <h2>Spinner</h2>
       <div class="reader" id="spinner"></div>
       <p>
+        Tap in middle of page to invoke a page-embedded spinner.
       </p>
     </div>
 
@@ -177,6 +206,7 @@
       <h2>Table of Contents</h2>
       <div class="reader" id="toc"></div>
       <p>
+        Tap middle of page to invoke modal window. Tap modal window to dismiss.
       </p>
     </div>
 

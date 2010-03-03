@@ -26,7 +26,7 @@ Carlyle.Styles = {
     "display": "none",
     "width": "100%",
     "height": "100%",
-    "z-index": "100"
+    "z-index": "1000"
   },
 
   page: {
@@ -73,7 +73,7 @@ Carlyle.Styles = {
   },
 
   control: {
-    "z-index": "100"
+    "z-index": "100"  // Must be higher than any pages
   }
 }
 
