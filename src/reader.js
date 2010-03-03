@@ -222,7 +222,7 @@ Carlyle.Reader = function (node, bookData, options) {
       p.flipper.overrideDimensions();
     }
 
-    moveToPage(pageNumber());
+    moveTo({ page: pageNumber() });
   }
 
 
@@ -248,44 +248,11 @@ Carlyle.Reader = function (node, bookData, options) {
   }
 
 
-  // Flips to the given page within the current component. If pageN is
-  // greater than the number of pages in this component, overflows into
-  // subsequent components.
+  // Moves the current page as specified by the locus. See
+  // Carlyle.Book#changePage for documentation on the locus argument.
   //
-  // The componentId is optional, defaults to the current component.
-  //
-  function moveToPage(pageN, componentId) {
-    if (!componentId) {
-      var currPlace = getPlace();
-      if (currPlace) {
-        componentId = currPlace.componentId();
-      } else {
-        componentId = null;
-      }
-    }
-
-    p.flipper.moveTo({ page: pageN, componentId: componentId});
-  }
-
-
-  // Flips to the page approximately 'percent' of the way
-  // through the component. Percent, contrary to expectations perhaps,
-  // should be a float, where 0.0 is the first page and 1.0 is the last page
-  // of the component.
-  //
-  // The componentId is optional, defaults to the current component.
-  //
-  function moveToPercentageThrough(percent, componentId) {
-    if (!componentId) {
-      var currPlace = getPlace();
-      if (currPlace) {
-        componentId = currPlace.componentId();
-      } else {
-        componentId = null;
-      }
-    }
-
-    p.flipper.moveTo({ percent: percent, componentId: componentId});
+  function moveTo(locus) {
+    p.flipper.moveTo(locus);
   }
 
 
@@ -295,7 +262,7 @@ Carlyle.Reader = function (node, bookData, options) {
     console.log("Skipping to chapter: " + src);
     //FIXME: SHOULD BE ACTIVE PAGE?
     var place = p.book.placeOfChapter(p.divs.pages[0].contentDiv, src);
-    p.flipper.moveTo(place.getLocus());
+    moveTo(place.getLocus());
   }
 
 
@@ -563,8 +530,7 @@ Carlyle.Reader = function (node, bookData, options) {
   API.getBook = getBook;
   API.reapplyStyles = reapplyStyles;
   API.getPlace = getPlace;
-  API.moveToPage = moveToPage;
-  API.moveToPercentageThrough = moveToPercentageThrough;
+  API.moveTo = moveTo;
   API.skipToChapter = skipToChapter;
   API.resized = resized;
   API.addControl = addControl;

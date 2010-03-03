@@ -87,7 +87,7 @@ Carlyle.Controls.PlaceSaver = function (reader) {
   function restorePlace() {
     var place = savedPlace();
     if (place) {
-      reader.moveToPercentageThrough(place.percent, place.component);
+      reader.moveTo({ percent: place.percent, componentId: place.component });
     }
   }
 

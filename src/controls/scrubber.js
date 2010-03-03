@@ -165,10 +165,10 @@ Carlyle.Controls.Scrubber = function (reader) {
 
     var endEvt = function (evt) {
       var place = moveEvt(evt, p.lastX);
-      p.reader.moveToPercentageThrough(
-        place.percentageThrough,
-        place.componentId
-      );
+      p.reader.moveTo({
+        percent: place.percentageThrough,
+        componentId: place.componentId
+      });
       cntr.removeEventListener(eventType('move'), moveEvt, false);
       document.body.removeEventListener(eventType('end'), endEvt, false);
       bubble.style.display = "none";

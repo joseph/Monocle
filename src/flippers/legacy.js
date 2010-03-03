@@ -68,7 +68,7 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
         Carlyle.Styles.Flippers.Legacy.next
       );
       p.divs.nextButton.onclick = function () {
-        p.reader.moveToPercentageThrough(1.5);
+        moveTo({ percent: 1.5 });
       }
       p.page.scrollerDiv.appendChild(p.divs.nextButton);
     }
