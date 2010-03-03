@@ -33,9 +33,9 @@ Monocle.Controls.Scrubber = function (reader) {
       return;
     }
     p.rightBound = cntr.offsetWidth;
-    p.leftBound = 0;
+    p.leftBound = p.reader.properties.boxDimensions.left;
     var box = cntr;
-    while (box && typeof(box.offsetLeft) != 'undefined') {
+    while (box && box != p.reader.properties.divs.box) {
       p.leftBound += box.offsetLeft;
       box = box.parentNode;
     }
