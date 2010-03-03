@@ -1,6 +1,6 @@
 # Monocle
 
-A silky-smooth browser-based ebook reader.
+A silky, tactile browser-based ebook reader.
 
 Invented by [Inventive Labs](http://inventivelabs.com.au). Released under the
 MIT license.
