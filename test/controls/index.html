@@ -11,8 +11,8 @@
     <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
     <title>Flippers test</title>
 
-    <!-- CARLYLE CORE -->
-    <script type="text/javascript" src="../../src/carlyle.js"></script>
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
     <script type="text/javascript" src="../../src/compat.js"></script>
     <script type="text/javascript" src="../../src/reader.js"></script>
     <script type="text/javascript" src="../../src/book.js"></script>
@@ -20,11 +20,11 @@
     <script type="text/javascript" src="../../src/place.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
 
-    <!-- CARLYLE FLIPPERS -->
+    <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
-    <!-- CARLYLE STANDARD CONTROLS -->
+    <!-- MONOCLE STANDARD CONTROLS -->
     <script type="text/javascript" src="../../src/controls/placesaver.js"></script>
     <script type="text/javascript" src="../../src/controls/magnifier.js"></script>
     <script type="text/javascript" src="../../src/controls/scrubber.js"></script>
@@ -100,14 +100,14 @@
       }
 
       // Initialize the reader element.
-      Carlyle.addListener(
+      Monocle.addListener(
         window,
         'load',
         function () {
 
           // PLACESAVER
-          window.reader1 = Carlyle.Reader('placesaver', bookData);
-          var placeSaver = new Carlyle.Controls.PlaceSaver(reader1);
+          window.reader1 = Monocle.Reader('placesaver', bookData);
+          var placeSaver = new Monocle.Controls.PlaceSaver(reader1);
           reader1.addControl(placeSaver, 'invisible');
           var lastPlace = placeSaver.savedPlace();
           if (lastPlace) {
@@ -115,21 +115,21 @@
           }
 
           // MAGNIFIER
-          window.reader2 = Carlyle.Reader('magnifier', bookData);
-          var magnifier = new Carlyle.Controls.Magnifier(reader2);
+          window.reader2 = Monocle.Reader('magnifier', bookData);
+          var magnifier = new Monocle.Controls.Magnifier(reader2);
           reader2.addControl(magnifier, 'page');
 
           // SCRUBBER
-          window.reader3 = Carlyle.Reader('scrubber', bookData);
-          var scrubber = new Carlyle.Controls.Scrubber(reader3);
+          window.reader3 = Monocle.Reader('scrubber', bookData);
+          var scrubber = new Monocle.Controls.Scrubber(reader3);
           reader3.addControl(scrubber, 'standard');
 
           // SPINNER
-          window.reader4 = Carlyle.Reader('spinner', bookData);
-          var spinner = Carlyle.Controls.Spinner(reader4);
+          window.reader4 = Monocle.Reader('spinner', bookData);
+          var spinner = Monocle.Controls.Spinner(reader4);
           reader4.addControl(spinner, 'page', { hidden: true });
           reader4.addListener(
-            'carlyle:contact:start:unhandled',
+            'monocle:contact:start:unhandled',
             function () {
               if (spinner.spinning) {
                 spinner.spun();
@@ -141,11 +141,11 @@
             }
           );
 
-          window.reader5 = Carlyle.Reader('toc', bookData);
-          var toc = Carlyle.Controls.Contents(reader5);
+          window.reader5 = Monocle.Reader('toc', bookData);
+          var toc = Monocle.Controls.Contents(reader5);
           reader5.addControl(toc, 'popover');
           reader5.addListener(
-            'carlyle:contact:start:unhandled',
+            'monocle:contact:start:unhandled',
             function () {
               reader5.showControl(toc);
             }

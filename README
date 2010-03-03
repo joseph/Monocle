@@ -101,10 +101,10 @@ Example use
   }
 
   // Initialize the reader element.
-  var reader = Carlyle.Reader('reader');
+  var reader = Monocle.Reader('reader');
 
   // Initialize a book object.
-  var book = Carlyle.Book(bookData);
+  var book = Monocle.Book(bookData);
 
   // Assign the book to the reader and go to the 14th page.
   reader.setBook(book);
@@ -117,22 +117,22 @@ Reader Events
 Events marked with (c) are cancellable -- call preventDefault() on them if
 you need to.
 
-* carlyle:initializing (NB: too early to call addControl)
-* carlyle:loading
-* carlyle:loaded
-* carlyle:resizing (c)
-* carlyle:resize
-* carlyle:bookchanging (c)
-* carlyle:bookchange
-* carlyle:pagechanging (c)
-* carlyle:pagechange
-* carlyle:contact:start (c)
-* carlyle:contact:move (c)
-* carlyle:contact:end (c)
-* carlyle:contact:start:unhandled (c)
-* carlyle:contact:move:unhandled (c)
-* carlyle:contact:end:unhandled (c)
-* carlyle:turn
+* monocle:initializing (NB: too early to call addControl)
+* monocle:loading
+* monocle:loaded
+* monocle:resizing (c)
+* monocle:resize
+* monocle:bookchanging (c)
+* monocle:bookchange
+* monocle:pagechanging (c)
+* monocle:pagechange
+* monocle:contact:start (c)
+* monocle:contact:move (c)
+* monocle:contact:end (c)
+* monocle:contact:start:unhandled (c)
+* monocle:contact:move:unhandled (c)
+* monocle:contact:end:unhandled (c)
+* monocle:turn
 
 
 Adding controls
@@ -142,7 +142,7 @@ Controls are objects that adhere to a specified interface. They can
 be any kind of object. They are added to a Reader object like this:
 
   // The reader object being in the variable named 'reader'...
-  var reader = Carlyle.Reader(someDiv);
+  var reader = Monocle.Reader(someDiv);
   // And the control object being in the variable named 'control'...
   var control = someObject;
 
@@ -187,13 +187,13 @@ the instantiation.
 
 You can set the flipper as an option to the Reader initialization command, eg:
 
-  var reader = Carlyle.Reader('someElementId', null, { flipper: MyFlipper });
+  var reader = Monocle.Reader('someElementId', null, { flipper: MyFlipper });
 
-Carlyle comes with three built in flipper classes:
+Monocle comes with three built in flipper classes:
 
-* Carlyle.Flippers.Slider - the animated, sliding page turns (default)
-* Carlyle.Flippers.Instant - pages immediately change, without animation
-* Carlyle.Flippers.Legacy - for browsers that don't support columns.
+* Monocle.Flippers.Slider - the animated, sliding page turns (default)
+* Monocle.Flippers.Instant - pages immediately change, without animation
+* Monocle.Flippers.Legacy - for browsers that don't support columns.
 
 The flipper interface is as follows:
 
@@ -218,7 +218,7 @@ Methods:
 Javascript Object Style
 -----------------------
 
-In this incarnation at least, Carlyle uses a Javascript idiom for defining
+In this incarnation at least, Monocle uses a Javascript idiom for defining
 many of the core classes. This is designed to declutter the classes, clarify
 their API, and reduce dependency problems that would constrain the progress of
 the project at this early style.
@@ -228,10 +228,10 @@ an object that references the public methods and properties of that object.
 
 The class idiom looks like this:
 
-  Carlyle.Foo = function (args) {
+  Monocle.Foo = function (args) {
     // Allows the constructor function to be an object factory itself,
-    // ie: "Carlyle.Foo()" is the same as "new Carlyle.Foo()".
-    if (Carlyle == this) { return new Carlyle.Foo(args); }
+    // ie: "Monocle.Foo()" is the same as "new Monocle.Foo()".
+    if (Monocle == this) { return new Monocle.Foo(args); }
 
     // Conventional name for any class constants.
     var k = {
@@ -249,7 +249,7 @@ The class idiom looks like this:
     // allowing access to the public methods and properties by external
     // code.
     var API = {
-      constructor: Carlyle.Foo,
+      constructor: Monocle.Foo,
       properties: p,
       constants: k
     };
@@ -273,4 +273,4 @@ The class idiom looks like this:
 
 This allows a quite concise, clear coding style. However, it does make class
 inheritance somewhat limited. There is room for the idiom to be reviewed if
-it proves to be a significant constraint on projects using Carlyle.
+it proves to be a significant constraint on projects using Monocle.

@@ -9,8 +9,8 @@
  * It should set and know the place of each page node too.
  *
  */
-Carlyle.Book = function (dataSource) {
-  if (Carlyle == this) { return new Carlyle.Book(dataSource); }
+Monocle.Book = function (dataSource) {
+  if (Monocle == this) { return new Monocle.Book(dataSource); }
 
   // Constants
   var k = {
@@ -26,7 +26,7 @@ Carlyle.Book = function (dataSource) {
 
   // Methods and properties available to external code.
   var API = {
-    constructor: Carlyle.Book,
+    constructor: Monocle.Book,
     constants: k,
     properties: p
   }
@@ -161,7 +161,7 @@ Carlyle.Book = function (dataSource) {
   function setPlaceFor(node, component, pageN) {
     var place = placeFor(node);
     if (!place) {
-      place = new Carlyle.Place();
+      place = new Monocle.Place();
       p.places[p.places.length] = [node, place];
     }
     place.setPlace(component, pageN);
@@ -173,7 +173,7 @@ Carlyle.Book = function (dataSource) {
     if (!p.components[index]) {
       var src = p.componentIds[index];
       var html = p.dataSource.getComponent(src);
-      p.components[index] = new Carlyle.Component(
+      p.components[index] = new Monocle.Component(
         API,
         src,
         index,
@@ -223,7 +223,7 @@ Carlyle.Book = function (dataSource) {
       var cIndex = p.componentIds.indexOf(cmptId);
       var component = componentAt(cIndex);
       component.updateDimensions(node); // FIXME: means no-going-back
-      var place = new Carlyle.Place(node);
+      var place = new Monocle.Place(node);
       if (fragment) {
         console.log("Looking for fragment '"+fragment+"' in '"+cmptId+"'");
         place.setPlace(component, component.pageForChapter(fragment));
@@ -249,7 +249,7 @@ Carlyle.Book = function (dataSource) {
 }
 
 
-Carlyle.Book.fromHTML = function (html) {
+Monocle.Book.fromHTML = function (html) {
   var bookData = {
     getComponents: function () {
       return ['anonymous'];
@@ -264,5 +264,5 @@ Carlyle.Book.fromHTML = function (html) {
     }
   }
 
-  return new Carlyle.Book(bookData);
+  return new Monocle.Book(bookData);
 }

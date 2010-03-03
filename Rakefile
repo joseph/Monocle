@@ -7,7 +7,7 @@ task :dist do
 
   sec = Sprockets::Secretary.new(
     :load_path => "src",
-    :source_files => "src/carlyle.js"
+    :source_files => "src/monocle.js"
   )
   out = sec.concatenation
 
@@ -22,7 +22,7 @@ task :dist do
 
   require 'fileutils'
   FileUtils.mkdir_p('dist')
-  File.open(File.join('dist', 'carlyle-min.js'), 'w') { |f|
+  File.open(File.join('dist', 'monocle-min.js'), 'w') { |f|
     f.write(out)
   }
 end

@@ -1,6 +1,6 @@
-Carlyle.Controls.Magnifier = function (reader) {
-  if (Carlyle.Controls == this) {
-    return new Carlyle.Controls.Magnifier(reader);
+Monocle.Controls.Magnifier = function (reader) {
+  if (Monocle.Controls == this) {
+    return new Monocle.Controls.Magnifier(reader);
   }
 
   // Constants.
@@ -14,7 +14,7 @@ Carlyle.Controls.Magnifier = function (reader) {
 
   // Public methods and properties.
   var API = {
-    constructor: Carlyle.Controls.Magnifier,
+    constructor: Monocle.Controls.Magnifier,
     constants: k,
     properties: p
   }
@@ -27,23 +27,23 @@ Carlyle.Controls.Magnifier = function (reader) {
 
   function createControlElements() {
     var btn = document.createElement('div');
-    btn.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Magnifier.button
+    btn.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Magnifier.button
     );
     btn.smallA = document.createElement('span');
-    btn.smallA.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Magnifier.smallA
+    btn.smallA.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Magnifier.smallA
     )
     btn.appendChild(btn.smallA);
     btn.largeA = document.createElement('span');
-    btn.largeA.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Magnifier.largeA
+    btn.largeA.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Magnifier.largeA
     )
     btn.largeA.innerHTML = btn.smallA.innerHTML = "A";
     btn.appendChild(btn.largeA);
 
     var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
-    Carlyle.addListener(btn, evtType, toggleMagnification, true);
+    Monocle.addListener(btn, evtType, toggleMagnification, true);
 
     p.buttons.push(btn);
     return btn;
@@ -55,13 +55,13 @@ Carlyle.Controls.Magnifier = function (reader) {
     evt.stopPropagation();
     var s = reader.properties.divs.pages[0].contentDiv.style;
     if (!s['font-size'] || s['font-size'] == "100%") {
-      Carlyle.Styles.content['font-size'] = "110%";
+      Monocle.Styles.content['font-size'] = "110%";
       for (var i = 0; i < p.buttons.length; i++) {
         p.buttons[i].smallA.style.opacity = "0.3";
         p.buttons[i].largeA.style.opacity = "1";
       }
     } else {
-      Carlyle.Styles.content['font-size'] = "100%";
+      Monocle.Styles.content['font-size'] = "100%";
       for (var i = 0; i < p.buttons.length; i++) {
         p.buttons[i].smallA.style.opacity = "1";
         p.buttons[i].largeA.style.opacity = "0.3";
@@ -78,7 +78,7 @@ Carlyle.Controls.Magnifier = function (reader) {
 }
 
 
-Carlyle.Styles.Controls.Magnifier = {
+Monocle.Styles.Controls.Magnifier = {
   button: {
     "cursor": "pointer",
     "color": "#555",

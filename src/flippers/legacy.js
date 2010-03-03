@@ -1,6 +1,6 @@
-Carlyle.Flippers.Legacy = function (reader, setPageFn) {
-  if (Carlyle.Flippers == this) {
-    return new Carlyle.Flippers.Legacy(reader, setPageFn);
+Monocle.Flippers.Legacy = function (reader, setPageFn) {
+  if (Monocle.Flippers == this) {
+    return new Monocle.Flippers.Legacy(reader, setPageFn);
   }
 
   // Constants
@@ -22,7 +22,7 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
   }
 
   var API = {
-    constructor: Carlyle.Flippers.Legacy,
+    constructor: Monocle.Flippers.Legacy,
     properties: p,
     constants: k
   }
@@ -51,7 +51,7 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
   function moveTo(locus) {
     var rslt = p.setPageFn(p.page, locus, updateButtons);
-    p.reader.dispatchEvent('carlyle:turn');
+    p.reader.dispatchEvent('monocle:turn');
     return rslt;
   }
 
@@ -67,8 +67,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
     if (!p.divs.legacyMessage) {
       p.divs.legacyMessage = document.createElement('div');
       p.divs.legacyMessage.innerHTML = k.LEGACY_MESSAGE;
-      p.divs.legacyMessage.style.cssText = Carlyle.Styles.ruleText(
-        Carlyle.Styles.Flippers.Legacy.message
+      p.divs.legacyMessage.style.cssText = Monocle.Styles.ruleText(
+        Monocle.Styles.Flippers.Legacy.message
       );
       p.page.scrollerDiv.insertBefore(p.divs.legacyMessage, p.page.contentDiv);
     }
@@ -76,8 +76,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
     if (!p.divs.prevButton) {
       p.divs.prevButton = document.createElement('div');
       p.divs.prevButton.innerHTML = k.buttonText.PREV;
-      p.divs.prevButton.style.cssText = Carlyle.Styles.ruleText(
-        Carlyle.Styles.Flippers.Legacy.button
+      p.divs.prevButton.style.cssText = Monocle.Styles.ruleText(
+        Monocle.Styles.Flippers.Legacy.button
       );
       p.page.scrollerDiv.insertBefore(p.divs.prevButton, p.page.contentDiv);
     }
@@ -85,8 +85,8 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
     if (!p.divs.nextButton) {
       p.divs.nextButton = document.createElement('div');
       p.divs.nextButton.innerHTML = k.buttonText.NEXT;
-      p.divs.nextButton.style.cssText = Carlyle.Styles.ruleText(
-        Carlyle.Styles.Flippers.Legacy.button
+      p.divs.nextButton.style.cssText = Monocle.Styles.ruleText(
+        Monocle.Styles.Flippers.Legacy.button
       );
       p.page.scrollerDiv.appendChild(p.divs.nextButton);
     }
@@ -112,12 +112,12 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function listenForInteraction() {
-    Carlyle.addListener(
+    Monocle.addListener(
       p.divs.prevButton,
       'click',
       function () { moveTo({ percent: -0.5 }) }
     )
-    Carlyle.addListener(
+    Monocle.addListener(
       p.divs.nextButton,
       'click',
       function () { moveTo({ percent: 1.5 }) }
@@ -140,7 +140,7 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 }
 
 
-Carlyle.Styles.Flippers.Legacy = {
+Monocle.Styles.Flippers.Legacy = {
   message: {
     "border": "1px solid #987",
     "background": "#FFC",

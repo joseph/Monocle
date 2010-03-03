@@ -1,6 +1,6 @@
-Carlyle.Controls.Spinner = function (reader) {
-  if (Carlyle.Controls == this) {
-    return new Carlyle.Controls.Spinner(reader);
+Monocle.Controls.Spinner = function (reader) {
+  if (Monocle.Controls == this) {
+    return new Monocle.Controls.Spinner(reader);
   }
 
   var k = {
@@ -18,7 +18,7 @@ Carlyle.Controls.Spinner = function (reader) {
   }
 
   var API = {
-    constructor: Carlyle.Controls.Spinner,
+    constructor: Monocle.Controls.Spinner,
     constants: k,
     properties: p
   }
@@ -31,8 +31,8 @@ Carlyle.Controls.Spinner = function (reader) {
 
   function createControlElements() {
     var anim = document.createElement('div');
-    anim.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Spinner.anim
+    anim.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Spinner.anim
     );
     anim.style.backgroundImage = "url(" + k.imgURI + ")";
     p.divs.push(anim);
@@ -42,10 +42,10 @@ Carlyle.Controls.Spinner = function (reader) {
 
   // Registers spin/spun event handlers for: loading, bookchanging, resizing.
   function listenForUsualDelays() {
-    p.reader.addListener('carlyle:bookchanging', spin);
-    p.reader.addListener('carlyle:bookchange', spun);
-    p.reader.addListener('carlyle:resizing', spin);
-    p.reader.addListener('carlyle:resize', spun);
+    p.reader.addListener('monocle:bookchanging', spin);
+    p.reader.addListener('monocle:bookchange', spun);
+    p.reader.addListener('monocle:resizing', spin);
+    p.reader.addListener('monocle:resize', spun);
   }
 
 
@@ -70,7 +70,7 @@ Carlyle.Controls.Spinner = function (reader) {
 
 
 
-Carlyle.Styles.Controls.Spinner = {
+Monocle.Styles.Controls.Spinner = {
   anim: {
     "position": "absolute",
     "width": "100%",

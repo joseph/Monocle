@@ -1,4 +1,4 @@
-Carlyle = {};
+Monocle = {};
 
 //= require <compat>
 //= require <reader>
@@ -7,5 +7,5 @@ Carlyle = {};
 //= require <component>
 //= require <styles>
 
-Carlyle.Flippers = {};
-Carlyle.Controls = {};
+Monocle.Flippers = {};
+Monocle.Controls = {};

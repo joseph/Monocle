@@ -1,6 +1,6 @@
 /* Standardized event registration - coheres the W3C and MS event models. */
 
-Carlyle.addListener = function (elem, evtType, fn, useCapture) {
+Monocle.addListener = function (elem, evtType, fn, useCapture) {
   if (elem.addEventListener) {
     return elem.addEventListener(evtType, fn, useCapture || false);
   } else if (elem.attachEvent) {
@@ -9,7 +9,7 @@ Carlyle.addListener = function (elem, evtType, fn, useCapture) {
 }
 
 
-Carlyle.removeListener = function (elem, evtType, fn, useCapture) {
+Monocle.removeListener = function (elem, evtType, fn, useCapture) {
   if (elem.removeEventListener) {
     return elem.removeEventListener(evtType, fn, useCapture || false);
   } else if (elem.detachEvent) {
@@ -18,7 +18,7 @@ Carlyle.removeListener = function (elem, evtType, fn, useCapture) {
 }
 
 
-if (typeof(CARLYLE_NO_COMPAT) == 'undefined') {
+if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
 
   // A little console stub if not initialized in a console-equipped browser.
   if (typeof window.console == "undefined") {

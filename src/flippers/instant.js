@@ -1,6 +1,6 @@
-Carlyle.Flippers.Instant = function (reader, setPageFn) {
-  if (Carlyle.Flippers == this) {
-    return new Carlyle.Flippers.Instant(reader, setPageFn);
+Monocle.Flippers.Instant = function (reader, setPageFn) {
+  if (Monocle.Flippers == this) {
+    return new Monocle.Flippers.Instant(reader, setPageFn);
   }
 
   // Constants
@@ -14,7 +14,7 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
   }
 
   var API = {
-    constructor: Carlyle.Flippers.Instant,
+    constructor: Monocle.Flippers.Instant,
     properties: p,
     constants: k
   }
@@ -38,9 +38,9 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
 
   function listenForInteraction() {
     p.reader.addListener(
-      "carlyle:contact:start",
+      "monocle:contact:start",
       function (evt) {
-        if (turn(evt.carlyleData.contactX)) {
+        if (turn(evt.monocleData.contactX)) {
           evt.preventDefault();
         }
       }
@@ -61,7 +61,7 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
       p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
     }
     var rslt = p.setPageFn(p.page, locus, spCallback);
-    p.reader.dispatchEvent('carlyle:turn');
+    p.reader.dispatchEvent('monocle:turn');
     return rslt;
   }
 

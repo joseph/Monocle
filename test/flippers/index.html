@@ -11,8 +11,8 @@
     <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
     <title>Flippers test</title>
 
-    <!-- CARLYLE CORE -->
-    <script type="text/javascript" src="../../src/carlyle.js"></script>
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
     <script type="text/javascript" src="../../src/compat.js"></script>
     <script type="text/javascript" src="../../src/reader.js"></script>
     <script type="text/javascript" src="../../src/book.js"></script>
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="../../src/place.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
 
-    <!-- CARLYLE FLIPPERS -->
+    <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
     <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
@@ -92,24 +92,24 @@
       }
 
       // Initialize the reader element.
-      Carlyle.addListener(
+      Monocle.addListener(
         window,
         'load',
         function () {
-          window.reader1 = Carlyle.Reader(
+          window.reader1 = Monocle.Reader(
             'slider',
             bookData,
-            { flipper: Carlyle.Flippers.Slider }
+            { flipper: Monocle.Flippers.Slider }
           );
-          window.reader2 = Carlyle.Reader(
+          window.reader2 = Monocle.Reader(
             'instant',
             bookData,
-            { flipper: Carlyle.Flippers.Instant }
+            { flipper: Monocle.Flippers.Instant }
           );
-          window.reader3 = Carlyle.Reader(
+          window.reader3 = Monocle.Reader(
             'legacy',
             bookData,
-            { flipper: Carlyle.Flippers.Legacy }
+            { flipper: Monocle.Flippers.Legacy }
           );
         }
       );

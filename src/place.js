@@ -1,7 +1,7 @@
 /* PLACE */
 
-Carlyle.Place = function () {
-  if (Carlyle == this) { return new Carlyle.Place(); }
+Monocle.Place = function () {
+  if (Monocle == this) { return new Monocle.Place(); }
 
   // Constants.
   var k = {
@@ -15,7 +15,7 @@ Carlyle.Place = function () {
 
   // Methods and properties available to external code.
   var API = {
-    constructor: Carlyle.Place,
+    constructor: Monocle.Place,
     constants: k,
     properties: p
   }
@@ -96,14 +96,14 @@ Carlyle.Place = function () {
 }
 
 
-Carlyle.Place.FromPageNumber = function (component, pageNumber) {
-  var place = new Carlyle.Place();
+Monocle.Place.FromPageNumber = function (component, pageNumber) {
+  var place = new Monocle.Place();
   place.setPlace(component, pageNumber);
   return place;
 }
 
-Carlyle.Place.FromPercentageThrough = function (component, percent) {
-  var place = new Carlyle.Place();
+Monocle.Place.FromPercentageThrough = function (component, percent) {
+  var place = new Monocle.Place();
   place.setPercentageThrough(component, percent);
   return place;
 }

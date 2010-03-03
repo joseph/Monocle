@@ -1,6 +1,6 @@
 (function () {
 
-  with (Carlyle.Styles) {
+  with (Monocle.Styles) {
     container.background = "none";
     container.right = "24px";
     container.left = '0';
@@ -163,16 +163,16 @@
 
 
   // Initialize the reader element.
-  Carlyle.addListener(
+  Monocle.addListener(
     window,
     'load',
     function () {
       /* Initialize the reader */
-      window.reader = Carlyle.Reader('reader', bookData);
+      window.reader = Monocle.Reader('reader', bookData);
 
       /* Because the 'reader' element changes size on window resize,
        * we should notify it of this event. */
-      Carlyle.addListener(
+      Monocle.addListener(
         window,
         'resize',
         function () { window.reader.resized() }
@@ -180,13 +180,13 @@
 
 
       /* SPINNER */
-      var spinner = Carlyle.Controls.Spinner(window.reader);
+      var spinner = Monocle.Controls.Spinner(window.reader);
       window.reader.addControl(spinner, 'page', { hidden: true });
       spinner.listenForUsualDelays();
 
 
       /* PLACE SAVER */
-      var placeSaver = new Carlyle.Controls.PlaceSaver(reader);
+      var placeSaver = new Monocle.Controls.PlaceSaver(reader);
       reader.addControl(placeSaver, 'invisible');
       var lastPlace = placeSaver.savedPlace();
       if (lastPlace) {
@@ -195,13 +195,13 @@
 
 
       /* MAGNIFIER CONTROL */
-      var magnifier = new Carlyle.Controls.Magnifier(reader);
+      var magnifier = new Monocle.Controls.Magnifier(reader);
       reader.addControl(magnifier, 'page');
 
 
       /* BOOK TITLE RUNNING HEAD */
       var bookTitle = {}
-      bookTitle.contentsMenu = Carlyle.Controls.Contents(reader);
+      bookTitle.contentsMenu = Monocle.Controls.Contents(reader);
       reader.addControl(bookTitle.contentsMenu, 'popover', { hidden: true });
       bookTitle.createControlElements = function () {
         var cntr = document.createElement('div');
@@ -211,7 +211,7 @@
         runner.innerHTML = reader.getBook().getMetaData('title');
         cntr.appendChild(runner);
 
-        Carlyle.addListener(
+        Monocle.addListener(
           cntr,
           typeof Touch == "object" ? "touchstart" : "mousedown",
           function (evt) {
@@ -221,7 +221,7 @@
           }
         );
 
-        //Carlyle.addListener(cntr, evtType, createToC, false);
+        //Monocle.addListener(cntr, evtType, createToC, false);
         return cntr;
       }
       reader.addControl(bookTitle, 'page');
@@ -247,8 +247,8 @@
       }
       reader.addControl(chapterTitle, 'page');
       reader.addListener(
-        'carlyle:pagechange',
-        function (evt) { chapterTitle.update(evt.carlyleData.page); }
+        'monocle:pagechange',
+        function (evt) { chapterTitle.update(evt.monocleData.page); }
       );
 
 
@@ -272,13 +272,13 @@
       }
       reader.addControl(pageNumber, 'page');
       reader.addListener(
-        'carlyle:pagechange',
-        function (evt) { pageNumber.update(evt.carlyleData.page) }
+        'monocle:pagechange',
+        function (evt) { pageNumber.update(evt.monocleData.page) }
       );
 
 
       /* Scrubber */
-      var scrubber = new Carlyle.Controls.Scrubber(reader);
+      var scrubber = new Monocle.Controls.Scrubber(reader);
       reader.addControl(scrubber, 'page', { hidden: true });
       var showFn = function (evt) {
         evt.stopPropagation();
@@ -287,14 +287,14 @@
       }
       var eType = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
       for (var i = 0; i < chapterTitle.runners.length; ++i) {
-        Carlyle.addListener(chapterTitle.runners[i].parentNode, eType, showFn);
-        Carlyle.addListener(pageNumber.runners[i].parentNode, eType, showFn);
+        Monocle.addListener(chapterTitle.runners[i].parentNode, eType, showFn);
+        Monocle.addListener(pageNumber.runners[i].parentNode, eType, showFn);
       }
       var hideScrubber = function (evt) {
         evt.stopPropagation();
         reader.hideControl(scrubber);
       }
-      reader.addListener('carlyle:contact:start', hideScrubber);
+      reader.addListener('monocle:contact:start', hideScrubber);
     }
   );
 })();

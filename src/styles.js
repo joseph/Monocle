@@ -1,5 +1,5 @@
 /* STYLES */
-Carlyle.Styles = {
+Monocle.Styles = {
   ruleText: function(rule) {
     if (typeof rule == "string") {
       rule = this[rule];
@@ -77,11 +77,11 @@ Carlyle.Styles = {
   }
 }
 
-Carlyle.Styles.Controls = {
+Monocle.Styles.Controls = {
   // A separate namespace for optional control styles, populated by those
   // optional scripts.
 }
 
-Carlyle.Styles.Flippers = {
+Monocle.Styles.Flippers = {
   // A separate namespace for flippers.
 }

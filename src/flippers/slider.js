@@ -1,6 +1,6 @@
-Carlyle.Flippers.Slider = function (reader, setPageFn) {
-  if (Carlyle.Flippers == this) {
-    return new Carlyle.Flippers.Slider(reader, setPageFn);
+Monocle.Flippers.Slider = function (reader, setPageFn) {
+  if (Monocle.Flippers == this) {
+    return new Monocle.Flippers.Slider(reader, setPageFn);
   }
 
   // Constants
@@ -27,7 +27,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   }
 
   var API = {
-    constructor: Carlyle.Flippers.Slider,
+    constructor: Monocle.Flippers.Slider,
     properties: p,
     constants: k
   }
@@ -51,25 +51,25 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
 
   function listenForInteraction() {
     p.reader.addListener(
-      "carlyle:contact:start",
+      "monocle:contact:start",
       function (evt) {
-        if (lift(evt.carlyleData.contactX)) {
+        if (lift(evt.monocleData.contactX)) {
           evt.preventDefault();
         }
       }
     );
     p.reader.addListener(
-      "carlyle:contact:move",
+      "monocle:contact:move",
       function (evt) {
-        if (turning(evt.carlyleData.contactX)) {
+        if (turning(evt.monocleData.contactX)) {
           evt.preventDefault();
         }
       }
     );
     p.reader.addListener(
-      "carlyle:contact:end",
+      "monocle:contact:end",
       function (evt) {
-        if (drop(evt.carlyleData.contactX)) {
+        if (drop(evt.monocleData.contactX)) {
           evt.preventDefault();
         }
       }
@@ -269,7 +269,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
   function completedTurn() {
     var place = getPlace();
     var resetTurn = function () {
-      p.reader.dispatchEvent('carlyle:turn');
+      p.reader.dispatchEvent('monocle:turn');
       p.turnData = {};
     }
 
@@ -349,7 +349,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
     }
 
     if (elem.setXTCB) {
-      Carlyle.removeListener(elem, 'webkitTransitionEnd', elem.setXTCB);
+      Monocle.removeListener(elem, 'webkitTransitionEnd', elem.setXTCB);
       elem.setXTCB = null;
     }
     if (callback) {
@@ -357,7 +357,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
         callback();
       } else {
         elem.setXTCB = callback;
-        Carlyle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
+        Monocle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
       }
     }
   }

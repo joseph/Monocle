@@ -1,6 +1,6 @@
-Carlyle.Controls.Contents = function (reader) {
-  if (Carlyle.Controls == this) {
-    return new Carlyle.Controls.Contents(reader);
+Monocle.Controls.Contents = function (reader) {
+  if (Monocle.Controls == this) {
+    return new Monocle.Controls.Contents(reader);
   }
 
   var k = {
@@ -12,7 +12,7 @@ Carlyle.Controls.Contents = function (reader) {
   }
 
   var API = {
-    constructor: Carlyle.Controls.Contents,
+    constructor: Monocle.Controls.Contents,
     constants: k,
     properties: p
   }
@@ -26,8 +26,8 @@ Carlyle.Controls.Contents = function (reader) {
   function createControlElements() {
     var div = document.createElement('div');
     p.divs.push(div);
-    div.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Contents.container
+    div.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Contents.container
     );
     contentsForBook(div, reader.getBook());
     return div;
@@ -38,8 +38,8 @@ Carlyle.Controls.Contents = function (reader) {
     div.innerHTML = ''; // FIXME
     var list = document.createElement('ul');
     div.appendChild(list);
-    list.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Contents.list
+    list.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Contents.list
     );
 
     // FIXME: don't circumvent the book!
@@ -56,7 +56,7 @@ Carlyle.Controls.Contents = function (reader) {
     span.style.paddingLeft = padLvl + "em";
     span.innerHTML = chp.title;
     li.appendChild(span);
-    Carlyle.addListener(
+    Monocle.addListener(
       li,
       k.CHAPTER_INVOKE_EVENT,
       function () {
@@ -64,8 +64,8 @@ Carlyle.Controls.Contents = function (reader) {
         p.reader.hideControl(API);
       }
     );
-    li.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Contents.chapter
+    li.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Contents.chapter
     );
     list.appendChild(li);
     if (chp.children) {
@@ -84,7 +84,7 @@ Carlyle.Controls.Contents = function (reader) {
 }
 
 
-Carlyle.Styles.Controls.Contents = {
+Monocle.Styles.Controls.Contents = {
   container: {
     "position": "relative",
     "width": "75%",

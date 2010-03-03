@@ -2,9 +2,9 @@
 
 // See the properties declaration for details of constructor arguments.
 //
-Carlyle.Component = function (book, id, index, chapters, html) {
-  if (Carlyle == this) {
-    return new Carlyle.Component(book, id, index, chapters, html);
+Monocle.Component = function (book, id, index, chapters, html) {
+  if (Monocle == this) {
+    return new Monocle.Component(book, id, index, chapters, html);
   }
 
   // Constants.
@@ -86,7 +86,7 @@ Carlyle.Component = function (book, id, index, chapters, html) {
 
   // Methods and properties available to external code.
   var API = {
-    constructor: Carlyle.Component,
+    constructor: Monocle.Component,
     constants: k,
     properties: p
   }

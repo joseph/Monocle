@@ -1,6 +1,6 @@
-Carlyle.Controls.Scrubber = function (reader) {
-  if (Carlyle.Controls == this) {
-    return new Carlyle.Controls.Scrubber(reader);
+Monocle.Controls.Scrubber = function (reader) {
+  if (Monocle.Controls == this) {
+    return new Monocle.Controls.Scrubber(reader);
   }
 
   // Constants.
@@ -14,7 +14,7 @@ Carlyle.Controls.Scrubber = function (reader) {
 
   // Public methods and properties.
   var API = {
-    constructor: Carlyle.Controls.Scrubber,
+    constructor: Monocle.Controls.Scrubber,
     constants: k,
     properties: p
   }
@@ -23,7 +23,7 @@ Carlyle.Controls.Scrubber = function (reader) {
   function initialize() {
     p.reader = reader;
     p.book = p.reader.getBook();
-    p.reader.addListener('carlyle:turn', updateNeedles);
+    p.reader.addListener('monocle:turn', updateNeedles);
     updateNeedles();
   }
 
@@ -109,8 +109,8 @@ Carlyle.Controls.Scrubber = function (reader) {
 
   function createDivNamed(name, parentNode) {
     var div = document.createElement('div');
-    div.style.cssText = Carlyle.Styles.ruleText(
-      Carlyle.Styles.Controls.Scrubber[name]
+    div.style.cssText = Monocle.Styles.ruleText(
+      Monocle.Styles.Controls.Scrubber[name]
     );
     if (parentNode) {
       parentNode.appendChild(div)
@@ -147,7 +147,7 @@ Carlyle.Controls.Scrubber = function (reader) {
       var cmptIndex = p.componentIds.indexOf(place.componentId);
       var chp = chps[Math.floor(chps.length * place.percentageThrough)];
       if (cmptIndex > -1 && p.book.properties.components[cmptIndex]) {
-        var actualPlace = Carlyle.Place.FromPercentageThrough(
+        var actualPlace = Monocle.Place.FromPercentageThrough(
           p.book.properties.components[cmptIndex],
           place.percentageThrough
         );
@@ -169,19 +169,19 @@ Carlyle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      Carlyle.removeListener(cntr, eventType('move'), moveEvt);
-      Carlyle.removeListener(document.body, eventType('end'), endEvt);
+      Monocle.removeListener(cntr, eventType('move'), moveEvt);
+      Monocle.removeListener(document.body, eventType('end'), endEvt);
       bubble.style.display = "none";
     }
 
-    Carlyle.addListener(
+    Monocle.addListener(
       cntr,
       eventType("start"),
       function (evt) {
         bubble.style.display = "block";
         moveEvt(evt);
-        Carlyle.addListener(cntr, eventType('move'), moveEvt);
-        Carlyle.addListener(document.body, eventType("end"), endEvt);
+        Monocle.addListener(cntr, eventType('move'), moveEvt);
+        Monocle.addListener(document.body, eventType("end"), endEvt);
       }
     );
 
@@ -197,7 +197,7 @@ Carlyle.Controls.Scrubber = function (reader) {
 }
 
 
-Carlyle.Styles.Controls.Scrubber = {
+Monocle.Styles.Controls.Scrubber = {
   container: {
     "position": "absolute",
     "left": "1em",

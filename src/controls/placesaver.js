@@ -1,10 +1,10 @@
-Carlyle.Controls.PlaceSaver = function (reader) {
-  if (Carlyle.Controls == this) {
-    return new Carlyle.Controls.PlaceSaver(reader);
+Monocle.Controls.PlaceSaver = function (reader) {
+  if (Monocle.Controls == this) {
+    return new Monocle.Controls.PlaceSaver(reader);
   }
 
   var k = {
-    COOKIE_NAMESPACE: "carlyle.controls.placesaver.",
+    COOKIE_NAMESPACE: "monocle.controls.placesaver.",
     COOKIE_EXPIRES_IN_DAYS: 7 // Set to 0 for session-based expiry.
   }
 
@@ -14,7 +14,7 @@ Carlyle.Controls.PlaceSaver = function (reader) {
 
   // Public methods and properties.
   var API = {
-    constructor: Carlyle.Controls.PlaceSaver,
+    constructor: Monocle.Controls.PlaceSaver,
     constants: k,
     properties: p
   }
@@ -23,7 +23,7 @@ Carlyle.Controls.PlaceSaver = function (reader) {
   function initialize() {
     p.reader = reader;
     p.prefix = k.COOKIE_NAMESPACE + p.reader.properties.divs.box.id + ".";
-    p.reader.addListener('carlyle:turn', savePlaceToCookie);
+    p.reader.addListener('monocle:turn', savePlaceToCookie);
   }
 
 

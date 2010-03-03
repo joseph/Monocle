@@ -1,7 +1,7 @@
 /* READER */
 
-Carlyle.Reader = function (node, bookData, options) {
-  if (Carlyle == this) { return new Carlyle.Reader(node, bookData, options); }
+Monocle.Reader = function (node, bookData, options) {
+  if (Monocle == this) { return new Monocle.Reader(node, bookData, options); }
 
   // Constants.
   var k = {
@@ -12,12 +12,12 @@ Carlyle.Reader = function (node, bookData, options) {
       CLASSNAME: "monocleAbortMessage",
       TEXT: "Your browser does not support this technology."
     },
-    FLIPPER_DEFAULT_CLASS: (typeof(Carlyle.Flippers.Slider) == "undefined") ?
+    FLIPPER_DEFAULT_CLASS: (typeof(Monocle.Flippers.Slider) == "undefined") ?
       null :
-      Carlyle.Flippers.Slider,
-    FLIPPER_LEGACY_CLASS: (typeof(Carlyle.Flippers.Legacy) == "undefined") ?
+      Monocle.Flippers.Slider,
+    FLIPPER_LEGACY_CLASS: (typeof(Monocle.Flippers.Legacy) == "undefined") ?
       null :
-      Carlyle.Flippers.Legacy,
+      Monocle.Flippers.Legacy,
     TOUCH_DEVICE: (typeof Touch == "object")
   }
 
@@ -68,7 +68,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
   // Methods and properties available to external code.
   var API = {
-    constructor: Carlyle.Reader,
+    constructor: Monocle.Reader,
     properties: p,
     constants: k
   }
@@ -83,13 +83,13 @@ Carlyle.Reader = function (node, bookData, options) {
 
     options = options || {}
 
-    dispatchEvent("carlyle:initializing");
+    dispatchEvent("monocle:initializing");
 
     var bk;
     if (bookData) {
-      bk = new Carlyle.Book(bookData);
+      bk = new Monocle.Book(bookData);
     } else {
-      bk = Carlyle.Book.fromHTML(p.divs.box.innerHTML);
+      bk = Monocle.Book.fromHTML(p.divs.box.innerHTML);
     }
     p.divs.box.innerHTML = "";
 
@@ -102,7 +102,7 @@ Carlyle.Reader = function (node, bookData, options) {
     // Create the essential DOM elements.
     createReaderElements();
 
-    dispatchEvent("carlyle:loading");
+    dispatchEvent("monocle:loading");
 
     // Make the reader elements look pretty.
     applyStyles();
@@ -113,7 +113,7 @@ Carlyle.Reader = function (node, bookData, options) {
     // Wait for user input.
     listenForInteraction();
 
-    dispatchEvent("carlyle:loaded")
+    dispatchEvent("monocle:loaded")
   }
 
 
@@ -172,14 +172,14 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function applyStyles() {
-    p.divs.container.style.cssText = Carlyle.Styles.ruleText('container');
+    p.divs.container.style.cssText = Monocle.Styles.ruleText('container');
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i];
-      page.style.cssText = Carlyle.Styles.ruleText('page');
-      page.scrollerDiv.style.cssText = Carlyle.Styles.ruleText('scroller');
-      page.contentDiv.style.cssText = Carlyle.Styles.ruleText('content');
+      page.style.cssText = Monocle.Styles.ruleText('page');
+      page.scrollerDiv.style.cssText = Monocle.Styles.ruleText('scroller');
+      page.contentDiv.style.cssText = Monocle.Styles.ruleText('content');
     }
-    p.divs.overlay.style.cssText = Carlyle.Styles.ruleText('overlay');
+    p.divs.overlay.style.cssText = Monocle.Styles.ruleText('overlay');
   }
 
 
@@ -190,12 +190,12 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function setBook(bk) {
-    if (!dispatchEvent("carlyle:bookchanging", {}, true)) {
+    if (!dispatchEvent("monocle:bookchanging", {}, true)) {
       return;
     }
     p.book = bk;
     calcDimensions();
-    dispatchEvent("carlyle:bookchange");
+    dispatchEvent("monocle:bookchange");
     return p.book;
   }
 
@@ -206,7 +206,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function resized() {
-    if (!dispatchEvent("carlyle:resizing", {}, true)) {
+    if (!dispatchEvent("monocle:resizing", {}, true)) {
       return;
     }
     clearTimeout(p.resizeTimer);
@@ -214,7 +214,7 @@ Carlyle.Reader = function (node, bookData, options) {
       function () {
         console.log('Recalculating dimensions after resize.')
         calcDimensions();
-        dispatchEvent("carlyle:resize");
+        dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
     );
@@ -273,7 +273,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   // Moves the current page as specified by the locus. See
-  // Carlyle.Book#changePage for documentation on the locus argument.
+  // Monocle.Book#changePage for documentation on the locus argument.
   //
   function moveTo(locus) {
     p.flipper.moveTo(locus);
@@ -300,7 +300,7 @@ Carlyle.Reader = function (node, bookData, options) {
     var eData = { page: pageDiv, locus: locus }
 
     // Other things may disallow page change.
-    if (!dispatchEvent('carlyle:pagechanging', eData, true)) {
+    if (!dispatchEvent('monocle:pagechanging', eData, true)) {
       return;
     }
 
@@ -317,7 +317,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
     eData.pageNumber = rslt.page;
     eData.componentId = rslt.componentId;
-    dispatchEvent("carlyle:pagechange", eData);
+    dispatchEvent("monocle:pagechange", eData);
 
     return rslt.page;
   }
@@ -325,7 +325,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
   function listenForInteraction() {
     if (!k.TOUCH_DEVICE) {
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'mousedown',
         function (evt) {
@@ -336,7 +336,7 @@ Carlyle.Reader = function (node, bookData, options) {
           contactEvent(evt, "start", evt);
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'mousemove',
         function (evt) {
@@ -346,7 +346,7 @@ Carlyle.Reader = function (node, bookData, options) {
           contactEvent(evt, "move", evt);
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'mouseup',
         function (evt) {
@@ -356,7 +356,7 @@ Carlyle.Reader = function (node, bookData, options) {
           contactEvent(evt, "end", evt);
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'mouseout',
         function (evt) {
@@ -371,7 +371,7 @@ Carlyle.Reader = function (node, bookData, options) {
         }
       );
     } else {
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'touchstart',
         function (evt) {
@@ -379,7 +379,7 @@ Carlyle.Reader = function (node, bookData, options) {
           contactEvent(evt, 'start', evt.targetTouches[0]);
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'touchmove',
         function (evt) {
@@ -397,21 +397,21 @@ Carlyle.Reader = function (node, bookData, options) {
           }
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'touchend',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
         }
       );
-      Carlyle.addListener(
+      Monocle.addListener(
         p.divs.container,
         'touchcancel',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
         }
       );
-      Carlyle.addListener(window, 'orientationchange', resized, true);
+      Monocle.addListener(window, 'orientationchange', resized, true);
     }
     p.flipper.listenForInteraction();
   }
@@ -434,8 +434,8 @@ Carlyle.Reader = function (node, bookData, options) {
       )
     };
     if (
-      !dispatchEvent("carlyle:contact:"+eType, cData, true) ||
-      !dispatchEvent("carlyle:contact:"+eType+":unhandled", cData, true)
+      !dispatchEvent("monocle:contact:"+eType, cData, true) ||
+      !dispatchEvent("monocle:contact:"+eType+":unhandled", cData, true)
     ) {
       evt.preventDefault();
     }
@@ -504,7 +504,7 @@ Carlyle.Reader = function (node, bookData, options) {
     }
 
     for (var i = 0; i < ctrlData.elements.length; ++i) {
-      ctrlData.elements[i].style.cssText += Carlyle.Styles.ruleText('control');
+      ctrlData.elements[i].style.cssText += Monocle.Styles.ruleText('control');
     }
 
     if (options.hidden) {
@@ -539,7 +539,7 @@ Carlyle.Reader = function (node, bookData, options) {
     }
     if (controlData.usesOverlay) {
       p.divs.overlay.style.display = "none";
-      Carlyle.removeListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
+      Monocle.removeListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -570,7 +570,7 @@ Carlyle.Reader = function (node, bookData, options) {
         } while (obj = obj.parentNode);
         hideControl(ctrl);
       }
-      Carlyle.addListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
+      Monocle.addListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
     }
     controlData.hidden = false;
     if (ctrl.properties) {
@@ -589,13 +589,13 @@ Carlyle.Reader = function (node, bookData, options) {
     }
     var evt = document.createEvent("Events");
     evt.initEvent(evtType, false, cancelable || false);
-    evt.carlyleData = data;
+    evt.monocleData = data;
     return p.divs.box.dispatchEvent(evt);
   }
 
 
   function addListener(evtType, fn, useCapture) {
-    Carlyle.addListener(p.divs.box, evtType, fn, useCapture);
+    Monocle.addListener(p.divs.box, evtType, fn, useCapture);
   }
 
 
