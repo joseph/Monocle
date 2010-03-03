@@ -94,7 +94,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function initialize() {
     if (!p.html) {
-      console.log("WARNING: accessed an empty component.");
+      console.log("Accessed an empty component:" + p.id);
       return;
     }
 
@@ -174,12 +174,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
       return;
     }
 
-    console.log(
-      "Appending chunk for client (" + nodeIndex(node) + "): " +
-        chunk.firstElementIndex + " - " + chunk.lastElementIndex +
-        " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
-    );
-
     addElementsTo(node, slice);
   }
 
@@ -193,12 +187,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     if (slice[0].parentNode != node) {
       return;
     }
-
-    console.log(
-      "Detaching chunk for client (" + nodeIndex(node) + "): " +
-        chunk.firstElementIndex + " - " + chunk.lastElementIndex +
-        " (pp " + chunk.firstPageNumber + " - " + chunk.lastPageNumber + ")"
-    );
 
     removeElementsFrom(node, slice);
   }
@@ -276,8 +264,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
       if (iRect.top == cRect.top) {
         imgs[i].style.marginTop = 0;
       } else {
-        imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top)) + "px";
-        console.log("Image offset by: " + imgs[i].style.marginTop);
+        imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top))+"px";
       }
     }
   }
@@ -374,11 +361,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     var elements = p.elementsForClient[nodeIndex(node)];
     // .. average 1 chunk every 4 pages.
     var pagesRemaining = p.clientDimensions.pages;
-    console.log("Chunking " + p.id + " - number of pages: " + pagesRemaining);
     var chunkSize = Math.ceil(elements.length / (pagesRemaining / 4));
-    console.log("Chunking " + p.id + " - elements per chunk: " + chunkSize);
     var chunkCount = Math.ceil(elements.length / chunkSize);
-    console.log("Chunking " + p.id + " - number of chunks: " + chunkCount);
 
     var elemCount = 0;
     for (var i = 0; i < chunkCount; ++i) {

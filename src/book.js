@@ -227,10 +227,8 @@ Monocle.Book = function (dataSource) {
       component.updateDimensions(node);
       var place = new Monocle.Place(node);
       if (fragment) {
-        console.log("Looking for fragment '"+fragment+"' in '"+cmptId+"'");
         place.setPlace(component, component.pageForChapter(fragment));
       } else {
-        console.log("Looking for start of '"+cmptId+"'");
         place.setPlace(component, 1);
       }
       return place;

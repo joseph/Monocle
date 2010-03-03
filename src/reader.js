@@ -212,7 +212,6 @@ Monocle.Reader = function (node, bookData, options) {
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
       function () {
-        console.log('Recalculating dimensions after resize.')
         calcDimensions();
         dispatchEvent("monocle:resize");
       },
@@ -283,7 +282,6 @@ Monocle.Reader = function (node, bookData, options) {
   // Moves to the relevant element in the relevant component.
   //
   function skipToChapter(src) {
-    console.log("Skipping to chapter: " + src);
     var page = p.flipper.visiblePages()[0];
     var place = p.book.placeOfChapter(page.contentDiv, src);
     moveTo(place.getLocus());
