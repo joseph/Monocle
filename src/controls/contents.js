@@ -35,15 +35,16 @@ Monocle.Controls.Contents = function (reader) {
 
 
   function contentsForBook(div, book) {
-    div.innerHTML = ''; // FIXME
+    while (div.hasChildNodes()) {
+      div.removeChild(div.firstChild);
+    }
     var list = document.createElement('ul');
     div.appendChild(list);
     list.style.cssText = Monocle.Styles.ruleText(
       Monocle.Styles.Controls.Contents.list
     );
 
-    // FIXME: don't circumvent the book!
-    var contents = book.properties.dataSource.getContents();
+    var contents = book.chapterTree();
     for (var i = 0; i < contents.length; ++i) {
       chapterBuilder(list, contents[i], 0);
     }

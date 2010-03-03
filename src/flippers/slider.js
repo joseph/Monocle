@@ -317,7 +317,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       // Exit any existing transition loop.
       clearTimeout(elem.setXTransitionInterval)
 
-      // FIXME: this is rather naive. We need to ensure that the duration is
+      // NB: this is a little naive. We need to ensure that the duration is
       // constant, probably by multiplying step against the ACTUAL interval,
       // rather than the scheduled one (because on slower machines, the
       // interval may be much longer).

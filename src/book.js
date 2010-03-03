@@ -34,6 +34,7 @@ Monocle.Book = function (dataSource) {
 
   function initialize() {
     p.componentIds = dataSource.getComponents();
+    p.contents = dataSource.getContents();
     p.lastCIndex = p.componentIds.length - 1;
   }
 
@@ -128,7 +129,8 @@ Monocle.Book = function (dataSource) {
     } else if (pageN < 1) {
       // Moving to previous component.
       component = componentAt(cIndex - 1);
-      component.updateDimensions(node); // FIXME: no going back
+      // NB: as soon as we update the dimensions, we've changed the page state.
+      component.updateDimensions(node);
       pageN += component.lastPageNumber();
       return changePage(
         node,
@@ -206,9 +208,8 @@ Monocle.Book = function (dataSource) {
       }
     }
 
-    var sourceData = dataSource.getContents();
-    for (var i = 0; i < sourceData.length; ++i) {
-      recurser(sourceData[i]);
+    for (var i = 0; i < p.contents.length; ++i) {
+      recurser(p.contents[i]);
     }
     return p.chapters[src];
   }
@@ -222,7 +223,8 @@ Monocle.Book = function (dataSource) {
       var fragment = matches[3] || null;
       var cIndex = p.componentIds.indexOf(cmptId);
       var component = componentAt(cIndex);
-      component.updateDimensions(node); // FIXME: means no-going-back
+      // NB: updating dimensions changes page state.
+      component.updateDimensions(node);
       var place = new Monocle.Place(node);
       if (fragment) {
         console.log("Looking for fragment '"+fragment+"' in '"+cmptId+"'");
@@ -237,8 +239,14 @@ Monocle.Book = function (dataSource) {
   }
 
 
+  function chapterTree() {
+    return p.contents;
+  }
+
+
   API.getMetaData = dataSource.getMetaData;
   API.changePage = changePage;
+  API.chapterTree = chapterTree;
   API.chaptersForComponent = chaptersForComponent;
   API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
