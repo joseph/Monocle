@@ -145,6 +145,18 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
+  function onLastPage() {
+    // At the end of the book, both page numbers are the same. So this is
+    // a way to test that we can advance one page.
+    var upperPlace = getPlace(upperPage());
+    var lowerPlace = getPlace(lowerPage());
+    return (
+      upperPlace.componentId() == lowerPlace.componentId() &&
+      upperPlace.pageNumber() == lowerPlace.pageNumber()
+    )
+  }
+
+
   function lift(boxPointX) {
     if (p.turnData.animating || p.turnData.direction) {
       return false;
@@ -157,11 +169,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     }
 
     if (inForwardZone(boxPointX)) {
-      // At the end of the book, both page numbers are the same. So this is
-      // a way to test that we can advance one page.
-      var upperPlace = getPlace(upperPage());
-      var lowerPlace = getPlace(lowerPage());
-      if (upperPlace.pageNumber() != lowerPlace.pageNumber()) {
+      if (!onLastPage()) {
         p.turnData.direction = k.FORWARDS;
         slideToCursor(boxPointX);
         liftAnimationFinished();
