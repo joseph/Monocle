@@ -94,8 +94,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function initialize() {
     if (!p.html) {
-      console.log("Accessed an empty component:" + p.id);
-      return;
+      console.log("Accessed an empty component: " + p.id);
+      p.html = "<p></p>"
     }
 
     var elems = p.elementsForClient[0] = [];

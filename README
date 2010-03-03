@@ -90,7 +90,7 @@ Example use
           '<p>Hello from the second chapter.</p>',
         'component4.xhtml':
           '<p>THE END.</p>'
-      ][componentId];
+      }[componentId];
     },
     getMetaData: function(key) {
       return {
@@ -106,9 +106,9 @@ Example use
   // Initialize a book object.
   var book = Monocle.Book(bookData);
 
-  // Assign the book to the reader and go to the 14th page.
+  // Assign the book to the reader and go to the 3rd page.
   reader.setBook(book);
-  reader.moveTo({ page: 14 });
+  reader.moveTo({ page: 3 });
 
 
 Reader Events
