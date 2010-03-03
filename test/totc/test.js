@@ -146,38 +146,6 @@
       listBuilder(contents[i], 0);
     }
 
-    /*
-    tocList.addEventListener(
-      'touchstart',
-      function (evt) {
-        tocList.moveStart = evt.touches[0].pageY;
-        tocList.scrollStart = tocList.scrollTop;
-        evt.preventDefault();
-      }
-    );
-
-    tocList.addEventListener(
-      'touchmove',
-      function (evt) {
-        evt.preventDefault();
-        var dist = evt.touches[0].pageY - tocList.moveStart;
-        if (dist) {
-          tocList.scrollTop = tocList.scrollStart - dist;
-        }
-      }
-    );
-
-    tocList.addEventListener(
-      'touchend',
-      function () {
-        if (tocList.moveStart == evt.touches[0].pageY) {
-          tocList.moveStart = null;
-          tocList.scrollStart = null;
-        }
-      }
-    );
-    */
-
     if (!controlLayer.tocMenu) {
       controlLayer.tocMenu = document.createElement('div');
       controlLayer.tocMenu.id = "toc";
@@ -195,7 +163,8 @@
 
 
   // Initialize the reader element.
-  window.addEventListener(
+  Carlyle.addListener(
+    window,
     'load',
     function () {
       /* Initialize the reader */
@@ -203,10 +172,10 @@
 
       /* Because the 'reader' element changes size on window resize,
        * we should notify it of this event. */
-      window.addEventListener(
+      Carlyle.addListener(
+        window,
         'resize',
-        function () { window.reader.resized() },
-        false
+        function () { window.reader.resized() }
       );
 
 
@@ -242,18 +211,17 @@
         runner.innerHTML = reader.getBook().getMetaData('title');
         cntr.appendChild(runner);
 
-        var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
-        cntr.addEventListener(
-          evtType,
+        Carlyle.addListener(
+          cntr,
+          typeof Touch == "object" ? "touchstart" : "mousedown",
           function (evt) {
             evt.stopPropagation();
             evt.preventDefault();
             reader.showControl(bookTitle.contentsMenu);
-          },
-          false
+          }
         );
 
-        //cntr.addEventListener(evtType, createToC, false);
+        //Carlyle.addListener(cntr, evtType, createToC, false);
         return cntr;
       }
       reader.addControl(bookTitle, 'page');
@@ -278,7 +246,7 @@
         }
       }
       reader.addControl(chapterTitle, 'page');
-      reader.addEventListener(
+      reader.addListener(
         'carlyle:pagechange',
         function (evt) { chapterTitle.update(evt.carlyleData.page); }
       );
@@ -303,7 +271,7 @@
         }
       }
       reader.addControl(pageNumber, 'page');
-      reader.addEventListener(
+      reader.addListener(
         'carlyle:pagechange',
         function (evt) { pageNumber.update(evt.carlyleData.page) }
       );
@@ -317,17 +285,16 @@
         reader.showControl(scrubber);
         scrubber.updateNeedles();
       }
-      var eT = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
+      var eType = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
       for (var i = 0; i < chapterTitle.runners.length; ++i) {
-        chapterTitle.runners[i].parentNode.addEventListener(eT, showFn, false);
-        pageNumber.runners[i].parentNode.addEventListener(eT, showFn, false);
+        Carlyle.addListener(chapterTitle.runners[i].parentNode, eType, showFn);
+        Carlyle.addListener(pageNumber.runners[i].parentNode, eType, showFn);
       }
       var hideScrubber = function (evt) {
         evt.stopPropagation();
         reader.hideControl(scrubber);
       }
-      reader.addEventListener('carlyle:contact:start', hideScrubber);
-    },
-    false
+      reader.addListener('carlyle:contact:start', hideScrubber);
+    }
   );
 })();

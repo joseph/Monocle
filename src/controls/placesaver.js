@@ -21,9 +21,9 @@ Carlyle.Controls.PlaceSaver = function (reader) {
 
 
   function initialize() {
-    var box = reader.properties.divs.box;
-    p.prefix = k.COOKIE_NAMESPACE + box.id + ".";
-    box.addEventListener('carlyle:turn', savePlaceToCookie, true);
+    p.reader = reader;
+    p.prefix = k.COOKIE_NAMESPACE + p.reader.properties.divs.box.id + ".";
+    p.reader.addListener('carlyle:turn', savePlaceToCookie);
   }
 
 
@@ -55,7 +55,7 @@ Carlyle.Controls.PlaceSaver = function (reader) {
 
 
   function savePlaceToCookie() {
-    var place = reader.getPlace();
+    var place = p.reader.getPlace();
     setCookie(
       "component",
       encodeURIComponent(place.componentId()),
@@ -87,7 +87,7 @@ Carlyle.Controls.PlaceSaver = function (reader) {
   function restorePlace() {
     var place = savedPlace();
     if (place) {
-      reader.moveTo({ percent: place.percent, componentId: place.component });
+      p.reader.moveTo({ percent: place.percent, componentId: place.component });
     }
   }
 

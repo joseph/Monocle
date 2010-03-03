@@ -94,16 +94,44 @@ Carlyle.Reader = function (node, bookData, options) {
     p.divs.box.innerHTML = "";
 
     // Make sure the box div is absolutely or relatively positioned.
-    var currStyle = document.defaultView.getComputedStyle(p.divs.box, null);
-    var currPosVal = currStyle.getPropertyValue('position');
-    if (["absolute", "relative"].indexOf(currPosVal) == -1) {
-      p.divs.box.style.position = "relative";
-    }
+    positionBox();
 
     // Attach the page-flipping gadget.
     attachFlipper(options.flipper);
 
     // Create the essential DOM elements.
+    createReaderElements();
+
+    dispatchEvent("carlyle:loading");
+
+    // Make the reader elements look pretty.
+    applyStyles();
+
+    // Apply the book, calculating column dimensions & etc.
+    setBook(bk);
+
+    // Wait for user input.
+    listenForInteraction();
+
+    dispatchEvent("carlyle:loaded")
+  }
+
+
+  function positionBox() {
+    var currPosVal;
+    if (document.defaultView) {
+      var currStyle = document.defaultView.getComputedStyle(p.divs.box, null);
+      currPosVal = currStyle.getPropertyValue('position');
+    } else if (p.divs.box.currentStyle) {
+      currPosVal = p.divs.box.currentStyle.position
+    }
+    if (["absolute", "relative"].indexOf(currPosVal) == -1) {
+      p.divs.box.style.position = "relative";
+    }
+  }
+
+
+  function createReaderElements() {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
@@ -120,16 +148,6 @@ Carlyle.Reader = function (node, bookData, options) {
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
-
-    dispatchEvent("carlyle:loading");
-
-    applyStyles();
-
-    setBook(bk);
-
-    listenForInteraction();
-
-    dispatchEvent("carlyle:loaded")
   }
 
 
@@ -307,7 +325,8 @@ Carlyle.Reader = function (node, bookData, options) {
 
   function listenForInteraction() {
     if (!k.TOUCH_DEVICE) {
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'mousedown',
         function (evt) {
           if (evt.button != 0) {
@@ -315,30 +334,30 @@ Carlyle.Reader = function (node, bookData, options) {
           }
           p.interactionData.mouseDown = true;
           contactEvent(evt, "start", evt);
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'mousemove',
         function (evt) {
           if (!p.interactionData.mouseDown) {
             return false;
           }
           contactEvent(evt, "move", evt);
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'mouseup',
         function (evt) {
           if (!p.interactionData.mouseDown) {
             return false;
           }
           contactEvent(evt, "end", evt);
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'mouseout',
         function (evt) {
           if (!p.interactionData.mouseDown) {
@@ -349,19 +368,19 @@ Carlyle.Reader = function (node, bookData, options) {
             if (obj == p.divs.container) { return; }
           }
           contactEvent(evt, 'end', evt);
-        },
-        false
+        }
       );
     } else {
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'touchstart',
         function (evt) {
           if (evt.targetTouches.length > 1) { return; }
           contactEvent(evt, 'start', evt.targetTouches[0]);
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'touchmove',
         function (evt) {
           if (evt.targetTouches.length > 1) { return; }
@@ -376,24 +395,23 @@ Carlyle.Reader = function (node, bookData, options) {
           } else {
             contactEvent(evt, "move", evt.targetTouches[0]);
           }
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'touchend',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
-        },
-        false
+        }
       );
-      p.divs.container.addEventListener(
+      Carlyle.addListener(
+        p.divs.container,
         'touchcancel',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
-        },
-        false
+        }
       );
-      window.addEventListener('orientationchange', resized, true);
+      Carlyle.addListener(window, 'orientationchange', resized, true);
     }
     p.flipper.listenForInteraction();
   }
@@ -521,11 +539,7 @@ Carlyle.Reader = function (node, bookData, options) {
     }
     if (controlData.usesOverlay) {
       p.divs.overlay.style.display = "none";
-      p.divs.overlay.removeEventListener(
-        'click',
-        p.divs.overlay.clickFn,
-        false
-      );
+      Carlyle.removeListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -556,11 +570,7 @@ Carlyle.Reader = function (node, bookData, options) {
         } while (obj = obj.parentNode);
         hideControl(ctrl);
       }
-      p.divs.overlay.addEventListener(
-        'click',
-        p.divs.overlay.clickFn,
-        false
-      );
+      Carlyle.addListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
     }
     controlData.hidden = false;
     if (ctrl.properties) {
@@ -569,17 +579,23 @@ Carlyle.Reader = function (node, bookData, options) {
   }
 
 
+  // Internet Explorer does not permit custom events, and I'm not going to
+  // write an event system from scratch. We will wait for a version of IE that
+  // supports the W3C model.
+  //
   function dispatchEvent(evtType, data, cancelable) {
-    cancelable = cancelable || false;
+    if (!document.createEvent) {
+      return true;
+    }
     var evt = document.createEvent("Events");
-    evt.initEvent(evtType, false, cancelable);
+    evt.initEvent(evtType, false, cancelable || false);
     evt.carlyleData = data;
     return p.divs.box.dispatchEvent(evt);
   }
 
 
-  function addEventListener(evtType, fn) {
-    p.divs.box.addEventListener(evtType, fn, false);
+  function addListener(evtType, fn, useCapture) {
+    Carlyle.addListener(p.divs.box, evtType, fn, useCapture);
   }
 
 
@@ -594,7 +610,7 @@ Carlyle.Reader = function (node, bookData, options) {
   API.hideControl = hideControl;
   API.showControl = showControl;
   API.dispatchEvent = dispatchEvent;
-  API.addEventListener = addEventListener;
+  API.addListener = addListener;
 
   initialize(node, bookData, options);
 

@@ -51,19 +51,18 @@ Carlyle.Controls.Contents = function (reader) {
 
 
   function chapterBuilder(list, chp, padLvl) {
-    console.log(list);
     var li = document.createElement('li');
     var span = document.createElement('span');
     span.style.paddingLeft = padLvl + "em";
     span.innerHTML = chp.title;
     li.appendChild(span);
-    li.addEventListener(
+    Carlyle.addListener(
+      li,
       k.CHAPTER_INVOKE_EVENT,
       function () {
         p.reader.skipToChapter(chp.src);
         p.reader.hideControl(API);
-      },
-      false
+      }
     );
     li.style.cssText = Carlyle.Styles.ruleText(
       Carlyle.Styles.Controls.Contents.chapter

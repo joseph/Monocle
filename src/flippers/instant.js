@@ -37,7 +37,7 @@ Carlyle.Flippers.Instant = function (reader, setPageFn) {
 
 
   function listenForInteraction() {
-    p.reader.addEventListener(
+    p.reader.addListener(
       "carlyle:contact:start",
       function (evt) {
         if (turn(evt.carlyleData.contactX)) {

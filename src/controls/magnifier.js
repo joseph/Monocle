@@ -43,7 +43,7 @@ Carlyle.Controls.Magnifier = function (reader) {
     btn.appendChild(btn.largeA);
 
     var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
-    btn.addEventListener(evtType, toggleMagnification, true);
+    Carlyle.addListener(btn, evtType, toggleMagnification, true);
 
     p.buttons.push(btn);
     return btn;

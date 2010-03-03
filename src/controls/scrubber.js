@@ -23,7 +23,7 @@ Carlyle.Controls.Scrubber = function (reader) {
   function initialize() {
     p.reader = reader;
     p.book = p.reader.getBook();
-    p.reader.addEventListener('carlyle:turn', updateNeedles);
+    p.reader.addListener('carlyle:turn', updateNeedles);
     updateNeedles();
   }
 
@@ -169,20 +169,20 @@ Carlyle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      cntr.removeEventListener(eventType('move'), moveEvt, false);
-      document.body.removeEventListener(eventType('end'), endEvt, false);
+      Carlyle.removeListener(cntr, eventType('move'), moveEvt);
+      Carlyle.removeListener(document.body, eventType('end'), endEvt);
       bubble.style.display = "none";
     }
 
-    cntr.addEventListener(
+    Carlyle.addListener(
+      cntr,
       eventType("start"),
       function (evt) {
         bubble.style.display = "block";
         moveEvt(evt);
-        cntr.addEventListener(eventType('move'), moveEvt, false);
-        document.body.addEventListener(eventType("end"), endEvt, false);
-      },
-      false
+        Carlyle.addListener(cntr, eventType('move'), moveEvt);
+        Carlyle.addListener(document.body, eventType("end"), endEvt);
+      }
     );
 
     return cntr;

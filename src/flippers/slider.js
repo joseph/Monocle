@@ -50,7 +50,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function listenForInteraction() {
-    p.reader.addEventListener(
+    p.reader.addListener(
       "carlyle:contact:start",
       function (evt) {
         if (lift(evt.carlyleData.contactX)) {
@@ -58,7 +58,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
         }
       }
     );
-    p.reader.addEventListener(
+    p.reader.addListener(
       "carlyle:contact:move",
       function (evt) {
         if (turning(evt.carlyleData.contactX)) {
@@ -66,7 +66,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
         }
       }
     );
-    p.reader.addEventListener(
+    p.reader.addListener(
       "carlyle:contact:end",
       function (evt) {
         if (drop(evt.carlyleData.contactX)) {
@@ -349,7 +349,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
     }
 
     if (elem.setXTCB) {
-      elem.removeEventListener('webkitTransitionEnd', elem.setXTCB, false);
+      Carlyle.removeListener(elem, 'webkitTransitionEnd', elem.setXTCB);
       elem.setXTCB = null;
     }
     if (callback) {
@@ -357,7 +357,7 @@ Carlyle.Flippers.Slider = function (reader, setPageFn) {
         callback();
       } else {
         elem.setXTCB = callback;
-        elem.addEventListener('webkitTransitionEnd', elem.setXTCB, false);
+        Carlyle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
       }
     }
   }

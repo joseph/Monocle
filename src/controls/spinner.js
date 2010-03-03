@@ -42,10 +42,10 @@ Carlyle.Controls.Spinner = function (reader) {
 
   // Registers spin/spun event handlers for: loading, bookchanging, resizing.
   function listenForUsualDelays() {
-    p.reader.addEventListener('carlyle:bookchanging', spin, false);
-    p.reader.addEventListener('carlyle:bookchange', spun, false);
-    p.reader.addEventListener('carlyle:resizing', spin, false);
-    p.reader.addEventListener('carlyle:resize', spun, false);
+    p.reader.addListener('carlyle:bookchanging', spin);
+    p.reader.addListener('carlyle:bookchange', spun);
+    p.reader.addListener('carlyle:resizing', spin);
+    p.reader.addListener('carlyle:resize', spun);
   }
 
 

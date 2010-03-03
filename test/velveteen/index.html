@@ -18,10 +18,10 @@
     <script type="text/javascript" src="../../src/place.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
     <style type="text/css">
       #rabbit {
-        position: relative;
         width: 300px;
         height: 400px;
         border: 1px solid #000;
@@ -63,11 +63,8 @@
 
     <script type="text/javascript">
       // Initialize the reader element.
-      window.addEventListener(
-        'load',
-        function () { window.reader = Carlyle.Reader('rabbit'); },
-        false
-      );
+      var initFn = function () { window.reader = Carlyle.Reader('rabbit'); }
+      Carlyle.addListener(window, 'load', initFn);
     </script>
 
   </head>

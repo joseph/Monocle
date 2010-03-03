@@ -5,8 +5,10 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
   // Constants
   var k = {
-    LEGACY_MESSAGE: "Your browser doesn't support Monocle's full feature set." +
-      "You may want to upgrade to Firefox, Safari or Chrome.",
+    LEGACY_MESSAGE: "Your browser doesn't support Monocle's full feature set. " +
+      'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
+      'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
+      'Google\'s <a href="http://google.com/chrome">Chrome</a>.',
     NEXT_BUTTON_TEXT: "Next part..."
   }
 
@@ -106,9 +108,9 @@ Carlyle.Styles.Flippers.Legacy = {
   message: {
     "border": "1px solid #987",
     "background": "#FFC",
-    "color": "#666",
-    "font-family": "sans-serif",
-    "font-size": "90%",
+    "color": "#333",
+    "font-family": "Helvetica, Arial, sans-serif",
+    "font-size": "11px",
     "margin-right": "3px",
     "margin-bottom": "3px",
     "padding": "0.5em 1em"

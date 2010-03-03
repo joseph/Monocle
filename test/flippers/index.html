@@ -88,7 +88,8 @@
       }
 
       // Initialize the reader element.
-      window.addEventListener(
+      Carlyle.addListener(
+        window,
         'load',
         function () {
           window.reader1 = Carlyle.Reader(
@@ -106,8 +107,7 @@
             bookData,
             { flipper: Carlyle.Flippers.Legacy }
           );
-        },
-        false
+        }
       );
     </script>
 

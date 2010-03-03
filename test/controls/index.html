@@ -96,7 +96,8 @@
       }
 
       // Initialize the reader element.
-      window.addEventListener(
+      Carlyle.addListener(
+        window,
         'load',
         function () {
 
@@ -123,7 +124,7 @@
           window.reader4 = Carlyle.Reader('spinner', bookData);
           var spinner = Carlyle.Controls.Spinner(reader4);
           reader4.addControl(spinner, 'page', { hidden: true });
-          reader4.addEventListener(
+          reader4.addListener(
             'carlyle:contact:start:unhandled',
             function () {
               if (spinner.spinning) {
@@ -139,14 +140,13 @@
           window.reader5 = Carlyle.Reader('toc', bookData);
           var toc = Carlyle.Controls.Contents(reader5);
           reader5.addControl(toc, 'popover');
-          reader5.addEventListener(
+          reader5.addListener(
             'carlyle:contact:start:unhandled',
             function () {
               reader5.showControl(toc);
             }
           );
-        },
-        false
+        }
       );
     </script>
 
