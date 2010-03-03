@@ -9,7 +9,10 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
       'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
       'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
       'Google\'s <a href="http://google.com/chrome">Chrome</a>.',
-    NEXT_BUTTON_TEXT: "Next part..."
+    buttonText: {
+      PREV: "... Previous part",
+      NEXT: "Next part..."
+    }
   }
 
   // Properties
@@ -47,11 +50,11 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    // FIXME: callback should hide nextbutton if on last component.
-    var rslt = p.setPageFn(p.page, locus);
+    var rslt = p.setPageFn(p.page, locus, updateButtons);
     p.reader.dispatchEvent('carlyle:turn');
     return rslt;
   }
+
 
 
   function overrideDimensions() {
@@ -70,22 +73,55 @@ Carlyle.Flippers.Legacy = function (reader, setPageFn) {
       p.page.scrollerDiv.insertBefore(p.divs.legacyMessage, p.page.contentDiv);
     }
 
+    if (!p.divs.prevButton) {
+      p.divs.prevButton = document.createElement('div');
+      p.divs.prevButton.innerHTML = k.buttonText.PREV;
+      p.divs.prevButton.style.cssText = Carlyle.Styles.ruleText(
+        Carlyle.Styles.Flippers.Legacy.button
+      );
+      p.page.scrollerDiv.insertBefore(p.divs.prevButton, p.page.contentDiv);
+    }
+
     if (!p.divs.nextButton) {
       p.divs.nextButton = document.createElement('div');
-      p.divs.nextButton.innerHTML = k.NEXT_BUTTON_TEXT;
+      p.divs.nextButton.innerHTML = k.buttonText.NEXT;
       p.divs.nextButton.style.cssText = Carlyle.Styles.ruleText(
-        Carlyle.Styles.Flippers.Legacy.next
+        Carlyle.Styles.Flippers.Legacy.button
       );
-      p.divs.nextButton.onclick = function () {
-        moveTo({ percent: 1.5 });
-      }
       p.page.scrollerDiv.appendChild(p.divs.nextButton);
     }
   }
 
 
+  function updateButtons() {
+    var cIndex = getPlace().properties.component.properties.index;
+    if (cIndex == 0) {
+      p.divs.legacyMessage.style.display = "block";
+      p.divs.prevButton.style.display = "none";
+    } else {
+      p.divs.legacyMessage.style.display = "none";
+      p.divs.prevButton.style.display = "block";
+    }
+
+    if (cIndex == p.reader.getBook().properties.lastCIndex) {
+      p.divs.nextButton.style.display = "none";
+    } else {
+      p.divs.nextButton.style.display = "block";
+    }
+  }
+
+
   function listenForInteraction() {
-    // TODO
+    Carlyle.addListener(
+      p.divs.prevButton,
+      'click',
+      function () { moveTo({ percent: -0.5 }) }
+    )
+    Carlyle.addListener(
+      p.divs.nextButton,
+      'click',
+      function () { moveTo({ percent: 1.5 }) }
+    )
   }
 
 
@@ -115,7 +151,17 @@ Carlyle.Styles.Flippers.Legacy = {
     "margin-bottom": "3px",
     "padding": "0.5em 1em"
   },
-  next: {
-    "background": "#F0F"
+  button: {
+    "background": "#DDD",
+    "padding": "6px",
+    "border": "1px solid #666",
+    "color": "#009",
+    "font": "bold 12px Helvetica, Arial, sans-serif",
+    "text-shadow": "-1px -1px #EEE",
+    "border-radius": "5px",
+    "-o-border-radius": "5px",
+    "margin-right": "3px",
+    "margin-bottom": "3px",
+    "margin-top": "3px"
   }
 }
