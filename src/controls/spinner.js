@@ -60,6 +60,8 @@ Carlyle.Controls.Spinner = function (reader) {
 
   API.createControlElements = createControlElements;
   API.listenForUsualDelays = listenForUsualDelays;
+  API.spin = spin;
+  API.spun = spun;
 
   initialize();
 

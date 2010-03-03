@@ -469,6 +469,7 @@ Carlyle.Reader = function (node, bookData, options) {
         ctrlData.elements.push(runner);
       }
     } else if (cType == "modal" || cType == "popover") {
+      // FIXME!!!
       ctrlElem = ctrl.createControlElements(p.divs.overlay);
       p.divs.overlay.appendChild(ctrlElem);
       p.divs.overlay.cssText += "width: 100%; height: 100%";
@@ -497,6 +498,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function hideControl(ctrl) {
+    // FIXME: don't hide if already hiding - inefficient
     for (var i = 0; i < p.controls.length; ++i) {
       if (p.controls[i].control == ctrl) {
         for (var j = 0; j < p.controls[i].elements.length; ++j) {
@@ -511,6 +513,7 @@ Carlyle.Reader = function (node, bookData, options) {
 
 
   function showControl(ctrl) {
+    // FIXME: don't show if already showing - inefficient
     for (var i = 0; i < p.controls.length; ++i) {
       if (p.controls[i].control == ctrl) {
         for (var j = 0; j < p.controls[i].elements.length; ++j) {
