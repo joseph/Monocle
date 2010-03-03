@@ -3,7 +3,9 @@
 // See the properties declaration for details of constructor arguments.
 //
 Carlyle.Component = function (book, id, index, chapters, html) {
-  if (Carlyle == this) { return new Carlyle.Book(dataSource); }
+  if (Carlyle == this) {
+    return new Carlyle.Component(book, id, index, chapters, html);
+  }
 
   // Constants.
   var k = {
