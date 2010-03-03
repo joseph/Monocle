@@ -43,7 +43,7 @@ Methods:
     Q: should it also return the stylesheet rules?
 
 * getMetaData(key): takes a string "key" and returns the value of that
-    metadata for this book. There is not yet any standardised list of
+    metadata for this book. There is not yet any standardized list of
     possible keys -- we'll just see what happens for a bit. Note that if
     nothing will go wrong if you return null or an empty string for any
     requested key.
@@ -108,7 +108,7 @@ Example use
 
   // Assign the book to the reader and go to the 14th page.
   reader.setBook(book);
-  reader.moveToPage(14);
+  reader.moveTo({ page: 14 });
 
 
 Reader Events
@@ -126,8 +126,6 @@ you need to.
 * carlyle:bookchange
 * carlyle:pagechanging (c)
 * carlyle:pagechange
--* carlyle:flipperchanging (c)
--* carlyle:flipperchange
 * carlyle:contact:start (c)
 * carlyle:contact:move (c)
 * carlyle:contact:end (c)
@@ -140,13 +138,81 @@ you need to.
 Adding controls
 ---------------
 
-!TODO!
+Controls are objects that adhere to a specified interface. They can
+be any kind of object. They are added to a Reader object like this:
+
+  // The reader object being in the variable named 'reader'...
+  var reader = Carlyle.Reader(someDiv);
+  // And the control object being in the variable named 'control'...
+  var control = someObject;
+
+  reader.addControl(control, 'standard');
+
+The Reader's addControl method takes the control, a control type string, and
+an options object. The control type string can be one of:
+
+  * standard (a DOM element that floats above or near the pages)
+  * page (DOM elements that sit within the page - one control element is
+      created for each page element)
+  * modal (an overlaying DOM element where clicking away does nothing)
+  * popover (an overlaying DOM element where clicking away hides the control)
+  * invisible
+
+Presently, the options argument to addControl has one recognized property:
+
+  * hidden - if true, control element is hidden as soon as it is created.
+
+The control interface is as follows:
+
+Methods:
+
+* createControlElements(parentNode)
+
+Note that the 'createControlElements' method is not strictly required for
+controls that are always added as 'invisible'. The method should return a
+DOM element (which can contain as many child elements as you like) -
+although again, this is optional for invisible controls. You should not
+insert the DOM element into the parentNode - the Reader will do this for you.
 
 
 Alternative page flipping mechanisms
 ------------------------------------
 
-!TODO!
+Flippers are objects that follow a defined interface, and do the hard labour
+of actually turning the page. They typically listen for user interaction of
+some kind, then tell the reader that they are changing the page.
+
+Flippers must be a 'class' (ie, instantiable via 'new') - the reader does
+the instantiation.
+
+You can set the flipper as an option to the Reader initialization command, eg:
+
+  var reader = Carlyle.Reader('someElementId', null, { flipper: MyFlipper });
+
+Carlyle comes with three built in flipper classes:
+
+* Carlyle.Flippers.Slider - the animated, sliding page turns (default)
+* Carlyle.Flippers.Instant - pages immediately change, without animation
+* Carlyle.Flippers.Legacy - for browsers that don't support columns.
+
+The flipper interface is as follows:
+
+Constructor arguments
+* reader
+* setPageFunction - the 'private' method of the reader that should be invoked
+    whenever a page is being changed. The actual flipper-specific logic to
+    change the page is generally provided in a callback to this invocation.
+    See the existing flippers for examples.
+
+Properties:
+* pageCount - must be an integer
+
+Methods:
+* addPage(pageDiv)
+* visiblePages()
+* getPlace(pageDiv)
+* moveTo(locus)
+* listenForInteraction()
 
 
 Javascript Object Style

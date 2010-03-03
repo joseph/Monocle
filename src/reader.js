@@ -6,12 +6,15 @@ Carlyle.Reader = function (node, bookData, options) {
   // Constants.
   var k = {
     durations: {
-      RESIZE_DELAY: 500
+      RESIZE_DELAY: 200
     },
     abortMessage: {
       CLASSNAME: "monocleAbortMessage",
       TEXT: "Your browser does not support this technology."
     },
+    FLIPPER_DEFAULT_CLASS: (typeof(Carlyle.Flippers.Slider) == "undefined") ?
+      null :
+      Carlyle.Flippers.Slider,
     FLIPPER_LEGACY_CLASS: (typeof(Carlyle.Flippers.Legacy) == "undefined") ?
       null :
       Carlyle.Flippers.Legacy,
@@ -141,7 +144,10 @@ Carlyle.Reader = function (node, bookData, options) {
       }
       flipperClass = k.FLIPPER_LEGACY_CLASS;
     } else if (!flipperClass) {
-      flipperClass = Carlyle.Flippers.Slider;
+      flipperClass = k.FLIPPER_DEFAULT_CLASS;
+      if (!flipperClass) {
+        throw("No flipper class");
+      }
     }
     p.flipper = new flipperClass(API, setPage);
   }
@@ -450,24 +456,30 @@ Carlyle.Reader = function (node, bookData, options) {
     }
     p.controls.push(ctrlData);
 
+    var ctrlElem;
     if (!cType || cType == "standard") {
-      var ctrlElem = ctrl.createControlElements();
+      ctrlElem = ctrl.createControlElements(p.divs.container);
       p.divs.container.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
       for (var i = 0; i < p.divs.pages.length; ++i) {
         var page = p.divs.pages[i];
-        var runner = ctrl.createControlElements();
+        var runner = ctrl.createControlElements(page);
         page.appendChild(runner);
         ctrlData.elements.push(runner);
       }
     } else if (cType == "modal" || cType == "popover") {
-      var ctrlElem = ctrl.createControlElements();
+      ctrlElem = ctrl.createControlElements(p.divs.overlay);
       p.divs.overlay.appendChild(ctrlElem);
       p.divs.overlay.cssText += "width: 100%; height: 100%";
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "invisible") {
-      // Nothing to do, really.
+      if (typeof(ctrl.createControlElements) == "function") {
+        if (ctrlElem = ctrl.createControlElements(p.divs.container)) {
+          p.divs.container.appendChild(ctrlElem);
+          ctrlData.elements.push(ctrlElem);
+        }
+      }
     } else {
       console.log("Unknown control type: " + cType);
     }

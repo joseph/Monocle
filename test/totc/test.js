@@ -244,13 +244,14 @@
       /* CHAPTER TITLE RUNNING HEAD */
       var chapterTitle = {
         runners: [],
-        createControlElements: function () {
+        createControlElements: function (page) {
           var cntr = document.createElement('div');
           cntr.className = "chapterTitle";
           var runner = document.createElement('div');
           runner.className = "runner";
           cntr.appendChild(runner);
           this.runners.push(runner);
+          this.update(page);
           return cntr;
         },
         update: function (page) {
@@ -259,10 +260,6 @@
         }
       }
       reader.addControl(chapterTitle, 'page');
-      // FIXME: a bit nasty...
-      for (var i = 0; i < reader.properties.divs.pages.length; ++i) {
-        chapterTitle.update(reader.properties.divs.pages[i]);
-      }
       reader.addEventListener(
         'carlyle:pagechange',
         function (evt) { chapterTitle.update(evt.carlyleData.page); }
@@ -272,13 +269,14 @@
       /* PAGE NUMBER RUNNING HEAD */
       var pageNumber = {
         runners: [],
-        createControlElements: function () {
+        createControlElements: function (page) {
           var cntr = document.createElement('div');
           cntr.className = "pageNumber";
           var runner = document.createElement('div');
           runner.className = "runner";
           cntr.appendChild(runner);
           this.runners.push(runner);
+          this.update(page);
           return cntr;
         },
         update: function (page) {
@@ -287,9 +285,6 @@
         }
       }
       reader.addControl(pageNumber, 'page');
-      for (var i = 0; i < reader.properties.divs.pages.length; ++i) {
-        pageNumber.update(reader.properties.divs.pages[i]);
-      }
       reader.addEventListener(
         'carlyle:pagechange',
         function (evt) { pageNumber.update(evt.carlyleData.page) }
