@@ -5,11 +5,14 @@ Monocle.Controls.Magnifier = function (reader) {
 
   // Constants.
   var k = {
+    LARGE_FONT_SIZE: "115%",
+    NORMAL_FONT_SIZE: Monocle.Styles.content['font-size'] || "100%"
   }
 
   // Properties.
   var p = {
-    buttons: []
+    buttons: [],
+    enlarged: false
   }
 
   // Public methods and properties.
@@ -53,20 +56,22 @@ Monocle.Controls.Magnifier = function (reader) {
   function toggleMagnification(evt) {
     evt.preventDefault();
     evt.stopPropagation();
-    var s = reader.properties.divs.pages[0].contentDiv.style;
-    if (!s['font-size'] || s['font-size'] == "100%") {
-      Monocle.Styles.content['font-size'] = "110%";
-      for (var i = 0; i < p.buttons.length; i++) {
-        p.buttons[i].smallA.style.opacity = "0.3";
-        p.buttons[i].largeA.style.opacity = "1";
-      }
+    var opacities;
+    if (!p.enlarged) {
+      Monocle.Styles.content['font-size'] = k.LARGE_FONT_SIZE;
+      opacities = [0.3, 1]
+      p.enlarged = true;
     } else {
-      Monocle.Styles.content['font-size'] = "100%";
-      for (var i = 0; i < p.buttons.length; i++) {
-        p.buttons[i].smallA.style.opacity = "1";
-        p.buttons[i].largeA.style.opacity = "0.3";
-      }
+      Monocle.Styles.content['font-size'] = k.NORMAL_FONT_SIZE;
+      opacities = [1, 0.3]
+      p.enlarged = false;
     }
+
+    for (var i = 0; i < p.buttons.length; i++) {
+      p.buttons[i].smallA.style.opacity = opacities[0];
+      p.buttons[i].largeA.style.opacity = opacities[1];
+    }
+
     p.reader.reapplyStyles();
   }
 
