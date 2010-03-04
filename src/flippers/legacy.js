@@ -159,7 +159,6 @@ Monocle.Styles.Flippers.Legacy = {
     "font": "bold 12px Helvetica, Arial, sans-serif",
     "text-shadow": "-1px -1px #EEE",
     "border-radius": "5px",
-    "-o-border-radius": "5px",
     "margin-right": "3px",
     "margin-bottom": "3px",
     "margin-top": "3px"

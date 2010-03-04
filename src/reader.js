@@ -373,15 +373,16 @@ Monocle.Reader = function (node, bookData, options) {
         p.divs.container,
         'touchstart',
         function (evt) {
-          if (evt.targetTouches.length > 1) { return; }
+          if (evt.touches.length > 1) { return; }
           contactEvent(evt, 'start', evt.targetTouches[0]);
+          evt.preventDefault();
         }
       );
       Monocle.addListener(
         p.divs.container,
         'touchmove',
         function (evt) {
-          if (evt.targetTouches.length > 1) { return; }
+          if (evt.touches.length > 1) { return; }
           var raw = {
             x: evt.targetTouches[0].pageX - p.boxDimensions.left,
             y: evt.targetTouches[0].pageY - p.boxDimensions.top,
@@ -393,6 +394,7 @@ Monocle.Reader = function (node, bookData, options) {
           } else {
             contactEvent(evt, "move", evt.targetTouches[0]);
           }
+          evt.preventDefault();
         }
       );
       Monocle.addListener(
@@ -400,6 +402,7 @@ Monocle.Reader = function (node, bookData, options) {
         'touchend',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
+          evt.preventDefault();
         }
       );
       Monocle.addListener(
