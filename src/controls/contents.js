@@ -38,7 +38,7 @@ Monocle.Controls.Contents = function (reader) {
     while (div.hasChildNodes()) {
       div.removeChild(div.firstChild);
     }
-    var list = document.createElement('ul');
+    var list = document.createElement('ol');
     div.appendChild(list);
     list.style.cssText = Monocle.Styles.ruleText(
       Monocle.Styles.Controls.Contents.list
@@ -87,18 +87,20 @@ Monocle.Controls.Contents = function (reader) {
 
 Monocle.Styles.Controls.Contents = {
   container: {
-    "position": "relative",
+    "position": "absolute",
     "width": "75%",
     "height": "75%",
     "left": "12.5%",
     "top": "12.5%",
     "background": "#EEE",
-    "-moz-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
-    "-webkit-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
+    "border": "2px solid #F7F7F7",
+    "overflow-y": "auto",
     "border-radius": "9px",
     "-moz-border-radius": "9px",
-    "border": "2px solid #F7F7F7",
-    "overflow-y": "auto"
+    "-webkit-border-radius": "9px",
+    "box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
+    "-moz-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)",
+    "-webkit-box-shadow": "1px 2px 6px rgba(0,0,0,0.5)"
   },
   list: {
     "margin": "6px",

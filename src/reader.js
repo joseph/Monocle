@@ -540,7 +540,8 @@ Monocle.Reader = function (node, bookData, options) {
     }
     if (controlData.usesOverlay) {
       p.divs.overlay.style.display = "none";
-      Monocle.removeListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
+      var evtType = k.TOUCH_DEVICE ? "touchstart" : "mousedown";
+      Monocle.removeListener(p.divs.overlay, evtType, p.divs.overlay.clickFn);
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -571,7 +572,8 @@ Monocle.Reader = function (node, bookData, options) {
         } while (obj = obj.parentNode);
         hideControl(ctrl);
       }
-      Monocle.addListener(p.divs.overlay, 'click', p.divs.overlay.clickFn);
+      var evtType = k.TOUCH_DEVICE ? "touchstart" : "mousedown";
+      Monocle.addListener(p.divs.overlay, evtType, p.divs.overlay.clickFn);
     }
     controlData.hidden = false;
     if (ctrl.properties) {
