@@ -1,4 +1,6 @@
-Monocle = {};
+Monocle = {
+  VERSION: "1.0.0"
+};
 
 //= require <compat>
 //= require <reader>
