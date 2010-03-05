@@ -13,7 +13,9 @@ Monocle.removeListener = function (elem, evtType, fn, useCapture) {
   if (elem.removeEventListener) {
     return elem.removeEventListener(evtType, fn, useCapture || false);
   } else if (elem.detachEvent) {
-    return elem.detachEvent('on'+evtType, fn);
+    try {
+      return elem.detachEvent('on'+evtType, fn);
+    } catch(e) {}
   }
 }
 

@@ -361,7 +361,7 @@ Monocle.Reader = function (node, bookData, options) {
           if (!p.interactionData.mouseDown) {
             return false;
           }
-          obj = evt.relatedTarget;
+          obj = evt.relatedTarget || e.fromElement;
           while (obj && (obj = obj.parentNode)) {
             if (obj == p.divs.container) { return; }
           }
@@ -566,10 +566,10 @@ Monocle.Reader = function (node, bookData, options) {
     }
     if (controlData.controlType == "popover") {
       p.divs.overlay.clickFn = function (evt) {
-        obj = evt.target;
+        obj = evt.target || window.event.srcElement;
         do {
-          if (obj == controlData.elements[0]) { return; }
-        } while (obj = obj.parentNode);
+          if (obj == controlData.elements[0]) { return true; }
+        } while (obj && (obj = obj.parentNode));
         hideControl(ctrl);
       }
       var evtType = k.TOUCH_DEVICE ? "touchstart" : "mousedown";

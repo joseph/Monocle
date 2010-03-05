@@ -54,8 +54,12 @@ Monocle.Controls.Magnifier = function (reader) {
 
 
   function toggleMagnification(evt) {
-    evt.preventDefault();
-    evt.stopPropagation();
+    if (evt.preventDefault) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    } else {
+      evt.returnValue = false;
+    }
     var opacities;
     if (!p.enlarged) {
       Monocle.Styles.content['font-size'] = k.LARGE_FONT_SIZE;

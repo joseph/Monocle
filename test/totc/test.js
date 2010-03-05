@@ -215,8 +215,12 @@
           cntr,
           typeof Touch == "object" ? "touchstart" : "mousedown",
           function (evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
+            if (evt.preventDefault) {
+              evt.stopPropagation();
+              evt.preventDefault();
+            } else {
+              evt.returnValue = false;
+            }
             reader.showControl(bookTitle.contentsMenu);
           }
         );
