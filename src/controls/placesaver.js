@@ -22,8 +22,18 @@ Monocle.Controls.PlaceSaver = function (reader) {
 
   function initialize() {
     p.reader = reader;
-    p.prefix = k.COOKIE_NAMESPACE + p.reader.properties.divs.box.id + ".";
+    applyToBook(p.reader.getBook());
     p.reader.addListener('monocle:turn', savePlaceToCookie);
+    p.reader.addListener('monocle:bookChange', applyToBook);
+  }
+
+
+  function applyToBook() {
+    p.bkTitle = p.reader.getBook().getMetaData('title');
+    p.bkTitle = p.bkTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+    p.prefix = k.COOKIE_NAMESPACE +
+      p.reader.properties.divs.box.id + "." +
+      p.bkTitle + ".";
   }
 
 
