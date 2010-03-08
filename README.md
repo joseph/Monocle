@@ -5,6 +5,8 @@ A silky, tactile browser-based ebook reader.
 Invented by [Inventive Labs](http://inventivelabs.com.au). Released under the
 MIT license.
 
+More information (including demos): http://monocle.inventivelabs.com.au
+
 Contributions welcome - fork the repository on
 [GitHub](http://github.com/joseph/monocle).
 
