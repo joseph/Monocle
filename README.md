@@ -163,7 +163,7 @@ small, and you can simply select which ones you want to include on the page.
 They're in `src/controls`.
 
 
-## Advanced Monocle
+### Advanced Monocle
 
 Monocle is built to be extended. It's pretty flexible. You can create custom
 controls and custom page-turning interactions (called 'flippers' in Monocle).
@@ -304,7 +304,7 @@ Methods:
 In this incarnation at least, Monocle uses a Javascript idiom for defining
 many of the core classes. This is designed to declutter the classes, clarify
 their API, and reduce dependency problems that would constrain the progress of
-the project at this early style.
+the project at this early stage.
 
 Essentially, the constructor function returns not the instance itself, but
 an object that references the public methods and properties of that object.
