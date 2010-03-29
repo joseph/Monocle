@@ -8,6 +8,7 @@
 
     <script type="text/javascript" src="../../src/monocle.js"></script>
     <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
     <script type="text/javascript" src="../../src/framer.js"></script>
 
     <style type="text/css">
@@ -70,7 +71,8 @@
           }
         }
 
-        var framer = Monocle.Framer('reader', bookData);
+        var framer = Monocle.Framer();
+        framer.newReader('reader', bookData);
       }
       Monocle.addListener(window, 'load', initFn);
     </script>
