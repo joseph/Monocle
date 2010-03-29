@@ -76,17 +76,29 @@
             }
           ]
         },
-        getComponent: function (cmptId) {
-          var ajReq = new XMLHttpRequest();
-          ajReq.open("GET", cmptId, false);
-          ajReq.send(null);
-          return ajReq.responseText;
+        getComponent: function (cmptId, callback) {
+          callback(this.getViaSjax(cmptId));
         },
         getMetaData: function(key) {
           return {
             title: "Howl",
             creator: "Allen Ginsberg"
           }[key];
+        },
+        getViaSjax: function (path) {
+          var ajReq = new XMLHttpRequest();
+          ajReq.open("GET", path, false);
+          ajReq.send(null);
+          return ajReq.responseText;
+        },
+        getViaAjax: function (path) {
+          var script = document.createElement('script');
+          script.id = "dynLoader";
+          script.type = "text/javascript";
+          script.charset = "utf-8";
+          script.src = path;
+          var head = document.getElementsByTagName('head')[0];
+          head.appendChild(script);
         }
       }
 

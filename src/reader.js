@@ -302,22 +302,22 @@ Monocle.Reader = function (node, bookData, options) {
       return;
     }
 
-    var rslt = p.book.changePage(pageDiv.contentDiv, locus);
+    var onChangePage = function (rslt) {
+      // The book may disallow changing to the given page.
+      if (!rslt) {
+        return false;
+      }
 
-    // The book may disallow changing to the given page.
-    if (!rslt) {
-      return false;
+      if (typeof callback == "function") {
+        callback(rslt.offset);
+      }
+
+      eData.pageNumber = rslt.page;
+      eData.componentId = rslt.componentId;
+      dispatchEvent("monocle:pagechange", eData);
     }
 
-    if (typeof callback == "function") {
-      callback(rslt.offset);
-    }
-
-    eData.pageNumber = rslt.page;
-    eData.componentId = rslt.componentId;
-    dispatchEvent("monocle:pagechange", eData);
-
-    return rslt.page;
+    return p.book.changePage(pageDiv.contentDiv, locus, callback);
   }
 
 
