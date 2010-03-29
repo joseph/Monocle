@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
+    <title>Framer test</title>
+
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/framer.js"></script>
+
+    <style type="text/css">
+      #reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+        margin: 2em;
+        float: left;
+      }
+    </style>
+
+
+    <script type="text/javascript">
+
+      var initFn = function () {
+        var bookData = {
+          getComponents: function () {
+            return [
+              'component1.xhtml',
+              'component2.xhtml',
+              'component3.xhtml',
+              'component4.xhtml'
+            ];
+          },
+          getContents: function () {
+            return [
+              {
+                title: "Chapter 1",
+                src: "component1.xhtml"
+              },
+              {
+                title: "Chapter 2",
+                src: "component3.xhtml#chapter-2"
+              }
+            ]
+          },
+          getComponent: function (componentId) {
+            return {
+              'component1.xhtml':
+                '<h1>Chapter 1</h1><p>Hello world</p>',
+              'component2.xhtml':
+                '<p>Chapter 1 continued.</p>',
+              'component3.xhtml':
+                '<p>Chapter 1 continued again.</p>' +
+                '<h1 id="chapter-2">Chapter 2</h1>' +
+                '<p>Hello from the second chapter.</p>',
+              'component4.xhtml':
+                '<p>THE END.</p>'
+            }[componentId];
+          },
+          getMetaData: function(key) {
+            return {
+              title: "A book",
+              creator: "Inventive Labs"
+            }[key];
+          }
+        }
+
+        var framer = Monocle.Framer('reader', bookData);
+      }
+      Monocle.addListener(window, 'load', initFn);
+    </script>
+  </head>
+
+  <body>
+    <h1>Framer test</h1>
+    <p>
+      Loads the reader in a dynamically generated iframe element (to sandbox
+      the JavaScript and CSS).
+    </p>
+
+    <div id="reader"></div>
+  </body>
+</html>
