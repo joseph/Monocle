@@ -72,6 +72,18 @@
         }
 
         var framer = Monocle.Framer();
+        framer.constants.stylesheets = ["framer.css"];
+        framer.constants.scripts = [
+          "../../src/monocle.js",
+          "../../src/compat.js",
+          "../../src/reader.js",
+          "../../src/book.js",
+          "../../src/component.js",
+          "../../src/place.js",
+          "../../src/styles.js",
+          "../../src/flippers/slider.js",
+          "../../src/flippers/legacy.js"
+        ];
         framer.newReader('reader', bookData);
       }
       Monocle.addListener(window, 'load', initFn);

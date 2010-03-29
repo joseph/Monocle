@@ -8,20 +8,11 @@ Monocle.Framer = function () {
   if (Monocle == this) { return new Monocle.Framer(); }
 
   var k = {
-    scripts: [
-      "../../src/monocle.js",
-      "../../src/compat.js",
-      "../../src/reader.js",
-      "../../src/book.js",
-      "../../src/component.js",
-      "../../src/place.js",
-      "../../src/styles.js",
-      "../../src/flippers/slider.js",
-      "../../src/flippers/legacy.js"
-    ],
-    documentStylesheet:
+    stylesheets: [],
+    documentStyles:
       "body { margin: 0; padding: 0; border: 0; }" +
-      "#rdr { width: 100%; height: 100%; position: absolute; }"
+      "#rdr { width: 100%; height: 100%; position: absolute; }",
+    scripts: ["monocle.js"]
   }
 
   var p = {
@@ -48,6 +39,11 @@ Monocle.Framer = function () {
     p.node.appendChild(p.frame);
     p.cWin = p.frame.contentWindow;
     var html = '<html><head>';
+    for (i = 0; i < k.stylesheets.length; ++i) {
+      html += '<link rel="stylesheet" type="text/css" href="' +
+        k.stylesheets[i] + '"/>';
+    }
+    html += '<style type="text/css">'+k.documentStyles+'</style>';
     for (var i = 0; i < k.scripts.length; ++i) {
       html += '<script type="text/javascript" src="'+k.scripts[i]+'"></script>';
     }
@@ -55,7 +51,6 @@ Monocle.Framer = function () {
       'Monocle.addListener(window, "load", function () {' +
         'window.framer.frameLoaded();' +
       '});</script>';
-    html += '<style type="text/css">'+k.documentStylesheet+'</style>';
     html += '</head><body><div id="rdr"></div></body></html>';
 
     doc = p.cWin.document;
