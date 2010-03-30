@@ -30,6 +30,11 @@ Monocle.Framer = function () {
   }
 
 
+  function setBase(href) {
+    p.baseHref = href;
+  }
+
+
   // Creates an iframe, populates it with the barest required HTML (including
   // all specified scripts and stylesheets), and waits for the HTML to load.
   // When it has fully loaded, frameLoaded() will be called to create the actual
@@ -52,6 +57,9 @@ Monocle.Framer = function () {
     p.node.appendChild(p.frame);
     p.cWin = p.frame.contentWindow;
     var html = '<html><head>';
+    if (p.baseHref) {
+      html += '<base href="'+p.baseHref+'" />';
+    }
     for (i = 0; i < k.stylesheets.length; ++i) {
       html += '<link rel="stylesheet" type="text/css" href="' +
         k.stylesheets[i] + '"/>';
@@ -93,6 +101,7 @@ Monocle.Framer = function () {
 
   initialize();
 
+  API.setBase = setBase;
   API.newReader = newReader;
   API.frameLoaded = frameLoaded;
 
