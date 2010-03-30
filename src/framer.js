@@ -73,6 +73,9 @@ Monocle.Framer = function () {
   function frameLoaded() {
     if (typeof p.cWin.Monocle != "undefined") {
       p.cWin.reader = p.cWin.Monocle.Reader('rdr', p.bookData, p.readerOptions);
+      if (typeof p.cWin.onMonocleReader == "function") {
+        p.cWin.onMonocleReader(p.cWin.reader);
+      }
     } else {
       p.cWin.onMonoclePiece = function (piece) {
         if (piece == k.waitForPiece) { frameLoaded(); }
