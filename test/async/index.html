@@ -36,21 +36,6 @@
       .reader p {
         line-height: 130%;
       }
-
-      .reader h1 {
-        text-align: center;
-      }
-      .reader h2 {
-        text-align: center;
-      }
-      .reader h3 {
-        text-align: center;
-      }
-      .reader p {
-        text-indent: -1em;
-        padding: 0 0 0 1em;
-        margin: 0;
-      }
       #part1, #part2 {
         display: none;
       }
@@ -78,7 +63,7 @@
           ]
         },
         getComponent: function (cmptId, callback) {
-          window.callback = callback;
+          window.receiveComponentData = callback;
           this.getViaAjax(cmptId);
         },
         getMetaData: function(key) {
@@ -86,12 +71,6 @@
             title: "Howl",
             creator: "Allen Ginsberg"
           }[key];
-        },
-        getViaSjax: function (path) {
-          var ajReq = new XMLHttpRequest();
-          ajReq.open("GET", path, false);
-          ajReq.send(null);
-          return ajReq.responseText;
         },
         getViaAjax: function (path) {
           var script = document.createElement('script');
