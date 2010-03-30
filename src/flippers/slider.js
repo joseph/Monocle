@@ -93,7 +93,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       pageDiv.scrollerDiv.scrollLeft = rslt.offset;
       setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);
     }
-    return p.setPageFn(pageDiv, locus, spCallback);
+    if (p.setPageFn(pageDiv, locus, spCallback) == false) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
 

@@ -78,7 +78,7 @@
           ]
         },
         getComponent: function (cmptId, callback) {
-                        window.callback = callback;
+          window.callback = callback;
           this.getViaAjax(cmptId);
         },
         getMetaData: function(key) {
@@ -109,7 +109,7 @@
         window,
         'load',
         function () {
-          window.reader = Monocle.Reader('reader', bookData, { flipper: Monocle.Flippers.Instant } );
+          window.reader = Monocle.Reader('reader', bookData);
         }
       );
     </script>
