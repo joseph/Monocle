@@ -19,6 +19,7 @@
 
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
     <style type="text/css">
@@ -77,7 +78,8 @@
           ]
         },
         getComponent: function (cmptId, callback) {
-          callback(this.getViaSjax(cmptId));
+                        window.callback = callback;
+          this.getViaAjax(cmptId);
         },
         getMetaData: function(key) {
           return {
@@ -107,7 +109,7 @@
         window,
         'load',
         function () {
-          window.reader = Monocle.Reader('reader', bookData);
+          window.reader = Monocle.Reader('reader', bookData, { flipper: Monocle.Flippers.Instant } );
         }
       );
     </script>
