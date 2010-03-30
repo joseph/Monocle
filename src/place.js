@@ -107,3 +107,5 @@ Monocle.Place.FromPercentageThrough = function (component, percent) {
   place.setPercentageThrough(component, percent);
   return place;
 }
+
+Monocle.pieceLoaded('place');

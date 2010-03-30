@@ -83,6 +83,7 @@
           "../../src/flippers/slider.js",
           "../../src/flippers/legacy.js"
         ];
+        framer.constants.waitForPiece = 'flippers/legacy';
         framer.newReader('reader', bookData);
       }
       Monocle.addListener(window, 'load', initFn);

@@ -242,3 +242,5 @@ Monocle.Styles.Controls.Scrubber = {
   }
 }
 
+
+Monocle.pieceLoaded('controls/scrubber');

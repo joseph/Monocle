@@ -104,3 +104,5 @@ Monocle.Styles.Controls.Magnifier = {
     "font-size": "11px"
   }
 }
+
+Monocle.pieceLoaded('controls/magnifier');

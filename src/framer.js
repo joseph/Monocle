@@ -12,7 +12,8 @@ Monocle.Framer = function () {
     documentStyles:
       "body { margin: 0; padding: 0; border: 0; }" +
       "#rdr { width: 100%; height: 100%; position: absolute; }",
-    scripts: ["monocle.js"]
+    scripts: ["monocle.js"],
+    waitForPiece: 'monocle'
   }
 
   var p = {
@@ -29,6 +30,11 @@ Monocle.Framer = function () {
   }
 
 
+  // Creates an iframe, populates it with the barest required HTML (including
+  // all specified scripts and stylesheets), and waits for the HTML to load.
+  // When it has fully loaded, frameLoaded() will be called to create the actual
+  // reader instance.
+  //
   function newReader(node, bookData, options) {
     p.node = typeof(node) == "string" ? document.getElementById(node) : node;
     p.bookData = bookData;
@@ -47,22 +53,31 @@ Monocle.Framer = function () {
     for (var i = 0; i < k.scripts.length; ++i) {
       html += '<script type="text/javascript" src="'+k.scripts[i]+'"></script>';
     }
-    html += '<script type="text/javascript">' +
-      'Monocle.addListener(window, "load", function () {' +
-        'window.framer.frameLoaded();' +
-      '});</script>';
-    html += '</head><body><div id="rdr"></div></body></html>';
+    html += '</head><body>' +
+      '<div id="rdr"></div>' +
+      '<script type="text/javascript">window.framer.frameLoaded();</script>' +
+      '</body></html>';
 
     doc = p.cWin.document;
     doc.open();
-    doc.write(html);
     p.cWin.framer = API;
+    doc.write(html);
     doc.close();
   }
 
 
+  // If all the required libraries are loaded, we can create the reader.
+  // Otherwise, we should wait for the libraries. Make sure that
+  // k.waitForPiece is set to the final piece you depend on.
+  //
   function frameLoaded() {
-    p.cWin.reader = p.cWin.Monocle.Reader('rdr', p.bookData, p.readerOptions);
+    if (typeof p.cWin.Monocle != "undefined") {
+      p.cWin.reader = p.cWin.Monocle.Reader('rdr', p.bookData, p.readerOptions);
+    } else {
+      p.cWin.onMonoclePiece = function (piece) {
+        if (piece == k.waitForPiece) { frameLoaded(); }
+      }
+    }
   }
 
 
@@ -81,3 +96,5 @@ Monocle.Styles.framer = {
   "border": "0",
   "display": "block"
 }
+
+Monocle.pieceLoaded('framer');

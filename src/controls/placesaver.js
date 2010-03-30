@@ -109,3 +109,6 @@ Monocle.Controls.PlaceSaver = function (reader) {
 
   return API;
 }
+
+
+Monocle.pieceLoaded('controls/placesaver');

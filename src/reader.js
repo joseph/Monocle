@@ -619,3 +619,5 @@ Monocle.Reader = function (node, bookData, options) {
 
   return API;
 }
+
+Monocle.pieceLoaded('reader');

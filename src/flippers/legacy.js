@@ -164,3 +164,6 @@ Monocle.Styles.Flippers.Legacy = {
     "margin-top": "3px"
   }
 }
+
+
+Monocle.pieceLoaded('flippers/legacy');

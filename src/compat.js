@@ -57,3 +57,5 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
   }
 
 }
+
+Monocle.pieceLoaded('compat');

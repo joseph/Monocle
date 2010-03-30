@@ -432,3 +432,5 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   return API;
 }
+
+Monocle.pieceLoaded('component');

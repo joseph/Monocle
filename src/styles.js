@@ -69,3 +69,5 @@ Monocle.Styles.Controls = {
 Monocle.Styles.Flippers = {
   // A separate namespace for flippers.
 }
+
+Monocle.pieceLoaded('styles');

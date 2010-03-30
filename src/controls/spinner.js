@@ -80,3 +80,6 @@ Monocle.Styles.Controls.Spinner = {
     "background-position": "center center"
   }
 }
+
+
+Monocle.pieceLoaded('controls/spinner');
