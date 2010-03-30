@@ -462,3 +462,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   return API;
 }
+
+
+Monocle.pieceLoaded('flippers/slider');

@@ -115,3 +115,5 @@ Monocle.Styles.Controls.Contents = {
     "cursor": "pointer"
   }
 }
+
+Monocle.pieceLoaded('controls/contents');

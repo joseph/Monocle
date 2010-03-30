@@ -304,3 +304,5 @@ Monocle.Book.fromHTML = function (html) {
 
   return new Monocle.Book(bookData);
 }
+
+Monocle.pieceLoaded('book');

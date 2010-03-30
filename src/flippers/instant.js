@@ -103,3 +103,6 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
   return API;
 }
+
+
+Monocle.pieceLoaded('flippers/instant');
