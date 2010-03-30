@@ -37,8 +37,15 @@ Monocle.Framer = function () {
   //
   function newReader(node, bookData, options) {
     p.node = typeof(node) == "string" ? document.getElementById(node) : node;
-    p.bookData = bookData;
     p.readerOptions = options;
+    p.bookData = bookData || {
+      getComponents: function () { return ['anonymous']; },
+      getContents: function () { return []; },
+      getComponent: function (n) { return p.originalHTML; },
+      getMetaData: function (key) { }
+    };
+    p.originalHTML = p.node.innerHTML;
+    p.node.innerHTML = "";
     p.frame = document.createElement("IFRAME");
     p.frame.src = "javascript: null;";
     p.frame.style.cssText = Monocle.Styles.ruleText('framer');

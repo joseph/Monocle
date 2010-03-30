@@ -1,6 +1,6 @@
 function createToC(reader) {
   var toc = Monocle.Controls.Contents(reader);
-  reader.addControl(toc, 'popover');
+  reader.addControl(toc, 'popover', { hidden: true });
   reader.addListener(
     'monocle:contact:start:unhandled',
     function () {
@@ -15,3 +15,7 @@ function createToC(reader) {
 function onMonocleReader(reader) {
   createToC(reader);
 }
+
+
+// Well, there's no reason we can't use this feature ourselves.
+Monocle.pieceLoaded('framerCustomScript');
