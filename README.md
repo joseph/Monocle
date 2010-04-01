@@ -273,6 +273,7 @@ You can set the flipper as an option to the Reader initialization command, eg:
 Monocle comes with three built in flipper classes:
 
 * `Monocle.Flippers.Slider` - the animated, sliding page turns (default)
+* `Monocle.Flippers.Scroller` - text rolls across the screen, like a scroll
 * `Monocle.Flippers.Instant` - pages immediately change, without animation
 * `Monocle.Flippers.Legacy` - for browsers that don't support columns.
 

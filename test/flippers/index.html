@@ -18,6 +18,7 @@
 
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/scroller.js"></script>
     <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
@@ -98,11 +99,16 @@
             { flipper: Monocle.Flippers.Slider }
           );
           window.reader2 = Monocle.Reader(
+            'scroller',
+            bookData,
+            { flipper: Monocle.Flippers.Scroller }
+          );
+          window.reader3 = Monocle.Reader(
             'instant',
             bookData,
             { flipper: Monocle.Flippers.Instant }
           );
-          window.reader3 = Monocle.Reader(
+          window.reader4 = Monocle.Reader(
             'legacy',
             bookData,
             { flipper: Monocle.Flippers.Legacy }
@@ -116,6 +122,8 @@
   <body>
 
     <div class="reader" id="slider"></div>
+
+    <div class="reader" id="scroller"></div>
 
     <div class="reader" id="instant"></div>
 
