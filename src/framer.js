@@ -73,7 +73,7 @@ Monocle.Framer = function () {
       '<script type="text/javascript">window.framer.frameLoaded();</script>' +
       '</body></html>';
 
-    doc = p.cWin.document;
+    var doc = p.cWin.document;
     doc.open();
     p.cWin.framer = API;
     doc.write(html);
