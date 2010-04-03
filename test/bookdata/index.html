@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
+    <title>BookData test</title>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
+    <script type="text/javascript" src="../../src/framer.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
+
+    <style type="text/css">
+      .readerInfo {
+        width: 300px;
+        float: left;
+        padding-right: 20px;
+      }
+      .condition {
+        color: #C90;
+      }
+      .reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+      }
+      .reader p {
+        line-height: 130%;
+      }
+
+      .reader h3 {
+        text-align: center;
+      }
+      .reader p {
+        text-indent: 1em;
+        padding: 0;
+        margin: 0;
+      }
+      .reader h3 + p {
+        text-indent: 0;
+      }
+      .reader h3 + p:first-letter {
+        font-size: 300%;
+        font-weight: bold;
+        float: left;
+        padding: 6px 4px 0 0;
+      }
+      #part1, #part2 {
+        display: none;
+      }
+    </style>
+
+    <script type="text/javascript">
+      var bookData = function (methods) {
+        for (var mthd in methods) {
+          this[mthd] = methods[mthd];
+        }
+      }
+
+      bookData.prototype.getComponents = function () {
+        return this.components;
+      }
+
+      bookData.prototype.getContents = function () {
+        return [];
+      }
+
+      bookData.prototype.getComponent = function (cmptId) {
+        var path = "components/"+cmptId+".html";
+        var ajReq = new XMLHttpRequest();
+        ajReq.open("GET", path, false);
+        ajReq.send(null);
+        return ajReq.responseText;
+      }
+
+      bookData.prototype.getMetaData =  function(key) {
+        return {
+          title: "Lorem Ipsum",
+          creator: "Mr Monocle"
+        }[key];
+      }
+
+      function inlineReader(num, cmpt) {
+        var bd = new bookData({components: [cmpt]});
+        return window['reader'+num] = Monocle.Reader('reader'+num, bd);
+      }
+
+      function framedReader(num, cmpt) {
+        var bd = new bookData({components: [cmpt]});
+        var framer = Monocle.Framer();
+        framer.constants.scripts = [
+          "../../src/monocle.js",
+          "../../src/compat.js",
+          "../../src/reader.js",
+          "../../src/book.js",
+          "../../src/component.js",
+          "../../src/place.js",
+          "../../src/styles.js",
+          "../../src/flippers/slider.js",
+          "../../src/flippers/legacy.js"
+        ]
+        framer.constants.waitForPiece = 'flippers/legacy';
+        return window['reader'+num] = framer.newReader('reader'+num, bd);
+      }
+
+      // Initialize the reader element.
+      Monocle.addListener(
+        window,
+        'load',
+        function () {
+          inlineReader(1, '01-basic-body-only');
+          inlineReader(2, '02-basic-full-document');
+          inlineReader(3, '03-empty');
+          inlineReader(4, '04-short-document');
+          inlineReader(5, '05-short-document-with-image');
+          framedReader(6, '06-document-with-stylesheet');
+          framedReader(7, '07-contains-javascript');
+        }
+      );
+    </script>
+
+  </head>
+
+  <body>
+
+    <div class="readerInfo">
+      <h2>01</h2>
+      <div class="reader" id="reader1"></div>
+      <p>
+        Component with just HTML content tags (no html, head, body etc).
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>02</h2>
+      <div class="reader" id="reader2"></div>
+      <p>
+        A full HTML document including head and body tags.
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>03</h2>
+      <div class="reader" id="reader3"></div>
+      <p>
+        Empty component, containing only whitespace.
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>04</h2>
+      <div class="reader" id="reader4"></div>
+      <p>
+        Two page document.
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>05</h2>
+      <div class="reader" id="reader5"></div>
+      <p>
+        Short document with image.
+        <span class="condition">Image should fit on one page.</span>
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>06</h2>
+      <div class="reader" id="reader6"></div>
+      <p>
+        Document with external stylesheet.
+        <span class="condition">Text should be white on black.</span>
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>07</h2>
+      <div class="reader" id="reader7"></div>
+      <p>
+        Component contains inline javascript to write a message to screen.
+        <span class="condition">If not blank, javascript has executed.</span>
+      </p>
+    </div>
+
+  </body>
+</html>
