@@ -91,7 +91,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function setPage(pageDiv, locus, callback) {
     var spCallback = function (offset) {
-      console.log("Offset: " + offset);
       //pageDiv.contentDocument.body.scrollLeft = offset;
       //pageDiv.contentFrame.contentWindow.scrollTo(offset, 0);
       pageDiv.contentDocument.body.style.left = "-"+offset+"px";

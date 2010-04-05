@@ -57,7 +57,8 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   function moveTo(locus) {
     var spCallback = function (offset) {
-      var jump = (offset - p.page.contentDocument.body.scrollLeft) / (k.speed / k.rate);
+      var jump = (offset - p.page.contentDocument.body.scrollLeft) /
+        (k.speed / k.rate);
       var div = p.page.contentDocument.body;
       clearTimeout(p.timer);
       p.timer = setInterval(

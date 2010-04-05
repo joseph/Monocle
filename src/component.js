@@ -155,18 +155,15 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     p.clientNodes.push(node);
 
-    // Any top-level text node will be inserted into a fresh
-    // div parent before being added to the array -- unless it is blank, in
-    // which case it is discarded. (In this way we ensure that all items
-    // in the array are Elements.)
-    //
-    // TODO: pull out <link rel="stylesheet"> and <style> tags, apply to head.
-    // TODO: pluck body from html, apply to tmpDiv.
-    // TODO: rewrite internal links
+
+    // TODO: if we have any existing clientFrame, just clone it.
+
 
     //node.open();
     node.write(p.html);
     //node.close();
+
+    // TODO: move to Styles?
     node.body.style.cssText =
       "margin: 0;" +
       "padding: 0;" +
@@ -177,12 +174,21 @@ Monocle.Component = function (book, id, index, chapters, html) {
       "-webkit-column-fill: auto;" +
       "-moz-column-gap: 0;" +
       "-moz-column-fill: 0;" +
+
+      // FIXME: Firefox hates this, but Safari requires it to hide scrollbars:
       //"overflow: hidden;" +
+
+      // FIXME: these should be set whenever dimensions have changed.
       "-webkit-column-width: " + node.body.clientWidth + "px;" +
       "-moz-column-width: " + node.body.clientWidth + "px;";
 
-    console.log("Applied new document body.");
+    // TODO: rewrite internal links
 
+    // Any top-level text node will be inserted into a fresh
+    // div parent before being added to the array -- unless it is blank, in
+    // which case it is discarded. (In this way we ensure that all items
+    // in the array are Elements.)
+    //
     var elem = node.body.firstChild;
     while (elem) {
       if (elem.nodeType == 3) {
@@ -208,6 +214,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     return (!p.clientDimensions) ||
       //(p.clientDimensions.width != node.body.clientWidth) ||
       (p.clientDimensions.height != node.body.clientHeight);// ||
+
+      // FIXME: need a better solution for detecting scaled-up text.
       //(p.clientDimensions.fontSize != node.style.fontSize);
   }
 
@@ -256,6 +264,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
       width: 263, //node.body.clientWidth,
       height: node.body.clientHeight,
       scrollWidth: node.body.scrollWidth//,
+
+      // FIXME: need a better solution for detecting scaled-up text.
       //fontSize: node.style.fontSize
     }
 

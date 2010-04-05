@@ -31,10 +31,10 @@ Monocle.Styles.page = {
 Monocle.Styles.scroller = {
   "position": "absolute",
   "top": "1em",
-  "bottom": "1.6em",
+  "bottom": "1em",
   "left": "1em",
   "right": "1em",
-  "overflow": "hidden"
+  "overflow": "hidden" // Required by MobileSafari to constrain inner iFrame.
 }
 
 Monocle.Styles.content = {
