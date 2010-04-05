@@ -106,8 +106,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // which case it is discarded. (In this way we ensure that all items
     // in the array are Elements.)
     //
+    var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
+    var html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
+
+
+    // TODO: pull out <link rel="stylesheet"> and <style> tags, apply to head.
+    // TODO: pluck body from html, apply to tmpDiv.
+    // TODO: rewrite internal links
+
     var tmpDiv = document.createElement('div');
-    tmpDiv.innerHTML = p.html;
+    tmpDiv.innerHTML = html;
+
     while (tmpDiv.hasChildNodes()) {
       var node = tmpDiv.removeChild(tmpDiv.firstChild);
       if (node.nodeType == 1) {
@@ -204,6 +213,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     if (haveDimensionsChanged(node)) {
       removeElementsFrom(node);
       addElementsTo(node, p.elementsForClient[nodeIndex(node)]);
+      clampCSS(node);
       //positionImages(node);
       measureDimensions(node);
       locateChapters(node);
@@ -247,6 +257,25 @@ Monocle.Component = function (book, id, index, chapters, html) {
       (p.clientDimensions.width != node.parentNode.offsetWidth) ||
       (p.clientDimensions.height != node.parentNode.offsetHeight) ||
       (p.clientDimensions.fontSize != node.style.fontSize);
+  }
+
+
+  function clampCSS(node) {
+    console.log('Clamping css for ' + node);
+    var clampDimensions = function (elem) {
+      elem.style.cssText +=
+        "float: left;" +
+        "max-width: 100% !important;" +
+        "max-height: 100% !important; ";
+    }
+    var elems = node.getElementsByTagName('img');
+    for (var i = elems.length - 1; i >= 0; --i) {
+      clampDimensions(elems[i]);
+    }
+    var elems = node.getElementsByTagName('table');
+    for (var i = elems.length - 1; i >= 0; --i) {
+      clampDimensions(elems[i]);
+    }
   }
 
 
