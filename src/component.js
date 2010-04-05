@@ -51,20 +51,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     //
     elementsForClient: [],
 
-    // An array of chunk objects, that split up an elements array into more
-    // manageable slices. A chunk object is defined as:
-    //  {
-    //    firstElementIndex: n,
-    //    lastElementIndex: n,
-    //    firstPageNumber: n,
-    //    lastPageNumber: n
-    //  }
-    //
-    //  This data is invalidated by dimensional changes in the reader, because
-    //  the page numbers may change.
-    //
-    //chunks: [],
-
     // The current dimensions of the client node that holds the elements of
     // this component. (The assumption is that all client nodes will have
     // identical dimensions — otherwise nothing will work as expected.)
@@ -111,14 +97,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function prepareNode(node, pageN) {
-    return;
-    for (var i = 0; i < p.chunks.length; ++i) {
-      if (p.chunks[i].firstPageNumber - 1 <= pageN) {
-        appendChunk(node, p.chunks[i]);
-      } else {
-        detachChunk(node, p.chunks[i]);
-      }
-    }
   }
 
 
@@ -148,38 +126,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function appendChunk(node, chunk) {
-    var slice = p.elementsForClient[nodeIndex(node)].slice(
-      chunk.firstElementIndex,
-      chunk.lastElementIndex
-    );
-
-    if (slice[0].parentNode == node) {
-      return;
-    }
-
-    addElementsTo(node, slice);
-  }
-
-
-  function detachChunk(node, chunk) {
-    var slice = p.elementsForClient[nodeIndex(node)].slice(
-      chunk.firstElementIndex,
-      chunk.lastElementIndex
-    );
-
-    if (slice[0].parentNode != node) {
-      return;
-    }
-
-    removeElementsFrom(node, slice);
-  }
-
-
   function applyTo(node) {
     p.clientNodes[nodeIndex(node)] = null;
     registerClient(node);
-    //removeElementsFrom(node);
   }
 
 
@@ -187,20 +136,10 @@ Monocle.Component = function (book, id, index, chapters, html) {
     registerClient(node);
 
     if (haveDimensionsChanged(node)) {
-      //removeElementsFrom(node.body);
-      //addElementsTo(node.body, p.elementsForClient[nodeIndex(node)]);
       clampCSS(node);
       //positionImages(node);
       measureDimensions(node);
       locateChapters(node);
-      //tmpLocateOcclusions(node);
-      //primeChunks(node);
-
-      // Remove elements from all client nodes, because they'll need to
-      // be re-applied with the new chunks.
-      //for (var i = 0; i < p.clientNodes.length; ++i) {
-      //  removeElementsFrom(p.clientNodes[i]);
-      //}
 
       return true;
     } else {
@@ -244,19 +183,23 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     console.log("Applied new document body.");
 
-    var elems = p.elementsForClient[nodeIndex(node)] = [];
-
-    while (node.body.hasChildNodes()) {
-      var n = node.body.removeChild(node.body.firstChild);
-      if (n.nodeType == 1) {
-        elems.push(n);
-      } else if (n.nodeType == 3 && !n.nodeValue.match(/^\s+$/)) {
-        var elem = document.createElement('div');
-        elem.appendChild(n);
-        elems.push(elem);
+    var elem = node.body.firstChild;
+    while (elem) {
+      if (elem.nodeType == 3) {
+        var textNode = elem;
+        if (elem.nodeValue.match(/^\s+$/)) {
+          elem = textNode.nextSibling;
+          textNode.parentNode.removeChild(textNode);
+        } else {
+          elem = node.createElement('div');
+          textNode.parentNode.insertBefore(elem, textNode);
+          textNode.parentNode.removeChild(textNode);
+        }
+      }
+      if (elem) {
+        elem = elem.nextSibling;
       }
     }
-    addElementsTo(node.body, elems);
   }
 
 
@@ -349,107 +292,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     node.body.scrollLeft = 0;
 
     return p.chapters;
-  }
-
-
-  // Just a test method for finding "occlusions" — which here means elements
-  // that appear at the top of a column. These can be used to do special
-  // occluded chunking — where past chunks can be *removed* from the element
-  // without appearing to reflow the content. This means less is being scrolled,
-  // and slower devices are better able to 3d-render the overPage.
-  //
-  function tmpLocateOcclusions(node) {
-    if (!node.getBoundingClientRect) {
-      console.log('Occlusion not supported');
-      return;
-    } else {
-      console.log('Locating occlusions');
-    }
-
-    var topElems = [];
-    var cRect = node.getBoundingClientRect();
-    for (var i = 0; i < node.childNodes.length; ++i) {
-      var elem = node.childNodes[i];
-      var prevElem = node.childNodes[i - 1];
-      if (!prevElem) {
-        topElems.push(elem);
-      } else {
-        var nRect = elem.getBoundingClientRect();
-        var pRect = prevElem.getBoundingClientRect();
-        if (pRect.bottom <= cRect.bottom && nRect.top <= pRect.top) {
-          topElems.push(elem);
-        }
-      }
-      elem.style.color = "#000"; // FOR DEBUGGING
-    }
-
-    for (i = 0; i < topElems.length; ++i) {
-      topElems[i].style.color = "#F0F"; // FOR DEBUGGING
-    }
-  }
-
-
-  // NB: we could also do chunking on the following:
-  //
-  //  - occlusions
-  //  - start of a section
-  //  - print media - pagebreak CSS?
-  //
-  function primeChunks(node) {
-    p.chunks = [];
-    var elements = p.elementsForClient[nodeIndex(node)];
-    // .. average 1 chunk every 4 pages.
-    var pagesRemaining = p.clientDimensions.pages;
-    var chunkSize = Math.ceil(elements.length / (pagesRemaining / 4));
-    var chunkCount = Math.ceil(elements.length / chunkSize);
-
-    var elemCount = 0;
-    for (var i = 0; i < chunkCount; ++i) {
-      for (var j = 0; j < chunkSize && node.hasChildNodes(); ++j, ++elemCount) {
-        node.removeChild(node.firstChild);
-      }
-      var newPagesRemaining = Math.floor(
-        node.body.scrollWidth / p.clientDimensions.width
-      );
-      p.chunks.push({
-        firstElementIndex: elemCount - j,
-        lastElementIndex: elemCount,
-        firstPageNumber: (p.clientDimensions.pages - pagesRemaining) + 1,
-        lastPageNumber: (p.clientDimensions.pages - newPagesRemaining) + 1
-      });
-      pagesRemaining = newPagesRemaining;
-    }
-
-    return p.chunks;
-  }
-
-
-  function addElementsTo(node, elementArray) {
-    var len = elementArray.length;
-    for (var i = 0; i < len; ++i) {
-      node.appendChild(elementArray[i]);
-    }
-    return len;
-  }
-
-
-  function removeElementsFrom(node, elementArray) {
-    var len;
-    if (elementArray) {
-      len = elementArray.length;
-      for (var i = 0; i < len; ++i) {
-        if (elementArray[i].parentNode == node) {
-          node.removeChild(elementArray[i]);
-        }
-      }
-      return len;
-    }
-
-    len = node.childNodes.length;
-    while (node.hasChildNodes()) {
-      node.removeChild(node.firstChild);
-    }
-    return len;
   }
 
 
