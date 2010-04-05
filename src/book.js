@@ -145,7 +145,7 @@ Monocle.Book = function (dataSource) {
     return {
       componentId: component.properties.id,
       page: pageN,
-      offset: (pageN - 1) * node.parentNode.offsetWidth
+      offset: (pageN - 1) * 263
     }
   }
 

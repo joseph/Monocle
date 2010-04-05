@@ -63,7 +63,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     //  This data is invalidated by dimensional changes in the reader, because
     //  the page numbers may change.
     //
-    chunks: [],
+    //chunks: [],
 
     // The current dimensions of the client node that holds the elements of
     // this component. (The assumption is that all client nodes will have
@@ -100,34 +100,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var elems = p.elementsForClient[0] = [];
 
-    // Populate the zeroth view of elements with the elements from a
-    // temporary div. Any top-level text node will be inserted into a fresh
-    // div parent before being added to the array -- unless it is blank, in
-    // which case it is discarded. (In this way we ensure that all items
-    // in the array are Elements.)
-    //
     var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-    var html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
-
-
-    // TODO: pull out <link rel="stylesheet"> and <style> tags, apply to head.
-    // TODO: pluck body from html, apply to tmpDiv.
-    // TODO: rewrite internal links
-
-    var tmpDiv = document.createElement('div');
-    tmpDiv.innerHTML = html;
-
-    while (tmpDiv.hasChildNodes()) {
-      var node = tmpDiv.removeChild(tmpDiv.firstChild);
-      if (node.nodeType == 1) {
-        elems.push(node);
-      } else if (node.nodeType == 3 && !node.nodeValue.match(/^\s+$/)) {
-        var elem = document.createElement('div');
-        elem.appendChild(node)
-        elems.push(elem);
-      }
-    }
-    delete(tmpDiv);
+    p.html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
   }
 
 
@@ -137,6 +111,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function prepareNode(node, pageN) {
+    return;
     for (var i = 0; i < p.chunks.length; ++i) {
       if (p.chunks[i].firstPageNumber - 1 <= pageN) {
         appendChunk(node, p.chunks[i]);
@@ -202,8 +177,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function applyTo(node) {
+    p.clientNodes[nodeIndex(node)] = null;
     registerClient(node);
-    removeElementsFrom(node);
+    //removeElementsFrom(node);
   }
 
 
@@ -211,20 +187,20 @@ Monocle.Component = function (book, id, index, chapters, html) {
     registerClient(node);
 
     if (haveDimensionsChanged(node)) {
-      removeElementsFrom(node);
-      addElementsTo(node, p.elementsForClient[nodeIndex(node)]);
+      //removeElementsFrom(node.body);
+      //addElementsTo(node.body, p.elementsForClient[nodeIndex(node)]);
       clampCSS(node);
       //positionImages(node);
       measureDimensions(node);
       locateChapters(node);
       //tmpLocateOcclusions(node);
-      primeChunks(node);
+      //primeChunks(node);
 
       // Remove elements from all client nodes, because they'll need to
       // be re-applied with the new chunks.
-      for (var i = 0; i < p.clientNodes.length; ++i) {
-        removeElementsFrom(p.clientNodes[i]);
-      }
+      //for (var i = 0; i < p.clientNodes.length; ++i) {
+      //  removeElementsFrom(p.clientNodes[i]);
+      //}
 
       return true;
     } else {
@@ -240,23 +216,56 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     p.clientNodes.push(node);
 
-    if (!p.elementsForClient[nodeIndex(node)]) {
-      var sourceElems = p.elementsForClient[0];
-      var destElems = p.elementsForClient[nodeIndex(node)] = [];
-      var len = sourceElems.length;
-      for (var i = 0; i < len; ++i) {
-        destElems[i] = sourceElems[i].cloneNode(true);
+    // Any top-level text node will be inserted into a fresh
+    // div parent before being added to the array -- unless it is blank, in
+    // which case it is discarded. (In this way we ensure that all items
+    // in the array are Elements.)
+    //
+    // TODO: pull out <link rel="stylesheet"> and <style> tags, apply to head.
+    // TODO: pluck body from html, apply to tmpDiv.
+    // TODO: rewrite internal links
+
+    //node.open();
+    node.write(p.html);
+    //node.close();
+    node.body.style.cssText =
+      "margin: 0;" +
+      "padding: 0;" +
+      "position: absolute;" +
+      "height: 100%;" +
+      "min-width: 200%;" +
+      "-webkit-column-gap: 0;" +
+      "-webkit-column-fill: auto;" +
+      "-moz-column-gap: 0;" +
+      "-moz-column-fill: 0;" +
+      //"overflow: hidden;" +
+      "-webkit-column-width: " + node.body.clientWidth + "px;" +
+      "-moz-column-width: " + node.body.clientWidth + "px;";
+
+    console.log("Applied new document body.");
+
+    var elems = p.elementsForClient[nodeIndex(node)] = [];
+
+    while (node.body.hasChildNodes()) {
+      var n = node.body.removeChild(node.body.firstChild);
+      if (n.nodeType == 1) {
+        elems.push(n);
+      } else if (n.nodeType == 3 && !n.nodeValue.match(/^\s+$/)) {
+        var elem = document.createElement('div');
+        elem.appendChild(n);
+        elems.push(elem);
       }
     }
+    addElementsTo(node.body, elems);
   }
 
 
   // Returns true or false.
   function haveDimensionsChanged(node) {
     return (!p.clientDimensions) ||
-      (p.clientDimensions.width != node.parentNode.offsetWidth) ||
-      (p.clientDimensions.height != node.parentNode.offsetHeight) ||
-      (p.clientDimensions.fontSize != node.style.fontSize);
+      //(p.clientDimensions.width != node.body.clientWidth) ||
+      (p.clientDimensions.height != node.body.clientHeight);// ||
+      //(p.clientDimensions.fontSize != node.style.fontSize);
   }
 
 
@@ -301,14 +310,14 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function measureDimensions(node) {
     p.clientDimensions = {
-      width: node.parentNode.offsetWidth,
-      height: node.parentNode.offsetHeight,
-      scrollWidth: node.parentNode.scrollWidth,
-      fontSize: node.style.fontSize
+      width: 263, //node.body.clientWidth,
+      height: node.body.clientHeight,
+      scrollWidth: node.body.scrollWidth//,
+      //fontSize: node.style.fontSize
     }
 
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
-      var lcEnd = node.lastChild.offsetTop + node.lastChild.offsetHeight;
+      var lcEnd = node.body.lastChild.offsetTop + node.body.lastChild.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
         (lcEnd > p.clientDimensions.height ? 2 : 1);
     }
@@ -316,6 +325,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.clientDimensions.pages = Math.ceil(
       p.clientDimensions.scrollWidth / p.clientDimensions.width
     );
+    console.log("Pages: "+p.clientDimensions.pages);
 
     return p.clientDimensions;
   }
@@ -336,7 +346,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
         }
       }
     }
-    node.parentNode.scrollLeft = 0;
+    node.body.scrollLeft = 0;
 
     return p.chapters;
   }
@@ -399,7 +409,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
         node.removeChild(node.firstChild);
       }
       var newPagesRemaining = Math.floor(
-        node.parentNode.scrollWidth / p.clientDimensions.width
+        node.body.scrollWidth / p.clientDimensions.width
       );
       p.chunks.push({
         firstElementIndex: elemCount - j,

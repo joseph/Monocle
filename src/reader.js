@@ -143,8 +143,10 @@ Monocle.Reader = function (node, bookData, options) {
       page.scrollerDiv = document.createElement('div');
       page.appendChild(page.scrollerDiv);
 
-      page.contentDiv = document.createElement('div');
-      page.scrollerDiv.appendChild(page.contentDiv);
+      page.contentFrame = document.createElement('iframe');
+      page.contentFrame.src = "javascript: '';";
+      page.scrollerDiv.appendChild(page.contentFrame);
+      page.contentDocument = page.contentFrame.contentWindow.document;
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
@@ -177,7 +179,7 @@ Monocle.Reader = function (node, bookData, options) {
       var page = p.divs.pages[i];
       page.style.cssText = Monocle.Styles.ruleText('page');
       page.scrollerDiv.style.cssText = Monocle.Styles.ruleText('scroller');
-      page.contentDiv.style.cssText = Monocle.Styles.ruleText('content');
+      page.contentFrame.style.cssText = Monocle.Styles.ruleText('content');
     }
     p.divs.overlay.style.cssText = Monocle.Styles.ruleText('overlay');
   }
@@ -238,7 +240,7 @@ Monocle.Reader = function (node, bookData, options) {
       p.pageWidth = measuringPage.offsetWidth;
       var cWidth = measuringPage.scrollerDiv.offsetWidth;
       for (var i = 0; i < p.divs.pages.length; ++i) {
-        var cDiv = p.divs.pages[i].contentDiv;
+        var cDiv = p.divs.pages[i].contentDocument.body;
         cDiv.style.webkitColumnWidth = cDiv.style.MozColumnWidth = cWidth+"px";
       }
     } else {
@@ -283,7 +285,7 @@ Monocle.Reader = function (node, bookData, options) {
   //
   function skipToChapter(src) {
     var page = p.flipper.visiblePages()[0];
-    var place = p.book.placeOfChapter(page.contentDiv, src);
+    var place = p.book.placeOfChapter(page.contentDocument, src);
     moveTo(place.getLocus());
   }
 
@@ -302,7 +304,7 @@ Monocle.Reader = function (node, bookData, options) {
       return;
     }
 
-    var rslt = p.book.changePage(pageDiv.contentDiv, locus);
+    var rslt = p.book.changePage(pageDiv.contentDocument, locus);
 
     // The book may disallow changing to the given page.
     if (!rslt) {

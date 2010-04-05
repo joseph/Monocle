@@ -79,7 +79,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function getPlace(pageDiv) {
     pageDiv = pageDiv || upperPage();
-    return p.reader.getBook().placeFor(pageDiv.contentDiv);
+    return p.reader.getBook().placeFor(pageDiv.contentDocument);
   }
 
 
@@ -91,7 +91,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function setPage(pageDiv, locus, callback) {
     var spCallback = function (offset) {
-      pageDiv.scrollerDiv.scrollLeft = offset;
+      console.log("Offset: " + offset);
+      //pageDiv.contentDocument.body.scrollLeft = offset;
+      //pageDiv.contentFrame.contentWindow.scrollTo(offset, 0);
+      pageDiv.contentDocument.body.style.left = "-"+offset+"px";
       setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);
     }
     return p.setPageFn(pageDiv, locus, spCallback);

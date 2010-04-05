@@ -31,22 +31,22 @@ Monocle.Styles.page = {
 Monocle.Styles.scroller = {
   "position": "absolute",
   "top": "1em",
-  "bottom": "1em",
+  "bottom": "1.6em",
   "left": "1em",
   "right": "1em",
   "overflow": "hidden"
 }
 
 Monocle.Styles.content = {
-  "position": "absolute",
-  "top": "0",
-  "bottom": "0",
-  "min-width": "200%",
-  "-webkit-text-size-adjust": "none",
-  "-webkit-column-gap": "0",
-  "-webkit-column-fill": "auto",
-  "-moz-column-gap": "0",
-  "-moz-column-fill": "auto"
+  "display": "block",
+  "height": "100%",
+  "width": "100%",
+  "border": "none",
+  "cursor": "pointer",
+  "overflow": "hidden",
+
+  // This stuff should be moved to the content iframe document body?
+  "-webkit-text-size-adjust": "none"
 }
 
 Monocle.Styles.spinner = {
