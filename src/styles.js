@@ -43,10 +43,7 @@ Monocle.Styles.content = {
   "width": "100%",
   "border": "none",
   "cursor": "pointer",
-  "overflow": "hidden",
-
-  // This stuff should be moved to the content iframe document body?
-  "-webkit-text-size-adjust": "none"
+  "overflow": "hidden"
 }
 
 Monocle.Styles.spinner = {

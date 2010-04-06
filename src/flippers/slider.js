@@ -84,8 +84,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    setPage(upperPage(), locus);
-    completedTurn();
+    setPage(upperPage(), locus, completedTurn);
   }
 
 

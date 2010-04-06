@@ -151,6 +151,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // Still, browser sniffing is an evil.
     if (/WebKit/i.test(navigator.userAgent)) {
       doc.body.style.overflow = 'hidden';
+      doc.body.style.webkitTextSizeAdjust = "none";
     }
 
     setColumnWidth(pageDiv);
@@ -196,10 +197,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
       setColumnWidth(pageDiv);
-      //var body = pageDiv.contentFrame.contentWindow.document.body;
-      //positionImages(body);
+      //positionImages(pageDiv);
       measureDimensions(pageDiv);
-      //locateChapters(body);
+      locateChapters(pageDiv);
 
       return true;
     } else {
@@ -242,6 +242,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   // function positionImages(node) {
+  //   var node = pageDiv.contentFrame.contentWindow.document.body;
   //   if (!node.getBoundingClientRect) {
   //     console.log('Image positioning not supported');
   //     return;
@@ -291,25 +292,27 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  // function locateChapters(body) {
-  //   for (var i = 0; i < p.chapters.length; ++i) {
-  //     var chp = p.chapters[i];
-  //     chp.page = 1;
-  //     if (chp.fragment) {
-  //       var target = document.getElementById(chp.fragment);
-  //       while (target && target.parentNode != body) {
-  //         target = target.parentNode;
-  //       }
-  //       if (target) {
-  //         target.scrollIntoView();
-  //         chp.page = (body.scrollLeft / p.clientDimensions.width) + 1;
-  //       }
-  //     }
-  //   }
-  //   body.scrollLeft = 0;
-  //
-  //   return p.chapters;
-  // }
+  function locateChapters(pageDiv) {
+    var doc = pageDiv.contentFrame.contentWindow.document;
+    var scroller = doc.body; // pageDiv.scrollerDiv;
+    for (var i = 0; i < p.chapters.length; ++i) {
+      var chp = p.chapters[i];
+      chp.page = 1;
+      if (chp.fragment) {
+        var target = doc.getElementById(chp.fragment);
+        while (target && target.parentNode != doc.body) {
+          target = target.parentNode;
+        }
+        if (target) {
+          target.scrollIntoView();
+          chp.page = (scroller.scrollLeft / p.clientDimensions.width) + 1;
+        }
+      }
+    }
+    doc.body.scrollLeft = 0;
+
+    return p.chapters;
+  }
 
 
   // A shortcut to p.clientDimensions.pages.
