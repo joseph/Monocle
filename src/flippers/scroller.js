@@ -56,19 +56,19 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    var spCallback = function (rslt) {
+    var spCallback = function (offset) {
       var div = p.page.contentFrame.contentWindow.document.body;
-      var jump = (rslt.offset - div.scrollLeft) / (k.speed / k.rate);
+      var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
       clearTimeout(p.timer);
       p.timer = setInterval(
         function () {
           div.scrollLeft += jump;
           if (
             (jump == 0) ||
-            (jump < 0 && div.scrollLeft < rslt.offset) ||
-            (jump > 0 && div.scrollLeft > rslt.offset)
+            (jump < 0 && div.scrollLeft < offset) ||
+            (jump > 0 && div.scrollLeft > offset)
           ) {
-            div.scrollLeft = rslt.offset;
+            div.scrollLeft = offset;
             clearTimeout(p.timer);
             p.reader.dispatchEvent('monocle:turn');
           }

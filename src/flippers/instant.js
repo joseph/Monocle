@@ -54,14 +54,14 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    var spCallback = function (rslt) {
+    var spCallback = function (offset) {
       var div = p.page.contentFrame.contentWindow.document.body;
-      div.scrollLeft = rslt.offset;
+      div.scrollLeft = offset;
       if (div.scrollLeft == 0) {
-        p.page.scrollerDiv.scrollLeft = rslt.offset;
+        p.page.scrollerDiv.scrollLeft = offset;
       }
       // FIXME: hacks for webkit rendering artefacts.
-      div.body.style.left = "0px";
+      div.style.left = "0px";
       var x = Math.random() / 1000 + 1.0;
       div.style.webkitTransform = "scale(" + x + ")";
     }

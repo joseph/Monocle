@@ -246,7 +246,9 @@
         },
         update: function (page) {
           var place = reader.getPlace(page);
-          this.runners[page.pageIndex].innerHTML = place.chapterTitle();
+          if (place) {
+            this.runners[page.pageIndex].innerHTML = place.chapterTitle();
+          }
         }
       }
       reader.addControl(chapterTitle, 'page');
@@ -269,15 +271,18 @@
           this.update(page);
           return cntr;
         },
-        update: function (page) {
-          var place = reader.getPlace(page);
-          this.runners[page.pageIndex].innerHTML = place.pageNumber();
+        update: function (page, pageNumber) {
+          if (pageNumber) {
+            this.runners[page.pageIndex].innerHTML = pageNumber;
+          }
         }
       }
       reader.addControl(pageNumber, 'page');
       reader.addListener(
         'monocle:pagechange',
-        function (evt) { pageNumber.update(evt.monocleData.page) }
+        function (evt) {
+          pageNumber.update(evt.monocleData.page, evt.monocleData.pageNumber);
+        }
       );
 
 

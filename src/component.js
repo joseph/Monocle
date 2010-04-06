@@ -110,7 +110,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function applyTo(pageDiv) {
+  function applyTo(pageDiv, callback) {
     if (pageDiv.contentFrame && pageDiv.contentFrame.component == API) {
       return;
     }
@@ -182,13 +182,21 @@ Monocle.Component = function (book, id, index, chapters, html) {
       }
       p.clientDimensions = null;
       updateDimensions(pageDiv);
+      if (callback) { callback(); }
     }
 
-    doc.open();
-    doc.write(p.html);
-    doc.close();
-    setUpFrame();
-    //setTimeout(setUpFrame, 500);
+
+    if (/WebKit/i.test(navigator.userAgent)) {
+      Monocle.addListener(doc, 'DOMContentLoaded', setUpFrame);
+      doc.open();
+      doc.write(p.html);
+      doc.close();
+    } else {
+      doc.open();
+      doc.write(p.html);
+      doc.close();
+      setUpFrame();
+    }
   }
 
 
@@ -229,7 +237,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   // TODO: Rewrite this to insert a dynamic stylesheet into the frame to set
   // the clamping.
   function clampCSS(body) {
-    console.log('Clamping css for ' + body);
+    //console.log('Clamping css for ' + body);
     var clampDimensions = function (elem) {
       elem.style.cssText +=
         // FIXME: helps with text-indent, but images get cut off at page breaks.

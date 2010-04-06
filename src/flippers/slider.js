@@ -89,11 +89,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function setPage(pageDiv, locus, callback) {
-    var spCallback = function (rslt) {
+    var spCallback = function (offset) {
       var div = pageDiv.contentFrame.contentWindow.document.body;
-      div.scrollLeft = rslt.offset;
+      div.scrollLeft = offset;
       if (div.scrollLeft == 0) {
-        pageDiv.scrollerDiv.scrollLeft = rslt.offset;
+        pageDiv.scrollerDiv.scrollLeft = offset;
       }
       div.style.left = "0px"; // Webkit hack
       setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);

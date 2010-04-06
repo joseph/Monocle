@@ -59,16 +59,29 @@ Monocle.Book = function (dataSource) {
   // if that doesn't exist, we default to the very first component.
   //
   function changePage(pageDiv, locus, callback) {
+    switchToComponent(
+      pageDiv,
+      locus,
+      function () {
+        var pageN = locusToPage(pageDiv, locus);
+        switchToPage(pageDiv, pageN, callback);
+      }
+    );
+  }
+
+
+  function switchToComponent(pageDiv, locus, callback) {
     // Find the place of the pageDiv in the book, or create one.
     var place = placeFor(pageDiv);
     if (!place) {
-      return componentAt(
+      componentAt(
         0,
         function (component) {
           setPlaceFor(pageDiv, component, 1);
-          changePage(pageDiv, locus, callback);
+          switchToComponent(pageDiv, locus, callback);
         }
       );
+      return;
     }
 
     var cIndex = p.componentIds.indexOf(locus.componentId);
@@ -78,18 +91,28 @@ Monocle.Book = function (dataSource) {
     } else if (p.components[cIndex]) {
       component = p.components[cIndex];
     } else {
-      return componentAt(
+      componentAt(
         cIndex,
         function (component) {
-          changePage(pageDiv, locus, callback);
+          switchToComponent(pageDiv, locus, callback);
         }
       );
+      return;
     }
 
     if (!pageDiv.contentFrame || component != pageDiv.contentFrame.component) {
-      component.applyTo(pageDiv);
+      component.applyTo(pageDiv, callback);
+      return;
     }
 
+    if (typeof callback == "function") {
+      callback();
+    }
+  }
+
+
+  function locusToPage(pageDiv, locus) {
+    var component = pageDiv.contentFrame.component;
     var oldCmptLPN = component.lastPageNumber();
     var changedDims = component.updateDimensions(pageDiv);
 
@@ -124,9 +147,16 @@ Monocle.Book = function (dataSource) {
       );
     }
 
+    return pageN;
+  }
+
+
+  function switchToPage(pageDiv, pageN, callback) {
+    var component = pageDiv.contentFrame.component;
+
     // Determine whether we need to apply a new component to the div, and
     // adjust the pageN accordingly.
-    cIndex = component.properties.index;
+    var cIndex = component.properties.index;
     var lpn = component.lastPageNumber();
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
@@ -152,7 +182,7 @@ Monocle.Book = function (dataSource) {
       return componentAt(
         cIndex - 1,
         function (component) {
-          component.updateDimensions(node);
+          component.updateDimensions(pageDiv);
           pageN += component.lastPageNumber();
           changePage(
             pageDiv,
@@ -254,7 +284,7 @@ Monocle.Book = function (dataSource) {
       var cmptId = matches[1];
       var fragment = matches[3] || null;
       var cIndex = p.componentIds.indexOf(cmptId);
-      var component = componentAt(cIndex);
+      var component = componentAt(cIndex, function () { console.log('fixme'); });
       // NB: updating dimensions changes page state.
       component.updateDimensions(pageDiv);
       var place = new Monocle.Place();

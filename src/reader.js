@@ -309,7 +309,7 @@ Monocle.Reader = function (node, bookData, options) {
       dispatchEvent("monocle:pagechange", eData);
     }
 
-    return p.book.changePage(pageDiv, locus, callback);
+    return p.book.changePage(pageDiv, locus, onChangePage);
   }
 
 
