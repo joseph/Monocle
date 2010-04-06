@@ -42,15 +42,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // the HTML provided by dataSource.getComponent() for this component
     html: html,
 
-    // An array of elements that will hold the elements of this component.
-    //
-    clientNodes: [],
-
-    // An array of arrays of HTML elements -- one for each client node.
-    // Accessed as: elementsForClient[node.index][n]
-    //
-    elementsForClient: [],
-
     // The current dimensions of the client node that holds the elements of
     // this component. (The assumption is that all client nodes will have
     // identical dimensions — otherwise nothing will work as expected.)
@@ -84,19 +75,12 @@ Monocle.Component = function (book, id, index, chapters, html) {
       p.html = "<p></p>"
     }
 
-    var elems = p.elementsForClient[0] = [];
-
     var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
     p.html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
   }
 
 
-  function nodeIndex(node) {
-    return p.clientNodes.indexOf(node);
-  }
-
-
-  function prepareNode(node, pageN) {
+  function preparePage(pageDiv, pageN) {
   }
 
 
@@ -126,45 +110,33 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function applyTo(node) {
-    p.clientNodes[nodeIndex(node)] = null;
-    registerClient(node);
-  }
-
-
-  function updateDimensions(node) {
-    registerClient(node);
-
-    if (haveDimensionsChanged(node)) {
-      clampCSS(node);
-      //positionImages(node);
-      measureDimensions(node);
-      locateChapters(node);
-
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-
-  function registerClient(node) {
-    if (nodeIndex(node) != -1) {
-      // Already registered.
+  function applyTo(pageDiv) {
+    if (pageDiv.contentFrame && pageDiv.contentFrame.component == API) {
       return;
     }
-    p.clientNodes.push(node);
+    console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
 
+    if (pageDiv.contentFrame) {
+      pageDiv.scrollerDiv.removeChild(pageDiv.contentFrame);
+    }
 
-    // TODO: if we have any existing clientFrame, just clone it.
+    // TODO: Can we reuse these frames? What's better - conserving memory, or
+    // conserving processing?
 
+    var frame = pageDiv.contentFrame = document.createElement('iframe');
+    frame.src = "javascript: '';";
+    frame.component = API;
+    pageDiv.scrollerDiv.appendChild(frame);
+    frame.style.cssText = Monocle.Styles.ruleText('content');
 
-    //node.open();
-    node.write(p.html);
-    //node.close();
+    var doc = frame.contentWindow.document;
+
+    doc.open();
+    doc.write(p.html);
+    doc.close();
 
     // TODO: move to Styles?
-    node.body.style.cssText =
+    doc.body.style.cssText =
       "margin: 0;" +
       "padding: 0;" +
       "position: absolute;" +
@@ -173,14 +145,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
       "-webkit-column-gap: 0;" +
       "-webkit-column-fill: auto;" +
       "-moz-column-gap: 0;" +
-      "-moz-column-fill: 0;" +
+      "-moz-column-fill: 0;";
 
-      // FIXME: Firefox hates this, but Safari requires it to hide scrollbars:
-      //"overflow: hidden;" +
+    // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
+    // Still, browser sniffing is an evil.
+    if (/WebKit/i.test(navigator.userAgent)) {
+      doc.body.style.overflow = 'hidden';
+    }
 
-      // FIXME: these should be set whenever dimensions have changed.
-      "-webkit-column-width: " + node.body.clientWidth + "px;" +
-      "-moz-column-width: " + node.body.clientWidth + "px;";
+    setColumnWidth(pageDiv);
+
+    clampCSS(doc.body);
 
     // TODO: rewrite internal links
 
@@ -189,7 +164,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // which case it is discarded. (In this way we ensure that all items
     // in the array are Elements.)
     //
-    var elem = node.body.firstChild;
+    var elem = doc.body.firstChild;
     while (elem) {
       if (elem.nodeType == 3) {
         var textNode = elem;
@@ -197,7 +172,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
           elem = textNode.nextSibling;
           textNode.parentNode.removeChild(textNode);
         } else {
-          elem = node.createElement('div');
+          elem = doc.createElement('div');
           textNode.parentNode.insertBefore(elem, textNode);
           textNode.parentNode.removeChild(textNode);
         }
@@ -209,68 +184,96 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  // Returns true or false.
-  function haveDimensionsChanged(node) {
-    return (!p.clientDimensions) ||
-      //(p.clientDimensions.width != node.body.clientWidth) ||
-      (p.clientDimensions.height != node.body.clientHeight);// ||
-
-      // FIXME: need a better solution for detecting scaled-up text.
-      //(p.clientDimensions.fontSize != node.style.fontSize);
+  function setColumnWidth(pageDiv) {
+    var doc = pageDiv.contentFrame.contentWindow.document;
+    var cw = pageDiv.scrollerDiv.clientWidth;
+    doc.body.style.columnWidth = cw+"px";
+    doc.body.style.MozColumnWidth = cw+"px";
+    doc.body.style.webkitColumnWidth = cw+"px";
   }
 
 
-  function clampCSS(node) {
-    console.log('Clamping css for ' + node);
+  function updateDimensions(pageDiv) {
+    if (haveDimensionsChanged(pageDiv)) {
+      setColumnWidth(pageDiv);
+      //var body = pageDiv.contentFrame.contentWindow.document.body;
+      //positionImages(body);
+      measureDimensions(pageDiv);
+      //locateChapters(body);
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  // Returns true or false.
+  function haveDimensionsChanged(pageDiv) {
+    return (!p.clientDimensions) ||
+      (p.clientDimensions.width != pageDiv.scrollerDiv.clientWidth) ||
+      (p.clientDimensions.height != pageDiv.scrollerDiv.clientHeight);// ||
+
+      // FIXME: need a better solution for detecting scaled-up text.
+      //(p.clientDimensions.fontSize != body.style.fontSize);
+  }
+
+
+  // TODO: Rewrite this to insert a dynamic stylesheet into the frame to set
+  // the clamping.
+  function clampCSS(body) {
+    console.log('Clamping css for ' + body);
     var clampDimensions = function (elem) {
       elem.style.cssText +=
-        "float: left;" +
+        // FIXME: helps with text-indent, but images get cut off at page breaks.
+        //"float: left;" +
         "max-width: 100% !important;" +
         "max-height: 100% !important; ";
     }
-    var elems = node.getElementsByTagName('img');
+    var elems = body.getElementsByTagName('img');
     for (var i = elems.length - 1; i >= 0; --i) {
       clampDimensions(elems[i]);
     }
-    var elems = node.getElementsByTagName('table');
+    var elems = body.getElementsByTagName('table');
     for (var i = elems.length - 1; i >= 0; --i) {
       clampDimensions(elems[i]);
     }
   }
 
 
-  function positionImages(node) {
-    if (!node.getBoundingClientRect) {
-      console.log('Image positioning not supported');
-      return;
-    } else {
-      console.log('Positioning images to top of pages');
-    }
-    var cRect = node.getBoundingClientRect();
-    var imgs = node.getElementsByTagName('img');
-    for (var i = 0; i < imgs.length; ++i) {
-      var iRect = imgs[i].getBoundingClientRect();
-      if (iRect.top == cRect.top) {
-        imgs[i].style.marginTop = 0;
-      } else {
-        imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top))+"px";
-      }
-    }
-  }
+  // function positionImages(node) {
+  //   if (!node.getBoundingClientRect) {
+  //     console.log('Image positioning not supported');
+  //     return;
+  //   } else {
+  //     console.log('Positioning images to top of pages');
+  //   }
+  //   var cRect = node.getBoundingClientRect();
+  //   var imgs = node.getElementsByTagName('img');
+  //   for (var i = 0; i < imgs.length; ++i) {
+  //     var iRect = imgs[i].getBoundingClientRect();
+  //     if (iRect.top == cRect.top) {
+  //       imgs[i].style.marginTop = 0;
+  //     } else {
+  //       imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top))+"px";
+  //     }
+  //   }
+  // }
 
 
-  function measureDimensions(node) {
+  function measureDimensions(pageDiv) {
+    var doc = pageDiv.contentFrame.contentWindow.document;
     p.clientDimensions = {
-      width: 263, //node.body.clientWidth,
-      height: node.body.clientHeight,
-      scrollWidth: node.body.scrollWidth//,
+      width: pageDiv.scrollerDiv.clientWidth,
+      height: pageDiv.scrollerDiv.clientHeight,
+      scrollWidth: doc.body.scrollWidth//,
 
       // FIXME: need a better solution for detecting scaled-up text.
-      //fontSize: node.style.fontSize
+      //fontSize: doc.body.style.fontSize
     }
 
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
-      var lcEnd = node.body.lastChild.offsetTop + node.body.lastChild.offsetHeight;
+      var lcEnd = doc.body.lastChild.offsetTop + doc.body.lastChild.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
         (lcEnd > p.clientDimensions.height ? 2 : 1);
     }
@@ -278,31 +281,35 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.clientDimensions.pages = Math.ceil(
       p.clientDimensions.scrollWidth / p.clientDimensions.width
     );
-    console.log("Pages: "+p.clientDimensions.pages);
+
+    console.log(
+      "Pages for '"+id+"' in pageDiv["+pageDiv.pageIndex+"]: " +
+      p.clientDimensions.pages
+    );
 
     return p.clientDimensions;
   }
 
 
-  function locateChapters(node) {
-    for (var i = 0; i < p.chapters.length; ++i) {
-      var chp = p.chapters[i];
-      chp.page = 1;
-      if (chp.fragment) {
-        var target = document.getElementById(chp.fragment);
-        while (target && target.parentNode != node) {
-          target = target.parentNode;
-        }
-        if (target) {
-          target.scrollIntoView();
-          chp.page = (node.parentNode.scrollLeft / p.clientDimensions.width) + 1;
-        }
-      }
-    }
-    node.body.scrollLeft = 0;
-
-    return p.chapters;
-  }
+  // function locateChapters(body) {
+  //   for (var i = 0; i < p.chapters.length; ++i) {
+  //     var chp = p.chapters[i];
+  //     chp.page = 1;
+  //     if (chp.fragment) {
+  //       var target = document.getElementById(chp.fragment);
+  //       while (target && target.parentNode != body) {
+  //         target = target.parentNode;
+  //       }
+  //       if (target) {
+  //         target.scrollIntoView();
+  //         chp.page = (body.scrollLeft / p.clientDimensions.width) + 1;
+  //       }
+  //     }
+  //   }
+  //   body.scrollLeft = 0;
+  //
+  //   return p.chapters;
+  // }
 
 
   // A shortcut to p.clientDimensions.pages.
@@ -313,11 +320,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   API.applyTo = applyTo;
+  API.preparePage = preparePage;
   API.updateDimensions = updateDimensions;
-  API.lastPageNumber = lastPageNumber;
-  API.prepareNode = prepareNode;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
+  API.lastPageNumber = lastPageNumber;
 
   initialize();
 

@@ -51,15 +51,14 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function getPlace() {
-    return p.reader.getBook().placeFor(p.page.contentDocument);
+    return p.reader.getBook().placeFor(p.page);
   }
 
 
   function moveTo(locus) {
     var spCallback = function (offset) {
-      var jump = (offset - p.page.contentDocument.body.scrollLeft) /
-        (k.speed / k.rate);
-      var div = p.page.contentDocument.body;
+      var div = p.page.contentFrame.contentWindow.document.body;
+      var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
       clearTimeout(p.timer);
       p.timer = setInterval(
         function () {
@@ -73,10 +72,11 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
             clearTimeout(p.timer);
             p.reader.dispatchEvent('monocle:turn');
           }
+
           // FIXME: a hack for webkit rendering artefacts.
-          // DISABLED for speed, but means this flipper is broken on iPhone.
+          // DISABLED for speed, but means this flipper is broken on some WebKits.
           //var x = Math.random() / 1000 + 1.0;
-          //p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
+          //div.style.webkitTransform = "scale(" + x + ")";
         },
         k.rate
       );

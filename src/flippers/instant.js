@@ -49,17 +49,21 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
 
   function getPlace() {
-    return p.reader.getBook().placeFor(p.page.contentDocument);
+    return p.reader.getBook().placeFor(p.page);
   }
 
 
   function moveTo(locus) {
     var spCallback = function (offset) {
-      p.page.contentDocument.body.style.left = "-"+offset+"px";
-      //p.page.contentDocument.body.scrollLeft = offset;
+      p.page.contentFrame.contentWindow.document.body.scrollLeft = offset;
+      if (p.page.contentFrame.contentWindow.document.body.scrollLeft == 0) {
+        p.page.scrollerDiv.scrollLeft = offset;
+      }
+      p.page.contentFrame.contentWindow.document.body.style.left = "0px";
+
       // FIXME: a hack for webkit rendering artefacts.
       var x = Math.random() / 1000 + 1.0;
-      p.page.scrollerDiv.style.webkitTransform = "scale(" + x + ")";
+      p.page.contentFrame.contentWindow.document.body.style.webkitTransform = "scale(" + x + ")";
     }
     var rslt = p.setPageFn(p.page, locus, spCallback);
     p.reader.dispatchEvent('monocle:turn');
