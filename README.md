@@ -71,9 +71,11 @@ Methods:
              ]
            }
         ]
-* `getComponent(componentId)`: takes a component id (from the list returned
-    by `getComponents`) and returns the body text of the corresponding
-    component.
+* `getComponent(componentId, callback)`: takes a component id (from the list
+    returned by `getComponents`) and returns the body text of the corresponding
+    component. If nothing is returned, Monocle will wait for the callback to
+    be invoked (ie, by an asynchronous operation). Either call the callback
+    with data, or return data, but not both.
 * `getMetaData(key)`: takes a string "key" and returns the value of that
     metadata for this book. There is not yet any standardized list of
     possible keys -- we'll just see what happens for a bit. Note that if
@@ -83,7 +85,8 @@ Methods:
 Note that if these methods retrieve any data from a server using AJAX
 techniques, it should be a synchronous operation, because the clients of the
 book data object expect the result to be returned from the method itself
-(not via a callback).
+(not via a callback). The exception is getComponent, which can use the
+callback for asynchronous data retrieval.
 
 
 ### Example of a book data object

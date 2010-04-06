@@ -3,6 +3,8 @@ Monocle.Styles.container = {
   "width": "100%",
   "height": "100%",
   "-webkit-user-select": "none",
+  "-moz-user-select": "none",
+  "user-select": "none",
   "-webkit-text-size-adjust": "none"
 }
 

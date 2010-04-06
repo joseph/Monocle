@@ -19,6 +19,7 @@
 
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
     <style type="text/css">
@@ -34,21 +35,6 @@
       }
       .reader p {
         line-height: 130%;
-      }
-
-      .reader h1 {
-        text-align: center;
-      }
-      .reader h2 {
-        text-align: center;
-      }
-      .reader h3 {
-        text-align: center;
-      }
-      .reader p {
-        text-indent: -1em;
-        padding: 0 0 0 1em;
-        margin: 0;
       }
       #part1, #part2 {
         display: none;
@@ -76,17 +62,24 @@
             }
           ]
         },
-        getComponent: function (cmptId) {
-          var ajReq = new XMLHttpRequest();
-          ajReq.open("GET", cmptId, false);
-          ajReq.send(null);
-          return ajReq.responseText;
+        getComponent: function (cmptId, callback) {
+          window.receiveComponentData = callback;
+          this.getViaAjax(cmptId);
         },
         getMetaData: function(key) {
           return {
             title: "Howl",
             creator: "Allen Ginsberg"
           }[key];
+        },
+        getViaAjax: function (path) {
+          var script = document.createElement('script');
+          script.id = "dynLoader";
+          script.type = "text/javascript";
+          script.charset = "utf-8";
+          script.src = path;
+          var head = document.getElementsByTagName('head')[0];
+          head.appendChild(script);
         }
       }
 
