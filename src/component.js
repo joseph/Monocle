@@ -131,57 +131,64 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var doc = frame.contentWindow.document;
 
+    var setUpFrame = function () {
+      console.log("SETTING UP FRAME: " + doc.body.innerHTML.length);
+      // TODO: move to Styles?
+      doc.body.style.cssText =
+        "margin: 0;" +
+        "padding: 0;" +
+        "position: absolute;" +
+        "height: 100%;" +
+        "min-width: 200%;" +
+        "-webkit-column-gap: 0;" +
+        "-webkit-column-fill: auto;" +
+        "-moz-column-gap: 0;" +
+        "-moz-column-fill: 0;";
+
+      // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
+      // Still, browser sniffing is an evil.
+      if (/WebKit/i.test(navigator.userAgent)) {
+        doc.body.style.overflow = 'hidden';
+        doc.body.style.webkitTextSizeAdjust = "none";
+      }
+
+      setColumnWidth(pageDiv);
+
+      clampCSS(doc.body);
+
+      // TODO: rewrite internal links
+
+      // Any top-level text node will be inserted into a fresh
+      // div parent before being added to the array -- unless it is blank, in
+      // which case it is discarded. (In this way we ensure that all items
+      // in the array are Elements.)
+      //
+      var elem = doc.body.firstChild;
+      while (elem) {
+        if (elem.nodeType == 3) {
+          var textNode = elem;
+          if (elem.nodeValue.match(/^\s+$/)) {
+            elem = textNode.nextSibling;
+            textNode.parentNode.removeChild(textNode);
+          } else {
+            elem = doc.createElement('div');
+            textNode.parentNode.insertBefore(elem, textNode);
+            textNode.parentNode.removeChild(textNode);
+          }
+        }
+        if (elem) {
+          elem = elem.nextSibling;
+        }
+      }
+      p.clientDimensions = null;
+      updateDimensions(pageDiv);
+    }
+
     doc.open();
     doc.write(p.html);
     doc.close();
-
-    // TODO: move to Styles?
-    doc.body.style.cssText =
-      "margin: 0;" +
-      "padding: 0;" +
-      "position: absolute;" +
-      "height: 100%;" +
-      "min-width: 200%;" +
-      "-webkit-column-gap: 0;" +
-      "-webkit-column-fill: auto;" +
-      "-moz-column-gap: 0;" +
-      "-moz-column-fill: 0;";
-
-    // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
-    // Still, browser sniffing is an evil.
-    if (/WebKit/i.test(navigator.userAgent)) {
-      doc.body.style.overflow = 'hidden';
-      doc.body.style.webkitTextSizeAdjust = "none";
-    }
-
-    setColumnWidth(pageDiv);
-
-    clampCSS(doc.body);
-
-    // TODO: rewrite internal links
-
-    // Any top-level text node will be inserted into a fresh
-    // div parent before being added to the array -- unless it is blank, in
-    // which case it is discarded. (In this way we ensure that all items
-    // in the array are Elements.)
-    //
-    var elem = doc.body.firstChild;
-    while (elem) {
-      if (elem.nodeType == 3) {
-        var textNode = elem;
-        if (elem.nodeValue.match(/^\s+$/)) {
-          elem = textNode.nextSibling;
-          textNode.parentNode.removeChild(textNode);
-        } else {
-          elem = doc.createElement('div');
-          textNode.parentNode.insertBefore(elem, textNode);
-          textNode.parentNode.removeChild(textNode);
-        }
-      }
-      if (elem) {
-        elem = elem.nextSibling;
-      }
-    }
+    setUpFrame();
+    //setTimeout(setUpFrame, 500);
   }
 
 
@@ -264,20 +271,26 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function measureDimensions(pageDiv) {
     var doc = pageDiv.contentFrame.contentWindow.document;
+
+    // This is weird. First time you access this value, it's doubled. Next time,
+    // it's the correct amount. MobileSafari only.
+    var junk = doc.body.scrollWidth;
+
     p.clientDimensions = {
       width: pageDiv.scrollerDiv.clientWidth,
       height: pageDiv.scrollerDiv.clientHeight,
-      scrollWidth: doc.body.scrollWidth//,
+      scrollWidth: doc.body.scrollWidth //,
 
       // FIXME: need a better solution for detecting scaled-up text.
       //fontSize: doc.body.style.fontSize
     }
 
+    /*
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
       var lcEnd = doc.body.lastChild.offsetTop + doc.body.lastChild.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
         (lcEnd > p.clientDimensions.height ? 2 : 1);
-    }
+    }*/
 
     p.clientDimensions.pages = Math.ceil(
       p.clientDimensions.scrollWidth / p.clientDimensions.width
@@ -294,7 +307,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function locateChapters(pageDiv) {
     var doc = pageDiv.contentFrame.contentWindow.document;
-    var scroller = doc.body; // pageDiv.scrollerDiv;
+    var scrollers = [doc.body, pageDiv.scrollerDiv];
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.page = 1;
@@ -305,11 +318,15 @@ Monocle.Component = function (book, id, index, chapters, html) {
         }
         if (target) {
           target.scrollIntoView();
-          chp.page = (scroller.scrollLeft / p.clientDimensions.width) + 1;
+          chp.page = (
+            Math.max(scrollers[0].scrollLeft, scrollers[1].scrollLeft) /
+            p.clientDimensions.width
+          ) + 1;
         }
       }
     }
-    doc.body.scrollLeft = 0;
+    scrollers[0].scrollLeft = 0;
+    scrollers[1].scrollLeft = 0;
 
     return p.chapters;
   }
