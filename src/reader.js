@@ -111,7 +111,9 @@ Monocle.Reader = function (node, bookData, options) {
     setBook(bk);
 
     // Wait for user input.
-    listenForInteraction();
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      listenForInteraction(p.divs.pages[i].controlsDiv);
+    }
 
     dispatchEvent("monocle:loaded")
   }
@@ -137,12 +139,13 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
       page.pageIndex = i;
-      page.setAttribute('unselectable', 'on');
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
 
       page.scrollerDiv = document.createElement('div');
       page.appendChild(page.scrollerDiv);
+      page.controlsDiv = document.createElement('div');
+      page.appendChild(page.controlsDiv);
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
@@ -175,6 +178,7 @@ Monocle.Reader = function (node, bookData, options) {
       var page = p.divs.pages[i];
       page.style.cssText = Monocle.Styles.ruleText('page');
       page.scrollerDiv.style.cssText = Monocle.Styles.ruleText('scroller');
+      page.controlsDiv.style.cssText = Monocle.Styles.ruleText('controls');
     }
     p.divs.overlay.style.cssText = Monocle.Styles.ruleText('overlay');
   }
@@ -313,10 +317,10 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function listenForInteraction() {
+  function listenForInteraction(layer) {
     if (!k.TOUCH_DEVICE) {
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'mousedown',
         function (evt) {
           if (evt.button != 0) {
@@ -327,7 +331,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'mousemove',
         function (evt) {
           if (!p.interactionData.mouseDown) {
@@ -337,7 +341,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'mouseup',
         function (evt) {
           if (!p.interactionData.mouseDown) {
@@ -347,7 +351,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'mouseout',
         function (evt) {
           if (!p.interactionData.mouseDown) {
@@ -355,14 +359,14 @@ Monocle.Reader = function (node, bookData, options) {
           }
           obj = evt.relatedTarget || e.fromElement;
           while (obj && (obj = obj.parentNode)) {
-            if (obj == p.divs.container) { return; }
+            if (obj == layer) { return; }
           }
           contactEvent(evt, 'end', evt);
         }
       );
     } else {
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'touchstart',
         function (evt) {
           if (evt.touches.length > 1) { return; }
@@ -371,7 +375,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'touchmove',
         function (evt) {
           if (evt.touches.length > 1) { return; }
@@ -390,7 +394,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'touchend',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
@@ -398,7 +402,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
       Monocle.addListener(
-        p.divs.container,
+        layer,
         'touchcancel',
         function (evt) {
           contactEvent(evt, "end", evt.changedTouches[0]);
@@ -474,7 +478,7 @@ Monocle.Reader = function (node, bookData, options) {
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
       for (var i = 0; i < p.divs.pages.length; ++i) {
-        var page = p.divs.pages[i];
+        var page = p.divs.pages[i].controlsDiv;
         var runner = ctrl.createControlElements(page);
         page.appendChild(runner);
         ctrlData.elements.push(runner);

@@ -23,7 +23,6 @@ Monocle.Styles.page = {
   "bottom": "3px",
   "right": "5px",
   "background": "#FFF",
-  "cursor": "pointer",
   "z-index": "1",
   "-webkit-box-shadow": "2px 0 2px #999",
   "-moz-box-shadow": "2px 0 2px #999",
@@ -44,8 +43,18 @@ Monocle.Styles.content = {
   "height": "100%",
   "width": "100%",
   "border": "none",
-  "cursor": "pointer",
   "overflow": "hidden"
+}
+
+Monocle.Styles.controls = {
+  "position": "absolute",
+  "top": "0",
+  "bottom": "0",
+  "left": "0",
+  "right": "0",
+  "cursor": "pointer",
+  "background": "#000",
+  "opacity": "0.4"
 }
 
 Monocle.Styles.spinner = {

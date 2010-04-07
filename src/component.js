@@ -293,12 +293,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
       //fontSize: doc.body.style.fontSize
     }
 
-    /*
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
       var lcEnd = doc.body.lastChild.offsetTop + doc.body.lastChild.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
         (lcEnd > p.clientDimensions.height ? 2 : 1);
-    }*/
+    }
 
     p.clientDimensions.pages = Math.ceil(
       p.clientDimensions.scrollWidth / p.clientDimensions.width
