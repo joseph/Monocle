@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+
+    <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
+    <title>iPad frame touch event bug</title>
+
+    <script>
+      (function () {
+        function init() {
+          var layer = document.getElementById('layer');
+          layer.addEventListener('touchstart', layerTouched, false);
+        }
+        function layerTouched(evt) {
+          alert('touched');
+        }
+        window.addEventListener('load', init, false);
+      })();
+    </script>
+
+    <style>
+      div#container {
+        position: relative;
+      }
+      iframe {
+        position: absolute;
+        top: 100px;
+        left: 100px;
+        width: 100px;
+        height: 100px;
+        background: #CCC;
+      }
+      div#layer {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 100px;
+        height: 100px;
+        background: #000;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div id="container">
+      <iframe src="javascript:'';"></iframe>
+      <div id="layer"></div>
+    </div>
+    <p>
+      Touching any part of the black div that is NOT over the iframe will
+      display an alert.
+    </p>
+
+  </body>
+
+</html>
