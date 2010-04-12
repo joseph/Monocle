@@ -142,14 +142,25 @@ Monocle.Component = function (book, id, index, chapters, html) {
         "min-width: 200%;" +
         "-webkit-column-gap: 0;" +
         "-webkit-column-fill: auto;" +
+        "-webkit-user-select: none;" +
         "-moz-column-gap: 0;" +
-        "-moz-column-fill: 0;";
+        "-moz-column-fill: 0;" +
+        "-moz-user-select: none;" +
+        "column-gap: 0;" +
+        "column-fill: 0;" +
+        "user-select: none";
 
-      // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
-      // Still, browser sniffing is an evil.
       if (/WebKit/i.test(navigator.userAgent)) {
+        // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
+        // Still, browser sniffing is an evil.
         doc.body.style.overflow = 'hidden';
         doc.body.style.webkitTextSizeAdjust = "none";
+
+        // FIXME: presently required to route around MobileSafari's
+        // problems with iframes. But it would be very nice to rip it out.
+        if (typeof Touch == "object") {
+          enableTouchProxyOnFrame(frame);
+        }
       }
 
       setColumnWidth(pageDiv);
@@ -186,6 +197,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
 
 
+    // FIXME: more nasty browser sniffing.
+    // This time, we need to wait for Safari to finish loading the frame
+    // contents before we setup the frame. This is because MobileSafari
+    // apparently performs the document.write in ~4000-byte increments over
+    // several JS cycles -- asynchronously.
     if (/WebKit/i.test(navigator.userAgent)) {
       Monocle.addListener(doc, 'DOMContentLoaded', setUpFrame);
       doc.open();
@@ -197,6 +213,84 @@ Monocle.Component = function (book, id, index, chapters, html) {
       doc.close();
       setUpFrame();
     }
+  }
+
+
+  function enableTouchProxyOnFrame(frame) {
+    evtFn = function (evt) {
+      // var offsets = { x: 0, y: 0 }
+      // var node = frame;
+      // while (node && node.nodeType == 1) {
+      //   offsets.x += node.offsetLeft;
+      //   offsets.y += node.offsetTop;
+      //   node = node.parentNode;
+      // }
+      var touch = evt.touches[0] || evt.changedTouches[0];
+      // console.log("Screen: " + touch.screenX + ", " + touch.screenY);
+      // console.log("Page: " + touch.pageX + ", " + touch.pageY);
+      // var div = frame.parentNode;
+      // console.log(
+      //   "Client?: " + (touch.pageX - div.scrollLeft) + ", " +
+      //   (touch.pageY - div.scrollTop)
+      // );
+      var target = document.elementFromPoint(
+        touch.screenX,
+        touch.screenY
+      );
+      if (!target) {
+        console.log('No target for ' + evt.type);
+        return;
+      }
+      if (target == frame) {
+        return;
+      }
+
+      // Xerox the event data, dispatching it on the new target.
+      var touches = [];
+      var newTouch = document.createTouch(
+        document.defaultView,
+        target,
+        0,
+        touch.screenX,
+        touch.screenY,
+        touch.screenX,
+        touch.screenY
+      );
+      touches.push(newTouch);
+      var newTouchList = document.createTouchList(touches[0]);
+      var newEvt = document.createEvent('TouchEvent');
+      newEvt.initTouchEvent(
+        evt.type,
+        true,
+        true,
+        document.defaultView,
+        evt.detail,
+        touches[0].screenX,
+        touches[0].screenY,
+        touches[0].pageX,
+        touches[0].pageY,
+        evt.ctrlKey,
+        evt.altKey,
+        evt.shiftKey,
+        evt.metaKey,
+        newTouchList,
+        newTouchList,
+        newTouchList,
+        evt.scale,
+        evt.rotation
+      );
+
+      if (!target.dispatchEvent(newEvt)) {
+        evt.preventDefault();
+      }
+    }
+
+    // We only need to listen for touch events.
+    var doc = frame.contentWindow.document;
+    Monocle.addListener(doc, 'touchstart', evtFn);
+    Monocle.addListener(doc, 'touchmove', evtFn);
+    Monocle.addListener(doc, 'touchend', evtFn);
+    Monocle.addListener(doc, 'touchcancel', evtFn);
   }
 
 
