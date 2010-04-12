@@ -52,9 +52,7 @@ Monocle.Styles.controls = {
   "bottom": "0",
   "left": "0",
   "right": "0",
-  "cursor": "pointer",
-  "background": "#000",
-  "opacity": "0.4"
+  "cursor": "pointer"
 }
 
 Monocle.Styles.spinner = {
