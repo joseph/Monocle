@@ -160,9 +160,11 @@ Monocle.Book = function (dataSource) {
     var lpn = component.lastPageNumber();
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
+      callback(false);
       return false;
     } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
       // After last page of book. Disallow.
+      callback(false);
       return false;
     } else if (pageN > component.lastPageNumber()) {
       // Moving to next component.

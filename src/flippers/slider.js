@@ -88,8 +88,13 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function setPage(pageDiv, locus, callback) {
+  function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
+      if (offset === false) {
+        if (typeof failCallback == 'function') { failCallback(); }
+        p.turnData = {};
+        return;
+      }
       var div = pageDiv.contentFrame.contentWindow.document.body;
       div.scrollLeft = offset;
       if (div.scrollLeft == 0) {
@@ -182,13 +187,13 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         slideToCursor(boxPointX);
         liftAnimationFinished();
       }
-      return true;
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
       var pageSetSuccessfully = setPage(
         lowerPage(),
         place.getLocus({ direction: k.BACKWARDS }),
+        // Callback on success
         function () {
           p.turnData.direction = k.BACKWARDS;
           deferredCall(function() {
@@ -200,16 +205,14 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
               });
             });
           });
+        },
+        // Callback on failure
+        function () {
+          p.turnData = {};
         }
       );
-
-      if (!pageSetSuccessfully) {
-        p.turnData = {};
-        return false;
-      }
-      return true;
     }
-    return false;
+    return true;
   }
 
 
@@ -289,23 +292,24 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       p.turnData = {};
     }
 
-    if (
-      !setPage(
-        lowerPage(),
-        place.getLocus({ direction: k.FORWARDS }),
-        function () {
-          jumpIn(resetTurn);
-        }
-      )
-    ) {
-      setPage(
-        lowerPage(),
-        place.getLocus(),
-        function () {
-          jumpIn(resetTurn);
-        }
-      );
-    }
+    setPage(
+      lowerPage(),
+      place.getLocus({ direction: k.FORWARDS }),
+      // If successful...
+      function () {
+        jumpIn(resetTurn);
+      },
+      // If unsuccessful, we just assume setting to current page will succeed...
+      function () {
+        setPage(
+          lowerPage(),
+          place.getLocus(),
+          function () {
+            jumpIn(resetTurn);
+          }
+        );
+      }
+    );
   }
 
 

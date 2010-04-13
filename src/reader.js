@@ -300,7 +300,8 @@ Monocle.Reader = function (node, bookData, options) {
 
     var onChangePage = function (rslt) {
       // The book may disallow changing to the given page.
-      if (!rslt) {
+      if (rslt === false) {
+        callback(false);
         return false;
       }
 
@@ -359,7 +360,7 @@ Monocle.Reader = function (node, bookData, options) {
           }
           obj = evt.relatedTarget || e.fromElement;
           while (obj && (obj = obj.parentNode)) {
-            if (obj == layer) { return; }
+            if (obj == p.divs.box) { return; }
           }
           contactEvent(evt, 'end', evt);
         }
