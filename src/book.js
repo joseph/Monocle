@@ -279,25 +279,29 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  function placeOfChapter(pageDiv, src) {
+  function placeOfChapter(pageDiv, src, callback) {
     var matcher = new RegExp('^(.+?)(#(.*))?$');
     var matches = src.match(matcher);
-    if (matches) {
-      var cmptId = matches[1];
-      var fragment = matches[3] || null;
-      var cIndex = p.componentIds.indexOf(cmptId);
-      var component = componentAt(cIndex, function () { console.log('fixme'); });
-      // NB: updating dimensions changes page state.
-      component.updateDimensions(pageDiv);
-      var place = new Monocle.Place();
-      if (fragment) {
-        place.setPlace(component, component.pageForChapter(fragment));
-      } else {
-        place.setPlace(component, 1);
-      }
-      return place;
+    if (!matches) {
+      return null;
     }
-    return null;
+    var cmptId = matches[1];
+    var fragment = matches[3] || null;
+    var cIndex = p.componentIds.indexOf(cmptId);
+    componentAt(
+      cIndex,
+      function (component) {
+        // NB: updating dimensions changes page state.
+        component.updateDimensions(pageDiv);
+        var place = new Monocle.Place();
+        if (fragment) {
+          place.setPlace(component, component.pageForChapter(fragment));
+        } else {
+          place.setPlace(component, 1);
+        }
+        callback(place);
+      }
+    );
   }
 
 
