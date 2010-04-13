@@ -46,6 +46,24 @@ Monocle.Styles.content = {
   "overflow": "hidden"
 }
 
+Monocle.Styles.framebody = {
+  "margin": "0",
+  "padding": "0",
+  "position": "absolute",
+  "height": "100%",
+  "min-width": "200%",
+  "-webkit-column-gap": "0",
+  "-webkit-column-fill": "auto",
+  "-webkit-user-select": "none",
+  "-webkit-text-size-adjust": "none",
+  "-moz-column-gap": "0",
+  "-moz-column-fill": "0",
+  "-moz-user-select": "none",
+  "column-gap": "0",
+  "column-fill": "0",
+  "user-select": "none"
+}
+
 Monocle.Styles.controls = {
   "position": "absolute",
   "top": "0",

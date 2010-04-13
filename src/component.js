@@ -131,79 +131,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var doc = frame.contentWindow.document;
 
-    var setUpFrame = function () {
-      console.log("SETTING UP FRAME: " + doc.body.innerHTML.length);
-      // TODO: move to Styles?
-      doc.body.style.cssText =
-        "margin: 0;" +
-        "padding: 0;" +
-        "position: absolute;" +
-        "height: 100%;" +
-        "min-width: 200%;" +
-        "-webkit-column-gap: 0;" +
-        "-webkit-column-fill: auto;" +
-        "-webkit-user-select: none;" +
-        "-moz-column-gap: 0;" +
-        "-moz-column-fill: 0;" +
-        "-moz-user-select: none;" +
-        "column-gap: 0;" +
-        "column-fill: 0;" +
-        "user-select: none";
-
-      if (/WebKit/i.test(navigator.userAgent)) {
-        // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
-        // Still, browser sniffing is an evil.
-        doc.body.style.overflow = 'hidden';
-        doc.body.style.webkitTextSizeAdjust = "none";
-
-        // FIXME: presently required to route around MobileSafari's
-        // problems with iframes. But it would be very nice to rip it out.
-        if (typeof Touch == "object") {
-          Monocle.enableTouchProxyOnFrame(frame);
-        }
-      }
-
-      setColumnWidth(pageDiv);
-
-      clampCSS(doc.body);
-
-      // TODO: rewrite internal links
-
-      // Any top-level text node will be inserted into a fresh
-      // div parent before being added to the array -- unless it is blank, in
-      // which case it is discarded. (In this way we ensure that all items
-      // in the array are Elements.)
-      //
-      var elem = doc.body.firstChild;
-      while (elem) {
-        if (elem.nodeType == 3) {
-          var textNode = elem;
-          if (elem.nodeValue.match(/^\s+$/)) {
-            elem = textNode.nextSibling;
-            textNode.parentNode.removeChild(textNode);
-          } else {
-            elem = doc.createElement('div');
-            textNode.parentNode.insertBefore(elem, textNode);
-            textNode.parentNode.removeChild(textNode);
-          }
-        }
-        if (elem) {
-          elem = elem.nextSibling;
-        }
-      }
-      p.clientDimensions = null;
-      updateDimensions(pageDiv);
-      if (callback) { callback(); }
-    }
-
-
     // FIXME: more nasty browser sniffing.
     // This time, we need to wait for Safari to finish loading the frame
     // contents before we setup the frame. This is because MobileSafari
     // apparently performs the document.write in ~4000-byte increments over
     // several JS cycles -- asynchronously.
     if (/WebKit/i.test(navigator.userAgent)) {
-      Monocle.addListener(doc, 'DOMContentLoaded', setUpFrame);
+      Monocle.addListener(
+        doc,
+        'DOMContentLoaded',
+        function () { setupFrame(pageDiv, callback) }
+      );
       doc.open();
       doc.write(p.html);
       doc.close();
@@ -211,8 +149,59 @@ Monocle.Component = function (book, id, index, chapters, html) {
       doc.open();
       doc.write(p.html);
       doc.close();
-      setUpFrame();
+      setupFrame(pageDiv, callback);
     }
+  }
+
+
+  function setupFrame(pageDiv, callback) {
+    var frame = pageDiv.contentFrame;
+    var doc = frame.contentWindow.document;
+    doc.body.style.cssText = Monocle.Styles.ruleText('framebody');
+
+    if (/WebKit/i.test(navigator.userAgent)) {
+      // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
+      // Still, browser sniffing is an evil.
+      doc.body.style.overflow = 'hidden';
+
+      // FIXME: presently required to route around MobileSafari's
+      // problems with iframes. But it would be very nice to rip it out.
+      if (typeof Touch == "object") {
+        Monocle.Compat.enableTouchProxyOnFrame(frame);
+      }
+    }
+
+    setColumnWidth(pageDiv);
+
+    clampCSS(doc.body);
+
+    // TODO: rewrite internal links
+
+    // Any top-level text node will be inserted into a fresh
+    // div parent before being added to the array -- unless it is blank, in
+    // which case it is discarded. (In this way we ensure that all items
+    // in the array are Elements.)
+    //
+    var elem = doc.body.firstChild;
+    while (elem) {
+      if (elem.nodeType == 3) {
+        var textNode = elem;
+        if (elem.nodeValue.match(/^\s+$/)) {
+          elem = textNode.nextSibling;
+          textNode.parentNode.removeChild(textNode);
+        } else {
+          elem = doc.createElement('div');
+          textNode.parentNode.insertBefore(elem, textNode);
+          textNode.parentNode.removeChild(textNode);
+        }
+      }
+      if (elem) {
+        elem = elem.nextSibling;
+      }
+    }
+    p.clientDimensions = null;
+    updateDimensions(pageDiv);
+    if (callback) { callback(); }
   }
 
 
