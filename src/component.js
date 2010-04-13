@@ -159,7 +159,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
         // FIXME: presently required to route around MobileSafari's
         // problems with iframes. But it would be very nice to rip it out.
         if (typeof Touch == "object") {
-          enableTouchProxyOnFrame(frame);
+          Monocle.enableTouchProxyOnFrame(frame);
         }
       }
 
@@ -213,84 +213,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
       doc.close();
       setUpFrame();
     }
-  }
-
-
-  function enableTouchProxyOnFrame(frame) {
-    evtFn = function (evt) {
-      // var offsets = { x: 0, y: 0 }
-      // var node = frame;
-      // while (node && node.nodeType == 1) {
-      //   offsets.x += node.offsetLeft;
-      //   offsets.y += node.offsetTop;
-      //   node = node.parentNode;
-      // }
-      var touch = evt.touches[0] || evt.changedTouches[0];
-      // console.log("Screen: " + touch.screenX + ", " + touch.screenY);
-      // console.log("Page: " + touch.pageX + ", " + touch.pageY);
-      // var div = frame.parentNode;
-      // console.log(
-      //   "Client?: " + (touch.pageX - div.scrollLeft) + ", " +
-      //   (touch.pageY - div.scrollTop)
-      // );
-      var target = document.elementFromPoint(
-        touch.screenX,
-        touch.screenY
-      );
-      if (!target) {
-        console.log('No target for ' + evt.type);
-        return;
-      }
-      if (target == frame) {
-        return;
-      }
-
-      // Xerox the event data, dispatching it on the new target.
-      var touches = [];
-      var newTouch = document.createTouch(
-        document.defaultView,
-        target,
-        0,
-        touch.screenX,
-        touch.screenY,
-        touch.screenX,
-        touch.screenY
-      );
-      touches.push(newTouch);
-      var newTouchList = document.createTouchList(touches[0]);
-      var newEvt = document.createEvent('TouchEvent');
-      newEvt.initTouchEvent(
-        evt.type,
-        true,
-        true,
-        document.defaultView,
-        evt.detail,
-        touches[0].screenX,
-        touches[0].screenY,
-        touches[0].pageX,
-        touches[0].pageY,
-        evt.ctrlKey,
-        evt.altKey,
-        evt.shiftKey,
-        evt.metaKey,
-        newTouchList,
-        newTouchList,
-        newTouchList,
-        evt.scale,
-        evt.rotation
-      );
-
-      if (!target.dispatchEvent(newEvt)) {
-        evt.preventDefault();
-      }
-    }
-
-    // We only need to listen for touch events.
-    var doc = frame.contentWindow.document;
-    Monocle.addListener(doc, 'touchstart', evtFn);
-    Monocle.addListener(doc, 'touchmove', evtFn);
-    Monocle.addListener(doc, 'touchend', evtFn);
-    Monocle.addListener(doc, 'touchcancel', evtFn);
   }
 
 
