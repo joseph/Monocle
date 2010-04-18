@@ -6,7 +6,7 @@ Monocle.Controls.Magnifier = function (reader) {
   // Constants.
   var k = {
     LARGE_FONT_SIZE: "115%",
-    NORMAL_FONT_SIZE: Monocle.Styles.content['font-size'] || "100%"
+    NORMAL_FONT_SIZE: Monocle.Styles.body['font-size'] || "100%"
   }
 
   // Properties.
@@ -62,11 +62,11 @@ Monocle.Controls.Magnifier = function (reader) {
     }
     var opacities;
     if (!p.enlarged) {
-      Monocle.Styles.content['font-size'] = k.LARGE_FONT_SIZE;
+      Monocle.Styles.body['font-size'] = k.LARGE_FONT_SIZE;
       opacities = [0.3, 1]
       p.enlarged = true;
     } else {
-      Monocle.Styles.content['font-size'] = k.NORMAL_FONT_SIZE;
+      Monocle.Styles.body['font-size'] = k.NORMAL_FONT_SIZE;
       opacities = [1, 0.3]
       p.enlarged = false;
     }

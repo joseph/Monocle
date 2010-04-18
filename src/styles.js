@@ -4,16 +4,7 @@ Monocle.Styles.container = {
   "height": "100%",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
-  "user-select": "none",
-  "-webkit-text-size-adjust": "none"
-}
-
-Monocle.Styles.overlay = {
-  "position": "absolute",
-  "display": "none",
-  "width": "100%",
-  "height": "100%",
-  "z-index": "1000"
+  "user-select": "none"
 }
 
 Monocle.Styles.page = {
@@ -24,12 +15,10 @@ Monocle.Styles.page = {
   "right": "5px",
   "background": "#FFF",
   "z-index": "1",
-  "-webkit-box-shadow": "2px 0 2px #999",
-  "-moz-box-shadow": "2px 0 2px #999",
   "-webkit-transform-style": "preserve-3d"
 }
 
-Monocle.Styles.scroller = {
+Monocle.Styles.sheaf = {
   "position": "absolute",
   "top": "1em",
   "bottom": "1em",
@@ -38,7 +27,7 @@ Monocle.Styles.scroller = {
   "overflow": "hidden" // Required by MobileSafari to constrain inner iFrame.
 }
 
-Monocle.Styles.content = {
+Monocle.Styles.component = {
   "display": "block",
   "height": "100%",
   "width": "100%",
@@ -46,7 +35,7 @@ Monocle.Styles.content = {
   "overflow": "hidden"
 }
 
-Monocle.Styles.framebody = {
+Monocle.Styles.body = {
   "margin": "0",
   "padding": "0",
   "position": "absolute",
@@ -73,16 +62,16 @@ Monocle.Styles.controls = {
   "cursor": "pointer"
 }
 
-Monocle.Styles.spinner = {
-  "width": "48px",
-  "height": "48px",
-  "position": "relative",
-  "display": "block",
-  "margin": "auto"
+Monocle.Styles.control = {
+  "z-index": "100"
 }
 
-Monocle.Styles.control = {
-  "z-index": "100"  // Must be higher than any pages
+Monocle.Styles.overlay = {
+  "position": "absolute",
+  "display": "none",
+  "width": "100%",
+  "height": "100%",
+  "z-index": "1000"
 }
 
 Monocle.Styles.Controls = {

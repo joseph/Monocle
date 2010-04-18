@@ -100,7 +100,7 @@ Monocle.Book = function (dataSource) {
       return;
     }
 
-    if (!pageDiv.contentFrame || component != pageDiv.contentFrame.component) {
+    if (!pageDiv.componentFrame || component != pageDiv.componentFrame.component) {
       component.applyTo(pageDiv, callback);
       return;
     }
@@ -112,7 +112,7 @@ Monocle.Book = function (dataSource) {
 
 
   function locusToPage(pageDiv, locus) {
-    var component = pageDiv.contentFrame.component;
+    var component = pageDiv.componentFrame.component;
     var oldCmptLPN = component.lastPageNumber();
     var changedDims = component.updateDimensions(pageDiv);
 
@@ -152,7 +152,7 @@ Monocle.Book = function (dataSource) {
 
 
   function switchToPage(pageDiv, pageN, callback) {
-    var component = pageDiv.contentFrame.component;
+    var component = pageDiv.componentFrame.component;
 
     // Determine whether we need to apply a new component to the div, and
     // adjust the pageN accordingly.
@@ -202,7 +202,7 @@ Monocle.Book = function (dataSource) {
     callback({
       componentId: component.properties.id,
       page: pageN,
-      offset: (pageN - 1) * pageDiv.scrollerDiv.clientWidth
+      offset: (pageN - 1) * pageDiv.sheafDiv.clientWidth
     });
   }
 

@@ -111,23 +111,23 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function applyTo(pageDiv, callback) {
-    if (pageDiv.contentFrame && pageDiv.contentFrame.component == API) {
+    if (pageDiv.componentFrame && pageDiv.componentFrame.component == API) {
       return;
     }
     console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
 
-    if (pageDiv.contentFrame) {
-      pageDiv.scrollerDiv.removeChild(pageDiv.contentFrame);
+    if (pageDiv.componentFrame) {
+      pageDiv.sheafDiv.removeChild(pageDiv.componentFrame);
     }
 
     // TODO: Can we reuse these frames? What's better - conserving memory, or
     // conserving processing?
 
-    var frame = pageDiv.contentFrame = document.createElement('iframe');
+    var frame = pageDiv.componentFrame = document.createElement('iframe');
     frame.src = "javascript: '';";
     frame.component = API;
-    pageDiv.scrollerDiv.appendChild(frame);
-    frame.style.cssText = Monocle.Styles.ruleText('content');
+    pageDiv.sheafDiv.appendChild(frame);
+    frame.style.cssText = Monocle.Styles.ruleText('component');
 
     var doc = frame.contentWindow.document;
 
@@ -155,9 +155,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function setupFrame(pageDiv, callback) {
-    var frame = pageDiv.contentFrame;
+    var frame = pageDiv.componentFrame;
     var doc = frame.contentWindow.document;
-    doc.body.style.cssText = Monocle.Styles.ruleText('framebody');
+    doc.body.style.cssText = Monocle.Styles.ruleText('body');
 
     if (/WebKit/i.test(navigator.userAgent)) {
       // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
@@ -206,8 +206,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function setColumnWidth(pageDiv) {
-    var doc = pageDiv.contentFrame.contentWindow.document;
-    var cw = pageDiv.scrollerDiv.clientWidth;
+    var doc = pageDiv.componentFrame.contentWindow.document;
+    var cw = pageDiv.sheafDiv.clientWidth;
     doc.body.style.columnWidth = cw+"px";
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
@@ -231,8 +231,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
   // Returns true or false.
   function haveDimensionsChanged(pageDiv) {
     return (!p.clientDimensions) ||
-      (p.clientDimensions.width != pageDiv.scrollerDiv.clientWidth) ||
-      (p.clientDimensions.height != pageDiv.scrollerDiv.clientHeight);// ||
+      (p.clientDimensions.width != pageDiv.sheafDiv.clientWidth) ||
+      (p.clientDimensions.height != pageDiv.sheafDiv.clientHeight);// ||
 
       // FIXME: need a better solution for detecting scaled-up text.
       //(p.clientDimensions.fontSize != body.style.fontSize);
@@ -262,7 +262,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   // function positionImages(node) {
-  //   var node = pageDiv.contentFrame.contentWindow.document.body;
+  //   var node = pageDiv.componentFrame.contentWindow.document.body;
   //   if (!node.getBoundingClientRect) {
   //     console.log('Image positioning not supported');
   //     return;
@@ -283,15 +283,15 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function measureDimensions(pageDiv) {
-    var doc = pageDiv.contentFrame.contentWindow.document;
+    var doc = pageDiv.componentFrame.contentWindow.document;
 
     // This is weird. First time you access this value, it's doubled. Next time,
     // it's the correct amount. MobileSafari only.
     var junk = doc.body.scrollWidth;
 
     p.clientDimensions = {
-      width: pageDiv.scrollerDiv.clientWidth,
-      height: pageDiv.scrollerDiv.clientHeight,
+      width: pageDiv.sheafDiv.clientWidth,
+      height: pageDiv.sheafDiv.clientHeight,
       scrollWidth: doc.body.scrollWidth //,
 
       // FIXME: need a better solution for detecting scaled-up text.
@@ -318,8 +318,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function locateChapters(pageDiv) {
-    var doc = pageDiv.contentFrame.contentWindow.document;
-    var scrollers = [doc.body, pageDiv.scrollerDiv];
+    var doc = pageDiv.componentFrame.contentWindow.document;
+    var scrollers = [doc.body, pageDiv.sheafDiv];
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.page = 1;

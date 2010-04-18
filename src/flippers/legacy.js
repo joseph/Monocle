@@ -58,8 +58,8 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function overrideDimensions() {
-    p.page.scrollerDiv.style.right = "0";
-    p.page.scrollerDiv.style.overflow = "auto";
+    p.page.sheafDiv.style.right = "0";
+    p.page.sheafDiv.style.overflow = "auto";
     p.page.contentDiv.style.position = "relative";
     p.page.contentDiv.style.width = "100%";
     p.page.contentDiv.style.minWidth = "0%";
@@ -70,7 +70,7 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
       p.divs.legacyMessage.style.cssText = Monocle.Styles.ruleText(
         Monocle.Styles.Flippers.Legacy.message
       );
-      p.page.scrollerDiv.insertBefore(p.divs.legacyMessage, p.page.contentDiv);
+      p.page.sheafDiv.insertBefore(p.divs.legacyMessage, p.page.contentDiv);
     }
 
     if (!p.divs.prevButton) {
@@ -79,7 +79,7 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
       p.divs.prevButton.style.cssText = Monocle.Styles.ruleText(
         Monocle.Styles.Flippers.Legacy.button
       );
-      p.page.scrollerDiv.insertBefore(p.divs.prevButton, p.page.contentDiv);
+      p.page.sheafDiv.insertBefore(p.divs.prevButton, p.page.contentDiv);
     }
 
     if (!p.divs.nextButton) {
@@ -88,7 +88,7 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
       p.divs.nextButton.style.cssText = Monocle.Styles.ruleText(
         Monocle.Styles.Flippers.Legacy.button
       );
-      p.page.scrollerDiv.appendChild(p.divs.nextButton);
+      p.page.sheafDiv.appendChild(p.divs.nextButton);
     }
   }
 

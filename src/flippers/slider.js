@@ -95,13 +95,13 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData = {};
         return;
       }
-      var div = pageDiv.contentFrame.contentWindow.document.body;
+      var div = pageDiv.componentFrame.contentWindow.document.body;
       div.scrollLeft = offset;
       if (div.scrollLeft == 0) {
-        pageDiv.scrollerDiv.scrollLeft = offset;
+        pageDiv.sheafDiv.scrollLeft = offset;
       }
       div.style.left = "0px"; // Webkit hack
-      setX(pageDiv.scrollerDiv, 0, { duration: 0 }, callback);
+      setX(pageDiv.sheafDiv, 0, { duration: 0 }, callback);
     }
     if (p.setPageFn(pageDiv, locus, spCallback) == false) {
       return false;

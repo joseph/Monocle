@@ -28,9 +28,10 @@ Monocle.Reader = function (node, bookData, options) {
     //
     //   box
     //    -> container
-    //      -> pages (the number of pages is determined by the flipper)
-    //        -> scroller (basically just sets the margins)
-    //          -> content (an iframe created by the current component)
+    //      -> pages (the number of page elements is determined by the flipper)
+    //        -> sheaf (basically just sets the margins)
+    //          -> component (an iframe created by the current component)
+    //            -> body (the document.body of the iframe)
     //        -> page controls
     //      -> standard controls
     //    -> overlay
@@ -142,8 +143,8 @@ Monocle.Reader = function (node, bookData, options) {
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
 
-      page.scrollerDiv = document.createElement('div');
-      page.appendChild(page.scrollerDiv);
+      page.sheafDiv = document.createElement('div');
+      page.appendChild(page.sheafDiv);
       page.controlsDiv = document.createElement('div');
       page.appendChild(page.controlsDiv);
     }
@@ -177,8 +178,13 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i];
       page.style.cssText = Monocle.Styles.ruleText('page');
-      page.scrollerDiv.style.cssText = Monocle.Styles.ruleText('scroller');
+      page.sheafDiv.style.cssText = Monocle.Styles.ruleText('sheaf');
       page.controlsDiv.style.cssText = Monocle.Styles.ruleText('controls');
+      if (page.componentFrame && page.componentFrame.contentWindow.document) {
+        page.componentFrame.style.cssText = Monocle.Styles.ruleText('component');
+        var doc = page.componentFrame.contentWindow.document;
+        doc.body.style.cssText = Monocle.Styles.ruleText('body');
+      }
     }
     p.divs.overlay.style.cssText = Monocle.Styles.ruleText('overlay');
   }
