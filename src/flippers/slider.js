@@ -292,23 +292,22 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       p.turnData = {};
     }
 
+    // If successful:
+    var winCallback = function () {
+      jumpIn(resetTurn);
+      // FIXME: this little hack only applies to Webkit nightlies...
+      lowerPage().sheafDiv.style.webkitTransform = "scale(1.0)";
+    }
+    // If unsuccessful, we just assume setting to current page will succeed:
+    var failCallback = function () {
+      setPage(lowerPage(), place.getLocus(), winCallback);
+    }
+
     setPage(
       lowerPage(),
       place.getLocus({ direction: k.FORWARDS }),
-      // If successful...
-      function () {
-        jumpIn(resetTurn);
-      },
-      // If unsuccessful, we just assume setting to current page will succeed...
-      function () {
-        setPage(
-          lowerPage(),
-          place.getLocus(),
-          function () {
-            jumpIn(resetTurn);
-          }
-        );
-      }
+      winCallback,
+      failCallback
     );
   }
 
