@@ -174,19 +174,19 @@ Monocle.Reader = function (node, bookData, options) {
 
 
   function applyStyles() {
-    p.divs.container.style.cssText = Monocle.Styles.ruleText('container');
+    Monocle.Styles.applyRules(p.divs.container, 'container');
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i];
-      page.style.cssText = Monocle.Styles.ruleText('page');
-      page.sheafDiv.style.cssText = Monocle.Styles.ruleText('sheaf');
-      page.controlsDiv.style.cssText = Monocle.Styles.ruleText('controls');
+      Monocle.Styles.applyRules(page, 'page');
+      Monocle.Styles.applyRules(page.sheafDiv, 'sheaf');
+      Monocle.Styles.applyRules(page.controlsDiv, 'controls');
       if (page.componentFrame && page.componentFrame.contentWindow.document) {
-        page.componentFrame.style.cssText = Monocle.Styles.ruleText('component');
+        Monocle.Styles.applyRules(page.componentFrame, 'component');
         var doc = page.componentFrame.contentWindow.document;
-        doc.body.style.cssText = Monocle.Styles.ruleText('body');
+        Monocle.Styles.applyRules(doc.body, 'body');
       }
     }
-    p.divs.overlay.style.cssText = Monocle.Styles.ruleText('overlay');
+    Monocle.Styles.applyRules(p.divs.overlay, 'overlay');
   }
 
 

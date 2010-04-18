@@ -127,7 +127,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     frame.src = "javascript: '';";
     frame.component = API;
     pageDiv.sheafDiv.appendChild(frame);
-    frame.style.cssText = Monocle.Styles.ruleText('component');
+    Monocle.Styles.applyRules(frame, 'component');
 
     var doc = frame.contentWindow.document;
 
@@ -157,7 +157,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   function setupFrame(pageDiv, callback) {
     var frame = pageDiv.componentFrame;
     var doc = frame.contentWindow.document;
-    doc.body.style.cssText = Monocle.Styles.ruleText('body');
+    Monocle.Styles.applyRules(doc.body, 'body');
 
     if (/WebKit/i.test(navigator.userAgent)) {
       // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.

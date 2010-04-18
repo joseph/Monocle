@@ -9,7 +9,7 @@ Monocle.pieceLoaded = function (piece) {
 }
 
 Monocle.Styles = {
-  ruleText: function(rule) {
+  ruleText: function (rule) {
     if (typeof rule == "string") {
       rule = this[rule];
     }
@@ -20,6 +20,12 @@ Monocle.Styles = {
       parts.push(declaration + ": " + rule[declaration] + ";")
     }
     return parts.join(" ");
+  },
+  applyRules: function (elem, rule) {
+    if (typeof rule == "string") {
+      elem.className = "mon_"+rule;
+    }
+    elem.style.cssText = this.ruleText(rule);
   }
 }
 
