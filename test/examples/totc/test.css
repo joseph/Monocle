@@ -90,29 +90,27 @@ body {
 }
 
 .pageNumber, .bookTitle, .chapterTitle {
-  padding: 6px 12px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border: 1px solid #FFFEFC;
+  padding: 3% 2%;
 }
 
 .bookTitle, .chapterTitle {
   position: absolute;
-  top: 10px;
-  left: 1em;
+  top: 1%;
+  left: 6%;
   cursor: pointer;
   padding-left: 0;
 }
 
 .chapterTitle {
   top: auto;
-  bottom: 10px;
+  bottom: 1%;
+  right: 20%;
 }
 
 .pageNumber {
   position: absolute;
-  bottom: 10px;
-  right: 1em;
+  bottom: 1%;
+  right: 8%;
   padding-right: 0;
 }
 

@@ -17,17 +17,18 @@
       "-moz-linear-gradient(0deg, #EDEAE8 0px, #FFFEFC 24px)";
     page.background =
       "-webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFEFC))";
-    scroller.top = scroller.bottom = "2.5em";
-    scroller.left = "1em";
-    scroller.right = "1em";
-    content.color = "#310";
-    content["font-family"] = "Palatino, Georgia, serif";
-    content["line-height"] = "130%";
+    sheaf.top = sheaf.bottom = "8%";
+    sheaf.left = "6%";
+    sheaf.right = "8%";
+    body.color = "#310";
+    body["font-family"] = "Palatino, Georgia, serif";
+    body["line-height"] = "120%";
     Controls.Magnifier.button.color = "#632";
-    Controls.Magnifier.button.padding = "3px 6px";
+    Controls.Magnifier.button.padding = "2%";
     Controls.Magnifier.button['-webkit-border-radius'] = "3px";
     Controls.Magnifier.button.background = "#FFF";
-    Controls.Magnifier.button.top = "8px";
+    Controls.Magnifier.button.top = "1%";
+    Controls.Magnifier.button.right = "6%";
     Controls.Contents.container.background = "#E0D3C0";
     Controls.Contents.container.border = "1px solid #EEd";
     Controls.Contents.list.font = "11pt Georgia, serif";
