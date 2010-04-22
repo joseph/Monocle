@@ -230,12 +230,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   // Returns true or false.
   function haveDimensionsChanged(pageDiv) {
+    var win = pageDiv.componentFrame.contentWindow;
+    var currStyle = win.getComputedStyle(win.document.body, null);
     return (!p.clientDimensions) ||
       (p.clientDimensions.width != pageDiv.sheafDiv.clientWidth) ||
-      (p.clientDimensions.height != pageDiv.sheafDiv.clientHeight);// ||
-
-      // FIXME: need a better solution for detecting scaled-up text.
-      //(p.clientDimensions.fontSize != body.style.fontSize);
+      (p.clientDimensions.height != pageDiv.sheafDiv.clientHeight) ||
+      (p.clientDimensions.scrollWidth != win.document.body.scrollWidth) ||
+      (p.clientDimensions.fontSize != currStyle.getPropertyValue('font-size'));
   }
 
 
@@ -283,7 +284,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function measureDimensions(pageDiv) {
-    var doc = pageDiv.componentFrame.contentWindow.document;
+    var win = pageDiv.componentFrame.contentWindow;
+    var doc = win.document;
+    var currStyle = win.getComputedStyle(doc.body, null);
 
     // This is weird. First time you access this value, it's doubled. Next time,
     // it's the correct amount. MobileSafari only.
@@ -292,10 +295,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.clientDimensions = {
       width: pageDiv.sheafDiv.clientWidth,
       height: pageDiv.sheafDiv.clientHeight,
-      scrollWidth: doc.body.scrollWidth //,
-
-      // FIXME: need a better solution for detecting scaled-up text.
-      //fontSize: doc.body.style.fontSize
+      scrollWidth: doc.body.scrollWidth,
+      fontSize: currStyle.getPropertyValue('font-size')
     }
 
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
