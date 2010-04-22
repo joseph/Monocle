@@ -6,6 +6,7 @@
     container.left = '0';
     container.width = 'auto';
     page.top = page.bottom = "6px";
+    page["outline"] = "none";
     page["-webkit-box-shadow"] = "1px 0 2px #997";
     page["-moz-box-shadow"] = "1px 0 2px #997";
     page["-webkit-border-top-left-radius"] = "26px 4px";

@@ -15,7 +15,8 @@ Monocle.Styles.page = {
   "right": "5px",
   "background": "#FFF",
   "z-index": "1",
-  "-webkit-transform-style": "preserve-3d"
+  "-webkit-transform-style": "preserve-3d",
+  "outline": "1px solid #999"
 }
 
 Monocle.Styles.sheaf = {

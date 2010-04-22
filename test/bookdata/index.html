@@ -99,7 +99,10 @@
       }
 
       function inlineReader(num, cmpt) {
-        var bd = new bookData({components: [cmpt]});
+        if (typeof cmpt == 'string') {
+          cmpt = [cmpt];
+        }
+        var bd = new bookData({components: cmpt});
         return window['reader'+num] = Monocle.Reader('reader'+num, bd);
       }
 
@@ -129,7 +132,7 @@
           inlineReader(1, '01-basic-body-only');
           inlineReader(2, '02-basic-full-document');
           inlineReader(3, '03-empty');
-          inlineReader(4, '04-short-document');
+          inlineReader(4, ['04-short-1page', '04-short-2page','04-short-3page','04-short-1page','04-short-2page','04-short-3page']);
           inlineReader(5, '05-short-document-with-image');
           inlineReader(6, '06-document-with-stylesheet');
           framedReader(7, '07-contains-javascript');
@@ -169,7 +172,7 @@
       <h2>04</h2>
       <div class="reader" id="reader4"></div>
       <p>
-        Two page document.
+        1 page component, 2 page component, 3 page component. Twice.
       </p>
     </div>
 
