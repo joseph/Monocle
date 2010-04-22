@@ -187,6 +187,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         slideToCursor(boxPointX);
         liftAnimationFinished();
       }
+      return true;
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
@@ -211,8 +212,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           p.turnData = {};
         }
       );
+      return true;
     }
-    return true;
+    return false;
   }
 
 

@@ -72,9 +72,12 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
   function turn(boxPointX) {
     if (inForwardZone(boxPointX)) {
       moveTo({ page: getPlace().pageNumber() + 1});
+      return true;
     } else if (inBackwardZone(boxPointX)) {
       moveTo({ page: getPlace().pageNumber() - 1});
+      return true;
     }
+    return false;
   }
 
 

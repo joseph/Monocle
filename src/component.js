@@ -217,7 +217,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     doc.body.style.columnWidth = cw+"px";
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
-    console.log("SETTING COLUMN WIDTH [" + pageDiv.pageIndex + "]: " + cw);
 
     if (/WebKit/i.test(navigator.userAgent)) {
       // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
