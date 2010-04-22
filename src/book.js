@@ -184,12 +184,16 @@ Monocle.Book = function (dataSource) {
       return componentAt(
         cIndex - 1,
         function (component) {
-          component.updateDimensions(pageDiv);
-          pageN += component.lastPageNumber();
-          changePage(
+          component.applyTo(
             pageDiv,
-            { page: pageN, componentId: component.properties.id },
-            callback
+            function () {
+              pageN += component.lastPageNumber();
+              changePage(
+                pageDiv,
+                { page: pageN, componentId: component.properties.id },
+                callback
+              );
+            }
           );
         }
       );

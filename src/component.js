@@ -42,6 +42,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // the HTML provided by dataSource.getComponent() for this component
     html: html,
 
+    // The array of iframes that are currently rendering this component.
+    clientFrames: [],
+
     // The current dimensions of the client node that holds the elements of
     // this component. (The assumption is that all client nodes will have
     // identical dimensions — otherwise nothing will work as expected.)
@@ -117,7 +120,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
 
     if (pageDiv.componentFrame) {
-      pageDiv.sheafDiv.removeChild(pageDiv.componentFrame);
+      pageDiv.componentFrame.component.removeFrame(pageDiv);
     }
 
     // TODO: Can we reuse these frames? What's better - conserving memory, or
@@ -126,8 +129,10 @@ Monocle.Component = function (book, id, index, chapters, html) {
     var frame = pageDiv.componentFrame = document.createElement('iframe');
     frame.src = "javascript: '';";
     frame.component = API;
+    frame.pageDiv = pageDiv;
     pageDiv.sheafDiv.appendChild(frame);
     Monocle.Styles.applyRules(frame, 'component');
+    p.clientFrames.push(frame);
 
     var doc = frame.contentWindow.document;
 
@@ -200,23 +205,51 @@ Monocle.Component = function (book, id, index, chapters, html) {
       }
     }
     p.clientDimensions = null;
-    updateDimensions(pageDiv);
+    measureDimensions(pageDiv);
+    locateChapters(pageDiv);
     if (callback) { callback(); }
   }
 
 
   function setColumnWidth(pageDiv) {
+    if (!pageDiv) {
+      for (var i = 0; i < p.clientFrames.length; ++i) {
+        setColumnWidth(p.clientFrames[i].pageDiv);
+      }
+      return;
+    }
     var doc = pageDiv.componentFrame.contentWindow.document;
     var cw = pageDiv.sheafDiv.clientWidth;
     doc.body.style.columnWidth = cw+"px";
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
+    console.log("SETTING COLUMN WIDTH [" + pageDiv.pageIndex + "]: " + cw);
+  }
+
+
+  function removeFrame(pageDiv) {
+    if (!pageDiv.componentFrame) {
+      throw("Requested to remove a frame that does not exist.");
+    }
+    if (pageDiv.componentFrame && pageDiv.componentFrame.component != API) {
+      throw("Requested to remove a frame that is not mine.")
+    }
+    var idx = p.clientFrames.indexOf(pageDiv.componentFrame);
+    if (idx < 0) {
+      throw("Requested to remove a frame that is not in my list of frames.");
+    }
+    pageDiv.sheafDiv.removeChild(pageDiv.componentFrame);
+    var rest = p.clientFrames.slice(idx + 1);
+    p.clientFrames.length = idx;
+    p.clientFrames.push.apply(p.clientFrames, rest);
+    pageDiv.componentFrame = null;
+    return true;
   }
 
 
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
-      setColumnWidth(pageDiv);
+      setColumnWidth();
       //positionImages(pageDiv);
       measureDimensions(pageDiv);
       locateChapters(pageDiv);
@@ -355,6 +388,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   API.applyTo = applyTo;
   API.preparePage = preparePage;
   API.updateDimensions = updateDimensions;
+  API.removeFrame = removeFrame;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;
