@@ -331,8 +331,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
       fontSize: currStyle.getPropertyValue('font-size')
     }
 
+    // Detect single-page components.
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
-      var lcEnd = doc.body.lastChild.offsetTop + doc.body.lastChild.offsetHeight;
+      var elems = doc.body.getElementsByTagName('*');
+      var elem = elems[elems.length - 1];
+      var lcEnd = elem.offsetTop + elem.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
         (lcEnd > p.clientDimensions.height ? 2 : 1);
     }
