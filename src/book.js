@@ -141,10 +141,7 @@ Monocle.Book = function (dataSource) {
     // pageN against the difference between the old number of pages in the
     // component and the new number of pages in the component.
     if (changedDims && parseInt(oldCmptLPN)) {
-      pageN = Math.max(
-        Math.round(component.lastPageNumber() * (pageN / oldCmptLPN)),
-        1
-      );
+      pageN = Math.round(component.lastPageNumber() * (pageN / oldCmptLPN));
     }
 
     return pageN;
