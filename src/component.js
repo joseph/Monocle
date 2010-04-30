@@ -80,6 +80,10 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
     p.html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
+
+    // Gecko chokes on the DOCTYPE declaration.
+    var doctypeFragment = "<!DOCTYPE[^>]*>";
+    p.html = p.html.replace(new RegExp(doctypeFragment, 'm'), '');
   }
 
 
@@ -172,7 +176,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     setColumnWidth(pageDiv);
 
-    clampCSS(doc.body);
+    clampCSS(doc);
 
     // TODO: rewrite internal links
 
@@ -274,23 +278,29 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   // TODO: Rewrite this to insert a dynamic stylesheet into the frame to set
   // the clamping.
-  function clampCSS(body) {
+  function clampCSS(doc) {
     //console.log('Clamping css for ' + body);
-    var clampDimensions = function (elem) {
-      elem.style.cssText +=
-        // FIXME: helps with text-indent, but images get cut off at page breaks.
-        //"float: left;" +
-        "max-width: 100% !important;" +
-        "max-height: 100% !important; ";
+    // TODO: move to somewhere it can be configured...
+    var rules = "body * { float: none !important; clear: none !important; }" +
+      "p { margin-left: 0 !important; margin-right: 0 !important; }" +
+      "table, img { max-width: 100% !important; max-height: 90% !important; }";
+
+    var styleTag = document.createElement('style');
+    styleTag.type = 'text/css';
+    if (styleTag.styleSheet) {
+      styleTag.styleSheet.cssText = rules;
+    } else {
+      styleTag.appendChild(document.createTextNode(rules));
     }
-    var elems = body.getElementsByTagName('img');
-    for (var i = elems.length - 1; i >= 0; --i) {
-      clampDimensions(elems[i]);
-    }
-    var elems = body.getElementsByTagName('table');
-    for (var i = elems.length - 1; i >= 0; --i) {
-      clampDimensions(elems[i]);
-    }
+    doc.getElementsByTagName('head')[0].appendChild(styleTag);
+
+    // Correct the body lineHeight to use a number, not a percentage, which
+    // causes the text to jump upwards.
+    var win = doc.defaultView;
+    var currStyle = win.getComputedStyle(doc.body, null);
+    var lh = parseFloat(currStyle.getPropertyValue('line-height'));
+    var fs = parseFloat(currStyle.getPropertyValue('font-size'));
+    doc.body.style.lineHeight = lh / fs;
   }
 
 
