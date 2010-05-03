@@ -202,7 +202,6 @@ Monocle.Book = function (dataSource) {
     pageDiv.reader.dispatchEvent('monocle:componentchange');
 
     // Do it.
-    component.preparePage(pageDiv, pageN)
     setPlaceFor(pageDiv, component, pageN);
 
     callback({

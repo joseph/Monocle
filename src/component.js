@@ -94,10 +94,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function preparePage(pageDiv, pageN) {
-  }
-
-
   function chapterForPage(pageN) {
     var cand = null;
     for (var i = 0; i < p.chapters.length; ++i) {
@@ -363,7 +359,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   API.applyTo = applyTo;
-  API.preparePage = preparePage;
   API.updateDimensions = updateDimensions;
   API.removeFrame = removeFrame;
   API.chapterForPage = chapterForPage;
