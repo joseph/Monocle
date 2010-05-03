@@ -145,7 +145,6 @@ Monocle.Controls.Scrubber = function (reader) {
       x = x || rebaseX(evt, cntr);
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
-      needleTrail.style.width = x + "px";
       var chps = p.book.chaptersForComponent(place.componentId);
       var cmptIndex = p.componentIds.indexOf(place.componentId);
       var chp = chps[Math.floor(chps.length * place.percentageThrough)];
@@ -225,8 +224,8 @@ Monocle.Styles.Controls.Scrubber = {
     "top": "5px",
     "background": "#CCC",
     "border": "1px solid #999",
-    "-webkit-border-radius": "14px",
-    "-moz-border-radius": "14px"
+    "-webkit-border-radius": "8px",
+    "-moz-border-radius": "8px"
   },
   needleTrail: {
     "position": "absolute",
