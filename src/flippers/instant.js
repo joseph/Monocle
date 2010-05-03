@@ -49,13 +49,13 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
 
   function getPlace() {
-    return p.reader.getBook().placeFor(p.page);
+    return p.page.m.place;
   }
 
 
   function moveTo(locus) {
     var spCallback = function (offset) {
-      var div = p.page.componentFrame.contentWindow.document.body;
+      var div = p.page.m.activeFrame.contentDocument.body;
       div.scrollLeft = offset;
       if (div.scrollLeft == 0) {
         p.page.sheafDiv.scrollLeft = offset;

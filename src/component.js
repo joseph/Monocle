@@ -42,8 +42,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // the HTML provided by dataSource.getComponent() for this component
     html: html,
 
-    // The array of iframes that are currently rendering this component.
-    clientFrames: [],
+    // The array of pageDivs that have rendered this component. Indexed by
+    // their pageIndex.
+    pageDivs: [],
 
     // The current dimensions of the client node that holds the elements of
     // this component. (The assumption is that all client nodes will have
@@ -94,66 +95,42 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function chapterForPage(pageN) {
-    var cand = null;
-    for (var i = 0; i < p.chapters.length; ++i) {
-      if (pageN >= p.chapters[i].page) {
-        cand = p.chapters[i];
-      } else {
-        return cand;
-      }
-    }
-    return cand;
-  }
-
-
-  function pageForChapter(fragment) {
-    if (!fragment) {
-      return 1;
-    }
-    for (var i = 0; i < p.chapters.length; ++i) {
-      if (p.chapters[i].fragment == fragment) {
-        return p.chapters[i].page;
-      }
-    }
-    return null;
-  }
-
-
   function applyTo(pageDiv, callback) {
-    if (pageDiv.componentFrame && pageDiv.componentFrame.component == API) {
+    if (pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API) {
       return;
     }
-    console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
+    console.log("Applying component '"+id+"' to pageDiv: "+pageDiv.m.pageIndex);
 
-    if (pageDiv.componentFrame) {
-      pageDiv.componentFrame.component.clearComponent(pageDiv);
-    }
+    blankPage(pageDiv);
 
-    var frameLoaded = function () { setupFrame(pageDiv, callback); }
-    var frame = p.clientFrames[pageDiv.pageIndex];
+    var frame = pageDiv.m.componentFrames[p.index];
     if (frame) {
       console.log("Reusing existing frame.")
       frame.style.display = "block";
-      pageDiv.componentFrame = frame;
-      frameLoaded();
+      pageDiv.m.activeFrame = frame;
+      setupFrame(pageDiv, callback);
     } else {
       console.log("Generating new frame.")
-      frame = pageDiv.componentFrame = document.createElement('iframe');
-      frame.component = API;
-      frame.pageDiv = pageDiv;
+      frame = document.createElement('iframe');
+      pageDiv.m.componentFrames[p.index] = frame;
+      pageDiv.m.activeFrame = frame;
+      frame.m = {
+        'component': API,
+        'pageDiv': pageDiv
+      }
       Monocle.Styles.applyRules(frame, 'component');
-      p.clientFrames[pageDiv.pageIndex] = frame;
-      pageDiv.sheafDiv.appendChild(frame);
+      pageDiv.m.sheafDiv.appendChild(frame);
 
+      var frameLoaded = function () { setupFrame(pageDiv, callback); }
       Monocle.addListener(frame, 'load', frameLoaded);
+
       frame.src = "javascript: '" + p.html + "';";
     }
   }
 
 
   function setupFrame(pageDiv, callback) {
-    var frame = pageDiv.componentFrame;
+    var frame = pageDiv.m.activeFrame;
     var doc = frame.contentWindow.document;
     Monocle.Styles.applyRules(doc.body, 'body');
 
@@ -195,13 +172,87 @@ Monocle.Component = function (book, id, index, chapters, html) {
     measureDimensions(pageDiv);
     locateChapters(pageDiv);
     if (callback) { callback(); }
-    pageDiv.style.background = "#FFF"; // FIXME: componentchange
+
+    pageDiv.m.reader.dispatchEvent('componentchange', { 'page': pageDiv });
+  }
+
+
+  function blankPage(pageDiv) {
+    if (pageDiv.m.activeFrame) {
+      pageDiv.m.activeFrame.style.display = 'none';
+    }
+    pageDiv.m.activeFrame = null;
+    pageDiv.m.reader.dispatchEvent('componentchanging', { page: pageDiv });
+  }
+
+
+  function updateDimensions(pageDiv) {
+    if (haveDimensionsChanged(pageDiv)) {
+      for (var i = 0; i < p.pageDivs.length; ++i) {
+        setColumnWidth(p.pageDivs[i]);
+      }
+      measureDimensions(pageDiv);
+      locateChapters(pageDiv);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  // Returns true or false.
+  function haveDimensionsChanged(pageDiv) {
+    var win = pageDiv.m.activeFrame.contentWindow;
+    var currStyle = win.getComputedStyle(win.document.body, null);
+    return (!p.clientDimensions) ||
+      (p.clientDimensions.width != pageDiv.m.sheafDiv.clientWidth) ||
+      (p.clientDimensions.height != pageDiv.m.sheafDiv.clientHeight) ||
+      (p.clientDimensions.scrollWidth != win.document.body.scrollWidth) ||
+      (p.clientDimensions.fontSize != currStyle.getPropertyValue('font-size'));
+  }
+
+
+  function measureDimensions(pageDiv) {
+    var win = pageDiv.m.activeFrame.contentWindow;
+    var doc = win.document;
+    var currStyle = win.getComputedStyle(doc.body, null);
+
+    // This is weird. First time you access this value, it's doubled. Next time,
+    // it's the correct amount. MobileSafari only.
+    var junk = doc.body.scrollWidth;
+
+    p.clientDimensions = {
+      width: pageDiv.m.sheafDiv.clientWidth,
+      height: pageDiv.m.sheafDiv.clientHeight,
+      scrollWidth: doc.body.scrollWidth,
+      fontSize: currStyle.getPropertyValue('font-size')
+    }
+
+    // Detect single-page components.
+    if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
+      var elems = doc.body.getElementsByTagName('*');
+      var elem = elems[elems.length - 1];
+      var lcEnd = elem.offsetTop + elem.offsetHeight;
+      p.clientDimensions.scrollWidth = p.clientDimensions.width *
+        (lcEnd > p.clientDimensions.height ? 2 : 1);
+    }
+
+    p.clientDimensions.pages = Math.ceil(
+      p.clientDimensions.scrollWidth / p.clientDimensions.width
+    );
+
+    console.log(
+      "Pages for '"+id+"' in pageDiv["+pageDiv.m.pageIndex+"]: " +
+      p.clientDimensions.pages
+    );
+
+    return p.clientDimensions;
   }
 
 
   function setColumnWidth(pageDiv) {
-    var doc = pageDiv.componentFrame.contentWindow.document;
-    var cw = pageDiv.sheafDiv.clientWidth;
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var cw = pageDiv.m.sheafDiv.clientWidth;
     doc.body.style.columnWidth = cw+"px";
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
@@ -214,52 +265,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function clearComponent(pageDiv) {
-    if (!pageDiv.componentFrame) {
-      throw("Requested to remove a frame that does not exist.");
-    }
-    if (pageDiv.componentFrame && pageDiv.componentFrame.component != API) {
-      throw("Requested to remove a frame that is not mine.")
-    }
-    var frame = p.clientFrames[pageDiv.pageIndex];
-    if (!frame) {
-      throw("Requested to remove a frame that is not in my list of frames.");
-    }
-    pageDiv.componentFrame.style.display = 'none';
-    pageDiv.componentFrame = null;
-    pageDiv.style.background = "#CCC"; // FIXME: componentchanging
-    return true;
-  }
-
-
-  function updateDimensions(pageDiv) {
-    if (haveDimensionsChanged(pageDiv)) {
-      setColumnWidth(pageDiv);
-      measureDimensions(pageDiv);
-      locateChapters(pageDiv);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-
-  // Returns true or false.
-  function haveDimensionsChanged(pageDiv) {
-    var win = pageDiv.componentFrame.contentWindow;
-    var currStyle = win.getComputedStyle(win.document.body, null);
-    return (!p.clientDimensions) ||
-      (p.clientDimensions.width != pageDiv.sheafDiv.clientWidth) ||
-      (p.clientDimensions.height != pageDiv.sheafDiv.clientHeight) ||
-      (p.clientDimensions.scrollWidth != win.document.body.scrollWidth) ||
-      (p.clientDimensions.fontSize != currStyle.getPropertyValue('font-size'));
-  }
-
-
-  // TODO: Rewrite this to insert a dynamic stylesheet into the frame to set
-  // the clamping.
   function clampCSS(doc) {
-    //console.log('Clamping css for ' + body);
     // TODO: move to somewhere it can be configured...
     var rules = "body * { float: none !important; clear: none !important; }" +
       "p { margin-left: 0 !important; margin-right: 0 !important; }" +
@@ -284,47 +290,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function measureDimensions(pageDiv) {
-    var win = pageDiv.componentFrame.contentWindow;
-    var doc = win.document;
-    var currStyle = win.getComputedStyle(doc.body, null);
-
-    // This is weird. First time you access this value, it's doubled. Next time,
-    // it's the correct amount. MobileSafari only.
-    var junk = doc.body.scrollWidth;
-
-    p.clientDimensions = {
-      width: pageDiv.sheafDiv.clientWidth,
-      height: pageDiv.sheafDiv.clientHeight,
-      scrollWidth: doc.body.scrollWidth,
-      fontSize: currStyle.getPropertyValue('font-size')
-    }
-
-    // Detect single-page components.
-    if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
-      var elems = doc.body.getElementsByTagName('*');
-      var elem = elems[elems.length - 1];
-      var lcEnd = elem.offsetTop + elem.offsetHeight;
-      p.clientDimensions.scrollWidth = p.clientDimensions.width *
-        (lcEnd > p.clientDimensions.height ? 2 : 1);
-    }
-
-    p.clientDimensions.pages = Math.ceil(
-      p.clientDimensions.scrollWidth / p.clientDimensions.width
-    );
-
-    console.log(
-      "Pages for '"+id+"' in pageDiv["+pageDiv.pageIndex+"]: " +
-      p.clientDimensions.pages
-    );
-
-    return p.clientDimensions;
-  }
-
-
   function locateChapters(pageDiv) {
-    var doc = pageDiv.componentFrame.contentWindow.document;
-    var scrollers = [doc.body, pageDiv.sheafDiv];
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var scrollers = [doc.body, pageDiv.m.sheafDiv];
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.page = 1;
@@ -349,6 +317,32 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
+  function chapterForPage(pageN) {
+    var cand = null;
+    for (var i = 0; i < p.chapters.length; ++i) {
+      if (pageN >= p.chapters[i].page) {
+        cand = p.chapters[i];
+      } else {
+        return cand;
+      }
+    }
+    return cand;
+  }
+
+
+  function pageForChapter(fragment) {
+    if (!fragment) {
+      return 1;
+    }
+    for (var i = 0; i < p.chapters.length; ++i) {
+      if (p.chapters[i].fragment == fragment) {
+        return p.chapters[i].page;
+      }
+    }
+    return null;
+  }
+
+
   // A shortcut to p.clientDimensions.pages.
   //
   function lastPageNumber() {
@@ -358,7 +352,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
-  API.clearComponent = clearComponent;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;

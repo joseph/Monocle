@@ -113,7 +113,7 @@ Monocle.Reader = function (node, bookData, options) {
 
     // Wait for user input.
     for (var i = 0; i < p.divs.pages.length; ++i) {
-      listenForInteraction(p.divs.pages[i].controlsDiv);
+      listenForInteraction(p.divs.pages[i].m.controlsDiv);
     }
 
     dispatchEvent("monocle:loaded")
@@ -139,14 +139,19 @@ Monocle.Reader = function (node, bookData, options) {
     p.divs.box.appendChild(p.divs.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
-      page.pageIndex = i;
+      page.m = {
+        reader: API,
+        pageIndex: i,
+        sheafDiv: document.createElement('div'),
+        controlsDiv: document.createElement('div'),
+        componentFrames: [],
+        activeFrame: null,
+        place: null
+      }
+      page.appendChild(page.m.sheafDiv);
+      page.appendChild(page.m.controlsDiv);
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
-
-      page.sheafDiv = document.createElement('div');
-      page.appendChild(page.sheafDiv);
-      page.controlsDiv = document.createElement('div');
-      page.appendChild(page.controlsDiv);
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
@@ -178,8 +183,8 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i];
       Monocle.Styles.applyRules(page, 'page');
-      Monocle.Styles.applyRules(page.sheafDiv, 'sheaf');
-      Monocle.Styles.applyRules(page.controlsDiv, 'controls');
+      Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
+      Monocle.Styles.applyRules(page.m.controlsDiv, 'controls');
       if (page.componentFrame && page.componentFrame.contentWindow.document) {
         Monocle.Styles.applyRules(page.componentFrame, 'component');
         var doc = page.componentFrame.contentWindow.document;
@@ -488,9 +493,9 @@ Monocle.Reader = function (node, bookData, options) {
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
       for (var i = 0; i < p.divs.pages.length; ++i) {
-        var page = p.divs.pages[i].controlsDiv;
-        var runner = ctrl.createControlElements(page);
-        page.appendChild(runner);
+        var cDiv = p.divs.pages[i].m.controlsDiv;
+        var runner = ctrl.createControlElements(cDiv);
+        cDiv.appendChild(runner);
         ctrlData.elements.push(runner);
       }
     } else if (cType == "modal" || cType == "popover") {

@@ -45,7 +45,7 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function getPlace() {
-    return p.reader.getBook().placeFor(p.page.contentDiv);
+    return p.page.m.place;
   }
 
 

@@ -20,7 +20,6 @@ Monocle.Book = function (dataSource) {
   var p = {
     dataSource: dataSource,
     components: [],
-    places: [],
     chapters: {} // flat arrays of chapters per component
   }
 
@@ -72,11 +71,9 @@ Monocle.Book = function (dataSource) {
 
   function switchToComponent(pageDiv, locus, callback) {
     // Find the place of the pageDiv in the book, or create one.
-    var place = placeFor(pageDiv);
+    var place = pageDiv.m.place;
     if (!place) {
-      if (pageDiv.componentFrame) {
-        pageDiv.componentFrame.component.clearComponent(pageDiv);
-      }
+      // FIXME: BLANK THE PAGE
       componentAt(
         0,
         function (component) {
@@ -94,9 +91,7 @@ Monocle.Book = function (dataSource) {
     } else if (p.components[cIndex]) {
       component = p.components[cIndex];
     } else {
-      if (pageDiv.componentFrame) {
-        pageDiv.componentFrame.component.clearComponent(pageDiv);
-      }
+      // FIXME: BLANK THE PAGE
       componentAt(
         cIndex,
         function (component) {
@@ -106,10 +101,7 @@ Monocle.Book = function (dataSource) {
       return;
     }
 
-    if (!pageDiv.componentFrame || component != pageDiv.componentFrame.component) {
-      if (pageDiv.componentFrame) {
-        pageDiv.componentFrame.component.clearComponent(pageDiv);
-      }
+    if (!pageDiv.m.activeFrame || component != pageDiv.m.activeFrame.m.component) {
       component.applyTo(pageDiv, callback);
       return;
     }
@@ -121,7 +113,7 @@ Monocle.Book = function (dataSource) {
 
 
   function locusToPage(pageDiv, locus) {
-    var component = pageDiv.componentFrame.component;
+    var component = pageDiv.m.activeFrame.m.component;
     var oldCmptLPN = component.lastPageNumber();
     var changedDims = component.updateDimensions(pageDiv);
 
@@ -134,7 +126,7 @@ Monocle.Book = function (dataSource) {
       place = setPlaceFor(pageDiv, component, 1);
       pageN = place.pageAtPercentageThrough(locus.percent);
     } else if (typeof(locus.direction) == "number") {
-      pageN = place.pageNumber();
+      pageN = pageDiv.m.place.pageNumber();
       pageN += locus.direction;
     } else if (typeof(locus.anchor) == "string") {
       if (locus.position == "start") {
@@ -158,7 +150,7 @@ Monocle.Book = function (dataSource) {
 
 
   function switchToPage(pageDiv, pageN, callback) {
-    var component = pageDiv.componentFrame.component;
+    var component = pageDiv.m.activeFrame.m.component;
 
     // Determine whether we need to apply a new component to the div, and
     // adjust the pageN accordingly.
@@ -211,29 +203,15 @@ Monocle.Book = function (dataSource) {
     callback({
       componentId: component.properties.id,
       page: pageN,
-      offset: (pageN - 1) * pageDiv.sheafDiv.clientWidth
+      offset: (pageN - 1) * pageDiv.m.sheafDiv.clientWidth
     });
   }
 
 
-  function placeFor(pageDiv) {
-    for (var i = p.places.length - 1; i >= 0; --i) {
-      if (p.places[i][0] == pageDiv) {
-        return p.places[i][1];
-      }
-    }
-    return null;
-  }
-
-
   function setPlaceFor(pageDiv, component, pageN) {
-    var place = placeFor(pageDiv);
-    if (!place) {
-      place = new Monocle.Place();
-      p.places[p.places.length] = [pageDiv, place];
-    }
-    place.setPlace(component, pageN);
-    return place;
+    pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
+    pageDiv.m.place.setPlace(component, pageN);
+    return pageDiv.m.place;
   }
 
 
@@ -301,6 +279,7 @@ Monocle.Book = function (dataSource) {
       cIndex,
       function (component) {
         // NB: updating dimensions changes page state.
+        // FIXME: THIS LOOKS NASTY
         component.updateDimensions(pageDiv);
         var place = new Monocle.Place();
         if (fragment) {
@@ -323,7 +302,6 @@ Monocle.Book = function (dataSource) {
   API.changePage = changePage;
   API.chapterTree = chapterTree;
   API.chaptersForComponent = chaptersForComponent;
-  API.placeFor = placeFor;
   API.placeOfChapter = placeOfChapter;
 
   initialize();
