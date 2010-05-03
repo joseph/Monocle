@@ -131,15 +131,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // }
 
     var frameLoaded = function () { setupFrame(pageDiv, callback); }
-
-    var frame = null;
-    for (var i = 0; i < p.clientFrames.length; ++i) {
-      if (p.clientFrames[i].pageDiv == pageDiv) {
-        frame = p.clientFrames[i];
-        break;
-      }
-    }
-
+    var frame = p.clientFrames[pageDiv.pageIndex];
     if (frame) {
       console.log("Reusing existing frame.")
       frame.style.display = "block";
@@ -153,7 +145,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
       frame.pageDiv = pageDiv;
 
       Monocle.Styles.applyRules(frame, 'component');
-      p.clientFrames.push(frame);
+      p.clientFrames[pageDiv.pageIndex] = frame;
 
       pageDiv.sheafDiv.appendChild(frame);
       frame.src = "javascript: '" + p.html + "';";
@@ -209,12 +201,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function setColumnWidth(pageDiv) {
-    if (!pageDiv) {
-      for (var i = 0; i < p.clientFrames.length; ++i) {
-        setColumnWidth(p.clientFrames[i].pageDiv);
-      }
-      return;
-    }
     var doc = pageDiv.componentFrame.contentWindow.document;
     var cw = pageDiv.sheafDiv.clientWidth;
     doc.body.style.columnWidth = cw+"px";
@@ -236,8 +222,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     if (pageDiv.componentFrame && pageDiv.componentFrame.component != API) {
       throw("Requested to remove a frame that is not mine.")
     }
-    var idx = p.clientFrames.indexOf(pageDiv.componentFrame);
-    if (idx < 0) {
+    var frame = p.clientFrames[pageDiv.pageIndex];
+    if (!frame) {
       throw("Requested to remove a frame that is not in my list of frames.");
     }
     pageDiv.componentFrame.style.display = 'none';
@@ -249,7 +235,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
-      setColumnWidth();
+      setColumnWidth(pageDiv);
       measureDimensions(pageDiv);
       locateChapters(pageDiv);
       return true;
