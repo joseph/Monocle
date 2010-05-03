@@ -99,7 +99,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     if (pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API) {
       return;
     }
-    console.log("Applying component '"+id+"' to pageDiv: "+pageDiv.m.pageIndex);
+    console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
 
     blankPage(pageDiv);
 
@@ -146,34 +146,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     // TODO: rewrite internal links
 
-    // Any top-level text node will be inserted into a fresh
-    // div parent before being added to the array -- unless it is blank, in
-    // which case it is discarded. (In this way we ensure that all items
-    // in the array are Elements.)
-    //
-    var elem = doc.body.firstChild;
-    while (elem) {
-      if (elem.nodeType == 3) {
-        var textNode = elem;
-        if (elem.nodeValue.match(/^\s+$/)) {
-          elem = textNode.nextSibling;
-          textNode.parentNode.removeChild(textNode);
-        } else {
-          elem = doc.createElement('div');
-          textNode.parentNode.insertBefore(elem, textNode);
-          textNode.parentNode.removeChild(textNode);
-        }
-      }
-      if (elem) {
-        elem = elem.nextSibling;
-      }
-    }
     p.clientDimensions = null;
     measureDimensions(pageDiv);
     locateChapters(pageDiv);
-    if (callback) { callback(); }
-
     pageDiv.m.reader.dispatchEvent('componentchange', { 'page': pageDiv });
+    if (typeof callback == 'function') {
+      callback();
+    }
   }
 
 
@@ -242,7 +221,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     );
 
     console.log(
-      "Pages for '"+id+"' in pageDiv["+pageDiv.m.pageIndex+"]: " +
+      ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
       p.clientDimensions.pages
     );
 
