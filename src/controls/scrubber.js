@@ -84,6 +84,7 @@ Monocle.Controls.Scrubber = function (reader) {
     var x = placeToPixel(place, p.divs.container[0]);
     for (var i = 0; i < p.divs.needle.length; ++i) {
       setX(p.divs.needle[i], x - p.divs.needle[i].offsetWidth / 2);
+      p.divs.needleTrail[i].style.width = x + "px";
     }
   }
 
@@ -134,6 +135,7 @@ Monocle.Controls.Scrubber = function (reader) {
   function createControlElements() {
     var cntr = createDivNamed('container');
     var track = createDivNamed('track', cntr);
+    var needleTrail = createDivNamed('needleTrail', cntr);
     var needle = createDivNamed('needle', cntr);
     var bubble = createDivNamed('bubble', cntr);
 
@@ -143,6 +145,7 @@ Monocle.Controls.Scrubber = function (reader) {
       x = x || rebaseX(evt, cntr);
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
+      needleTrail.style.width = x + "px";
       var chps = p.book.chaptersForComponent(place.componentId);
       var cmptIndex = p.componentIds.indexOf(place.componentId);
       var chp = chps[Math.floor(chps.length * place.percentageThrough)];
@@ -204,41 +207,51 @@ Monocle.Styles.Controls.Scrubber = {
     "right": "1em",
     "bottom": "8px",
     "height": "30px",
-    "background": "#FFF",
-    "-webkit-transform-style": "preserve-3d"
+    "background": "rgba(255,255,255,0.8)",
+    "-webkit-border-radius": "6px",
+    "-moz-border-radius": "6px",
+    "border-radius": "6px",
+    "-webkit-box-shadow": "0px 0px 8px rgba(255,255,255,1)"
   },
   track: {
-    "margin-top": "13px",
-    "border-top": "2px groove #CCC",
-    "-webkit-transform-style": "preserve-3d"
+    "margin-top": "10px",
+    "height": "5px",
+    "border": "1px solid #999"
   },
   needle: {
     "position": "absolute",
-    "width": "1px",
-    "height": "12px",
-    "top": "7px",
-    "border": "2px solid #777",
-    "-webkit-transform-style": "preserve-3d"
+    "width": "14px",
+    "height": "14px",
+    "top": "5px",
+    "background": "#CCC",
+    "border": "1px solid #999",
+    "-webkit-border-radius": "14px",
+    "-moz-border-radius": "14px"
+  },
+  needleTrail: {
+    "position": "absolute",
+    "height": "4px",
+    "background": "#DDD",
+    "top": "11px",
+    "left": "1px",
+    "height": "5px"
   },
   bubble: {
     "position": "absolute",
     "bottom": "2.5em",
     "background": "rgba(0, 0, 0, 0.9)",
-    "-webkit-box-shadow": "2px 2px 8px #000",
-    //"-moz-box-shadow": "2px 2px 8px #000",
     "-webkit-border-radius": "10px",
     "-moz-border-radius": "10px",
-    "padding": "12px",
+    "padding": "1em",
     "display": "none",
-    "font": "bold 12px Lucida Grande, Helvetica, sans-serif",
-    "color": "#CCC",
-    "text-shadow": "1px 1px #333",
     "white-space": "nowrap",
-    "min-width": "8em",
-    "max-width": "12em",
     "text-overflow": "ellipsis",
     "overflow": "hidden",
-    "-webkit-transform-style": "preserve-3d"
+    "-webkit-transform-style": "preserve-3d",
+    "min-width": "20%",
+    "max-width": "30%",
+    "color": "#CCC",
+    "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
   }
 }
 
