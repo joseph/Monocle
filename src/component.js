@@ -78,6 +78,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
       p.html = "<p></p>"
     }
 
+    // Compress whitespace.
+    p.html = p.html.replace(/\s+/g, ' ');
+
+    // Escape single-quotes.
+    p.html = p.html.replace(/\'/g, '\\\'');
+
+    // Remove scripts.
     var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
     p.html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
 
@@ -130,36 +137,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // TODO: Can we reuse these frames? What's better - conserving memory, or
     // conserving processing?
 
+    var frameLoaded = function () { setupFrame(pageDiv, callback); }
     var frame = pageDiv.componentFrame = document.createElement('iframe');
-    frame.src = "javascript: '';";
+    Monocle.addListener(frame, 'load', frameLoaded);
     frame.component = API;
     frame.pageDiv = pageDiv;
-    pageDiv.sheafDiv.appendChild(frame);
+
     Monocle.Styles.applyRules(frame, 'component');
     p.clientFrames.push(frame);
 
-    var doc = frame.contentWindow.document;
-
-    // FIXME: more nasty browser sniffing.
-    // This time, we need to wait for Safari to finish loading the frame
-    // contents before we setup the frame. This is because MobileSafari
-    // apparently performs the document.write in ~4000-byte increments over
-    // several JS cycles -- asynchronously.
-    if (/WebKit/i.test(navigator.userAgent)) {
-      Monocle.addListener(
-        doc,
-        'DOMContentLoaded',
-        function () { setupFrame(pageDiv, callback) }
-      );
-      doc.open();
-      doc.write(p.html);
-      doc.close();
-    } else {
-      doc.open();
-      doc.write(p.html);
-      doc.close();
-      setupFrame(pageDiv, callback);
-    }
+    pageDiv.sheafDiv.appendChild(frame);
+    frame.src = "javascript: '" + p.html + "';";
   }
 
 

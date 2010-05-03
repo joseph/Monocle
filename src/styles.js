@@ -47,7 +47,6 @@ Monocle.Styles.body = {
   "-webkit-user-select": "none",
   "-webkit-text-size-adjust": "none",
   "-moz-column-gap": "0",
-  "-moz-column-fill": "0",
   "-moz-user-select": "none",
   "column-gap": "0",
   "column-fill": "0",
