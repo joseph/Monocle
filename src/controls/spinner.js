@@ -44,6 +44,8 @@ Monocle.Controls.Spinner = function (reader) {
   function listenForUsualDelays() {
     p.reader.addListener('monocle:bookchanging', spin);
     p.reader.addListener('monocle:bookchange', spun);
+    p.reader.addListener('monocle:componentchanging', spin);
+    p.reader.addListener('monocle:componentchange', spun);
     p.reader.addListener('monocle:resizing', spin);
     p.reader.addListener('monocle:resize', spun);
   }

@@ -71,6 +71,8 @@ Monocle.Book = function (dataSource) {
 
 
   function switchToComponent(pageDiv, locus, callback) {
+    pageDiv.reader.dispatchEvent('monocle:componentchanging');
+
     // Find the place of the pageDiv in the book, or create one.
     var place = placeFor(pageDiv);
     if (!place) {
@@ -157,10 +159,12 @@ Monocle.Book = function (dataSource) {
     var lpn = component.lastPageNumber();
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
+      pageDiv.reader.dispatchEvent('monocle:componentchange');
       callback(false);
       return false;
     } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
       // After last page of book. Disallow.
+      pageDiv.reader.dispatchEvent('monocle:componentchange');
       callback(false);
       return false;
     } else if (pageN > component.lastPageNumber()) {
@@ -195,6 +199,7 @@ Monocle.Book = function (dataSource) {
         }
       );
     }
+    pageDiv.reader.dispatchEvent('monocle:componentchange');
 
     // Do it.
     component.preparePage(pageDiv, pageN)
