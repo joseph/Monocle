@@ -140,7 +140,6 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
       page.pageIndex = i;
-      page.reader = API;
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
 

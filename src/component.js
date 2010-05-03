@@ -126,9 +126,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
 
-    if (pageDiv.componentFrame) {
-      pageDiv.componentFrame.component.removeFrame(pageDiv);
-    }
+    // if (pageDiv.componentFrame) {
+    //   pageDiv.componentFrame.component.clearComponent(pageDiv);
+    // }
 
     var frameLoaded = function () { setupFrame(pageDiv, callback); }
 
@@ -204,6 +204,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     measureDimensions(pageDiv);
     locateChapters(pageDiv);
     if (callback) { callback(); }
+    pageDiv.style.background = "#FFF"; // FIXME: componentchange
   }
 
 
@@ -228,7 +229,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function removeFrame(pageDiv) {
+  function clearComponent(pageDiv) {
     if (!pageDiv.componentFrame) {
       throw("Requested to remove a frame that does not exist.");
     }
@@ -241,6 +242,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     pageDiv.componentFrame.style.display = 'none';
     pageDiv.componentFrame = null;
+    pageDiv.style.background = "#CCC"; // FIXME: componentchanging
     return true;
   }
 
@@ -371,7 +373,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
-  API.removeFrame = removeFrame;
+  API.clearComponent = clearComponent;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;
