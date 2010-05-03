@@ -130,20 +130,34 @@ Monocle.Component = function (book, id, index, chapters, html) {
       pageDiv.componentFrame.component.removeFrame(pageDiv);
     }
 
-    // TODO: Can we reuse these frames? What's better - conserving memory, or
-    // conserving processing?
-
     var frameLoaded = function () { setupFrame(pageDiv, callback); }
-    var frame = pageDiv.componentFrame = document.createElement('iframe');
-    Monocle.addListener(frame, 'load', frameLoaded);
-    frame.component = API;
-    frame.pageDiv = pageDiv;
 
-    Monocle.Styles.applyRules(frame, 'component');
-    p.clientFrames.push(frame);
+    var frame = null;
+    for (var i = 0; i < p.clientFrames.length; ++i) {
+      if (p.clientFrames[i].pageDiv == pageDiv) {
+        frame = p.clientFrames[i];
+        break;
+      }
+    }
 
-    pageDiv.sheafDiv.appendChild(frame);
-    frame.src = "javascript: '" + p.html + "';";
+    if (frame) {
+      console.log("Reusing existing frame.")
+      frame.style.display = "block";
+      pageDiv.componentFrame = frame;
+      frameLoaded();
+    } else {
+      console.log("Generating new frame.")
+      frame = pageDiv.componentFrame = document.createElement('iframe');
+      Monocle.addListener(frame, 'load', frameLoaded);
+      frame.component = API;
+      frame.pageDiv = pageDiv;
+
+      Monocle.Styles.applyRules(frame, 'component');
+      p.clientFrames.push(frame);
+
+      pageDiv.sheafDiv.appendChild(frame);
+      frame.src = "javascript: '" + p.html + "';";
+    }
   }
 
 
@@ -225,10 +239,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     if (idx < 0) {
       throw("Requested to remove a frame that is not in my list of frames.");
     }
-    pageDiv.sheafDiv.removeChild(pageDiv.componentFrame);
-    var rest = p.clientFrames.slice(idx + 1);
-    p.clientFrames.length = idx;
-    p.clientFrames.push.apply(p.clientFrames, rest);
+    pageDiv.componentFrame.style.display = 'none';
     pageDiv.componentFrame = null;
     return true;
   }
