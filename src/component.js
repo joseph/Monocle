@@ -126,9 +126,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     console.log("Applying component '"+id+"' to pageDiv: " + pageDiv.pageIndex);
 
-    // if (pageDiv.componentFrame) {
-    //   pageDiv.componentFrame.component.clearComponent(pageDiv);
-    // }
+    if (pageDiv.componentFrame) {
+      pageDiv.componentFrame.component.clearComponent(pageDiv);
+    }
 
     var frameLoaded = function () { setupFrame(pageDiv, callback); }
     var frame = p.clientFrames[pageDiv.pageIndex];
@@ -140,14 +140,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
     } else {
       console.log("Generating new frame.")
       frame = pageDiv.componentFrame = document.createElement('iframe');
-      Monocle.addListener(frame, 'load', frameLoaded);
       frame.component = API;
       frame.pageDiv = pageDiv;
-
       Monocle.Styles.applyRules(frame, 'component');
       p.clientFrames[pageDiv.pageIndex] = frame;
-
       pageDiv.sheafDiv.appendChild(frame);
+
+      Monocle.addListener(frame, 'load', frameLoaded);
       frame.src = "javascript: '" + p.html + "';";
     }
   }
