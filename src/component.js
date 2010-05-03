@@ -253,10 +253,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
       setColumnWidth();
-      //positionImages(pageDiv);
       measureDimensions(pageDiv);
       locateChapters(pageDiv);
-
       return true;
     } else {
       return false;
@@ -302,27 +300,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
     var fs = parseFloat(currStyle.getPropertyValue('font-size'));
     doc.body.style.lineHeight = lh / fs;
   }
-
-
-  // function positionImages(node) {
-  //   var node = pageDiv.componentFrame.contentWindow.document.body;
-  //   if (!node.getBoundingClientRect) {
-  //     console.log('Image positioning not supported');
-  //     return;
-  //   } else {
-  //     console.log('Positioning images to top of pages');
-  //   }
-  //   var cRect = node.getBoundingClientRect();
-  //   var imgs = node.getElementsByTagName('img');
-  //   for (var i = 0; i < imgs.length; ++i) {
-  //     var iRect = imgs[i].getBoundingClientRect();
-  //     if (iRect.top == cRect.top) {
-  //       imgs[i].style.marginTop = 0;
-  //     } else {
-  //       imgs[i].style.marginTop = (cRect.height - (iRect.top - cRect.top))+"px";
-  //     }
-  //   }
-  // }
 
 
   function measureDimensions(pageDiv) {

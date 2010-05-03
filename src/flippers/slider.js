@@ -172,7 +172,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function lift(boxPointX) {
     if (p.turnData.animating || p.turnData.direction) {
-      return false;
+      return true;
     }
 
     p.turnData.points = {
