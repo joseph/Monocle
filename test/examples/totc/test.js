@@ -249,7 +249,7 @@
         update: function (page) {
           var place = reader.getPlace(page);
           if (place) {
-            this.runners[page.pageIndex].innerHTML = place.chapterTitle();
+            this.runners[page.m.pageIndex].innerHTML = place.chapterTitle();
           }
         }
       }
@@ -275,7 +275,7 @@
         },
         update: function (page, pageNumber) {
           if (pageNumber) {
-            this.runners[page.pageIndex].innerHTML = pageNumber;
+            this.runners[page.m.pageIndex].innerHTML = pageNumber;
           }
         }
       }

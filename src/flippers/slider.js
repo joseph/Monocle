@@ -79,7 +79,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function getPlace(pageDiv) {
     pageDiv = pageDiv || upperPage();
-    return pageDiv.m.place;
+    return pageDiv.m ? pageDiv.m.place : null;
   }
 
 

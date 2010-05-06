@@ -111,6 +111,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
       setupFrame(pageDiv, callback);
     } else {
       console.log("Generating new frame.")
+      p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
       frame = document.createElement('iframe');
       pageDiv.m.componentFrames[p.index] = frame;
       pageDiv.m.activeFrame = frame;
@@ -256,6 +257,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
       styleTag.styleSheet.cssText = rules;
     } else {
       styleTag.appendChild(document.createTextNode(rules));
+    }
+
+    if (!doc.getElementsByTagName('head')[0]) {
+      var head = doc.createElement('head');
+      doc.documentElement.insertBefore(head, doc.body);
     }
     doc.getElementsByTagName('head')[0].appendChild(styleTag);
 
