@@ -95,12 +95,26 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
+  function currentlyApplyingTo(pageDiv) {
+    return pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API;
+  }
+
+
   function applyTo(pageDiv, callback) {
-    if (pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API) {
+    if (currentlyApplyingTo(pageDiv)) {
       return;
     }
     console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
+    p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
+    var evtData = { 'page': pageDiv, 'html': p.html };
+    if (!pageDiv.m.reader.dispatchEvent('componentchanging', evtData)) {
+      if (typeof callback == 'function') {
+        callback();
+      }
+      return;
+    }
+    var html = evtData.html;
     blankPage(pageDiv);
 
     var frame = pageDiv.m.componentFrames[p.index];
@@ -111,7 +125,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
       setupFrame(pageDiv, callback);
     } else {
       console.log("Generating new frame.")
-      p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
       frame = document.createElement('iframe');
       pageDiv.m.componentFrames[p.index] = frame;
       pageDiv.m.activeFrame = frame;
@@ -119,13 +132,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
         'component': API,
         'pageDiv': pageDiv
       }
-      Monocle.Styles.applyRules(frame, 'component');
+      frame.style.visibility = "hidden";
       pageDiv.m.sheafDiv.appendChild(frame);
 
       var frameLoaded = function () { setupFrame(pageDiv, callback); }
       Monocle.addListener(frame, 'load', frameLoaded);
 
-      frame.src = "javascript: '" + p.html + "';";
+      frame.src = "javascript: '" + html + "';";
     }
   }
 
@@ -133,7 +146,19 @@ Monocle.Component = function (book, id, index, chapters, html) {
   function setupFrame(pageDiv, callback) {
     var frame = pageDiv.m.activeFrame;
     var doc = frame.contentWindow.document;
-    Monocle.Styles.applyRules(doc.body, 'body');
+
+    // FIXME: cross-browser?
+    if (!doc.getElementsByTagName('head')[0]) {
+      var head = doc.createElement('head');
+      doc.documentElement.insertBefore(head, doc.body);
+    }
+
+    applyStyles(pageDiv);
+    frame.style.visibility = "visible";
+    pageDiv.m.reader.addListener(
+      'monocle:styles',
+      function () { applyStyles(pageDiv); }
+    );
 
     // FIXME: presently required to route around MobileSafari's
     // problems with iframes. But it would be very nice to rip it out.
@@ -150,7 +175,13 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.clientDimensions = null;
     measureDimensions(pageDiv);
     locateChapters(pageDiv);
-    pageDiv.m.reader.dispatchEvent('componentchange', { 'page': pageDiv });
+    pageDiv.m.reader.dispatchEvent(
+      'componentchange',
+      {
+        'page': pageDiv,
+        'document': doc
+      }
+    );
     if (typeof callback == 'function') {
       callback();
     }
@@ -162,14 +193,15 @@ Monocle.Component = function (book, id, index, chapters, html) {
       pageDiv.m.activeFrame.style.display = 'none';
     }
     pageDiv.m.activeFrame = null;
-    pageDiv.m.reader.dispatchEvent('componentchanging', { page: pageDiv });
   }
 
 
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
       for (var i = 0; i < p.pageDivs.length; ++i) {
-        setColumnWidth(p.pageDivs[i]);
+        if (p.pageDivs[i]) {
+          setColumnWidth(p.pageDivs[i]);
+        }
       }
       measureDimensions(pageDiv);
       locateChapters(pageDiv);
@@ -245,6 +277,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
+  function applyStyles(pageDiv) {
+    if (currentlyApplyingTo(pageDiv)) {
+      var frame = pageDiv.m.activeFrame;
+      Monocle.Styles.applyRules(frame, 'component');
+      if (frame.contentDocument && frame.contentDocument.body) {
+        Monocle.Styles.applyRules(frame.contentDocument.body, 'body');
+      }
+    }
+  }
+
+
   function clampCSS(doc) {
     // TODO: move to somewhere it can be configured...
     var rules = "body * { float: none !important; clear: none !important; }" +
@@ -259,10 +302,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
       styleTag.appendChild(document.createTextNode(rules));
     }
 
-    if (!doc.getElementsByTagName('head')[0]) {
-      var head = doc.createElement('head');
-      doc.documentElement.insertBefore(head, doc.body);
-    }
     doc.getElementsByTagName('head')[0].appendChild(styleTag);
 
     // Correct the body lineHeight to use a number, not a percentage, which

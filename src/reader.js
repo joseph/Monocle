@@ -185,13 +185,9 @@ Monocle.Reader = function (node, bookData, options) {
       Monocle.Styles.applyRules(page, 'page');
       Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
       Monocle.Styles.applyRules(page.m.controlsDiv, 'controls');
-      if (page.componentFrame && page.componentFrame.contentWindow.document) {
-        Monocle.Styles.applyRules(page.componentFrame, 'component');
-        var doc = page.componentFrame.contentWindow.document;
-        Monocle.Styles.applyRules(doc.body, 'body');
-      }
     }
     Monocle.Styles.applyRules(p.divs.overlay, 'overlay');
+    dispatchEvent('monocle:styles');
   }
 
 
