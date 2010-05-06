@@ -108,7 +108,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
     var evtData = { 'page': pageDiv, 'html': p.html };
-    if (!pageDiv.m.reader.dispatchEvent('componentchanging', evtData)) {
+    if (!pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData)) {
       if (typeof callback == 'function') {
         callback();
       }
@@ -176,7 +176,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     measureDimensions(pageDiv);
     locateChapters(pageDiv);
     pageDiv.m.reader.dispatchEvent(
-      'componentchange',
+      'monocle:componentchange',
       {
         'page': pageDiv,
         'document': doc
