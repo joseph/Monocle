@@ -119,12 +119,12 @@ Monocle.Book = function (dataSource) {
     var lpn = component.lastPageNumber();
     if (cIndex == 0 && pageN < 1) {
       // Before first page of book. Disallow.
-      callback(false);
-      return 'ready';
+      callback('disallow');
+      return 'disallow';
     } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
       // After last page of book. Disallow.
-      callback(false);
-      return 'ready';
+      callback('disallow');
+      return 'disallow';
     } else if (pageN > component.lastPageNumber()) {
       pageN -= component.lastPageNumber();
       return shiftIntoComponent(pageDiv, cIndex + 1, { page: pageN }, callback);

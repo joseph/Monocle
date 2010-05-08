@@ -63,7 +63,7 @@
               ajReq.send(null);
               callback(ajReq.responseText);
             },
-            1000
+            cmptId == '2.html' ? 8000 : 200
           );
         },
         getMetaData: function(key) {

@@ -53,8 +53,14 @@ Monocle.Controls.Spinner = function (reader) {
   }
 
 
-  function spin() {
+  function spin(evt) {
     p.reader.showControl(API);
+    for (var i = 0; i < p.divs.length; ++i) {
+      p.divs[i].style.display =
+        evt.monocleData.page == (null || p.divs[i].parentNode.parentNode) ?
+          'block' :
+          'none'
+    }
   }
 
 
