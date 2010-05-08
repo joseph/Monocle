@@ -97,7 +97,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function applyTo(pageDiv, callback) {
+  function applyTo(pageDiv, waitCallback) {
     if (currentlyApplyingTo(pageDiv)) {
       return;
     }
@@ -105,10 +105,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
     var evtData = { 'page': pageDiv, 'html': p.html };
-    if (!pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData)) {
-      callback();
-      return;
-    }
+    pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData);
     var html = evtData.html;
     blankPage(pageDiv);
 
@@ -117,7 +114,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
       console.log("Reusing existing frame.")
       frame.style.display = "block";
       pageDiv.m.activeFrame = frame;
-      setupFrame(pageDiv, callback);
+      setupFrame(pageDiv);
+      return 'ready';
     } else {
       console.log("Generating new frame.")
       frame = document.createElement('iframe');
@@ -130,15 +128,16 @@ Monocle.Component = function (book, id, index, chapters, html) {
       frame.style.visibility = "hidden";
       pageDiv.m.sheafDiv.appendChild(frame);
 
-      var frameLoaded = function () { setupFrame(pageDiv, callback); }
+      var frameLoaded = function () { setupFrame(pageDiv, waitCallback); }
       Monocle.addListener(frame, 'load', frameLoaded);
 
       frame.src = "javascript: '" + html + "';";
+      return 'wait';
     }
   }
 
 
-  function setupFrame(pageDiv, callback) {
+  function setupFrame(pageDiv, waitCallback) {
     var frame = pageDiv.m.activeFrame;
     var doc = frame.contentDocument;
 
@@ -177,7 +176,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
         'document': doc
       }
     );
-    callback();
+    if (typeof waitCallback == 'function') {
+      waitCallback();
+    }
   }
 
 

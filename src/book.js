@@ -59,30 +59,22 @@ Monocle.Book = function (dataSource) {
   // if that doesn't exist, we default to the very first component.
   //
   function changePage(pageDiv, locus, callback) {
-    switchToComponent(
-      pageDiv,
-      locus,
-      function () {
-        var pageN = locusToPage(pageDiv, locus);
-        switchToPage(pageDiv, pageN, callback);
-      }
-    );
-  }
-
-
-  function switchToComponent(pageDiv, locus, callback) {
-    // Find the place of the pageDiv in the book, or create one.
     var place = pageDiv.m.place;
     if (!place) {
-      loadComponent(
-        0,
-        function (component) {
-          setPlaceFor(pageDiv, component, 1);
-          switchToComponent(pageDiv, locus, callback);
-        },
-        pageDiv
-      );
-      return;
+      // FIXME: can this be generalised into shiftIntoComponent?
+      if (p.components[0]) {
+        place = setPlaceFor(pageDiv, p.components[0], 1);
+      } else {
+        loadComponent(
+          0,
+          function (cmpt) {
+            setPlaceFor(pageDiv, cmpt, 1);
+            changePage(pageDiv, locus, callback);
+          },
+          pageDiv
+        );
+        return 'wait';
+      }
     }
 
     var cIndex = p.componentIds.indexOf(locus.componentId);
@@ -90,23 +82,86 @@ Monocle.Book = function (dataSource) {
     if (cIndex == -1 || cIndex == place.properties.component.index) {
       component = place.properties.component;
     } else if (p.components[cIndex]) {
+      // FIXME: can this be generalised into shiftIntoComponent?
       component = p.components[cIndex];
     } else {
       loadComponent(
         cIndex,
-        function (component) {
-          switchToComponent(pageDiv, locus, callback);
-        },
+        function () { changePage(pageDiv, locus, callback); },
         pageDiv
       );
-      return;
+      return 'wait';
     }
 
-    if (component.currentlyApplyingTo(pageDiv)) {
-      callback();
+    if (!component.currentlyApplyingTo(pageDiv)) {
+      // TODO: If we're applying a component, let's load its next and previous.
+      // But be aware that if we're loading components without a callback, we
+      // should set a flag so that we don't double-load the component... Tricky.
+
+      if (
+        component.applyTo(
+          pageDiv,
+          function () { changePage(pageDiv, locus, callback); }
+        ) == 'wait'
+      ) {
+        return 'wait';
+      }
+    }
+
+    var pageN = locusToPage(pageDiv, locus);
+
+    // Determine whether we need to apply a new component to the div, and
+    // adjust the pageN accordingly.
+    var cIndex = component.properties.index;
+    var lpn = component.lastPageNumber();
+    if (cIndex == 0 && pageN < 1) {
+      // Before first page of book. Disallow.
+      callback(false);
+      return 'ready';
+    } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
+      // After last page of book. Disallow.
+      callback(false);
+      return 'ready';
+    } else if (pageN > component.lastPageNumber()) {
+      return shiftIntoComponent(
+        pageDiv,
+        cIndex + 1,
+        pageN - component.lastPageNumber(),
+        callback
+      );
+    } else if (pageN < 1) {
+      return shiftIntoComponent(
+        pageDiv,
+        cIndex - 1,
+        pageN + component.lastPageNumber(),
+        callback
+      );
+    }
+
+    // Do it.
+    setPlaceFor(pageDiv, component, pageN);
+
+    callback({
+      componentId: component.properties.id,
+      page: pageN,
+      offset: (pageN - 1) * pageDiv.m.sheafDiv.clientWidth
+    });
+
+    return 'ready';
+  }
+
+
+  function shiftIntoComponent(pageDiv, componentIndex, pageN, callback) {
+    var shift = function (cmpt) {
+      var cmptId = cmpt.properties.id;
+      return changePage(pageDiv, { page: pageN, componentId: cmptId }, callback);
+    }
+
+    if (p.components[componentIndex]) {
+      return shift(p.components[componentIndex]);
     } else {
-      component.applyTo(pageDiv, callback);
-      // TODO: If we're applying a component, let's load it's next and previous.
+      loadComponent(componentIndex, shift, pageDiv);
+      return 'wait';
     }
   }
 
@@ -147,67 +202,6 @@ Monocle.Book = function (dataSource) {
     }
 
     return pageN;
-  }
-
-
-  function switchToPage(pageDiv, pageN, callback) {
-    var component = pageDiv.m.activeFrame.m.component;
-
-    // Determine whether we need to apply a new component to the div, and
-    // adjust the pageN accordingly.
-    var cIndex = component.properties.index;
-    var lpn = component.lastPageNumber();
-    if (cIndex == 0 && pageN < 1) {
-      // Before first page of book. Disallow.
-      callback(false);
-      return false;
-    } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
-      // After last page of book. Disallow.
-      callback(false);
-      return false;
-    } else if (pageN > component.lastPageNumber()) {
-      // Moving to next component.
-      pageN -= component.lastPageNumber();
-      return loadComponent(
-        cIndex + 1,
-        function (component) {
-          changePage(
-            pageDiv,
-            { page: pageN, componentId: component.properties.id },
-            callback
-          );
-        },
-        pageDiv
-      );
-    } else if (pageN < 1) {
-      // Moving to previous component.
-      return loadComponent(
-        cIndex - 1,
-        function (component) {
-          component.applyTo(
-            pageDiv,
-            function () {
-              pageN += component.lastPageNumber();
-              changePage(
-                pageDiv,
-                { page: pageN, componentId: component.properties.id },
-                callback
-              );
-            }
-          );
-        },
-        pageDiv
-      );
-    }
-
-    // Do it.
-    setPlaceFor(pageDiv, component, pageN);
-
-    callback({
-      componentId: component.properties.id,
-      page: pageN,
-      offset: (pageN - 1) * pageDiv.m.sheafDiv.clientWidth
-    });
   }
 
 

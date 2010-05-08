@@ -191,7 +191,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
-      var pageSetSuccessfully = setPage(
+      setPage(
         lowerPage(),
         place.getLocus({ direction: k.BACKWARDS }),
         // Callback on success
