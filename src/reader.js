@@ -285,12 +285,7 @@ Monocle.Reader = function (node, bookData, options) {
   // Moves to the relevant element in the relevant component.
   //
   function skipToChapter(src) {
-    var pageDiv = p.flipper.visiblePages()[0];
-    p.book.placeOfChapter(
-      pageDiv,
-      src,
-      function (place) { moveTo(place.getLocus()); }
-    );
+    moveTo(p.book.locusOfChapter(src));
   }
 
 

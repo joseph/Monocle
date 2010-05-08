@@ -38,20 +38,21 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  // This method must return the actual page number WITHIN THE COMPONENT that
-  // will result from the page being turned to 'pageN'. That is, it constrains
-  // and corrects the value of pageN.
+  // This method must call the callback with the pixel offset that
+  // will result from the page being turned to 'pageN'.
   //
   // In this process, it should load a new component if required. It should
   // recurse if pageN overflows the first or last pages of the given component.
   //
-  // The locus argument is required, and is an object that responds to one of:
+  // The locus argument is required, and is an object that responds to
+  // componentId and one of:
   //
   //  - page: integer
   //  - percent: float
-  //  - direction: integer relative to the current page number for this page element
+  //  - direction: integer relative to the current page number for this pageDiv
   //  - position: string, one of "start" or "end", moves to corresponding point
   //      in the given component
+  //  - anchor: an element id within the component
   //
   // The locus object can also specify a componentId. If it is not provided
   // (or it is invalid), we default to the currently active component, and
@@ -127,6 +128,8 @@ Monocle.Book = function (dataSource) {
       pageN = pageDiv.m.place.pageNumber();
       pageN += locus.direction;
     } else if (typeof(locus.anchor) == "string") {
+      pageN = component.pageForChapter(locus.anchor);
+    } else if (typeof(locus.position) == "string") {
       if (locus.position == "start") {
         pageN = 1;
       } else if (locus.position == "end") {
@@ -280,30 +283,15 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  function placeOfChapter(pageDiv, src, callback) {
+  function locusOfChapter(src) {
     var matcher = new RegExp('^(.+?)(#(.*))?$');
     var matches = src.match(matcher);
     if (!matches) {
       return null;
     }
-    var cmptId = matches[1];
-    var fragment = matches[3] || null;
-    var cIndex = p.componentIds.indexOf(cmptId);
-    componentAt(
-      cIndex,
-      function (component) {
-        // NB: updating dimensions changes page state.
-        // FIXME: THIS LOOKS NASTY
-        component.updateDimensions(pageDiv);
-        var place = new Monocle.Place();
-        if (fragment) {
-          place.setPlace(component, component.pageForChapter(fragment));
-        } else {
-          place.setPlace(component, 1);
-        }
-        callback(place);
-      }
-    );
+    var locus = { componentId: matches[1] }
+    matches[3] ? locus.anchor = matches[3] : locus.position = "start";
+    return locus;
   }
 
 
@@ -316,7 +304,7 @@ Monocle.Book = function (dataSource) {
   API.changePage = changePage;
   API.chapterTree = chapterTree;
   API.chaptersForComponent = chaptersForComponent;
-  API.placeOfChapter = placeOfChapter;
+  API.locusOfChapter = locusOfChapter;
 
   initialize();
 

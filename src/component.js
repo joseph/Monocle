@@ -28,14 +28,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
     //  {
     //     title: str,
     //     fragment: str, // optional anchor id
-    //     page: n        // number of the page on which the chapter begins
+    //     percent: n     // how far into the component the chapter begins
     //  }
     //
-    // NOTE: the page property is calculated by the component - you only need
+    // NOTE: the percent property is calculated by the component - you only need
     // to pass in the title and the optional id string.
-    //
-    // The page property is invalidated by dimensional changes in the reader,
-    // and will be regenerated as soon as possible thereafter.
     //
     chapters: chapters,
 
@@ -172,6 +169,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     p.clientDimensions = null;
     measureDimensions(pageDiv);
+    locateChapters(pageDiv);
     pageDiv.m.reader.dispatchEvent(
       'monocle:componentchange',
       {
@@ -252,8 +250,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
       p.clientDimensions.pages
     );
 
-    //locateChapters(pageDiv);
-
     return p.clientDimensions;
   }
 
@@ -311,11 +307,15 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function locateChapters(pageDiv) {
+    if (p.chapters[0] && typeof p.chapters[0].percent == "number") {
+      return;
+    }
     var doc = pageDiv.m.activeFrame.contentDocument;
     var scrollers = [doc.body, pageDiv.m.sheafDiv];
+    var scrollLefts = [scrollers[0].scrollLeft, scrollers[1].scrollLeft];
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
-      chp.page = 1;
+      chp.percent = 0;
       if (chp.fragment) {
         var target = doc.getElementById(chp.fragment);
         while (target && target.parentNode != doc.body) {
@@ -323,15 +323,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
         }
         if (target) {
           target.scrollIntoView();
-          chp.page = (
+          chp.percent = (
             Math.max(scrollers[0].scrollLeft, scrollers[1].scrollLeft) /
-            p.clientDimensions.width
-          ) + 1;
+            p.clientDimensions.scrollWidth
+          );
         }
       }
     }
-    scrollers[0].scrollLeft = 0;
-    scrollers[1].scrollLeft = 0;
+    for (var i = 0; i < scrollers.length; ++i) {
+      scrollers[i].scrollTop = 0;
+      scrollers[i].scrollLeft = scrollLefts[i];
+    }
 
     return p.chapters;
   }
@@ -339,8 +341,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function chapterForPage(pageN) {
     var cand = null;
+    var percent = (pageN - 1) / p.clientDimensions.pages;
     for (var i = 0; i < p.chapters.length; ++i) {
-      if (pageN >= p.chapters[i].page) {
+      if (percent >= p.chapters[i].percent) {
         cand = p.chapters[i];
       } else {
         return cand;
@@ -356,7 +359,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
     }
     for (var i = 0; i < p.chapters.length; ++i) {
       if (p.chapters[i].fragment == fragment) {
-        return p.chapters[i].page;
+        return Math.round(p.chapters[i].percent * p.clientDimensions.pages) + 1;
       }
     }
     return null;
