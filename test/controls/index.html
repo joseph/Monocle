@@ -108,15 +108,15 @@
         window,
         'load',
         function () {
+          var readerOptions = {};
 
           // PLACESAVER
-          window.reader1 = Monocle.Reader('placesaver', bookData);
-          var placeSaver = new Monocle.Controls.PlaceSaver(reader1);
+          var placeSaver = new Monocle.Controls.PlaceSaver('placesaver');
+          readerOptions.place = placeSaver.savedPlace();
+
+          // The Reader itself
+          window.reader1 = Monocle.Reader('placesaver', bookData, readerOptions);
           reader1.addControl(placeSaver, 'invisible');
-          var lastPlace = placeSaver.savedPlace();
-          if (lastPlace) {
-            placeSaver.restorePlace();
-          }
 
           // MAGNIFIER
           window.reader2 = Monocle.Reader('magnifier', bookData);
