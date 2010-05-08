@@ -63,31 +63,21 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
 
 
   Monocle.Compat.enableTouchProxyOnFrame = function (frame) {
+    if (frame.m.touchProxy) {
+      return;
+    }
     var fn = function (evt) { Monocle.Compat.touchProxyHandler(frame, evt); }
     var doc = frame.contentWindow.document;
     Monocle.addListener(doc, 'touchstart', fn);
     Monocle.addListener(doc, 'touchmove', fn);
     Monocle.addListener(doc, 'touchend', fn);
     Monocle.addListener(doc, 'touchcancel', fn);
+    frame.m.touchProxy = true;
   }
 
 
   Monocle.Compat.touchProxyHandler = function (frame, evt) {
-    // var offsets = { x: 0, y: 0 }
-    // var node = frame;
-    // while (node && node.nodeType == 1) {
-    //   offsets.x += node.offsetLeft;
-    //   offsets.y += node.offsetTop;
-    //   node = node.parentNode;
-    // }
     var touch = evt.touches[0] || evt.changedTouches[0];
-    // console.log("Screen: " + touch.screenX + ", " + touch.screenY);
-    // console.log("Page: " + touch.pageX + ", " + touch.pageY);
-    // var div = frame.parentNode;
-    // console.log(
-    //   "Client?: " + (touch.pageX - div.scrollLeft) + ", " +
-    //   (touch.pageY - div.scrollTop)
-    // );
     var target = document.elementFromPoint(
       touch.screenX,
       touch.screenY
@@ -97,8 +87,13 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
       return;
     }
     if (target == frame) {
+      //console.log(evt.type + ' touch: target is component frame.');
       return;
     }
+    // console.log(
+    //   evt.type + ' touch: target is "' +
+    //   target.tagName + "#" +  target.id + '"'
+    // );
 
     var cloneTouch = function (t) {
       return document.createTouch(
