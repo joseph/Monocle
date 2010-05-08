@@ -1,5 +1,10 @@
 /* READER */
 
+// Options:
+//
+//  flipper: The class of page flipper to use.
+//  place: A book locus for the page to open to when the reader is initialized.
+//
 Monocle.Reader = function (node, bookData, options) {
   if (Monocle == this) { return new Monocle.Reader(node, bookData, options); }
 
@@ -109,7 +114,7 @@ Monocle.Reader = function (node, bookData, options) {
     applyStyles();
 
     // Apply the book, calculating column dimensions & etc.
-    setBook(bk);
+    setBook(bk, options.place);
 
     // Wait for user input.
     for (var i = 0; i < p.divs.pages.length; ++i) {
@@ -197,12 +202,17 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function setBook(bk) {
+  // Changes the current book for this reader.
+  //
+  //  bk - must be a valid book-data object
+  //  locus - OPTIONAL. The locus (see book.js) to open the book to.
+  //
+  function setBook(bk, locus) {
     if (!dispatchEvent("monocle:bookchanging", {}, true)) {
       return;
     }
     p.book = bk;
-    calcDimensions();
+    calcDimensions(locus);
     dispatchEvent("monocle:bookchange");
     return p.book;
   }
@@ -228,7 +238,10 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function calcDimensions() {
+  // Note: locus argument is OPTIONAL. Defaults to "current page".
+  //
+  function calcDimensions(locus) {
+    locus = locus || { page: pageNumber() };
     p.boxDimensions = {
       left: 0,
       top: 0,
@@ -248,7 +261,7 @@ Monocle.Reader = function (node, bookData, options) {
       p.flipper.overrideDimensions();
     }
 
-    moveTo({ page: pageNumber() });
+    moveTo(locus);
   }
 
 
@@ -475,6 +488,10 @@ Monocle.Reader = function (node, bookData, options) {
     }
     p.controls.push(ctrlData);
 
+    if (typeof ctrl.assignToReader == 'function') {
+      ctrl.assignToReader(API);
+    }
+
     var ctrlElem;
     if (!cType || cType == "standard") {
       ctrlElem = ctrl.createControlElements(p.divs.container);
@@ -601,6 +618,11 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
+  function removeListener(evtType, fn) {
+    Monocle.removeListener(p.divs.box, evtType, fn);
+  }
+
+
   API.setBook = setBook;
   API.getBook = getBook;
   API.reapplyStyles = reapplyStyles;
@@ -613,6 +635,7 @@ Monocle.Reader = function (node, bookData, options) {
   API.showControl = showControl;
   API.dispatchEvent = dispatchEvent;
   API.addListener = addListener;
+  API.removeListener = removeListener;
 
   initialize(node, bookData, options);
 

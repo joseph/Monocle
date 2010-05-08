@@ -44,10 +44,10 @@ Monocle.Book = function (dataSource) {
   // In this process, it should load a new component if required. It should
   // recurse if pageN overflows the first or last pages of the given component.
   //
-  // The locus argument is required, and is an object that responds to
-  // componentId and one of:
+  // The locus argument is required, and is an object that responds to one of:
   //
-  //  - page: integer
+  //  - page: integer. If positive, counts forwards from start of component.
+  //      If negative, counts backwards from end.
   //  - percent: float
   //  - direction: integer relative to the current page number for this pageDiv
   //  - position: string, one of "start" or "end", moves to corresponding point
@@ -59,25 +59,35 @@ Monocle.Book = function (dataSource) {
   // if that doesn't exist, we default to the very first component.
   //
   function changePage(pageDiv, locus, callback) {
+    var tryAgain = function () {
+      pageDiv.m.pageChanging = false;
+      // TODO: pageDiv.m.changePageQueue?
+      changePage(pageDiv, locus, callback);
+    }
+    if (pageDiv.m.pageChanging) {
+      console.log("WARNING: page is already in process of changing...");
+      // TODO: queue it up?
+      return 'wait';
+    }
+
+    console.log(
+      "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] to '" +
+      locus.componentId + "'"
+    );
+
+    var cIndex = p.componentIds.indexOf(locus.componentId);
     var place = pageDiv.m.place;
     if (!place) {
-      // FIXME: can this be generalised into shiftIntoComponent?
-      if (p.components[0]) {
-        place = setPlaceFor(pageDiv, p.components[0], 1);
+      var loadIndex = cIndex > 0 ? cIndex : 0;
+      if (p.components[loadIndex]) {
+        place = setPlaceFor(pageDiv, p.components[loadIndex], 1);
       } else {
-        loadComponent(
-          0,
-          function (cmpt) {
-            setPlaceFor(pageDiv, cmpt, 1);
-            changePage(pageDiv, locus, callback);
-          },
-          pageDiv
-        );
+        pageDiv.m.pageChanging = true;
+        loadComponent(loadIndex, tryAgain, pageDiv);
         return 'wait';
       }
     }
 
-    var cIndex = p.componentIds.indexOf(locus.componentId);
     var component;
     if (cIndex == -1 || cIndex == place.properties.component.index) {
       component = place.properties.component;
@@ -85,11 +95,8 @@ Monocle.Book = function (dataSource) {
       // FIXME: can this be generalised into shiftIntoComponent?
       component = p.components[cIndex];
     } else {
-      loadComponent(
-        cIndex,
-        function () { changePage(pageDiv, locus, callback); },
-        pageDiv
-      );
+      pageDiv.m.pageChanging = true;
+      loadComponent(cIndex, tryAgain, pageDiv);
       return 'wait';
     }
 
@@ -98,12 +105,8 @@ Monocle.Book = function (dataSource) {
       // But be aware that if we're loading components without a callback, we
       // should set a flag so that we don't double-load the component... Tricky.
 
-      if (
-        component.applyTo(
-          pageDiv,
-          function () { changePage(pageDiv, locus, callback); }
-        ) == 'wait'
-      ) {
+      pageDiv.m.pageChanging = true;
+      if (component.applyTo(pageDiv, tryAgain) == 'wait') {
         return 'wait';
       }
     }
@@ -123,19 +126,10 @@ Monocle.Book = function (dataSource) {
       callback(false);
       return 'ready';
     } else if (pageN > component.lastPageNumber()) {
-      return shiftIntoComponent(
-        pageDiv,
-        cIndex + 1,
-        pageN - component.lastPageNumber(),
-        callback
-      );
+      pageN -= component.lastPageNumber();
+      return shiftIntoComponent(pageDiv, cIndex + 1, pageN, callback);
     } else if (pageN < 1) {
-      return shiftIntoComponent(
-        pageDiv,
-        cIndex - 1,
-        pageN + component.lastPageNumber(),
-        callback
-      );
+      return shiftIntoComponent(pageDiv, cIndex - 1, pageN, callback);
     }
 
     // Do it.
@@ -151,16 +145,19 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  function shiftIntoComponent(pageDiv, componentIndex, pageN, callback) {
+  function shiftIntoComponent(pageDiv, cIndex, pageOffset, callback) {
     var shift = function (cmpt) {
-      var cmptId = cmpt.properties.id;
-      return changePage(pageDiv, { page: pageN, componentId: cmptId }, callback);
+      pageDiv.m.pageChanging = false;
+      var locus = { componentId: cmpt.properties.id, page: pageOffset };
+      return changePage(pageDiv, locus, callback);
     }
 
-    if (p.components[componentIndex]) {
-      return shift(p.components[componentIndex]);
+    if (p.components[cIndex]) {
+      return shift(p.components[cIndex]);
     } else {
-      loadComponent(componentIndex, shift, pageDiv);
+      console.log("Loading on shift: " + cIndex);
+      pageDiv.m.pageChanging = true;
+      loadComponent(cIndex, shift, pageDiv);
       return 'wait';
     }
   }
@@ -175,7 +172,12 @@ Monocle.Book = function (dataSource) {
     // deduce the page number for the given locus.
     var pageN = 1;
     if (typeof(locus.page) == "number") {
-      pageN = locus.page;
+      if (locus.page < 1) {
+        pageN = component.lastPageNumber() - locus.page;
+        console.log("Going backwards by " + locus.page + " to " + pageN);
+      } else {
+        pageN = locus.page;
+      }
     } else if (typeof(locus.percent) == "number") {
       place = setPlaceFor(pageDiv, component, 1);
       pageN = place.pageAtPercentageThrough(locus.percent);
@@ -227,6 +229,7 @@ Monocle.Book = function (dataSource) {
       pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
     }
     var src = p.componentIds[index];
+    console.log("Loading component HTML: '"+src+"'");
     var fn = function (html) {
       if (pageDiv) {
         evtData['html'] = html;

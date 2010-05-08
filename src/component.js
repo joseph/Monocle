@@ -127,7 +127,10 @@ Monocle.Component = function (book, id, index, chapters, html) {
       frame.style.visibility = "hidden";
       pageDiv.m.sheafDiv.appendChild(frame);
 
-      var frameLoaded = function () { setupFrame(pageDiv); waitCallback(); }
+      var frameLoaded = function () {
+        setupFrame(pageDiv);
+        waitCallback();
+      }
       Monocle.addListener(frame, 'load', frameLoaded);
 
       frame.src = "javascript: '" + html + "';";

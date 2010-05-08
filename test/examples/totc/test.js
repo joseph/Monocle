@@ -169,8 +169,17 @@
     window,
     'load',
     function () {
+      var readerOptions = {};
+
+      /* PLACE SAVER */
+      var bkTitle = bookData.getMetaData('title');
+      var placeSaver = new Monocle.Controls.PlaceSaver(bkTitle);
+      readerOptions.place = placeSaver.savedPlace();
+
       /* Initialize the reader */
-      window.reader = Monocle.Reader('reader', bookData);
+      window.reader = Monocle.Reader('reader', bookData, readerOptions);
+
+      reader.addControl(placeSaver, 'invisible');
 
       /* Because the 'reader' element changes size on window resize,
        * we should notify it of this event. */
@@ -185,16 +194,6 @@
       var spinner = Monocle.Controls.Spinner(window.reader);
       window.reader.addControl(spinner, 'page', { hidden: true });
       spinner.listenForUsualDelays();
-
-
-      /* PLACE SAVER */
-      var placeSaver = new Monocle.Controls.PlaceSaver(reader);
-      reader.addControl(placeSaver, 'invisible');
-      var lastPlace = placeSaver.savedPlace();
-      if (lastPlace) {
-        placeSaver.restorePlace();
-      }
-
 
       /* MAGNIFIER CONTROL */
       var magnifier = new Monocle.Controls.Magnifier(reader);
