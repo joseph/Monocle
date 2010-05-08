@@ -73,13 +73,13 @@ Monocle.Book = function (dataSource) {
     // Find the place of the pageDiv in the book, or create one.
     var place = pageDiv.m.place;
     if (!place) {
-      // FIXME: BLANK THE PAGE
-      componentAt(
+      loadComponent(
         0,
         function (component) {
           setPlaceFor(pageDiv, component, 1);
           switchToComponent(pageDiv, locus, callback);
-        }
+        },
+        pageDiv
       );
       return;
     }
@@ -91,23 +91,21 @@ Monocle.Book = function (dataSource) {
     } else if (p.components[cIndex]) {
       component = p.components[cIndex];
     } else {
-      // FIXME: BLANK THE PAGE
-      componentAt(
+      loadComponent(
         cIndex,
         function (component) {
           switchToComponent(pageDiv, locus, callback);
-        }
+        },
+        pageDiv
       );
       return;
     }
 
-    if (!pageDiv.m.activeFrame || component != pageDiv.m.activeFrame.m.component) {
-      component.applyTo(pageDiv, callback);
-      return;
-    }
-
-    if (typeof callback == "function") {
+    if (component.currentlyApplyingTo(pageDiv)) {
       callback();
+    } else {
+      component.applyTo(pageDiv, callback);
+      // TODO: If we're applying a component, let's load it's next and previous.
     }
   }
 
@@ -167,7 +165,7 @@ Monocle.Book = function (dataSource) {
     } else if (pageN > component.lastPageNumber()) {
       // Moving to next component.
       pageN -= component.lastPageNumber();
-      return componentAt(
+      return loadComponent(
         cIndex + 1,
         function (component) {
           changePage(
@@ -175,11 +173,12 @@ Monocle.Book = function (dataSource) {
             { page: pageN, componentId: component.properties.id },
             callback
           );
-        }
+        },
+        pageDiv
       );
     } else if (pageN < 1) {
       // Moving to previous component.
-      return componentAt(
+      return loadComponent(
         cIndex - 1,
         function (component) {
           component.applyTo(
@@ -193,7 +192,8 @@ Monocle.Book = function (dataSource) {
               );
             }
           );
-        }
+        },
+        pageDiv
       );
     }
 
@@ -215,25 +215,39 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  function componentAt(index, callback) {
-    if (!p.components[index]) {
-      var src = p.componentIds[index];
-      var fn = function (html) {
-        p.components[index] = new Monocle.Component(
-          API,
-          src,
-          index,
-          chaptersForComponent(src),
-          html
-        );
-        callback(p.components[index]);
+  // Fetches the component HTML from the dataSource. The index argument is
+  // the index of the component in the dataSource.getComponents array.
+  // Callback is invoked when the HTML is received. pageDiv is optional,
+  // and simply allows communication with the reader object that has requested
+  // this component, ONLY if the HTML has not already been received.
+  //
+  function loadComponent(index, callback, pageDiv) {
+    if (p.components[index]) {
+      return callback(p.components[index]);
+    }
+    if (pageDiv) {
+      var evtData = { 'page': pageDiv, 'component': src, 'index': index };
+      pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
+    }
+    var src = p.componentIds[index];
+    var fn = function (html) {
+      if (pageDiv) {
+        evtData['html'] = html;
+        pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
+        html = evtData['html'];
       }
-      var html = p.dataSource.getComponent(src, fn);
-      if (html && !p.components[index]) {
-        fn(html);
-      }
-    } else {
+      p.components[index] = new Monocle.Component(
+        API,
+        src,
+        index,
+        chaptersForComponent(src),
+        html
+      );
       callback(p.components[index]);
+    }
+    var html = p.dataSource.getComponent(src, fn);
+    if (html && !p.components[index]) {
+      fn(html);
     }
   }
 

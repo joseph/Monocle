@@ -109,9 +109,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var evtData = { 'page': pageDiv, 'html': p.html };
     if (!pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData)) {
-      if (typeof callback == 'function') {
-        callback();
-      }
+      callback();
       return;
     }
     var html = evtData.html;
@@ -181,9 +179,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
         'document': doc
       }
     );
-    if (typeof callback == 'function') {
-      callback();
-    }
+    callback();
   }
 
 
@@ -374,6 +370,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
+  API.currentlyApplyingTo = currentlyApplyingTo;
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;

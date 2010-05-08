@@ -315,9 +315,7 @@ Monocle.Reader = function (node, bookData, options) {
         return false;
       }
 
-      if (typeof callback == "function") {
-        callback(rslt.offset);
-      }
+      callback(rslt.offset);
 
       eData.pageNumber = rslt.page;
       eData.componentId = rslt.componentId;
