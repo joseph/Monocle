@@ -112,9 +112,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     var frame = pageDiv.m.componentFrames[p.index];
     if (frame) {
       console.log("Reusing existing frame.")
-      frame.style.display = "block";
       pageDiv.m.activeFrame = frame;
-      setupFrame(pageDiv);
+      showFrame(pageDiv);
       return 'ready';
     } else {
       console.log("Generating new frame.")
@@ -128,7 +127,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
       frame.style.visibility = "hidden";
       pageDiv.m.sheafDiv.appendChild(frame);
 
-      var frameLoaded = function () { setupFrame(pageDiv, waitCallback); }
+      var frameLoaded = function () { setupFrame(pageDiv); waitCallback(); }
       Monocle.addListener(frame, 'load', frameLoaded);
 
       frame.src = "javascript: '" + html + "';";
@@ -137,38 +136,44 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
-  function setupFrame(pageDiv, waitCallback) {
+  function setupFrame(pageDiv) {
     var frame = pageDiv.m.activeFrame;
     var doc = frame.contentDocument;
 
-    // FIXME: cross-browser?
+    // Create the <head> element in the frame if it doesn't exist.
+    // FIXME: I presume this isn't cross-browser?
     if (!doc.getElementsByTagName('head')[0]) {
       var head = doc.createElement('head');
       doc.documentElement.insertBefore(head, doc.body);
     }
 
-    applyStyles(pageDiv);
-    frame.style.visibility = "visible";
+    // Register iframe to get reapplyStyles notifications from the reader.
     pageDiv.m.reader.addListener(
       'monocle:styles',
       function () { applyStyles(pageDiv); }
     );
 
-    // FIXME: presently required to route around MobileSafari's
+    // On MobileSafari, translates a click on the iframe into a click on
+    // the reader's controls div.
+    // Presently required to route around MobileSafari's
     // problems with iframes. But it would be very nice to rip it out.
     if (/WebKit/i.test(navigator.userAgent) && typeof Touch == "object") {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 
-    setColumnWidth(pageDiv);
-
+    // Apply non-negotiable CSS to the document, overriding book designer's
+    // styles.
     clampCSS(doc);
 
     // TODO: rewrite internal links
 
-    p.clientDimensions = null;
-    measureDimensions(pageDiv);
+    // Run every-time frame display tasks.
+    showFrame(pageDiv);
+
+    // Find the place of any chapters in the component.
     locateChapters(pageDiv);
+
+    // Announce that the component has changed.
     pageDiv.m.reader.dispatchEvent(
       'monocle:componentchange',
       {
@@ -176,9 +181,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
         'document': doc
       }
     );
-    if (typeof waitCallback == 'function') {
-      waitCallback();
-    }
+  }
+
+
+  function showFrame(pageDiv) {
+    var frame = pageDiv.m.activeFrame;
+    applyStyles(pageDiv);
+    frame.style.visibility = "visible";
+    frame.style.display = "block";
+    setColumnWidth(pageDiv);
+    p.clientDimensions = null;
+    measureDimensions(pageDiv);
   }
 
 
