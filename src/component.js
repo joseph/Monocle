@@ -120,7 +120,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
       frame = document.createElement('iframe');
       pageDiv.m.componentFrames[p.index] = frame;
       pageDiv.m.activeFrame = frame;
-      frame.m = {
+      frame.m = frame.monocleData = {
         'component': API,
         'pageDiv': pageDiv
       }

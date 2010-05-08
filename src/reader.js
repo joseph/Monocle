@@ -144,7 +144,7 @@ Monocle.Reader = function (node, bookData, options) {
     p.divs.box.appendChild(p.divs.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = p.divs.pages[i] = document.createElement('div');
-      page.m = {
+      page.m = page.monocleData = {
         reader: API,
         pageIndex: i,
         sheafDiv: document.createElement('div'),
@@ -448,7 +448,7 @@ Monocle.Reader = function (node, bookData, options) {
       )
     };
 
-    if (!dispatchEvent("monocle:contact:"+eType, cData, true)) {
+    if (dispatchEvent("monocle:contact:"+eType, cData, true)) {
       dispatchEvent("monocle:contact:"+eType+":unhandled", cData, true)
     }
 
@@ -608,7 +608,7 @@ Monocle.Reader = function (node, bookData, options) {
     }
     var evt = document.createEvent("Events");
     evt.initEvent(evtType, false, cancelable || false);
-    evt.monocleData = data;
+    evt.m = evt.monocleData = data;
     return p.divs.box.dispatchEvent(evt);
   }
 
