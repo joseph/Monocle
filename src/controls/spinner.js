@@ -1,6 +1,6 @@
-Monocle.Controls.Spinner = function (reader) {
+Monocle.Controls.Spinner = function () {
   if (Monocle.Controls == this) {
-    return new Monocle.Controls.Spinner(reader);
+    return new Monocle.Controls.Spinner();
   }
 
   var k = {
@@ -14,7 +14,8 @@ Monocle.Controls.Spinner = function (reader) {
   }
 
   var p = {
-    divs: []
+    divs: [],
+    spinCount: 0
   }
 
   var API = {
@@ -25,7 +26,15 @@ Monocle.Controls.Spinner = function (reader) {
 
 
   function initialize() {
+  }
+
+
+  function assignToReader(reader) {
     p.reader = reader;
+    if (p.spinCount > 0) {
+      p.spinCount -= 1;
+      spin();
+    }
   }
 
 
@@ -41,33 +50,50 @@ Monocle.Controls.Spinner = function (reader) {
 
 
   // Registers spin/spun event handlers for: loading, bookchanging, resizing.
-  function listenForUsualDelays() {
-    p.reader.addListener('monocle:bookchanging', spin);
-    p.reader.addListener('monocle:bookchange', spun);
-    p.reader.addListener('monocle:componentloading', spin);
-    p.reader.addListener('monocle:componentloaded', spun);
-    p.reader.addListener('monocle:componentchanging', spin);
-    p.reader.addListener('monocle:componentchange', spun);
-    p.reader.addListener('monocle:resizing', spin);
-    p.reader.addListener('monocle:resize', spun);
+  function listenForUsualDelays(listenToElement) {
+    if (!listenToElement) {
+      if (p.reader) {
+        listenToElement = p.reader.p.divs.box;
+      } else {
+        throw("No listenToElement or assigned reader.");
+      }
+    }
+    Monocle.addListener(listenToElement, 'monocle:bookchanging', spin);
+    Monocle.addListener(listenToElement, 'monocle:bookchange', spun);
+    Monocle.addListener(listenToElement, 'monocle:componentloading', spin);
+    Monocle.addListener(listenToElement, 'monocle:componentloaded', spun);
+    Monocle.addListener(listenToElement, 'monocle:componentchanging', spin);
+    Monocle.addListener(listenToElement, 'monocle:componentchange', spun);
+    Monocle.addListener(listenToElement, 'monocle:resizing', spin);
+    Monocle.addListener(listenToElement, 'monocle:resize', spun);
   }
 
 
   function spin(evt) {
+    console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
+    p.spinCount += 1;
+    if (!p.reader) {
+      return;
+    }
     p.reader.showControl(API);
+    var pNode = evt && evt.monocleData.page ? evt.monocleData.page : null;
     for (var i = 0; i < p.divs.length; ++i) {
       p.divs[i].style.display =
-        evt.monocleData.page == (null || p.divs[i].parentNode.parentNode) ?
-          'block' :
-          'none'
+        (!pNode || pNode == p.divs[i].parentNode.parentNode) ? 'block' : 'none'
     }
   }
 
 
-  function spun() {
+  function spun(evt) {
+    console.log('Spun on ' + (evt ? evt.type : 'unknown'));
+    p.spinCount -= 1;
+    if (p.spinCount > 0 || !p.reader) {
+      return;
+    }
     p.reader.hideControl(API);
   }
 
+  API.assignToReader = assignToReader;
   API.createControlElements = createControlElements;
   API.listenForUsualDelays = listenForUsualDelays;
   API.spin = spin;

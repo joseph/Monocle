@@ -63,7 +63,7 @@
               ajReq.send(null);
               callback(ajReq.responseText);
             },
-            cmptId == '2.html' ? 8000 : 200
+            cmptId == '2.html' ? 4000 : 400
           );
         },
         getMetaData: function(key) {
@@ -79,10 +79,10 @@
         window,
         'load',
         function () {
+          var spinner = Monocle.Controls.Spinner();
+          spinner.listenForUsualDelays(document.getElementById('reader'));
           window.reader = Monocle.Reader('reader', bookData);
-          var spinner = Monocle.Controls.Spinner(window.reader);
           window.reader.addControl(spinner, 'page', { hidden: true });
-          spinner.listenForUsualDelays();
         }
       );
     </script>

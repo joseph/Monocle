@@ -318,9 +318,9 @@ Monocle.Reader = function (node, bookData, options) {
 
     var onChangePage = function (rslt) {
       // The book may disallow changing to the given page.
-      if (rslt === false) {
-        callback(false);
-        return false;
+      if (rslt === 'disallow') {
+        callback(rslt);
+        return rslt;
       }
 
       callback(rslt.offset);
@@ -488,10 +488,6 @@ Monocle.Reader = function (node, bookData, options) {
     }
     p.controls.push(ctrlData);
 
-    if (typeof ctrl.assignToReader == 'function') {
-      ctrl.assignToReader(API);
-    }
-
     var ctrlElem;
     if (!cType || cType == "standard") {
       ctrlElem = ctrl.createControlElements(p.divs.container);
@@ -529,6 +525,10 @@ Monocle.Reader = function (node, bookData, options) {
       hideControl(ctrl);
     } else {
       showControl(ctrl);
+    }
+
+    if (typeof ctrl.assignToReader == 'function') {
+      ctrl.assignToReader(API);
     }
 
     return ctrl;

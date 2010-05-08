@@ -90,7 +90,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
-      if (offset === false) {
+      if (offset === 'disallow') {
         if (typeof failCallback == 'function') { failCallback(); }
         p.turnData = {};
         return;
@@ -103,11 +103,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       div.style.left = "0px"; // Webkit hack
       setX(pageDiv.m.sheafDiv, 0, { duration: 0 }, callback);
     }
-    if (p.setPageFn(pageDiv, locus, spCallback) == false) {
-      return false;
-    } else {
-      return true;
-    }
+    var rslt = p.setPageFn(pageDiv, locus, spCallback);
+    // ??
   }
 
 
