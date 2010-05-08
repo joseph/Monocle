@@ -145,7 +145,7 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
   function setupFrame(pageDiv, callback) {
     var frame = pageDiv.m.activeFrame;
-    var doc = frame.contentWindow.document;
+    var doc = frame.contentDocument;
 
     // FIXME: cross-browser?
     if (!doc.getElementsByTagName('head')[0]) {
@@ -174,7 +174,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     p.clientDimensions = null;
     measureDimensions(pageDiv);
-    locateChapters(pageDiv);
     pageDiv.m.reader.dispatchEvent(
       'monocle:componentchange',
       {
@@ -204,7 +203,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
         }
       }
       measureDimensions(pageDiv);
-      locateChapters(pageDiv);
       return true;
     } else {
       return false;
@@ -257,6 +255,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
       ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
       p.clientDimensions.pages
     );
+
+    //locateChapters(pageDiv);
 
     return p.clientDimensions;
   }

@@ -441,12 +441,12 @@ Monocle.Reader = function (node, bookData, options) {
         Math.max(0, cursorInfo.pageY - p.boxDimensions.top)
       )
     };
-    if (
-      !dispatchEvent("monocle:contact:"+eType, cData, true) ||
-      !dispatchEvent("monocle:contact:"+eType+":unhandled", cData, true)
-    ) {
-      evt.preventDefault();
+
+    if (!dispatchEvent("monocle:contact:"+eType, cData, true)) {
+      dispatchEvent("monocle:contact:"+eType+":unhandled", cData, true)
     }
+
+    evt.preventDefault();
 
     if (eType == "end") {
       p.interactionData = {};
@@ -589,9 +589,8 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  // Internet Explorer does not permit custom events, and I'm not going to
-  // write an event system from scratch. We will wait for a version of IE that
-  // supports the W3C model.
+  // Internet Explorer does not permit custom events; we'll wait for a
+  // version of IE that supports the W3C model.
   //
   function dispatchEvent(evtType, data, cancelable) {
     if (!document.createEvent) {
