@@ -175,15 +175,6 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     // Find the place of any chapters in the component.
     locateChapters(pageDiv);
-
-    // Announce that the component has changed.
-    pageDiv.m.reader.dispatchEvent(
-      'monocle:componentchange',
-      {
-        'page': pageDiv,
-        'document': doc
-      }
-    );
   }
 
 
@@ -195,6 +186,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     setColumnWidth(pageDiv);
     p.clientDimensions = null;
     measureDimensions(pageDiv);
+    // Announce that the component has changed.
+    var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
+    pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
   }
 
 

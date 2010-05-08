@@ -174,7 +174,7 @@
       /* PLACE SAVER */
       var bkTitle = bookData.getMetaData('title');
       var placeSaver = new Monocle.Controls.PlaceSaver(bkTitle);
-      readerOptions.place = placeSaver.savedPlace();
+      //readerOptions.place = placeSaver.savedPlace();
 
       /* Initialize the reader */
       window.reader = Monocle.Reader('reader', bookData, readerOptions);

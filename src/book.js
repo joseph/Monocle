@@ -71,7 +71,7 @@ Monocle.Book = function (dataSource) {
     }
 
     console.log(
-      "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] to '" +
+      "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] within '" +
       locus.componentId + "'"
     );
 
@@ -92,7 +92,6 @@ Monocle.Book = function (dataSource) {
     if (cIndex == -1 || cIndex == place.properties.component.index) {
       component = place.properties.component;
     } else if (p.components[cIndex]) {
-      // FIXME: can this be generalised into shiftIntoComponent?
       component = p.components[cIndex];
     } else {
       pageDiv.m.pageChanging = true;
@@ -109,6 +108,7 @@ Monocle.Book = function (dataSource) {
       if (component.applyTo(pageDiv, tryAgain) == 'wait') {
         return 'wait';
       }
+      pageDiv.m.pageChanging = false;
     }
 
     var pageN = locusToPage(pageDiv, locus);
@@ -127,9 +127,9 @@ Monocle.Book = function (dataSource) {
       return 'ready';
     } else if (pageN > component.lastPageNumber()) {
       pageN -= component.lastPageNumber();
-      return shiftIntoComponent(pageDiv, cIndex + 1, pageN, callback);
+      return shiftIntoComponent(pageDiv, cIndex + 1, { page: pageN }, callback);
     } else if (pageN < 1) {
-      return shiftIntoComponent(pageDiv, cIndex - 1, pageN, callback);
+      return shiftIntoComponent(pageDiv, cIndex - 1, { pagesBack: pageN }, callback);
     }
 
     // Do it.
@@ -145,14 +145,16 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  function shiftIntoComponent(pageDiv, cIndex, pageOffset, callback) {
+  function shiftIntoComponent(pageDiv, cIndex, locus, callback) {
     var shift = function (cmpt) {
       pageDiv.m.pageChanging = false;
-      var locus = { componentId: cmpt.properties.id, page: pageOffset };
+      //var locus = { componentId: cmpt.properties.id, page: pageOffset };
+      locus.componentId = cmpt.properties.id;
       return changePage(pageDiv, locus, callback);
     }
 
     if (p.components[cIndex]) {
+      console.log("Already loaded for shift: " + cIndex);
       return shift(p.components[cIndex]);
     } else {
       console.log("Loading on shift: " + cIndex);
@@ -172,12 +174,10 @@ Monocle.Book = function (dataSource) {
     // deduce the page number for the given locus.
     var pageN = 1;
     if (typeof(locus.page) == "number") {
-      if (locus.page < 1) {
-        pageN = component.lastPageNumber() - locus.page;
-        console.log("Going backwards by " + locus.page + " to " + pageN);
-      } else {
-        pageN = locus.page;
-      }
+      pageN = locus.page;
+    } else if (typeof(locus.pagesBack) == "number") {
+      pageN = component.lastPageNumber() + locus.pagesBack;
+      console.log("Going backwards by " + locus.pagesBack + " to " + pageN);
     } else if (typeof(locus.percent) == "number") {
       place = setPlaceFor(pageDiv, component, 1);
       pageN = place.pageAtPercentageThrough(locus.percent);
