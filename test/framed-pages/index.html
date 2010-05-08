@@ -26,6 +26,8 @@
     <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
+    <script type="text/javascript" src="../../src/controls/spinner.js"></script>
+
     <style type="text/css">
       .readerInfo {
         width: 300px;
@@ -53,11 +55,16 @@
         getContents: function () {
           return [];
         },
-        getComponent: function (cmptId) {
-          var ajReq = new XMLHttpRequest();
-          ajReq.open("GET", cmptId, false);
-          ajReq.send(null);
-          return ajReq.responseText;
+        getComponent: function (cmptId, callback) {
+          setTimeout(
+            function () {
+              var ajReq = new XMLHttpRequest();
+              ajReq.open("GET", cmptId, false);
+              ajReq.send(null);
+              callback(ajReq.responseText);
+            },
+            1000
+          );
         },
         getMetaData: function(key) {
           return {
@@ -73,6 +80,9 @@
         'load',
         function () {
           window.reader = Monocle.Reader('reader', bookData);
+          var spinner = Monocle.Controls.Spinner(window.reader);
+          window.reader.addControl(spinner, 'page', { hidden: true });
+          spinner.listenForUsualDelays();
         }
       );
     </script>
