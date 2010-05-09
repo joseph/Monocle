@@ -171,14 +171,19 @@
     function () {
       var readerOptions = {};
 
+      /* SPINNER */
+      var spinner = Monocle.Controls.Spinner();
+      spinner.listenForUsualDelays('reader');
+
       /* PLACE SAVER */
       var bkTitle = bookData.getMetaData('title');
       var placeSaver = new Monocle.Controls.PlaceSaver(bkTitle);
-      //readerOptions.place = placeSaver.savedPlace();
+      readerOptions.place = placeSaver.savedPlace();
 
       /* Initialize the reader */
       window.reader = Monocle.Reader('reader', bookData, readerOptions);
 
+      reader.addControl(spinner, 'page', { hidden: true });
       reader.addControl(placeSaver, 'invisible');
 
       /* Because the 'reader' element changes size on window resize,
@@ -188,12 +193,6 @@
         'resize',
         function () { window.reader.resized() }
       );
-
-
-      /* SPINNER */
-      var spinner = Monocle.Controls.Spinner(window.reader);
-      window.reader.addControl(spinner, 'page', { hidden: true });
-      spinner.listenForUsualDelays();
 
       /* MAGNIFIER CONTROL */
       var magnifier = new Monocle.Controls.Magnifier(reader);

@@ -55,6 +55,9 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
   function moveTo(locus) {
     var spCallback = function (offset) {
+      if (offset == 'disallow') {
+        return;
+      }
       var div = p.page.m.activeFrame.contentDocument.body;
       div.scrollLeft = offset;
       if (div.scrollLeft == 0) {

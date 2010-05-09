@@ -57,6 +57,9 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   function moveTo(locus) {
     var spCallback = function (offset) {
+      if (offset == 'disallow') {
+        return;
+      }
       var div = p.page.m.activeFrame.contentDocument.body;
       var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
       clearTimeout(p.timer);

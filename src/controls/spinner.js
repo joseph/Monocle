@@ -53,7 +53,7 @@ Monocle.Controls.Spinner = function () {
   function listenForUsualDelays(listenToElement) {
     if (!listenToElement) {
       if (p.reader) {
-        listenToElement = p.reader.p.divs.box;
+        listenToElement = p.reader.properties.divs.box;
       } else {
         throw("No listenToElement or assigned reader.");
       }
