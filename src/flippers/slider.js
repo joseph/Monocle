@@ -103,8 +103,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       div.style.left = "0px"; // Webkit hack
       setX(pageDiv.m.sheafDiv, 0, { duration: 0 }, callback);
     }
-    var rslt = p.setPageFn(pageDiv, locus, spCallback);
-    // ??
+    return p.setPageFn(pageDiv, locus, spCallback);
   }
 
 
@@ -188,7 +187,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     } else if (inBackwardZone(boxPointX)) {
       p.turnData.animating = true;
       var place = getPlace();
-      setPage(
+      var rslt = setPage(
         lowerPage(),
         place.getLocus({ direction: k.BACKWARDS }),
         // Callback on success
@@ -209,6 +208,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           p.turnData = {};
         }
       );
+      if (rslt == 'wait') {
+        // TODO ???
+      }
       return true;
     }
     return false;
@@ -302,7 +304,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       setPage(lowerPage(), place.getLocus(), winCallback);
     }
 
-    setPage(
+    var rslt = setPage(
       lowerPage(),
       place.getLocus({ direction: k.FORWARDS }),
       winCallback,
