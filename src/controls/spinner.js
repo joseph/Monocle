@@ -64,8 +64,23 @@ Monocle.Controls.Spinner = function () {
     Monocle.addListener(listenToElement, 'monocle:componentloaded', spun);
     Monocle.addListener(listenToElement, 'monocle:componentchanging', spin);
     Monocle.addListener(listenToElement, 'monocle:componentchange', spun);
-    Monocle.addListener(listenToElement, 'monocle:resizing', spin);
-    Monocle.addListener(listenToElement, 'monocle:resize', spun);
+    Monocle.addListener(listenToElement, 'monocle:resizing', resizeSpin);
+    Monocle.addListener(listenToElement, 'monocle:resize', resizeSpun);
+  }
+
+
+  function resizeSpin(evt) {
+    if (p.resizing) {
+      return;
+    }
+    spin(evt);
+    p.resizing = true;
+  }
+
+
+  function resizeSpun(evt) {
+    spun(evt);
+    p.resizing = false;
   }
 
 
