@@ -133,7 +133,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
       }
       Monocle.addListener(frame, 'load', frameLoaded);
 
-      frame.src = "javascript: '" + html + "';";
+      if (html.indexOf('<') == -1) {
+        frame.src = html;
+      } else {
+        frame.src = "javascript: '" + html + "';";
+      }
       return 'wait';
     }
   }
