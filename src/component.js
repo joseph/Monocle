@@ -92,6 +92,44 @@ Monocle.Component = function (book, id, index, chapters, html) {
   }
 
 
+  function loadFrame(pageDiv, callback) {
+    var frame = pageDiv.m.componentFrames[p.index];
+    if (frame) {
+      if (callback) {
+        callback(frame);
+      }
+      return;
+    }
+    frame = document.createElement('iframe');
+    pageDiv.m.componentFrames[p.index] = frame;
+    pageDiv.m.activeFrame = frame;
+    frame.m = frame.monocleData = {
+      'component': API,
+      'pageDiv': pageDiv
+    }
+    frame.style.visibility = "hidden";
+    pageDiv.m.sheafDiv.appendChild(frame);
+
+    Monocle.addListener(
+      frame,
+      'load',
+      function () {
+        setupFrame(pageDiv, frame);
+        if (callback) {
+          callback(frame);
+        }
+      }
+    );
+
+    /* FIXME: THIS IS NOT A REASONABLE TEST! */
+    if (html.indexOf('<') == -1) {
+      frame.src = html;
+    } else {
+      frame.src = "javascript: '" + html + "';";
+    }
+  }
+
+
   function currentlyApplyingTo(pageDiv) {
     return pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API;
   }
@@ -111,40 +149,22 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
     var frame = pageDiv.m.componentFrames[p.index];
     if (frame) {
-      console.log("Reusing existing frame.")
-      pageDiv.m.activeFrame = frame;
-      showFrame(pageDiv);
+      showFrame(pageDiv, frame);
       return 'ready';
     } else {
-      console.log("Generating new frame.")
-      frame = document.createElement('iframe');
-      pageDiv.m.componentFrames[p.index] = frame;
-      pageDiv.m.activeFrame = frame;
-      frame.m = frame.monocleData = {
-        'component': API,
-        'pageDiv': pageDiv
-      }
-      frame.style.visibility = "hidden";
-      pageDiv.m.sheafDiv.appendChild(frame);
-
-      var frameLoaded = function () {
-        setupFrame(pageDiv);
-        waitCallback();
-      }
-      Monocle.addListener(frame, 'load', frameLoaded);
-
-      if (html.indexOf('<') == -1) {
-        frame.src = html;
-      } else {
-        frame.src = "javascript: '" + html + "';";
-      }
+      loadFrame(
+        pageDiv,
+        function (frame) {
+          showFrame(pageDiv, frame);
+          waitCallback();
+        }
+      );
       return 'wait';
     }
   }
 
 
-  function setupFrame(pageDiv) {
-    var frame = pageDiv.m.activeFrame;
+  function setupFrame(pageDiv, frame) {
     var doc = frame.contentDocument;
 
     // Create the <head> element in the frame if it doesn't exist.
@@ -173,17 +193,11 @@ Monocle.Component = function (book, id, index, chapters, html) {
     clampCSS(doc);
 
     // TODO: rewrite internal links
-
-    // Run every-time frame display tasks.
-    showFrame(pageDiv);
-
-    // Find the place of any chapters in the component.
-    locateChapters(pageDiv);
   }
 
 
-  function showFrame(pageDiv) {
-    var frame = pageDiv.m.activeFrame;
+  function showFrame(pageDiv, frame) {
+    pageDiv.m.activeFrame = frame;
     applyStyles(pageDiv);
     frame.style.visibility = "visible";
     frame.style.display = "block";
@@ -193,6 +207,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
+
+    // Find the place of any chapters in the component.
+    locateChapters(pageDiv);
   }
 
 
@@ -250,6 +267,9 @@ Monocle.Component = function (book, id, index, chapters, html) {
     // Detect single-page components.
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
       var elems = doc.body.getElementsByTagName('*');
+      if (!elems || elems.length == 0) {
+        throw("Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id);
+      }
       var elem = elems[elems.length - 1];
       var lcEnd = elem.offsetTop + elem.offsetHeight;
       p.clientDimensions.scrollWidth = p.clientDimensions.width *
