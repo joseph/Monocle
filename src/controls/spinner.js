@@ -79,7 +79,7 @@ Monocle.Controls.Spinner = function () {
 
 
   function spin(evt) {
-    console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
+    //console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
     p.spinCount += 1;
     if (!p.reader) {
       return;
@@ -94,7 +94,7 @@ Monocle.Controls.Spinner = function () {
 
 
   function spun(evt) {
-    console.log('Spun on ' + (evt ? evt.type : 'unknown'));
+    //console.log('Spun on ' + (evt ? evt.type : 'unknown'));
     p.spinCount -= 1;
     if (p.spinCount > 0 || !p.reader) {
       return;

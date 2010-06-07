@@ -107,7 +107,7 @@
       ]
     },
     getComponent: function (componentId) {
-      return document.getElementById(componentId).innerHTML;
+      return [document.getElementById(componentId).cloneNode(true)];
     },
     getMetaData: function (key) {
       return {

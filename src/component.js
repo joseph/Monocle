@@ -2,9 +2,9 @@
 
 // See the properties declaration for details of constructor arguments.
 //
-Monocle.Component = function (book, id, index, chapters, html) {
+Monocle.Component = function (book, id, index, chapters, source) {
   if (Monocle == this) {
-    return new Monocle.Component(book, id, index, chapters, html);
+    return new Monocle.Component(book, id, index, chapters, source);
   }
 
   // Constants.
@@ -36,8 +36,8 @@ Monocle.Component = function (book, id, index, chapters, html) {
     //
     chapters: chapters,
 
-    // the HTML provided by dataSource.getComponent() for this component
-    html: html,
+    // the frame provided by dataSource.getComponent() for this component
+    source: source,
 
     // The array of pageDivs that have rendered this component. Indexed by
     // their pageIndex.
@@ -71,61 +71,59 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function initialize() {
-    if (!p.html) {
-      console.log("Accessed an empty component: " + p.id);
-      p.html = "<p></p>"
-    }
-
-    // Compress whitespace.
-    p.html = p.html.replace(/\s+/g, ' ');
-
-    // Escape single-quotes.
-    p.html = p.html.replace(/\'/g, '\\\'');
-
-    // Remove scripts.
-    var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-    p.html = p.html.replace(new RegExp(scriptFragment, 'img'), '');
-
-    // Gecko chokes on the DOCTYPE declaration.
-    var doctypeFragment = "<!DOCTYPE[^>]*>";
-    p.html = p.html.replace(new RegExp(doctypeFragment, 'm'), '');
   }
 
 
   function loadFrame(pageDiv, callback) {
-    var frame = pageDiv.m.componentFrames[p.index];
-    if (frame) {
+    var frame = pageDiv.m.activeFrame;
+
+    if (!frame) {
+      console.log("Creating a new frame for pageDiv["+pageDiv.m.pageIndex+"]");
+      frame = document.createElement('iframe');
+      pageDiv.m.activeFrame = frame;
+      frame.m = frame.monocleData = {
+        'pageDiv': pageDiv
+      }
+      pageDiv.m.sheafDiv.appendChild(frame);
+      frame.style.visibility = "hidden";
+
+      frame.m.component = API;
+
+      frame.m.loadCallback = function () {
+        var f = frame;
+        frame = null;
+        Monocle.removeListener(f, 'load', f.m.loadCallback);
+        setupFrame(pageDiv, f);
+        if (callback) {
+          callback(f);
+        }
+      }
+
+      Monocle.addListener(frame, 'load', frame.m.loadCallback);
+      frame.src = p.source.contentWindow.location;
+      return 'wait';
+    } else {
+      frame.m.component = API;
+
+      var srcDoc = p.source.contentDocument;
+      var srcDocElem = srcDoc.documentElement;
+      var destDoc = frame.contentDocument;
+      var destDocElem = destDoc.documentElement;
+      var origChildrenLength = destDocElem.childNodes.length;
+      for (var i = 0; i < srcDocElem.childNodes.length; ++i) {
+        var node = destDoc.importNode(srcDocElem.childNodes[i], true);
+        destDocElem.appendChild(node);
+      }
+      for (i = 0; i < origChildrenLength; ++i) {
+        destDocElem.removeChild(destDocElem.firstChild);
+      }
+
+      setupFrame(pageDiv, frame);
       if (callback) {
         callback(frame);
       }
-      return;
-    }
-    frame = document.createElement('iframe');
-    pageDiv.m.componentFrames[p.index] = frame;
-    pageDiv.m.activeFrame = frame;
-    frame.m = frame.monocleData = {
-      'component': API,
-      'pageDiv': pageDiv
-    }
-    frame.style.visibility = "hidden";
-    pageDiv.m.sheafDiv.appendChild(frame);
 
-    Monocle.addListener(
-      frame,
-      'load',
-      function () {
-        setupFrame(pageDiv, frame);
-        if (callback) {
-          callback(frame);
-        }
-      }
-    );
-
-    /* FIXME: THIS IS NOT A REASONABLE TEST! */
-    if (html.indexOf('<') == -1) {
-      frame.src = html;
-    } else {
-      frame.src = "javascript: '" + html + "';";
+      return 'ready';
     }
   }
 
@@ -142,30 +140,30 @@ Monocle.Component = function (book, id, index, chapters, html) {
     console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
-    var evtData = { 'page': pageDiv, 'html': p.html };
+    var evtData = { 'page': pageDiv, 'source': p.source };
     pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData);
-    var html = evtData.html;
-    blankPage(pageDiv);
 
-    var frame = pageDiv.m.componentFrames[p.index];
-    if (frame) {
-      showFrame(pageDiv, frame);
-      return 'ready';
-    } else {
-      loadFrame(
-        pageDiv,
-        function (frame) {
-          showFrame(pageDiv, frame);
-          waitCallback();
-        }
-      );
-      return 'wait';
-    }
+    return loadFrame(
+      pageDiv,
+      function (frame) {
+        showFrame(pageDiv, frame);
+        waitCallback();
+      }
+    );
   }
 
 
   function setupFrame(pageDiv, frame) {
     var doc = frame.contentDocument;
+
+    if (!doc.body) {
+      var body = doc.createElement('body');
+      var nodes = doc.documentElement.childNodes;
+      for (var i = 0; i < nodes.length; ++i) {
+        body.appendChild(nodes[i]);
+      }
+      doc.documentElement.appendChild(body);
+    }
 
     // Create the <head> element in the frame if it doesn't exist.
     // FIXME: I presume this isn't cross-browser?
@@ -197,27 +195,17 @@ Monocle.Component = function (book, id, index, chapters, html) {
 
 
   function showFrame(pageDiv, frame) {
-    pageDiv.m.activeFrame = frame;
     applyStyles(pageDiv);
-    frame.style.visibility = "visible";
-    frame.style.display = "block";
     setColumnWidth(pageDiv);
-    p.clientDimensions = null;
+    frame.style.visibility = "visible";
     measureDimensions(pageDiv);
+
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
     // Find the place of any chapters in the component.
-    locateChapters(pageDiv);
-  }
-
-
-  function blankPage(pageDiv) {
-    if (pageDiv.m.activeFrame) {
-      pageDiv.m.activeFrame.style.display = 'none';
-    }
-    pageDiv.m.activeFrame = null;
+    //locateChapters(pageDiv);
   }
 
 

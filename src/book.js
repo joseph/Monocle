@@ -70,10 +70,10 @@ Monocle.Book = function (dataSource) {
       return 'wait';
     }
 
-    console.log(
-      "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] within '" +
-      locus.componentId + "'"
-    );
+    // console.log(
+    //   "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] within '" +
+    //   locus.componentId + "'"
+    // );
 
     var cIndex = p.componentIds.indexOf(locus.componentId);
     var place = pageDiv.m.place;
