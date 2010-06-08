@@ -260,7 +260,7 @@ Monocle.Book = function (dataSource) {
     var matcher = new RegExp('^'+cmptId+"(\#(.+)|$)");
     var matches;
     var recurser = function (chp) {
-      if (matches = chp.cmptId.match(matcher)) {
+      if (matches = chp.src.match(matcher)) {
         p.chapters[cmptId].push({
           title: chp.title,
           fragment: matches[2] || null

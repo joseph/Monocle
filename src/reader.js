@@ -113,6 +113,14 @@ Monocle.Reader = function (node, bookData, options) {
     // Make the reader elements look pretty.
     applyStyles();
 
+    addListener(
+      'monocle:componentchange',
+      function (evt) {
+        var doc = evt.monocleData['document'];
+        Monocle.Styles.applyRules(doc.body, 'body');
+      }
+    );
+
     // Apply the book, calculating column dimensions & etc.
     setBook(bk, options.place);
 
@@ -150,11 +158,15 @@ Monocle.Reader = function (node, bookData, options) {
         sheafDiv: document.createElement('div'),
         controlsDiv: document.createElement('div'),
         componentFrames: [],
-        activeFrame: null,
+        activeFrame: document.createElement('iframe'),
         place: null
+      }
+      page.m.activeFrame.m = page.m.activeFrame.monocleData = {
+        'pageDiv': page
       }
       page.appendChild(page.m.sheafDiv);
       page.appendChild(page.m.controlsDiv);
+      page.m.sheafDiv.appendChild(page.m.activeFrame);
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
     }
@@ -190,6 +202,7 @@ Monocle.Reader = function (node, bookData, options) {
       Monocle.Styles.applyRules(page, 'page');
       Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
       Monocle.Styles.applyRules(page.m.controlsDiv, 'controls');
+      Monocle.Styles.applyRules(page.m.activeFrame, 'component');
     }
     Monocle.Styles.applyRules(p.divs.overlay, 'overlay');
     dispatchEvent('monocle:styles');

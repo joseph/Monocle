@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+  <head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
+    <title>Component loading methods test</title>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+
+    <style type="text/css">
+      .readerInfo {
+        width: 300px;
+        float: left;
+        padding-right: 20px;
+      }
+      .reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+      }
+
+      #hiddenFrames {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+      }
+    </style>
+
+    <script type="text/javascript">
+      function basicBookData(getComponentFn) {
+        return {
+          getComponents: function () {
+            return ['1.html', '2.html', '3.html'];
+          },
+          getComponent: getComponentFn,
+          getContents: function () {
+            return [];
+          },
+          getMetaData: function(key) {
+            return { title: "Lorem Ipsum", creator: "Mr Monocle" }[key];
+          },
+          frameFor: function (url) {
+            var frameCntr = document.getElementById('hiddenFrames');
+            var frames = frameCntr.getElementsByTagName('iframe');
+            for (var i = 0; i < frames.length; ++i) {
+              if (frames[i].getAttribute('src') == url) {
+                return frames[i];
+              }
+            }
+          }
+        }
+      }
+
+      var bookData_URL = basicBookData(function (cmptId, callback) {
+        return { url: cmptId };
+      });
+      var bookData_HTML = basicBookData(function (cmptId, callback) {
+        return this.frameFor(cmptId).contentDocument.documentElement.innerHTML;
+      });
+      var bookData_DOCUMENT = basicBookData(function (cmptId, callback) {
+        return { doc: this.frameFor(cmptId).contentDocument };
+      });
+      var bookData_NODES = basicBookData(function (cmptId, callback) {
+        return { nodes: this.frameFor(cmptId).contentDocument.body.childNodes };
+      });
+
+
+      // Initialize the reader element.
+      Monocle.addListener(
+        window,
+        'load',
+        function () {
+          window.reader1 = Monocle.Reader('reader_URL', bookData_URL);
+          window.reader2 = Monocle.Reader('reader_HTML', bookData_HTML);
+          window.reader3 = Monocle.Reader('reader_DOCUMENT', bookData_DOCUMENT);
+          window.reader4 = Monocle.Reader('reader_NODES', bookData_NODES);
+        }
+      );
+    </script>
+
+  </head>
+
+  <body>
+
+    <div class="readerInfo">
+      <h2>URL</h2>
+      <div class="reader" id="reader_URL"></div>
+      <p>
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>HTML</h2>
+      <div class="reader" id="reader_HTML"></div>
+      <p>
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOCUMENT</h2>
+      <div class="reader" id="reader_DOCUMENT"></div>
+      <p>
+      </p>
+    </div>
+
+    <div class="readerInfo">
+      <h2>NODES</h2>
+      <div class="reader" id="reader_NODES"></div>
+      <p>
+      </p>
+    </div>
+
+
+    <div id="hiddenFrames">
+      <iframe src="1.html"></iframe>
+      <iframe src="2.html"></iframe>
+      <iframe src="3.html"></iframe>
+    </div>
+
+  </body>
+</html>

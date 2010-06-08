@@ -39,7 +39,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // the frame provided by dataSource.getComponent() for this component
     source: source,
 
-    // The array of pageDivs that have rendered this component. Indexed by
+    // The array of pageDivs that have applied this component. Indexed by
     // their pageIndex.
     pageDivs: [],
 
@@ -74,135 +74,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  function loadFrame(pageDiv, callback) {
-    var frame = pageDiv.m.activeFrame;
-
-    if (!frame) {
-      console.log("Creating a new frame for pageDiv["+pageDiv.m.pageIndex+"]");
-      frame = document.createElement('iframe');
-      pageDiv.m.activeFrame = frame;
-      frame.m = frame.monocleData = {
-        'pageDiv': pageDiv
-      }
-      pageDiv.m.sheafDiv.appendChild(frame);
-      frame.style.visibility = "hidden";
-
-      // Prevent about:blank overriding imported nodes in Firefox.
-      frame.contentWindow.stop();
-    }
-
-    frame.m.component = API;
-
-    if (typeof p.source == "string") {  // STRING
-      frame.m.loadCallback = function () {
-        var f = frame;
-        frame = null;
-        if (f) {
-          Monocle.removeListener(f, 'load', f.m.loadCallback);
-          setupFrame(pageDiv, f);
-          if (callback) {
-            callback(f);
-          }
-        }
-      }
-
-      src = p.source;
-
-      // Compress whitespace.
-      src = src.replace(/\s+/g, ' ');
-
-      // Escape single-quotes.
-      src = src.replace(/\'/g, '\\\'');
-
-      // Remove scripts.
-      var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-      src = src.replace(new RegExp(scriptFragment, 'img'), '');
-
-      // Gecko chokes on the DOCTYPE declaration.
-      var doctypeFragment = "<!DOCTYPE[^>]*>";
-      src = src.replace(new RegExp(doctypeFragment, 'm'), '');
-
-      src = "javascript: '" + src + "';";
-
-      Monocle.addListener(frame, 'load', frame.m.loadCallback);
-      frame.src = src;
-      return 'wait';
-    } else if (p.source.url) {          // URL
-      frame.m.loadCallback = function () {
-        var f = frame;
-        frame = null;
-        if (f) {
-          Monocle.removeListener(f, 'load', f.m.loadCallback);
-          setupFrame(pageDiv, f);
-          if (callback) {
-            callback(f);
-          }
-        }
-      }
-      Monocle.addListener(frame, 'load', frame.m.loadCallback);
-      frame.src = p.source.url;
-      return 'wait';
-    } else if (p.source.nodes) {        // NODES
-      var destDoc = frame.contentDocument;
-      var destDocElem = destDoc.documentElement;
-
-      destDoc.body.innerHTML = "";
-      //var origChildrenLength = destDocElem.childNodes.length;
-      for (var i = 0; i < p.source.nodes.length; ++i) {
-        var node = destDoc.importNode(p.source.nodes[i], true);
-        destDoc.body.appendChild(node);
-      }
-      // for (i = 0; i < origChildrenLength; ++i) {
-      //   destDocElem.removeChild(destDocElem.firstChild);
-      // }
-
-      // Create the body and move everything inside it if relevant.
-      // if (!destDoc.body) {
-      //   var body = destDoc.createElement('body');
-      //   var nodes = destDoc.documentElement.childNodes;
-      //   for (var i = 0; i < nodes.length; ++i) {
-      //     body.appendChild(nodes[i]);
-      //   }
-      //   destDoc.documentElement.appendChild(body);
-      // }
-
-      // Create the <head> element in the frame if it doesn't exist.
-      if (!destDoc.getElementsByTagName('head')[0]) {
-        var head = destDoc.createElement('head');
-        destDoc.documentElement.insertBefore(head, destDoc.body);
-      }
-
-      setupFrame(pageDiv, frame);
-      if (callback) {
-        callback(frame);
-      }
-      return 'ready';
-    } else if (p.source.doc) {          // DOCUMENT
-      var srcDoc = p.source.doc;
-      var srcDocElem = srcDoc.documentElement;
-      var destDoc = frame.contentDocument;
-      var destDocElem = destDoc.documentElement;
-      var origChildrenLength = destDocElem.childNodes.length;
-      for (var i = 0; i < srcDocElem.childNodes.length; ++i) {
-        var node = destDoc.importNode(srcDocElem.childNodes[i], true);
-        destDocElem.appendChild(node);
-      }
-      for (i = 0; i < origChildrenLength; ++i) {
-        destDocElem.removeChild(destDocElem.firstChild);
-      }
-
-      setupFrame(pageDiv, frame);
-      if (callback) {
-        callback(frame);
-      }
-
-      return 'ready';
-    }
-  }
-
-
   function currentlyApplyingTo(pageDiv) {
-    return pageDiv.m.activeFrame && pageDiv.m.activeFrame.m.component == API;
+    return pageDiv.m.activeFrame.m.component == API;
   }
 
 
@@ -220,47 +93,136 @@ Monocle.Component = function (book, id, index, chapters, source) {
     return loadFrame(
       pageDiv,
       function (frame) {
-        showFrame(pageDiv, frame);
+        setupFrame(pageDiv, frame);
         waitCallback();
       }
     );
   }
 
 
+  function loadFrame(pageDiv, callback) {
+    var frame = pageDiv.m.activeFrame;
+
+    // We own this frame now.
+    frame.m.component = API;
+
+    // Hide the frame while we're changing it.
+    frame.style.visibility = "hidden";
+
+    // Prevent about:blank overriding imported nodes in Firefox.
+    frame.contentWindow.stop();
+
+    if (p.source.html || (typeof p.source == "string")) {   // HTML
+      return loadFrameFromHTML(p.source.html || p.source, frame, callback);
+    } else if (p.source.url) {                              // URL
+      return loadFrameFromURL(p.source.url, frame, callback);
+    } else if (p.source.nodes) {                            // NODES
+      return loadFrameFromNodes(p.source.nodes, frame, callback);
+    } else if (p.source.doc) {                              // DOCUMENT
+      return loadFrameFromDocument(p.source.doc, frame, callback);
+    }
+  }
+
+
+  function loadFrameFromHTML(src, frame, callback) {
+    // Compress whitespace.
+    src = src.replace(/\s+/g, ' ');
+
+    // Escape single-quotes.
+    src = src.replace(/\'/g, '\\\'');
+
+    // Remove scripts.
+    var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
+    src = src.replace(new RegExp(scriptFragment, 'img'), '');
+
+    // Gecko chokes on the DOCTYPE declaration.
+    var doctypeFragment = "<!DOCTYPE[^>]*>";
+    src = src.replace(new RegExp(doctypeFragment, 'm'), '');
+
+    src = "javascript: '" + src + "';";
+
+    frame.onload = function () {
+      frame.onload = null;
+      if (callback) { callback(frame); }
+    }
+    frame.src = src;
+    return 'wait';
+  }
+
+
+  function loadFrameFromURL(url, frame, callback) {
+    frame.onload = function () {
+      frame.onload = null;
+      if (callback) { callback(frame); }
+    }
+    frame.src = url;
+    return 'wait';
+  }
+
+
+  function loadFrameFromNodes(nodes, frame, callback) {
+    var destDoc = frame.contentDocument;
+    destDoc.documentElement.innerHTML = "";
+    var destHd = destDoc.createElement("head");
+    var destBdy = destDoc.createElement("body");
+
+    for (var i = 0; i < nodes.length; ++i) {
+      var node = destDoc.importNode(nodes[i], true);
+      destBdy.appendChild(node);
+    }
+
+    destDoc.documentElement.appendChild(destHd);
+    destDoc.documentElement.appendChild(destBdy);
+
+    if (callback) { callback(frame); }
+    return 'ready';
+  }
+
+
+  function loadFrameFromDocument(srcDoc, frame, callback) {
+    if (p.source.cacheCompatible) {
+      return loadFrameFromURL(srcDoc.defaultView.location, frame, callback);
+    }
+    var srcDocElem = srcDoc.documentElement;
+    var destDoc = frame.contentDocument;
+    var destDocElem = destDoc.documentElement;
+    var origChildrenLength = destDocElem.childNodes.length;
+    for (var i = 0; i < srcDocElem.childNodes.length; ++i) {
+      var node = destDoc.importNode(srcDocElem.childNodes[i], true);
+      destDocElem.appendChild(node);
+    }
+    for (i = 0; i < origChildrenLength; ++i) {
+      destDocElem.removeChild(destDocElem.firstChild);
+    }
+
+    if (callback) { callback(frame); }
+    return 'ready';
+  }
+
+
   function setupFrame(pageDiv, frame) {
-    var doc = frame.contentDocument;
-
-    // Register iframe to get reapplyStyles notifications from the reader.
-    pageDiv.m.reader.addListener(
-      'monocle:styles',
-      function () { applyStyles(pageDiv); }
-    );
-
     // On MobileSafari, translates a click on the iframe into a click on
     // the reader's controls div.
-    // Presently required to route around MobileSafari's
-    // problems with iframes. But it would be very nice to rip it out.
+    // Presently required to route around MobileSafari's problems with
+    // iframes. But it would be very nice to rip it out.
     if (/WebKit/i.test(navigator.userAgent) && typeof Touch == "object") {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 
     // Apply non-negotiable CSS to the document, overriding book designer's
     // styles.
-    clampCSS(doc);
+    clampCSS(frame.contentDocument);
 
     // TODO: rewrite internal links
-  }
 
-
-  function showFrame(pageDiv, frame) {
-    applyStyles(pageDiv);
-    setColumnWidth(pageDiv);
-    frame.style.visibility = "visible";
-    measureDimensions(pageDiv);
 
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
+
+    setColumnWidth(pageDiv);
+    frame.style.visibility = "visible";
+    measureDimensions(pageDiv);
 
     // Find the place of any chapters in the component.
     //locateChapters(pageDiv);
@@ -346,17 +308,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
       // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
       // Still, browser sniffing is an evil.
       doc.body.style.overflow = 'hidden';
-    }
-  }
-
-
-  function applyStyles(pageDiv) {
-    if (currentlyApplyingTo(pageDiv)) {
-      var frame = pageDiv.m.activeFrame;
-      Monocle.Styles.applyRules(frame, 'component');
-      if (frame.contentDocument && frame.contentDocument.body) {
-        Monocle.Styles.applyRules(frame.contentDocument.body, 'body');
-      }
     }
   }
 
