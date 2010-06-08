@@ -214,54 +214,54 @@ Monocle.Book = function (dataSource) {
   }
 
 
-  // Fetches the component HTML from the dataSource. The index argument is
+  // Fetches the component source from the dataSource. The index argument is
   // the index of the component in the dataSource.getComponents array.
-  // Callback is invoked when the HTML is received. pageDiv is optional,
-  // and simply allows communication with the reader object that has requested
-  // this component, ONLY if the HTML has not already been received.
+  // Callback is invoked when the source is received. pageDiv is optional,
+  // and simply allows firing events on the reader object that has requested
+  // this component, ONLY if the source has not already been received.
   //
   function loadComponent(index, callback, pageDiv) {
     if (p.components[index]) {
       return callback(p.components[index]);
     }
+    var cmptId = p.componentIds[index];
     if (pageDiv) {
-      var evtData = { 'page': pageDiv, 'component': src, 'index': index };
+      var evtData = { 'page': pageDiv, 'component': cmptId, 'index': index };
       pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
     }
-    var src = p.componentIds[index];
-    console.log("Loading component HTML: '"+src+"'");
-    var fn = function (html) {
+    console.log("Loading component contents: '"+cmptId+"' for pageDiv: " + pageDiv.m.pageIndex);
+    var fn = function (cmptSource) {
       if (pageDiv) {
-        evtData['html'] = html;
+        evtData['source'] = cmptSource;
         pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
         html = evtData['html'];
       }
       p.components[index] = new Monocle.Component(
         API,
-        src,
+        cmptId,
         index,
-        chaptersForComponent(src),
-        html
+        chaptersForComponent(cmptId),
+        cmptSource
       );
       callback(p.components[index]);
     }
-    var html = p.dataSource.getComponent(src, fn);
-    if (html && !p.components[index]) {
-      fn(html);
+    var cmptSource = p.dataSource.getComponent(cmptId, fn);
+    if (cmptSource && !p.components[index]) {
+      fn(cmptSource);
     }
   }
 
 
-  function chaptersForComponent(src) {
-    if (p.chapters[src]) {
-      return p.chapters[src];
+  function chaptersForComponent(cmptId) {
+    if (p.chapters[cmptId]) {
+      return p.chapters[cmptId];
     }
-    p.chapters[src] = [];
-    var matcher = new RegExp('^'+src+"(\#(.+)|$)");
+    p.chapters[cmptId] = [];
+    var matcher = new RegExp('^'+cmptId+"(\#(.+)|$)");
     var matches;
     var recurser = function (chp) {
-      if (matches = chp.src.match(matcher)) {
-        p.chapters[src].push({
+      if (matches = chp.cmptId.match(matcher)) {
+        p.chapters[cmptId].push({
           title: chp.title,
           fragment: matches[2] || null
         });
@@ -276,7 +276,7 @@ Monocle.Book = function (dataSource) {
     for (var i = 0; i < p.contents.length; ++i) {
       recurser(p.contents[i]);
     }
-    return p.chapters[src];
+    return p.chapters[cmptId];
   }
 
 

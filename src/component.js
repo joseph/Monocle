@@ -87,25 +87,98 @@ Monocle.Component = function (book, id, index, chapters, source) {
       pageDiv.m.sheafDiv.appendChild(frame);
       frame.style.visibility = "hidden";
 
-      frame.m.component = API;
+      // Prevent about:blank overriding imported nodes in Firefox.
+      frame.contentWindow.stop();
+    }
 
+    frame.m.component = API;
+
+    if (typeof p.source == "string") {  // STRING
       frame.m.loadCallback = function () {
         var f = frame;
         frame = null;
-        Monocle.removeListener(f, 'load', f.m.loadCallback);
-        setupFrame(pageDiv, f);
-        if (callback) {
-          callback(f);
+        if (f) {
+          Monocle.removeListener(f, 'load', f.m.loadCallback);
+          setupFrame(pageDiv, f);
+          if (callback) {
+            callback(f);
+          }
         }
       }
 
-      Monocle.addListener(frame, 'load', frame.m.loadCallback);
-      frame.src = p.source.contentWindow.location;
-      return 'wait';
-    } else {
-      frame.m.component = API;
+      src = p.source;
 
-      var srcDoc = p.source.contentDocument;
+      // Compress whitespace.
+      src = src.replace(/\s+/g, ' ');
+
+      // Escape single-quotes.
+      src = src.replace(/\'/g, '\\\'');
+
+      // Remove scripts.
+      var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
+      src = src.replace(new RegExp(scriptFragment, 'img'), '');
+
+      // Gecko chokes on the DOCTYPE declaration.
+      var doctypeFragment = "<!DOCTYPE[^>]*>";
+      src = src.replace(new RegExp(doctypeFragment, 'm'), '');
+
+      src = "javascript: '" + src + "';";
+
+      Monocle.addListener(frame, 'load', frame.m.loadCallback);
+      frame.src = src;
+      return 'wait';
+    } else if (p.source.url) {          // URL
+      frame.m.loadCallback = function () {
+        var f = frame;
+        frame = null;
+        if (f) {
+          Monocle.removeListener(f, 'load', f.m.loadCallback);
+          setupFrame(pageDiv, f);
+          if (callback) {
+            callback(f);
+          }
+        }
+      }
+      Monocle.addListener(frame, 'load', frame.m.loadCallback);
+      frame.src = p.source.url;
+      return 'wait';
+    } else if (p.source.nodes) {        // NODES
+      var destDoc = frame.contentDocument;
+      var destDocElem = destDoc.documentElement;
+
+      destDoc.body.innerHTML = "";
+      //var origChildrenLength = destDocElem.childNodes.length;
+      for (var i = 0; i < p.source.nodes.length; ++i) {
+        var node = destDoc.importNode(p.source.nodes[i], true);
+        destDoc.body.appendChild(node);
+      }
+      // for (i = 0; i < origChildrenLength; ++i) {
+      //   destDocElem.removeChild(destDocElem.firstChild);
+      // }
+
+      // Create the body and move everything inside it if relevant.
+      // if (!destDoc.body) {
+      //   var body = destDoc.createElement('body');
+      //   var nodes = destDoc.documentElement.childNodes;
+      //   for (var i = 0; i < nodes.length; ++i) {
+      //     body.appendChild(nodes[i]);
+      //   }
+      //   destDoc.documentElement.appendChild(body);
+      // }
+
+      // Create the <head> element in the frame if it doesn't exist.
+      if (!destDoc.getElementsByTagName('head')[0]) {
+        var head = destDoc.createElement('head');
+        destDoc.documentElement.insertBefore(head, destDoc.body);
+      }
+
+      setupFrame(pageDiv, frame);
+      if (callback) {
+        callback(frame);
+      }
+      return 'ready';
+    } else if (p.source.doc) {          // DOCUMENT
+      var srcDoc = p.source.doc;
       var srcDocElem = srcDoc.documentElement;
       var destDoc = frame.contentDocument;
       var destDocElem = destDoc.documentElement;
@@ -137,6 +210,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (currentlyApplyingTo(pageDiv)) {
       return;
     }
+
     console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
@@ -155,22 +229,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   function setupFrame(pageDiv, frame) {
     var doc = frame.contentDocument;
-
-    if (!doc.body) {
-      var body = doc.createElement('body');
-      var nodes = doc.documentElement.childNodes;
-      for (var i = 0; i < nodes.length; ++i) {
-        body.appendChild(nodes[i]);
-      }
-      doc.documentElement.appendChild(body);
-    }
-
-    // Create the <head> element in the frame if it doesn't exist.
-    // FIXME: I presume this isn't cross-browser?
-    if (!doc.getElementsByTagName('head')[0]) {
-      var head = doc.createElement('head');
-      doc.documentElement.insertBefore(head, doc.body);
-    }
 
     // Register iframe to get reapplyStyles notifications from the reader.
     pageDiv.m.reader.addListener(
