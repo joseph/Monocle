@@ -92,9 +92,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     return loadFrame(
       pageDiv,
-      function (frame) {
+      function (frame, waiting) {
         setupFrame(pageDiv, frame);
-        waitCallback();
+        if (waiting) { waitCallback(); }
       }
     );
   }
@@ -143,7 +143,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     frame.onload = function () {
       frame.onload = null;
-      if (callback) { callback(frame); }
+      if (callback) { callback(frame, true); }
     }
     frame.src = src;
     return 'wait';
@@ -154,7 +154,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     frame.onload = function () {
       frame.onload = null;
       frame.cacheInitialized = true;
-      if (callback) { callback(frame); }
+      if (callback) { callback(frame, true); }
     }
     frame.src = url;
     return 'wait';
@@ -175,7 +175,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     destDoc.documentElement.appendChild(destHd);
     destDoc.documentElement.appendChild(destBdy);
 
-    if (callback) { callback(frame); }
+    callback(frame, false);
     return 'ready';
   }
 
@@ -196,7 +196,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       destDocElem.removeChild(destDocElem.firstChild);
     }
 
-    if (callback) { callback(frame); }
+    callback(frame, false);
     return 'ready';
   }
 
