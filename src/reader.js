@@ -164,6 +164,7 @@ Monocle.Reader = function (node, bookData, options) {
       page.m.activeFrame.m = page.m.activeFrame.monocleData = {
         'pageDiv': page
       }
+      page.m.activeFrame.style.visibility = "hidden";
       page.appendChild(page.m.sheafDiv);
       page.appendChild(page.m.controlsDiv);
       page.m.sheafDiv.appendChild(page.m.activeFrame);

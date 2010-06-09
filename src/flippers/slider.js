@@ -10,7 +10,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     durations: {
       SLIDE: 240,
       FOLLOW_CURSOR: 100,
-      ANTI_FLICKER_DELAY: 20
+      ANTI_FLICKER_DELAY: 0
     }
   }
 
@@ -91,6 +91,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
       if (offset === 'disallow') {
+        console.log("Disallow!");
         if (typeof failCallback == 'function') { failCallback(); }
         p.turnData = {};
         return;
@@ -304,7 +305,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       setPage(lowerPage(), place.getLocus(), winCallback);
     }
 
-    var rslt = setPage(
+    setPage(
       lowerPage(),
       place.getLocus({ direction: k.FORWARDS }),
       winCallback,

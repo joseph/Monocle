@@ -4,7 +4,8 @@ Monocle.Styles.container = {
   "height": "100%",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
-  "user-select": "none"
+  "user-select": "none",
+  "background-color": "black"
 }
 
 Monocle.Styles.page = {
