@@ -110,7 +110,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
     frame.style.visibility = "hidden";
 
     // Prevent about:blank overriding imported nodes in Firefox.
-    frame.contentWindow.stop();
+    // Disabled again because it seems to result in blank pages in Saf.
+    //frame.contentWindow.stop();
 
     if (p.source.html || (typeof p.source == "string")) {   // HTML
       return loadFrameFromHTML(p.source.html || p.source, frame, callback);
@@ -184,17 +185,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (p.source.cacheCompatible && !frame.cacheInitialized) {
       return loadFrameFromURL(srcDoc.defaultView.location, frame, callback);
     }
-    var srcDocElem = srcDoc.documentElement;
     var destDoc = frame.contentDocument;
-    var destDocElem = destDoc.documentElement;
-    var origChildrenLength = destDocElem.childNodes.length;
-    for (var i = 0; i < srcDocElem.childNodes.length; ++i) {
-      var node = destDoc.importNode(srcDocElem.childNodes[i], true);
-      destDocElem.appendChild(node);
-    }
-    for (i = 0; i < origChildrenLength; ++i) {
-      destDocElem.removeChild(destDocElem.firstChild);
-    }
+    destDoc.replaceChild(
+      destDoc.importNode(srcDoc.documentElement, true),
+      destDoc.documentElement
+    );
 
     callback(frame, false);
     return 'ready';

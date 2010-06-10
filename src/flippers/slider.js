@@ -91,7 +91,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
       if (offset === 'disallow') {
-        console.log("Disallow!");
         if (typeof failCallback == 'function') { failCallback(); }
         p.turnData = {};
         return;
