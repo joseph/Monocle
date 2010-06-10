@@ -204,6 +204,10 @@ Monocle.Reader = function (node, bookData, options) {
       Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
       Monocle.Styles.applyRules(page.m.controlsDiv, 'controls');
       Monocle.Styles.applyRules(page.m.activeFrame, 'component');
+      Monocle.Styles.applyRules(
+        page.m.activeFrame.contentDocument.body,
+        'body'
+      );
     }
     Monocle.Styles.applyRules(p.divs.overlay, 'overlay');
     dispatchEvent('monocle:styles');
