@@ -84,7 +84,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       return;
     }
 
-    console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
+    //console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
     var evtData = { 'page': pageDiv, 'source': p.source };
@@ -284,10 +284,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
       p.clientDimensions.scrollWidth / p.clientDimensions.width
     );
 
-    console.log(
-      ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
-      p.clientDimensions.pages
-    );
+    // console.log(
+    //   ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
+    //   p.clientDimensions.pages
+    // );
 
     return p.clientDimensions;
   }

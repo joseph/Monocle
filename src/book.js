@@ -229,7 +229,6 @@ Monocle.Book = function (dataSource) {
       var evtData = { 'page': pageDiv, 'component': cmptId, 'index': index };
       pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
     }
-    console.log("Loading component contents: '"+cmptId+"' for pageDiv: " + pageDiv.m.pageIndex);
     var fn = function (cmptSource) {
       if (pageDiv) {
         evtData['source'] = cmptSource;

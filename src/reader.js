@@ -157,7 +157,6 @@ Monocle.Reader = function (node, bookData, options) {
         pageIndex: i,
         sheafDiv: document.createElement('div'),
         controlsDiv: document.createElement('div'),
-        componentFrames: [],
         activeFrame: document.createElement('iframe'),
         place: null
       }
