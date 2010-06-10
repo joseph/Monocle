@@ -28,38 +28,38 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function calcLeftBound(cntr) {
-    if (p.rightBound == cntr.offsetWidth) {
+  function calcTopBound(cntr) {
+    if (p.bottomBound == cntr.offsetHeight) {
       return;
     }
-    p.rightBound = cntr.offsetWidth;
-    p.leftBound = p.reader.properties.boxDimensions.left;
+    p.bottomBound = cntr.offsetHeight;
+    p.topBound = p.reader.properties.boxDimensions.top;
     var box = cntr;
     while (box && box != p.reader.properties.divs.box) {
-      p.leftBound += box.offsetLeft;
+      p.topBound += box.offsetTop;
       box = box.parentNode;
     }
   }
 
 
-  function rebaseX(evt, cntr) {
-    calcLeftBound(cntr);
-    var x = evt.pageX;
+  function rebaseY(evt, cntr) {
+    calcTopBound(cntr);
+    var y = evt.pageY;
     if (evt.changedTouches) {
-      x = evt.changedTouches[0].pageX;
+      y = evt.changedTouches[0].pageY;
     }
-    return Math.max(Math.min(p.rightBound, x - p.leftBound), 0);
+    return Math.max(Math.min(p.bottomBound, y - p.topBound), 0);
   }
 
 
-  function pixelToPlace(x, cntr) {
+  function pixelToPlace(y, cntr) {
     if (!p.componentIds) {
       p.componentIds = p.reader.getBook().properties.componentIds;
-      p.componentWidth = 100 / p.componentIds.length;
+      p.componentHeight = 100 / p.componentIds.length;
     }
-    var pc = (x / cntr.offsetWidth) * 100;
-    var cmpt = p.componentIds[Math.floor(pc / p.componentWidth)];
-    var cmptPc = ((pc % p.componentWidth) / p.componentWidth);
+    var pc = (y / cntr.offsetHeight) * 100;
+    var cmpt = p.componentIds[Math.floor(pc / p.componentHeight)];
+    var cmptPc = ((pc % p.componentHeight) / p.componentHeight);
     return { componentId: cmpt, percentageThrough: cmptPc };
   }
 
@@ -81,10 +81,10 @@ Monocle.Controls.Scrubber = function (reader) {
       return;
     }
     var place = p.reader.getPlace();
-    var x = placeToPixel(place, p.divs.container[0]);
+    var y = placeToPixel(place, p.divs.container[0]);
     for (var i = 0; i < p.divs.needle.length; ++i) {
-      setX(p.divs.needle[i], x - p.divs.needle[i].offsetWidth / 2);
-      p.divs.needleTrail[i].style.width = x + "px";
+      setY(p.divs.needle[i], y - p.divs.needle[i].offsetHeight / 2);
+      p.divs.needleTrail[i].style.height = y + "px";
     }
   }
 
@@ -123,12 +123,12 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function setX(node, x) {
-    x = Math.min(p.divs.container[0].offsetWidth - node.offsetWidth, x);
-    x = Math.max(x, 0);
+  function setY(node, y) {
+    y = Math.min(p.divs.container[0].offsetHeight - node.offsetHeight, y);
+    y = Math.max(y, 0);
     node.style.webkitTransform =
       node.style.MozTransform =
-        "translateX(" + x + "px)";
+        "translateY(" + y + "px)";
   }
 
 
@@ -139,12 +139,12 @@ Monocle.Controls.Scrubber = function (reader) {
     var needle = createDivNamed('needle', cntr);
     var bubble = createDivNamed('bubble', cntr);
 
-    var moveEvt = function (evt, x) {
+    var moveEvt = function (evt, y) {
       evt.stopPropagation();
       evt.preventDefault();
-      x = x || rebaseX(evt, cntr);
-      var place = pixelToPlace(x, cntr);
-      setX(needle, x - needle.offsetWidth / 2);
+      y = y || rebaseY(evt, cntr);
+      var place = pixelToPlace(y, cntr);
+      setY(needle, y - needle.offsetHeight / 2);
       var chps = p.book.chaptersForComponent(place.componentId);
       var cmptIndex = p.componentIds.indexOf(place.componentId);
       var chp = chps[Math.floor(chps.length * place.percentageThrough)];
@@ -159,14 +159,14 @@ Monocle.Controls.Scrubber = function (reader) {
       if (chp) {
         bubble.innerHTML = chp.title;
       }
-      setX(bubble, x - bubble.offsetWidth / 2);
+      setY(bubble, y - bubble.offsetHeight / 2);
 
-      p.lastX = x;
+      p.lastY = y;
       return place;
     }
 
     var endEvt = function (evt) {
-      var place = moveEvt(evt, p.lastX);
+      var place = moveEvt(evt, p.lastY);
       p.reader.moveTo({
         percent: place.percentageThrough,
         componentId: place.componentId
@@ -202,42 +202,36 @@ Monocle.Controls.Scrubber = function (reader) {
 Monocle.Styles.Controls.Scrubber = {
   container: {
     "position": "absolute",
-    "left": "1em",
-    "right": "1em",
-    "bottom": "8px",
-    "height": "30px",
-    "background": "rgba(255,255,255,0.8)",
-    "-webkit-border-radius": "6px",
-    "-moz-border-radius": "6px",
-    "border-radius": "6px",
-    "-webkit-box-shadow": "0px 0px 8px rgba(255,255,255,1)"
+    "left": "40%",
+    "right": "40%",
+    "top": "10%",
+    "bottom": "10%",
+    "-webkit-border-radius": "100px",
+    "-moz-border-radius": "100px",
+    "border-radius": "100px",
+    "border": "3px solid #333"
   },
   track: {
-    "margin-top": "10px",
-    "height": "5px",
-    "border": "1px solid #999"
+    "display": "none"
   },
   needle: {
     "position": "absolute",
-    "width": "14px",
-    "height": "14px",
-    "top": "5px",
-    "background": "#CCC",
-    "border": "1px solid #999",
-    "-webkit-border-radius": "8px",
-    "-moz-border-radius": "8px"
+    "width": "100%",
+    "height": "50px",
+    "background": "#333",
+    "-webkit-border-radius": "100px",
+    "-moz-border-radius": "100px"
   },
   needleTrail: {
     "position": "absolute",
-    "height": "4px",
-    "background": "#DDD",
-    "top": "11px",
-    "left": "1px",
-    "height": "5px"
+    "background": "#333",
+    "-webkit-border-radius": "100px",
+    "-moz-border-radius": "100px",
+    "width": "100%"
   },
   bubble: {
+    "display": "none",
     "position": "absolute",
-    "bottom": "2.5em",
     "background": "rgba(0, 0, 0, 0.9)",
     "-webkit-border-radius": "10px",
     "-moz-border-radius": "10px",
