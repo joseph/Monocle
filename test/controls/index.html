@@ -93,7 +93,7 @@
           ]
         },
         getComponent: function (cmptId) {
-          return [document.getElementById(cmptId).cloneNode(true)]; //.innerHTML;
+          return { nodes: [document.getElementById(cmptId).cloneNode(true)] };
         },
         getMetaData: function(key) {
           return {

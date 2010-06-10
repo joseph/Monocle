@@ -95,7 +95,7 @@ Monocle.Reader = function (node, bookData, options) {
     if (bookData) {
       bk = new Monocle.Book(bookData);
     } else {
-      bk = Monocle.Book.fromHTML([p.divs.box.cloneNode(true)]);
+      bk = Monocle.Book.fromNodes([p.divs.box.cloneNode(true)]);
     }
     p.divs.box.innerHTML = "";
 

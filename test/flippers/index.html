@@ -88,7 +88,7 @@
           ]
         },
         getComponent: function (cmptId) {
-          return document.getElementById(cmptId).innerHTML;
+          return { nodes: [document.getElementById(cmptId).cloneNode(true)] };
         },
         getMetaData: function(key) {
           return {

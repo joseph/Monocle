@@ -68,15 +68,15 @@
         },
         getComponent: function (cmptId, callback) {
           window.receiveComponentData = callback;
-          this.getViaAjax(cmptId);
+          this.getViaJsonP(cmptId);
         },
         getMetaData: function(key) {
           return {
-            title: "Howl",
-            creator: "Allen Ginsberg"
+            title: "Lorem Ipsum",
+            creator: "Mr Monocle"
           }[key];
         },
-        getViaAjax: function (path) {
+        getViaJsonP: function (path) {
           var script = document.createElement('script');
           script.id = "dynLoader";
           script.type = "text/javascript";

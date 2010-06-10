@@ -309,7 +309,7 @@ Monocle.Book = function (dataSource) {
 }
 
 
-Monocle.Book.fromHTML = function (html) {
+Monocle.Book.fromNodes = function (nodes) {
   var bookData = {
     getComponents: function () {
       return ['anonymous'];
@@ -318,7 +318,7 @@ Monocle.Book.fromHTML = function (html) {
       return [];
     },
     getComponent: function (n) {
-      return html;
+      return { 'nodes': nodes };
     },
     getMetaData: function (key) {
     }

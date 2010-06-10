@@ -23,7 +23,7 @@
     sheaf.right = "8%";
     body.color = "#310";
     body["font-family"] = "Palatino, Georgia, serif";
-    body["line-height"] = "120%";
+    body["line-height"] = "1.2";
     Controls.Magnifier.button.color = "#632";
     Controls.Magnifier.button.padding = "2%";
     Controls.Magnifier.button['-webkit-border-radius'] = "3px";
@@ -107,7 +107,7 @@
       ]
     },
     getComponent: function (componentId) {
-      return [document.getElementById(componentId).cloneNode(true)];
+      return { nodes: [document.getElementById(componentId).cloneNode(true)] };
     },
     getMetaData: function (key) {
       return {
