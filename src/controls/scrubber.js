@@ -67,12 +67,12 @@ Monocle.Controls.Scrubber = function (reader) {
   function placeToPixel(place, cntr) {
     if (!p.componentIds) {
       p.componentIds = p.reader.getBook().properties.componentIds;
-      p.componentWidth = 100 / p.componentIds.length;
+      p.componentHeight = 100 / p.componentIds.length;
     }
     var componentIndex = p.componentIds.indexOf(place.componentId());
-    var pc = p.componentWidth * componentIndex;
-    pc += place.percentageThrough() * p.componentWidth;
-    return Math.round((pc / 100) * cntr.offsetWidth);
+    var pc = p.componentHeight * componentIndex;
+    pc += place.percentageThrough() * p.componentHeight;
+    return Math.round((pc / 100) * cntr.offsetHeight);
   }
 
 
@@ -84,7 +84,7 @@ Monocle.Controls.Scrubber = function (reader) {
     var y = placeToPixel(place, p.divs.container[0]);
     for (var i = 0; i < p.divs.needle.length; ++i) {
       setY(p.divs.needle[i], y - p.divs.needle[i].offsetHeight / 2);
-      p.divs.needleTrail[i].style.height = y + "px";
+      p.divs.needleTrail[i].style.height = (y + 25) + "px";
     }
   }
 
@@ -202,39 +202,43 @@ Monocle.Controls.Scrubber = function (reader) {
 Monocle.Styles.Controls.Scrubber = {
   container: {
     "position": "absolute",
+    "width": "52px",
     "left": "40%",
-    "right": "40%",
     "top": "10%",
     "bottom": "10%",
-    "-webkit-border-radius": "100px",
-    "-moz-border-radius": "100px",
+    "-webkit-border-radius": "26px",
+    "-moz-border-radius": "26px",
     "border-radius": "100px",
     "border": "3px solid #333"
   },
   track: {
-    "display": "none"
+    "width": "100%"
   },
   needle: {
     "position": "absolute",
-    "width": "100%",
+    "margin": "1px",
+    "width": "50px",
     "height": "50px",
     "background": "#333",
-    "-webkit-border-radius": "100px",
-    "-moz-border-radius": "100px"
+    "-webkit-border-radius": "24px",
+    "-moz-border-radius": "24px"
   },
   needleTrail: {
     "position": "absolute",
     "background": "#333",
-    "-webkit-border-radius": "100px",
-    "-moz-border-radius": "100px",
-    "width": "100%"
+    "opacity": "0.67",
+    "-webkit-border-radius": "26px",
+    "-moz-border-radius": "26px",
+    "margin": "1px",
+    "width": "50px",
+    "height": "150px"
   },
   bubble: {
-    "display": "none",
     "position": "absolute",
     "background": "rgba(0, 0, 0, 0.9)",
     "-webkit-border-radius": "10px",
     "-moz-border-radius": "10px",
+    "left": "-100%",
     "padding": "1em",
     "display": "none",
     "white-space": "nowrap",
@@ -242,7 +246,7 @@ Monocle.Styles.Controls.Scrubber = {
     "overflow": "hidden",
     "-webkit-transform-style": "preserve-3d",
     "min-width": "20%",
-    "max-width": "30%",
+    "max-width": "60%",
     "color": "#CCC",
     "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
   }
