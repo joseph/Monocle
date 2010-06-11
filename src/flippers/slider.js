@@ -84,7 +84,12 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    setPage(upperPage(), locus, completedTurn, function () { alert('failed') });
+    setPage(
+      upperPage(),
+      locus,
+      completedTurn,
+      function () { console.log("FAILED TO MOVE TO LOCUS"); }
+    );
   }
 
 

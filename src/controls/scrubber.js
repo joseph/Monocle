@@ -33,12 +33,7 @@ Monocle.Controls.Scrubber = function (reader) {
       return;
     }
     p.bottomBound = track.offsetHeight;
-    p.topBound = p.reader.properties.boxDimensions.top;
-    var box = track;
-    while (box && box != p.reader.properties.divs.box) {
-      p.topBound += box.offsetTop;
-      box = box.parentNode;
-    }
+    p.topBound = track.offsetTop + 4; // FIXME: track border + needle margin
   }
 
 
@@ -84,8 +79,11 @@ Monocle.Controls.Scrubber = function (reader) {
     var track = p.divs.track[0];
     var y = placeToPixel(place, track);
     for (var i = 0; i < p.divs.needle.length; ++i) {
-      setY(p.divs.needle[i], y - (p.divs.needle[i].offsetHeight / 2));
-      p.divs.needleTrail[i].style.height = (track.offsetHeight - y) + "px";
+      var halfHeight = p.divs.needle[i].offsetHeight / 2;
+      setY(p.divs.needle[i], y - halfHeight);
+      // FIXME: remove these magic numbers
+      p.divs.needleTrail[i].style.height =
+        Math.min((track.offsetHeight + 17 - y), track.offsetHeight - 8) + "px";
     }
   }
 
@@ -209,10 +207,9 @@ Monocle.Styles.Controls.Scrubber = {
   },
   track: {
     "position": "relative",
-    "margin": "auto",
+    "margin": "10% auto",
     "width": "52px",
     "height": "80%",
-    "top": "10%",
     "-webkit-border-radius": "26px",
     "-moz-border-radius": "26px",
     "border-radius": "100px",
@@ -232,10 +229,8 @@ Monocle.Styles.Controls.Scrubber = {
     "bottom": "0",
     "background": "#333",
     "opacity": "0.67",
-    "-webkit-border-bottom-left-radius": "24px",
-    "-webkit-border-bottom-right-radius": "24px",
-    "-moz-border-radius-bottomleft": "24px",
-    "-moz-border-radius-bottomright": "24px",
+    "-webkit-border-radius": "24px",
+    "-moz-border-radius": "24px",
     "margin": "1px",
     "width": "50px",
     "height": "150px"
@@ -243,16 +238,18 @@ Monocle.Styles.Controls.Scrubber = {
   bubble: {
     "position": "absolute",
     "background": "rgba(0, 0, 0, 0.9)",
-    "left": "20px",
-    "top": "20px",
+    "left": "2%",
+    "top": "2%",
     "padding": "1em",
     "white-space": "nowrap",
     "text-overflow": "ellipsis",
     "overflow": "hidden",
-    "width": "200px",
+    "width": "auto",
     "color": "#CCC",
     "display": "none",
-    "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
+    "font": "bold 12px Lucida Grande, Helvetica, sans-serif",
+    "-webkit-border-radius": "3px",
+    "-moz-border-radius": "3px",
   }
 }
 
