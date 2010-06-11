@@ -28,7 +28,8 @@ Monocle.Controls.Magnifier = function (reader) {
   }
 
 
-  function createControlElements() {
+  function createControlElements(holder) {
+    p.ctrlHolder = holder;
     var btn = document.createElement('div');
     btn.style.cssText = Monocle.Styles.ruleText(
       Monocle.Styles.Controls.Magnifier.button
@@ -77,6 +78,10 @@ Monocle.Controls.Magnifier = function (reader) {
     }
 
     p.reader.reapplyStyles();
+
+    // Reapplying styles may hide overlay. FIXME: this could be done more
+    // delicately...
+    p.ctrlHolder.style.display = "block";
   }
 
   API.createControlElements = createControlElements;
