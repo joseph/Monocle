@@ -308,6 +308,7 @@ Monocle.Reader = function (node, bookData, options) {
   // Monocle.Book#changePage for documentation on the locus argument.
   //
   function moveTo(locus) {
+    console.dir(locus);
     p.flipper.moveTo(locus);
   }
 

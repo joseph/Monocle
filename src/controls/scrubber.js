@@ -28,13 +28,13 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function calcTopBound(cntr) {
-    if (p.bottomBound == cntr.offsetHeight) {
+  function calcTopBound(track) {
+    if (p.bottomBound == track.offsetHeight) {
       return;
     }
-    p.bottomBound = cntr.offsetHeight;
+    p.bottomBound = track.offsetHeight;
     p.topBound = p.reader.properties.boxDimensions.top;
-    var box = cntr;
+    var box = track;
     while (box && box != p.reader.properties.divs.box) {
       p.topBound += box.offsetTop;
       box = box.parentNode;
@@ -42,8 +42,8 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function rebaseY(evt, cntr) {
-    calcTopBound(cntr);
+  function rebaseY(evt, track) {
+    calcTopBound(track);
     var y = evt.pageY;
     if (evt.changedTouches) {
       y = evt.changedTouches[0].pageY;
@@ -52,19 +52,19 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function pixelToPlace(y, cntr) {
+  function pixelToPlace(y, track) {
     if (!p.componentIds) {
       p.componentIds = p.reader.getBook().properties.componentIds;
       p.componentHeight = 100 / p.componentIds.length;
     }
-    var pc = (y / cntr.offsetHeight) * 100;
+    var pc = (y / track.offsetHeight) * 100;
     var cmpt = p.componentIds[Math.floor(pc / p.componentHeight)];
     var cmptPc = ((pc % p.componentHeight) / p.componentHeight);
     return { componentId: cmpt, percentageThrough: cmptPc };
   }
 
 
-  function placeToPixel(place, cntr) {
+  function placeToPixel(place, track) {
     if (!p.componentIds) {
       p.componentIds = p.reader.getBook().properties.componentIds;
       p.componentHeight = 100 / p.componentIds.length;
@@ -72,19 +72,20 @@ Monocle.Controls.Scrubber = function (reader) {
     var componentIndex = p.componentIds.indexOf(place.componentId());
     var pc = p.componentHeight * componentIndex;
     pc += place.percentageThrough() * p.componentHeight;
-    return Math.round((pc / 100) * cntr.offsetHeight);
+    return Math.round((pc / 100) * track.offsetHeight);
   }
 
 
   function updateNeedles() {
-    if (p.hidden || !p.divs.container) {
+    if (p.hidden || !p.divs.track) {
       return;
     }
     var place = p.reader.getPlace();
-    var y = placeToPixel(place, p.divs.container[0]);
+    var track = p.divs.track[0];
+    var y = placeToPixel(place, track);
     for (var i = 0; i < p.divs.needle.length; ++i) {
-      setY(p.divs.needle[i], y - p.divs.needle[i].offsetHeight / 2);
-      p.divs.needleTrail[i].style.height = (y + 25) + "px";
+      setY(p.divs.needle[i], y - (p.divs.needle[i].offsetHeight / 2));
+      p.divs.needleTrail[i].style.height = (track.offsetHeight - y) + "px";
     }
   }
 
@@ -124,7 +125,7 @@ Monocle.Controls.Scrubber = function (reader) {
 
 
   function setY(node, y) {
-    y = Math.min(p.divs.container[0].offsetHeight - node.offsetHeight, y);
+    y = Math.min(p.divs.track[0].offsetHeight - node.offsetHeight, y);
     y = Math.max(y, 0);
     node.style.webkitTransform =
       node.style.MozTransform =
@@ -135,15 +136,15 @@ Monocle.Controls.Scrubber = function (reader) {
   function createControlElements() {
     var cntr = createDivNamed('container');
     var track = createDivNamed('track', cntr);
-    var needleTrail = createDivNamed('needleTrail', cntr);
-    var needle = createDivNamed('needle', cntr);
+    var needleTrail = createDivNamed('needleTrail', track);
+    var needle = createDivNamed('needle', track);
     var bubble = createDivNamed('bubble', cntr);
 
     var moveEvt = function (evt, y) {
       evt.stopPropagation();
       evt.preventDefault();
-      y = y || rebaseY(evt, cntr);
-      var place = pixelToPlace(y, cntr);
+      y = y || rebaseY(evt, track);
+      var place = pixelToPlace(y, track);
       setY(needle, y - needle.offsetHeight / 2);
       var chps = p.book.chaptersForComponent(place.componentId);
       var cmptIndex = p.componentIds.indexOf(place.componentId);
@@ -158,8 +159,10 @@ Monocle.Controls.Scrubber = function (reader) {
 
       if (chp) {
         bubble.innerHTML = chp.title;
+        if (actualPlace) {
+          bubble.innerHTML += " - page " + actualPlace.pageNumber();
+        }
       }
-      setY(bubble, y - bubble.offsetHeight / 2);
 
       p.lastY = y;
       return place;
@@ -171,18 +174,18 @@ Monocle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      Monocle.removeListener(cntr, eventType('move'), moveEvt);
+      Monocle.removeListener(track, eventType('move'), moveEvt);
       Monocle.removeListener(document.body, eventType('end'), endEvt);
       bubble.style.display = "none";
     }
 
     Monocle.addListener(
-      cntr,
+      track,
       eventType("start"),
       function (evt) {
         bubble.style.display = "block";
         moveEvt(evt);
-        Monocle.addListener(cntr, eventType('move'), moveEvt);
+        Monocle.addListener(track, eventType('move'), moveEvt);
         Monocle.addListener(document.body, eventType("end"), endEvt);
       }
     );
@@ -201,18 +204,19 @@ Monocle.Controls.Scrubber = function (reader) {
 
 Monocle.Styles.Controls.Scrubber = {
   container: {
-    "position": "absolute",
+    "width": "100%",
+    "height": "100%"
+  },
+  track: {
+    "position": "relative",
+    "margin": "auto",
     "width": "52px",
-    "left": "40%",
+    "height": "80%",
     "top": "10%",
-    "bottom": "10%",
     "-webkit-border-radius": "26px",
     "-moz-border-radius": "26px",
     "border-radius": "100px",
     "border": "3px solid #333"
-  },
-  track: {
-    "width": "100%"
   },
   needle: {
     "position": "absolute",
@@ -225,10 +229,13 @@ Monocle.Styles.Controls.Scrubber = {
   },
   needleTrail: {
     "position": "absolute",
+    "bottom": "0",
     "background": "#333",
     "opacity": "0.67",
-    "-webkit-border-radius": "26px",
-    "-moz-border-radius": "26px",
+    "-webkit-border-bottom-left-radius": "24px",
+    "-webkit-border-bottom-right-radius": "24px",
+    "-moz-border-radius-bottomleft": "24px",
+    "-moz-border-radius-bottomright": "24px",
     "margin": "1px",
     "width": "50px",
     "height": "150px"
@@ -236,18 +243,15 @@ Monocle.Styles.Controls.Scrubber = {
   bubble: {
     "position": "absolute",
     "background": "rgba(0, 0, 0, 0.9)",
-    "-webkit-border-radius": "10px",
-    "-moz-border-radius": "10px",
-    "left": "-100%",
+    "left": "20px",
+    "top": "20px",
     "padding": "1em",
-    "display": "none",
     "white-space": "nowrap",
     "text-overflow": "ellipsis",
     "overflow": "hidden",
-    "-webkit-transform-style": "preserve-3d",
-    "min-width": "20%",
-    "max-width": "60%",
+    "width": "200px",
     "color": "#CCC",
+    "display": "none",
     "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
   }
 }
