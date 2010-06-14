@@ -207,7 +207,7 @@ Monocle.Styles.Controls.Scrubber = {
   },
   track: {
     "position": "relative",
-    "margin": "10% auto",
+    "margin": "0 auto",
     "width": "52px",
     "height": "80%",
     "-webkit-border-radius": "26px",
@@ -233,7 +233,8 @@ Monocle.Styles.Controls.Scrubber = {
     "-moz-border-radius": "24px",
     "margin": "1px",
     "width": "50px",
-    "height": "150px"
+    "height": "50px",
+    "-webkit-transition": "height ease-in 100ms"
   },
   bubble: {
     "position": "absolute",

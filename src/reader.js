@@ -308,7 +308,6 @@ Monocle.Reader = function (node, bookData, options) {
   // Monocle.Book#changePage for documentation on the locus argument.
   //
   function moveTo(locus) {
-    console.dir(locus);
     p.flipper.moveTo(locus);
   }
 
@@ -528,8 +527,8 @@ Monocle.Reader = function (node, bookData, options) {
         typeof(ctrl.createControlElements) == "function" &&
         (ctrlElem = ctrl.createControlElements(p.divs.container))
       ) {
-          p.divs.container.appendChild(ctrlElem);
-          ctrlData.elements.push(ctrlElem);
+        p.divs.container.appendChild(ctrlElem);
+        ctrlData.elements.push(ctrlElem);
       }
     } else {
       console.log("Unknown control type: " + cType);
@@ -582,6 +581,7 @@ Monocle.Reader = function (node, bookData, options) {
     if (ctrl.properties) {
       ctrl.properties.hidden = true;
     }
+    dispatchEvent('controlhide', ctrl, false);
   }
 
 
@@ -614,6 +614,7 @@ Monocle.Reader = function (node, bookData, options) {
     if (ctrl.properties) {
       ctrl.properties.hidden = false;
     }
+    dispatchEvent('controlshow', ctrl, false);
   }
 
 
