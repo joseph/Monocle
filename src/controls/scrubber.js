@@ -33,7 +33,15 @@ Monocle.Controls.Scrubber = function (reader) {
       return;
     }
     p.bottomBound = track.offsetHeight;
-    p.topBound = track.offsetTop + 4; // FIXME: track border + needle margin
+    var ot = track.offsetTop;
+    var node = track.parentNode;
+    while (node) {
+      if (node.offsetTop) {
+        ot += node.offsetTop;
+      }
+      node = node.parentNode;
+    }
+    p.topBound = ot + 8; // FIXME: track border + needle margin
   }
 
 
@@ -207,9 +215,9 @@ Monocle.Styles.Controls.Scrubber = {
   },
   track: {
     "position": "relative",
-    "margin": "0 auto",
+    "margin": "0 20px 0 auto",
     "width": "52px",
-    "height": "80%",
+    "height": "98%",
     "-webkit-border-radius": "26px",
     "-moz-border-radius": "26px",
     "border-radius": "100px",
