@@ -116,7 +116,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   // user turning a page.
   //
   function inForwardZone(x) {
-    return x > p.reader.properties.pageWidth * 0.75;
+    return x > p.reader.properties.pageWidth * 0.67;
   }
 
 
@@ -124,7 +124,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   // user turning a page.
   //
   function inBackwardZone(x) {
-    return x < p.reader.properties.pageWidth * 0.25;
+    return x < p.reader.properties.pageWidth * 0.33;
   }
 
 

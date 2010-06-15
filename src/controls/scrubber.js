@@ -221,7 +221,8 @@ Monocle.Styles.Controls.Scrubber = {
     "-webkit-border-radius": "26px",
     "-moz-border-radius": "26px",
     "border-radius": "100px",
-    "border": "3px solid #333"
+    "border": "3px solid #333",
+    "opacity": "0.7"
   },
   needle: {
     "position": "absolute",
@@ -246,19 +247,13 @@ Monocle.Styles.Controls.Scrubber = {
   },
   bubble: {
     "position": "absolute",
-    "background": "rgba(0, 0, 0, 0.9)",
     "left": "2%",
     "top": "2%",
     "padding": "1em",
-    "white-space": "nowrap",
-    "text-overflow": "ellipsis",
-    "overflow": "hidden",
     "width": "auto",
-    "color": "#CCC",
-    "display": "none",
-    "font": "bold 12px Lucida Grande, Helvetica, sans-serif",
-    "-webkit-border-radius": "3px",
-    "-moz-border-radius": "3px",
+    "max-width": "75%",
+    "font-size": "150%",
+    "display": "none"
   }
 }
 
