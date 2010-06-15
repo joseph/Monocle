@@ -56,10 +56,7 @@ Monocle.Controls.Scrubber = function (reader) {
 
 
   function pixelToPlace(y, track) {
-    if (!p.componentIds) {
-      p.componentIds = p.reader.getBook().properties.componentIds;
-      p.componentHeight = 100 / p.componentIds.length;
-    }
+    primeComponentIds();
     var pc = (y / track.offsetHeight) * 100;
     var cmpt = p.componentIds[Math.floor(pc / p.componentHeight)];
     var cmptPc = ((pc % p.componentHeight) / p.componentHeight);
@@ -68,14 +65,19 @@ Monocle.Controls.Scrubber = function (reader) {
 
 
   function placeToPixel(place, track) {
-    if (!p.componentIds) {
-      p.componentIds = p.reader.getBook().properties.componentIds;
-      p.componentHeight = 100 / p.componentIds.length;
-    }
+    primeComponentIds();
     var componentIndex = p.componentIds.indexOf(place.componentId());
     var pc = p.componentHeight * componentIndex;
     pc += place.percentageThrough() * p.componentHeight;
     return Math.round((pc / 100) * track.offsetHeight);
+  }
+
+
+  function primeComponentIds() {
+    if (!p.componentIds) {
+      p.componentIds = p.reader.getBook().properties.componentIds;
+      p.componentHeight = 100 / p.componentIds.length;
+    }
   }
 
 
@@ -92,6 +94,13 @@ Monocle.Controls.Scrubber = function (reader) {
       // FIXME: remove these magic numbers
       p.divs.needleTrail[i].style.height =
         Math.min((track.offsetHeight + 17 - y), track.offsetHeight - 8) + "px";
+      updateBubbleWithPlace(
+        p.divs.bubble[i],
+        {
+          componentId: place.componentId(),
+          percentageThrough: place.percentageThrough()
+        }
+      );
     }
   }
 
@@ -150,26 +159,9 @@ Monocle.Controls.Scrubber = function (reader) {
       evt.stopPropagation();
       evt.preventDefault();
       y = y || rebaseY(evt, track);
-      var place = pixelToPlace(y, track);
       setY(needle, y - needle.offsetHeight / 2);
-      var chps = p.book.chaptersForComponent(place.componentId);
-      var cmptIndex = p.componentIds.indexOf(place.componentId);
-      var chp = chps[Math.floor(chps.length * place.percentageThrough)];
-      if (cmptIndex > -1 && p.book.properties.components[cmptIndex]) {
-        var actualPlace = Monocle.Place.FromPercentageThrough(
-          p.book.properties.components[cmptIndex],
-          place.percentageThrough
-        );
-        chp = actualPlace.chapterInfo() || chp;
-      }
-
-      if (chp) {
-        bubble.innerHTML = chp.title;
-        if (actualPlace) {
-          bubble.innerHTML += " - page " + actualPlace.pageNumber();
-        }
-      }
-
+      var place = pixelToPlace(y, track);
+      updateBubbleWithPlace(bubble, place);
       p.lastY = y;
       return place;
     }
@@ -182,14 +174,12 @@ Monocle.Controls.Scrubber = function (reader) {
       });
       Monocle.removeListener(track, eventType('move'), moveEvt);
       Monocle.removeListener(document.body, eventType('end'), endEvt);
-      bubble.style.display = "none";
     }
 
     Monocle.addListener(
       track,
       eventType("start"),
       function (evt) {
-        bubble.style.display = "block";
         moveEvt(evt);
         Monocle.addListener(track, eventType('move'), moveEvt);
         Monocle.addListener(document.body, eventType("end"), endEvt);
@@ -198,6 +188,39 @@ Monocle.Controls.Scrubber = function (reader) {
 
     return cntr;
   }
+
+
+  function updateBubbleWithPlace(bubble, place) {
+    primeComponentIds();
+    var chps = p.book.chaptersForComponent(place.componentId);
+    var cmptIndex = p.componentIds.indexOf(place.componentId);
+    var chp = chps[Math.floor(chps.length * place.percentageThrough)];
+    if (cmptIndex > -1 && p.book.properties.components[cmptIndex]) {
+      var actualPlace = Monocle.Place.FromPercentageThrough(
+        p.book.properties.components[cmptIndex],
+        place.percentageThrough
+      );
+      chp = actualPlace.chapterInfo() || chp;
+    }
+
+    if (chp) {
+      if (!bubble.chapterTitle) {
+        var bCT = createDivNamed("bubbleChapterTitle", bubble);
+        bCT.appendChild(bubble.chapterTitle = document.createTextNode());
+        var bCP = createDivNamed("bubbleChapterPage", bubble);
+        bCP.appendChild(bubble.chapterPage = document.createTextNode());
+      }
+
+      bubble.chapterTitle.nodeValue = chp.title;
+      if (actualPlace) {
+        bubble.chapterPage.nodeValue = "Page " + actualPlace.pageNumber();
+        bubble.chapterPage.parentNode.style.visibility = "visible";
+      } else {
+        bubble.chapterPage.parentNode.style.visibility = "hidden";
+      }
+    }
+  }
+
 
   API.createControlElements = createControlElements;
   API.updateNeedles = updateNeedles;
@@ -247,13 +270,19 @@ Monocle.Styles.Controls.Scrubber = {
   },
   bubble: {
     "position": "absolute",
-    "left": "2%",
     "top": "2%",
-    "padding": "1em",
-    "width": "auto",
-    "max-width": "75%",
-    "font-size": "150%",
-    "display": "none"
+    "left": "0",
+    "margin-right": "75px",
+    "display": "block",
+    "background": "rgba(245,245,245,0.65)",
+    "padding": "0.2em 1em",
+    "-webkit-border-radius": "6px"
+  },
+  bubbleChapterTitle: {
+    "font-weight": "bold"
+  },
+  bubbleChapterPage: {
+    "font": "9pt Helvetica, Arial, sans-serif"
   }
 }
 

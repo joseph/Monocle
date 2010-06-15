@@ -46,7 +46,7 @@ Monocle.Place = function () {
 
 
   function pageAtPercentageThrough(pc) {
-    return Math.round(p.component.lastPageNumber() * pc);
+    return Math.max(Math.round(p.component.lastPageNumber() * pc), 1);
   }
 
 
