@@ -206,9 +206,9 @@ Monocle.Controls.Scrubber = function (reader) {
     if (chp) {
       if (!bubble.chapterTitle) {
         var bCT = createDivNamed("bubbleChapterTitle", bubble);
-        bCT.appendChild(bubble.chapterTitle = document.createTextNode());
+        bCT.appendChild(bubble.chapterTitle = document.createTextNode(''));
         var bCP = createDivNamed("bubbleChapterPage", bubble);
-        bCP.appendChild(bubble.chapterPage = document.createTextNode());
+        bCP.appendChild(bubble.chapterPage = document.createTextNode(''));
       }
 
       bubble.chapterTitle.nodeValue = chp.title;
