@@ -311,9 +311,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   function clampCSS(doc) {
     // TODO: move to somewhere it can be configured...
-    var rules = "body * { float: none !important; clear: none !important; text-align: left; }" +
-      "p { margin-left: 0 !important; margin-right: 0 !important; }" +
-      "table, img { max-width: 100% !important; max-height: 90% !important; }";
+    var rules = [
+      "body * { float: none !important; clear: none !important; text-align: left !important; }",
+      "p { margin-left: 0 !important; margin-right: 0 !important; }",
+      "table, img { max-width: 100% !important; max-height: 90% !important; }"
+    ].join("\n")
 
     var styleTag = document.createElement('style');
     styleTag.type = 'text/css';
