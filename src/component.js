@@ -258,14 +258,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var doc = win.document;
     var currStyle = win.getComputedStyle(doc.body, null);
 
-    // This is weird. First time you access this value, it's doubled. Next time,
-    // it's the correct amount. MobileSafari only.
-    var junk = doc.body.scrollWidth;
+    var sl = doc.body.scrollLeft = doc.body.scrollWidth;
+    if (doc.body.scrollLeft == 0) {
+      sl = pageDiv.m.sheafDiv.scrollWidth;
+    }
 
     p.clientDimensions = {
       width: pageDiv.m.sheafDiv.clientWidth,
       height: pageDiv.m.sheafDiv.clientHeight,
-      scrollWidth: doc.body.scrollWidth,
+      scrollWidth: sl,
       fontSize: currStyle.getPropertyValue('font-size')
     }
 
@@ -312,7 +313,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function clampCSS(doc) {
     // TODO: move to somewhere it can be configured...
     var rules = [
-      "body * { float: none !important; clear: none !important; text-align: left !important; }",
+      "body * { float: none !important; clear: none !important; }",
       "p { margin-left: 0 !important; margin-right: 0 !important; }",
       "table, img { max-width: 100% !important; max-height: 90% !important; }"
     ].join("\n")
