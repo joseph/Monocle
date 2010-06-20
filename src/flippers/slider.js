@@ -105,8 +105,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       if (div.scrollLeft == 0) {
         pageDiv.m.sheafDiv.scrollLeft = offset;
       }
-      div.style.left = "0px"; // Webkit hack
-      setX(pageDiv.m.sheafDiv, 0, { duration: 0 }, callback);
+      callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);
   }

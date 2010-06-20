@@ -55,12 +55,28 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
+  function scrollerDiv() {
+    var div = p.page.m.activeFrame.contentDocument.body;
+    if (div.scrollLeft > 0) {
+      return div;
+    }
+    var sl = div.scrollLeft;
+    div.scrollLeft = 1;
+    if (div.scrollLeft == 0) {
+      return p.page.m.sheafDiv;
+    } else {
+      div.scrollLeft = sl;
+      return div;
+    }
+  }
+
+
   function moveTo(locus) {
     var spCallback = function (offset) {
       if (offset == 'disallow') {
         return;
       }
-      var div = p.page.m.activeFrame.contentDocument.body;
+      var div = scrollerDiv();
       var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
       clearTimeout(p.timer);
       p.timer = setInterval(
@@ -75,11 +91,6 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
             clearTimeout(p.timer);
             p.reader.dispatchEvent('monocle:turn');
           }
-
-          // FIXME: a hack for webkit rendering artefacts.
-          // DISABLED for speed, but means this flipper is broken on some WebKits.
-          //var x = Math.random() / 1000 + 1.0;
-          //div.style.webkitTransform = "scale(" + x + ")";
         },
         k.rate
       );
