@@ -106,30 +106,28 @@ Monocle.Reader = function (node, bookData, options) {
     attachFlipper(options.flipper);
 
     // Create the essential DOM elements.
-    createReaderElements();
+    createReaderElements(function () {
+      // Make the reader elements look pretty.
+      applyStyles();
 
-    dispatchEvent("monocle:loading");
+      addListener(
+        'monocle:componentchange',
+        function (evt) {
+          var doc = evt.monocleData['document'];
+          Monocle.Styles.applyRules(doc.body, 'body');
+        }
+      );
 
-    // Make the reader elements look pretty.
-    applyStyles();
+      // Apply the book, calculating column dimensions & etc.
+      setBook(bk, options.place);
 
-    addListener(
-      'monocle:componentchange',
-      function (evt) {
-        var doc = evt.monocleData['document'];
-        Monocle.Styles.applyRules(doc.body, 'body');
+      // Wait for user input.
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        listenForInteraction(p.divs.pages[i].m.controlsDiv);
       }
-    );
 
-    // Apply the book, calculating column dimensions & etc.
-    setBook(bk, options.place);
-
-    // Wait for user input.
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      listenForInteraction(p.divs.pages[i].m.controlsDiv);
-    }
-
-    dispatchEvent("monocle:loaded")
+      dispatchEvent("monocle:loaded")
+    });
   }
 
 
@@ -147,7 +145,7 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function createReaderElements() {
+  function createReaderElements(callback) {
     p.divs.container = document.createElement('div');
     p.divs.box.appendChild(p.divs.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
@@ -164,6 +162,18 @@ Monocle.Reader = function (node, bookData, options) {
         'pageDiv': page
       }
       page.m.activeFrame.style.visibility = "hidden";
+      if (options.primeURL) {
+        console.log(options.primeURL);
+        if (callback) {
+          page.m.activeFrame.onload = function () {
+            p.pagesLoaded = p.pagesLoaded + 1 || 1;
+            if (p.pagesLoaded == p.flipper.pageCount) {
+              callback();
+            }
+          }
+        }
+        page.m.activeFrame.src = options.primeURL;
+      }
       page.appendChild(page.m.sheafDiv);
       page.appendChild(page.m.controlsDiv);
       page.m.sheafDiv.appendChild(page.m.activeFrame);
@@ -172,6 +182,10 @@ Monocle.Reader = function (node, bookData, options) {
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
+    dispatchEvent("monocle:loading");
+    if (callback && !options.primeURL) {
+      callback();
+    }
   }
 
 
