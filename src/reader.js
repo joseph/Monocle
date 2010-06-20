@@ -23,7 +23,24 @@ Monocle.Reader = function (node, bookData, options) {
     FLIPPER_LEGACY_CLASS: (typeof(Monocle.Flippers.Legacy) == "undefined") ?
       null :
       Monocle.Flippers.Legacy,
-    TOUCH_DEVICE: (typeof Touch == "object")
+    TOUCH_DEVICE: (typeof Touch == "object"),
+    DEFAULT_STYLE_RULES: [
+      "body * {" +
+        "float: none !important;" +
+        "clear: none !important;" +
+        "user-select: none !important;" +
+        "-webkit-user-select: none !important;" +
+        "-moz-user-select: none !important;" +
+      "}",
+      "p {" +
+        "margin-left: 0 !important;" +
+        "margin-right: 0 !important;" +
+      "}",
+      "table, img {" +
+        "max-width: 100% !important;" +
+        "max-height: 90% !important;" +
+      "}"
+    ]
   }
 
   // Properties.
@@ -69,7 +86,10 @@ Monocle.Reader = function (node, bookData, options) {
     // A resettable timer which must expire before dimensions are recalculated
     // after the reader has been resized.
     //
-    resizeTimer: null
+    resizeTimer: null,
+
+    // An array of style rules that are automatically applied to every page.
+    pageStylesheets: []
   }
 
   // Methods and properties available to external code.
@@ -105,6 +125,9 @@ Monocle.Reader = function (node, bookData, options) {
     // Attach the page-flipping gadget.
     attachFlipper(options.flipper);
 
+    // Clamp page frames to a set of styles that reduce Monocle breakage.
+    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES);
+
     // Create the essential DOM elements.
     createReaderElements(function () {
       // Make the reader elements look pretty.
@@ -114,6 +137,7 @@ Monocle.Reader = function (node, bookData, options) {
         'monocle:componentchange',
         function (evt) {
           var doc = evt.monocleData['document'];
+          applyPageStyles(doc);
           Monocle.Styles.applyRules(doc.body, 'body');
         }
       );
@@ -163,7 +187,6 @@ Monocle.Reader = function (node, bookData, options) {
       }
       page.m.activeFrame.style.visibility = "hidden";
       if (options.primeURL) {
-        console.log(options.primeURL);
         if (callback) {
           page.m.activeFrame.onload = function () {
             p.pagesLoaded = p.pagesLoaded + 1 || 1;
@@ -656,6 +679,87 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
+  function addPageStyles(styleRules) {
+    p.pageStylesheets.push(styleRules);
+    var sheetIndex = p.pageStylesheets.length - 1;
+
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      addPageStylesheet(doc, sheetIndex);
+    }
+
+    if (p.divs.pages.length) { calcDimensions(); }
+    return sheetIndex;
+  }
+
+
+  function updatePageStyles(sheetIndex, styleRules) {
+    p.pageStylesheets[sheetIndex] = styleRules;
+    if (typeof styleRules.join == "function") {
+      styleRules = styleRules.join("\n");
+    }
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
+      if (styleTag.styleSheet) {
+        styleTag.styleSheet.cssText = styleRules;
+      } else {
+        styleTag.replaceChild(
+          doc.createTextNode(styleRules),
+          styleTag.firstChild
+        );
+      }
+    }
+
+    if (p.divs.pages.length) { calcDimensions(); }
+  }
+
+
+  function removePageStyles(sheetIndex) {
+    p.pageStylesheets[sheetIndex] = null;
+    for (var i = 0; i < p.divs.pages.length; ++i) {
+      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
+      styleTag.parentNode.removeChild(styleTag);
+    }
+    if (p.divs.pages.length) { calcDimensions(); }
+  }
+
+
+  function applyPageStyles(doc) {
+    for (var i = 0; i < p.pageStylesheets.length; ++i) {
+      if (p.pageStylesheets[i]) {
+        addPageStylesheet(doc, i);
+      }
+    }
+  }
+
+
+  function addPageStylesheet(doc, sheetIndex) {
+    var styleRules = p.pageStylesheets[sheetIndex];
+    if (!styleRules) {
+      return;
+    }
+
+    if (typeof styleRules.join == "function") {
+      styleRules = styleRules.join("\n");
+    }
+
+    var styleTag = doc.createElement('style');
+    styleTag.type = 'text/css';
+    styleTag.id = "monStylesheet"+sheetIndex;
+    if (styleTag.styleSheet) {
+      styleTag.styleSheet.cssText = styleRules;
+    } else {
+      styleTag.appendChild(doc.createTextNode(styleRules));
+    }
+
+    doc.getElementsByTagName('head')[0].appendChild(styleTag);
+
+    return styleTag;
+  }
+
+
   API.setBook = setBook;
   API.getBook = getBook;
   API.reapplyStyles = reapplyStyles;
@@ -669,6 +773,9 @@ Monocle.Reader = function (node, bookData, options) {
   API.dispatchEvent = dispatchEvent;
   API.addListener = addListener;
   API.removeListener = removeListener;
+  API.addPageStyles = addPageStyles;
+  API.updatePageStyles = updatePageStyles;
+  API.removePageStyles = removePageStyles;
 
   initialize(node, bookData, options);
 

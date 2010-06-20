@@ -206,23 +206,27 @@ Monocle.Component = function (book, id, index, chapters, source) {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 
-    // Apply non-negotiable CSS to the document, overriding book designer's
-    // styles.
-    clampCSS(frame.contentDocument);
-
     // TODO: rewrite internal links
-
 
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
+
+    // Correct the body lineHeight to use a number, not a percentage, which
+    // causes the text to jump upwards.
+    var doc = frame.contentDocument;
+    var win = doc.defaultView;
+    var currStyle = win.getComputedStyle(doc.body, null);
+    var lh = parseFloat(currStyle.getPropertyValue('line-height'));
+    var fs = parseFloat(currStyle.getPropertyValue('font-size'));
+    doc.body.style.lineHeight = lh / fs;
 
     setColumnWidth(pageDiv);
     frame.style.visibility = "visible";
     measureDimensions(pageDiv);
 
     // Find the place of any chapters in the component.
-    //locateChapters(pageDiv);
+    locateChapters(pageDiv);
   }
 
 
@@ -307,34 +311,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
       // Still, browser sniffing is an evil.
       doc.body.style.overflow = 'hidden';
     }
-  }
-
-
-  function clampCSS(doc) {
-    // TODO: move to somewhere it can be configured...
-    var rules = [
-      "body * { float: none !important; clear: none !important; }",
-      "p { margin-left: 0 !important; margin-right: 0 !important; }",
-      "table, img { max-width: 100% !important; max-height: 90% !important; }"
-    ].join("\n")
-
-    var styleTag = document.createElement('style');
-    styleTag.type = 'text/css';
-    if (styleTag.styleSheet) {
-      styleTag.styleSheet.cssText = rules;
-    } else {
-      styleTag.appendChild(document.createTextNode(rules));
-    }
-
-    doc.getElementsByTagName('head')[0].appendChild(styleTag);
-
-    // Correct the body lineHeight to use a number, not a percentage, which
-    // causes the text to jump upwards.
-    var win = doc.defaultView;
-    var currStyle = win.getComputedStyle(doc.body, null);
-    var lh = parseFloat(currStyle.getPropertyValue('line-height'));
-    var fs = parseFloat(currStyle.getPropertyValue('font-size'));
-    doc.body.style.lineHeight = lh / fs;
   }
 
 
