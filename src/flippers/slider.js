@@ -230,17 +230,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     p.turnData.points.min = Math.min(p.turnData.points.min, boxPointX);
     p.turnData.points.max = Math.max(p.turnData.points.max, boxPointX);
 
-    // For speed reasons, we constrain motions to a constant number per second.
-    var stamp = (new Date()).getTime();
-    var followInterval = k.durations.FOLLOW_CURSOR;
-    if (
-      p.turnData.stamp &&
-      stamp - p.turnData.stamp < followInterval
-    ) {
-      return false;
-    }
-    p.turnData.stamp = stamp;
-
     slideToCursor(boxPointX);
 
     return true;
@@ -322,69 +311,92 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     var transition;
     var duration;
 
-    if (typeof(x) == "number") { x = x + "px"; }
-
-    if (!options.duration) {
-      duration = 0;
-      transition = 'none';
+    if (!callback && inCorrectDirection(parseInt(x))) {
+      p.turnData.nextX = x;
     } else {
-      duration = parseInt(options['duration']);
-      transition = '-webkit-transform';
-      transition += ' ' + duration + "ms";
-      transition += ' ' + (options['timing'] || 'linear');
-      transition += ' ' + (options['delay'] || 0) + 'ms';
-    }
+      //console.log("doing...");
 
-    if (typeof WebKitTransitionEvent != "undefined") {
-      elem.style.webkitTransition = transition;
-      elem.style.webkitTransform = "translateX("+x+")";
-    } else if (transition != "none") {
-      // Exit any existing transition loop.
-      clearTimeout(elem.setXTransitionInterval)
+      if (typeof(x) == "number") { x = x + "px"; }
 
-      // NB: this is a little naive. We need to ensure that the duration is
-      // constant, probably by multiplying step against the ACTUAL interval,
-      // rather than the scheduled one (because on slower machines, the
-      // interval may be much longer).
-      var stamp = (new Date()).getTime();
-      var frameRate = 40;
-      var finalX = parseInt(x);
-      var currX = getX(elem);
-      var step = (finalX - currX) * (frameRate / duration);
-      var stepFn = function () {
-        var destX = currX + step;
-        if (
-          (new Date()).getTime() - stamp > duration ||
-          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
-        ) {
-          clearTimeout(elem.setXTransitionInterval)
-          elem.style.MozTransform = "translateX(" + finalX + "px)";
-          if (elem.setXTCB) {
-            elem.setXTCB();
-          }
-        } else {
-          elem.style.MozTransform = "translateX(" + destX + "px)";
-          currX = destX;
-        }
+      if (!options.duration) {
+        duration = 0;
+        transition = 'none';
+      } else {
+        duration = parseInt(options['duration']);
+        transition = '-webkit-transform';
+        transition += ' ' + duration + "ms";
+        transition += ' ' + (options['timing'] || 'linear');
+        transition += ' ' + (options['delay'] || 0) + 'ms';
       }
 
-      elem.setXTransitionInterval = setInterval(stepFn, frameRate);
-    } else {
-      elem.style.MozTransform = "translateX("+x+")";
+      if (typeof WebKitTransitionEvent != "undefined") {
+        elem.style.webkitTransition = transition;
+        elem.style.webkitTransform = "translate3d("+x+",0,0)";
+      } else if (transition != "none") {
+        // Exit any existing transition loop.
+        clearTimeout(elem.setXTransitionInterval)
+
+        // NB: this is a little naive. We need to ensure that the duration is
+        // constant, probably by multiplying step against the ACTUAL interval,
+        // rather than the scheduled one (because on slower machines, the
+        // interval may be much longer).
+        var stamp = (new Date()).getTime();
+        var frameRate = 40;
+        var finalX = parseInt(x);
+        var currX = getX(elem);
+        var step = (finalX - currX) * (frameRate / duration);
+        var stepFn = function () {
+          var destX = currX + step;
+          if (
+            (new Date()).getTime() - stamp > duration ||
+            Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
+          ) {
+            clearTimeout(elem.setXTransitionInterval)
+            elem.style.MozTransform = "translateX(" + finalX + "px)";
+            if (elem.setXTCB) {
+              elem.setXTCB();
+            }
+          } else {
+            elem.style.MozTransform = "translateX(" + destX + "px)";
+            currX = destX;
+          }
+        }
+
+        elem.setXTransitionInterval = setInterval(stepFn, frameRate);
+      } else {
+        elem.style.MozTransform = "translateX("+x+")";
+      }
     }
 
     if (elem.setXTCB) {
       Monocle.removeListener(elem, 'webkitTransitionEnd', elem.setXTCB);
       elem.setXTCB = null;
     }
-    if (callback) {
-      if (transition == "none" || getX(elem) == parseInt(x)) {
-        callback();
-      } else {
-        elem.setXTCB = callback;
-        Monocle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
+
+    var sX = getX(elem);
+    if (transition == "none" || sX == parseInt(x)) {
+      if (callback) { callback(); }
+    } else {
+      p.turnData.srcX = sX;
+      p.turnData.destX = parseInt(x);
+      elem.setXTCB = function () {
+        p.turnData.srcX = null;
+        p.turnData.destX = null;
+        if (callback) { callback(); }
       }
+      Monocle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
     }
+  }
+
+
+  function inCorrectDirection(x) {
+    if (!p.turnData) { return false; }
+    var sX = p.turnData.srcX;
+    var dX = p.turnData.destX;
+    if (!sX || !dX) { return false; }
+    if (Math.abs(sX - dX) < 2) { return false; }
+    //console.log(sX + ", " + dX + ", " + x);
+    return !(Math.min(sX,dX) < x && Math.max(sX,dX) > x);
   }
 
 

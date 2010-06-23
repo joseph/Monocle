@@ -149,6 +149,7 @@ Monocle.Reader = function (node, bookData, options) {
       for (var i = 0; i < p.divs.pages.length; ++i) {
         listenForInteraction(p.divs.pages[i].m.controlsDiv);
       }
+      p.flipper.listenForInteraction();
 
       dispatchEvent("monocle:loaded")
     });
@@ -481,7 +482,6 @@ Monocle.Reader = function (node, bookData, options) {
       );
       Monocle.addListener(window, 'orientationchange', resized, true);
     }
-    p.flipper.listenForInteraction();
   }
 
 

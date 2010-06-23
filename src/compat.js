@@ -1,3 +1,16 @@
+// Borrowed from Prototype.
+Monocle.Browser = {
+  IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
+  Opera: navigator.userAgent.indexOf('Opera') > -1,
+  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
+  Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
+    navigator.userAgent.indexOf('KHTML') === -1,
+  MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+}
+Monocle.Browser.Version = (function () {
+  // TODO
+})();
+
 /* Standardized event registration - coheres the W3C and MS event models. */
 
 Monocle.addListener = function (elem, evtType, fn, useCapture) {
