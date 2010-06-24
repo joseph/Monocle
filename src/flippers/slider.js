@@ -8,7 +8,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     FORWARDS: 1,
     BACKWARDS: -1,
     durations: {
-      SLIDE: 240,
+      SLIDE: 200,
       FOLLOW_CURSOR: 100,
       ANTI_FLICKER_DELAY: 0
     }
@@ -213,9 +213,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           p.turnData = {};
         }
       );
-      if (rslt == 'wait') {
-        // TODO ???
-      }
       return true;
     }
     return false;
@@ -308,38 +305,37 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function setX(elem, x, options, callback) {
-    var transition;
     var duration;
 
-    if (!callback && inCorrectDirection(parseInt(x))) {
+    if (!options.duration) {
+      duration = 0;
+    } else {
+      duration = parseInt(options['duration']);
+    }
+
+    if (!callback && duration && sameDirection(parseInt(x))) {
       p.turnData.nextX = x;
     } else {
-      //console.log("doing...");
-
       if (typeof(x) == "number") { x = x + "px"; }
 
-      if (!options.duration) {
-        duration = 0;
-        transition = 'none';
-      } else {
-        duration = parseInt(options['duration']);
-        transition = '-webkit-transform';
-        transition += ' ' + duration + "ms";
-        transition += ' ' + (options['timing'] || 'linear');
-        transition += ' ' + (options['delay'] || 0) + 'ms';
-      }
-
+      // BROWSERHACK: WEBKIT (transitions & transition events)
       if (typeof WebKitTransitionEvent != "undefined") {
+        if (duration) {
+          transition = '-webkit-transform';
+          transition += ' ' + duration + "ms";
+          transition += ' ' + (options['timing'] || 'linear');
+          transition += ' ' + (options['delay'] || 0) + 'ms';
+        } else {
+          transition = 'none';
+        }
         elem.style.webkitTransition = transition;
         elem.style.webkitTransform = "translate3d("+x+",0,0)";
-      } else if (transition != "none") {
+
+      // BROWSERHACK: NON-WEBKIT (no transitions)
+      } else if (duration > 0) {
         // Exit any existing transition loop.
         clearTimeout(elem.setXTransitionInterval)
 
-        // NB: this is a little naive. We need to ensure that the duration is
-        // constant, probably by multiplying step against the ACTUAL interval,
-        // rather than the scheduled one (because on slower machines, the
-        // interval may be much longer).
         var stamp = (new Date()).getTime();
         var frameRate = 40;
         var finalX = parseInt(x);
@@ -374,7 +370,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     }
 
     var sX = getX(elem);
-    if (transition == "none" || sX == parseInt(x)) {
+    if (!duration || sX == parseInt(x)) {
       if (callback) { callback(); }
     } else {
       p.turnData.srcX = sX;
@@ -389,14 +385,15 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function inCorrectDirection(x) {
+  function sameDirection(x) {
     if (!p.turnData) { return false; }
     var sX = p.turnData.srcX;
     var dX = p.turnData.destX;
     if (!sX || !dX) { return false; }
-    if (Math.abs(sX - dX) < 2) { return false; }
+    if (Math.abs(x - dX) < 12) { return true; }
     //console.log(sX + ", " + dX + ", " + x);
-    return !(Math.min(sX,dX) < x && Math.max(sX,dX) > x);
+    //return !(Math.min(sX,dX) < x && Math.max(sX,dX) > x);
+    return false;
   }
 
 

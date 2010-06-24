@@ -214,6 +214,7 @@ Monocle.Reader = function (node, bookData, options) {
 
 
   function attachFlipper(flipperClass) {
+    // BROWSERHACK: WEBKIT + GECKO (CSS columns, basic HTML5/CSS3 support)
     if (navigator.product != "Gecko") { // FIXME: browser sniffing is a smell
       if (!k.FLIPPER_LEGACY_CLASS) {
         var abortMsg = document.createElement('div');
@@ -390,6 +391,7 @@ Monocle.Reader = function (node, bookData, options) {
 
 
   function listenForInteraction(layer) {
+    // BROWSERHACK: Mobile Webkit? (Touch event support)
     if (!k.TOUCH_DEVICE) {
       Monocle.addListener(
         layer,

@@ -132,13 +132,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // Escape single-quotes.
     src = src.replace(/\'/g, '\\\'');
 
-    // Remove scripts.
-    var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-    src = src.replace(new RegExp(scriptFragment, 'img'), '');
+    // Remove scripts. (DISABLED -- Monocle should leave this to implementers.)
+    //var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
+    //src = src.replace(new RegExp(scriptFragment, 'img'), '');
 
-    // Gecko chokes on the DOCTYPE declaration.
-    var doctypeFragment = "<!DOCTYPE[^>]*>";
-    src = src.replace(new RegExp(doctypeFragment, 'm'), '');
+    // BROWSERHACK: Gecko chokes on the DOCTYPE declaration.
+    if (true) {
+      var doctypeFragment = "<!DOCTYPE[^>]*>";
+      src = src.replace(new RegExp(doctypeFragment, 'm'), '');
+    }
 
     src = "javascript: '" + src + "';";
 
@@ -198,6 +200,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
 
   function setupFrame(pageDiv, frame) {
+    // BROWSERHACK: WEBKIT (touch events on iframe not sent to higher elems)
+    //
     // On MobileSafari, translates a click on the iframe into a click on
     // the reader's controls div.
     // Presently required to route around MobileSafari's problems with
@@ -306,9 +310,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
 
+    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
     if (/WebKit/i.test(navigator.userAgent)) {
       // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
-      // Still, browser sniffing is an evil.
       doc.body.style.overflow = 'hidden';
     }
   }
