@@ -48,13 +48,13 @@ Monocle.Styles.body = {
   "min-width": "200%",
   "-webkit-column-gap": "0",
   "-webkit-column-fill": "auto",
-  "-webkit-user-select": "none",
   "-webkit-text-size-adjust": "none",
   "-moz-column-gap": "0",
-  "-moz-user-select": "none",
   "column-gap": "0",
-  "column-fill": "0",
-  "user-select": "none"
+  "column-fill": "0"//,
+  //"-webkit-user-select": "none",
+  //"-moz-user-select": "none",
+  //"user-select": "none"
 }
 
 Monocle.Styles.controls = {

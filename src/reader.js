@@ -28,13 +28,6 @@ Monocle.Reader = function (node, bookData, options) {
       "body * {" +
         "float: none !important;" +
         "clear: none !important;" +
-        "user-select: none !important;" +
-        "-webkit-user-select: none !important;" +
-        "-moz-user-select: none !important;" +
-      "}",
-      "p {" +
-        "margin-left: 0 !important;" +
-        "margin-right: 0 !important;" +
       "}",
       "table, img {" +
         "max-width: 100% !important;" +
@@ -484,6 +477,29 @@ Monocle.Reader = function (node, bookData, options) {
       );
       Monocle.addListener(window, 'orientationchange', resized, true);
     }
+
+    Monocle.addListener(
+      document,
+      'keydown',
+      function (evt) {
+        console.log(evt.keyCode);
+        if (evt.keyCode == 18) {
+          console.log("hiding control layer");
+          layer.style.display = "none";
+        }
+      }
+    );
+    Monocle.addListener(
+      document,
+      'keyup',
+      function (evt) {
+        console.log(evt.keyCode);
+        if (evt.keyCode == 18) {
+          console.log("showing control layer");
+          layer.style.display = "block";
+        }
+      }
+    );
   }
 
 

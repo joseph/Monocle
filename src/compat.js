@@ -1,16 +1,3 @@
-// Borrowed from Prototype.
-Monocle.Browser = {
-  IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
-  Opera: navigator.userAgent.indexOf('Opera') > -1,
-  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
-  Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
-    navigator.userAgent.indexOf('KHTML') === -1,
-  MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
-}
-Monocle.Browser.Version = (function () {
-  // TODO
-})();
-
 /* Standardized event registration - coheres the W3C and MS event models. */
 
 Monocle.addListener = function (elem, evtType, fn, useCapture) {
@@ -32,6 +19,133 @@ Monocle.removeListener = function (elem, evtType, fn, useCapture) {
   }
 }
 
+
+// Borrowed from Prototype.
+Monocle.Browser = {
+  IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
+  Opera: navigator.userAgent.indexOf('Opera') > -1,
+  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
+  Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
+    navigator.userAgent.indexOf('KHTML') === -1,
+  MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+}
+
+
+Monocle.Browser.Version = (function () {
+  // TODO
+})();
+
+
+Monocle.Browser.touch = (typeof Touch == "object");
+
+Monocle.Browser.addContactListener = function (elem, evtType, fn) {
+  var eL = elem.offsetLeft, eT = elem.offsetTop;
+  var e = {
+    l: elem.offsetLeft,
+    t: elem.offsetTop,
+    w: elem.offsetWidth,
+    h: elem.offsetHeight
+  }
+  var cursorInfo = function (ci) {
+    return {
+      contactX: Math.min(e.w, Math.max(0, ci.pageX - e.l)),
+      contactY: Math.min(e.h, Math.max(0, ci.pageY - e.t))
+    };
+  }
+
+  if (!Monocle.Browser.touch) {
+    switch (evtType) {
+    case 'start':
+      var f = function (evt) {
+        if (evt.button != 0) { return; }
+        elem.mouseDown = true;
+        fn(cursorInfo(evt));
+      }
+      Monocle.addListener(elem, 'mousedown', f);
+      return f;
+    case 'move':
+      var f = function (evt) {
+        if (!elem.mouseDown) { return false; }
+        fn(cursorInfo(evt));
+      }
+      Monocle.addListener(elem, 'mousemove', f);
+      return f;
+    case 'end':
+      var f = function (evt) {
+        if (!elem.mouseDown) { return false; }
+        fn(cursorInfo(evt));
+      }
+      Monocle.addListener(elem, 'mouseup', f);
+      return f;
+    case 'cancel':
+      var f = function (evt) {
+        if (!elem.mouseDown) { return false; }
+        obj = evt.relatedTarget || e.fromElement;
+        while (obj && (obj = obj.parentNode)) {
+          if (obj == p.divs.box) { return; }
+        }
+        fn(cursorInfo(evt));
+      }
+      Monocle.addListener(elem, 'mouseout', f);
+      return f;
+    }
+  } else {
+    switch(evtType) {
+    case 'start':
+      var f = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        fn(cursorInfo(evt.targetTouches[0]));
+      }
+      Monocle.addListener(elem, 'touchstart', f);
+      return f;
+    case 'move':
+      var f = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        var raw = {
+          x: evt.targetTouches[0].pageX - e.l,
+          y: evt.targetTouches[0].pageY - e.t
+        }
+        if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
+          fn(evt, 'end'); // FIXME: how to invoke end evt?
+        } else {
+          fn(cursorInfo(evt.targetTouches[0]));
+        }
+      }
+      Monocle.addListener(elem, 'touchmove', f);
+      return f;
+    case 'end':
+      var f = function (evt) {
+        fn(cursorInfo(evt.changedTouches[0]));
+        evt.preventDefault();
+      }
+      Monocle.addListener(elem, 'touchend', f);
+      return f;
+    case 'cancel':
+      var f = function (evt) {
+        fn(cursorInfo(evt.changedTouches[0]));
+      }
+      Monocle.addListener(elem, 'touchcancel', f);
+      return f;
+    }
+  }
+}
+
+
+Monocle.Browser.removeContactListener = function (elem, evtType, fn) {
+  var evtTypes = {};
+  if (!Monocle.Browser.touch) {
+    evtTypes.start = 'mousedown';
+    evtTypes.move = 'mousemove';
+    evtTypes.end = 'mouseup';
+    evtTypes.cancel = 'mouseout';
+  } else {
+    evtTypes.start = 'touchstart';
+    evtTypes.move = 'touchmove';
+    evtTypes.end = 'touchend';
+    evtTypes.cancel = 'touchcancel';
+  }
+  Monocle.removeListener(elem, evtTypes[evtType], fn);
+}
 
 
 if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
