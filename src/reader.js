@@ -138,10 +138,6 @@ Monocle.Reader = function (node, bookData, options) {
       // Apply the book, calculating column dimensions & etc.
       setBook(bk, options.place);
 
-      // Wait for user input.
-      for (var i = 0; i < p.divs.pages.length; ++i) {
-        listenForInteraction(p.divs.pages[i].m.controlsDiv);
-      }
       p.flipper.listenForInteraction();
 
       dispatchEvent("monocle:loaded")
@@ -172,7 +168,6 @@ Monocle.Reader = function (node, bookData, options) {
         reader: API,
         pageIndex: i,
         sheafDiv: document.createElement('div'),
-        controlsDiv: document.createElement('div'),
         activeFrame: document.createElement('iframe'),
         place: null
       }
@@ -192,7 +187,6 @@ Monocle.Reader = function (node, bookData, options) {
         page.m.activeFrame.src = options.primeURL;
       }
       page.appendChild(page.m.sheafDiv);
-      page.appendChild(page.m.controlsDiv);
       page.m.sheafDiv.appendChild(page.m.activeFrame);
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
@@ -233,7 +227,6 @@ Monocle.Reader = function (node, bookData, options) {
       var page = p.divs.pages[i];
       Monocle.Styles.applyRules(page, 'page');
       Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
-      Monocle.Styles.applyRules(page.m.controlsDiv, 'controls');
       Monocle.Styles.applyRules(page.m.activeFrame, 'component');
       Monocle.Styles.applyRules(
         page.m.activeFrame.contentDocument.body,
@@ -383,6 +376,7 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
+  /*
   function listenForInteraction(layer) {
     // BROWSERHACK: Mobile Webkit? (Touch event support)
     if (!k.TOUCH_DEVICE) {
@@ -530,6 +524,7 @@ Monocle.Reader = function (node, bookData, options) {
       p.interactionData = {};
     }
   }
+  */
 
 
   /* Valid types:
@@ -567,7 +562,7 @@ Monocle.Reader = function (node, bookData, options) {
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
       for (var i = 0; i < p.divs.pages.length; ++i) {
-        var cDiv = p.divs.pages[i].m.controlsDiv;
+        var cDiv = p.divs.pages[i];
         var runner = ctrl.createControlElements(cDiv);
         cDiv.appendChild(runner);
         ctrlData.elements.push(runner);

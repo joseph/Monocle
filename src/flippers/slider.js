@@ -49,31 +49,83 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
+  /* MOVE ALL THIS TO A PAGEPANEL CONTROL */
   function listenForInteraction() {
-    p.reader.addListener(
-      "monocle:contact:start",
-      function (evt) {
-        if (lift(evt.monocleData.contactX)) {
-          evt.preventDefault();
-        }
+    p.panels = {
+      forwards: interactionPanel(
+        k.FORWARDS,
+        "left: 67%; background: rgba(255, 0, 0, 0.3);"
+      ),
+      backwards: interactionPanel(
+        k.BACKWARDS,
+        "left: 0%; background: rgba(0, 0, 255, 0.3);"
+      )
+    }
+    p.reader.addControl(p.panels.forwards);
+    p.reader.addControl(p.panels.backwards);
+  }
+
+
+  function interactionPanel(dir, styleRules) {
+    return {
+      createControlElements: function (cntr) {
+        var panel = this.div = document.createElement('div');
+        panel.style.cssText = "position: absolute; width: 33%; height: 100%;" +
+          styleRules;
+        panel.m = panel.monocleData = { 'dir': dir };
+        Monocle.Browser.addContactListeners(panel, liftFn);
+        return panel;
       }
+    }
+  }
+
+
+  function liftFn(evt) {
+    var panel = evt.target || evt.srcElement;
+    panel.monocleData.defaultCSS = panel.style.cssText;
+    panel.style.left = "0";
+    panel.style.width = "100%";
+    panel.style.zIndex = 1001;
+    lift(panel.monocleData.dir, evt.monocleData.pageX);
+    panel.monocleData.liftingListeners = Monocle.Browser.addContactListeners(
+      panel,
+      null,
+      moveFn,
+      endFn,
+      endFn
     );
-    p.reader.addListener(
-      "monocle:contact:move",
-      function (evt) {
-        if (turning(evt.monocleData.contactX)) {
-          evt.preventDefault();
-        }
-      }
+    evt.preventDefault();
+  }
+
+
+  function moveFn(evt) {
+    turning(evt.monocleData.pageX);
+    evt.preventDefault();
+  }
+
+
+  function endFn(evt) {
+    var panel = evt.target || evt.srcElement;
+    drop(evt.monocleData.pageX);
+    Monocle.Browser.removeContactListeners(
+      panel,
+      panel.monocleData.liftingListeners
     );
-    p.reader.addListener(
-      "monocle:contact:end",
-      function (evt) {
-        if (drop(evt.monocleData.contactX)) {
-          evt.preventDefault();
-        }
-      }
-    );
+    panel.style.cssText = panel.monocleData.defaultCSS;
+    evt.preventDefault();
+  }
+  /* END page panel */
+
+
+  function toggleInteractiveMode() {
+    if (p.interactive) {
+      p.panels.forwards.div.style.left = "67%";
+      p.panels.backwards.div.style.left = "0";
+    } else {
+      p.panels.forwards.div.style.left = "90%";
+      p.panels.backwards.div.style.left = "-23%";
+    }
+    p.interactive = !p.interactive;
   }
 
 
@@ -109,22 +161,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);
-  }
-
-
-  // Returns true if the box-based x point is in the "Go forward" zone for
-  // user turning a page.
-  //
-  function inForwardZone(x) {
-    return x > p.reader.properties.pageWidth * 0.67;
-  }
-
-
-  // Returns true if the box-based x point is in the "Go backward" zone for
-  // user turning a page.
-  //
-  function inBackwardZone(x) {
-    return x < p.reader.properties.pageWidth * 0.33;
   }
 
 
@@ -171,7 +207,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function lift(boxPointX) {
+  function lift(dir, boxPointX) {
     if (p.turnData.animating || p.turnData.direction) {
       return true;
     }
@@ -182,22 +218,22 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       max: boxPointX
     }
 
-    if (inForwardZone(boxPointX)) {
+    if (dir == k.FORWARDS) {
       if (!onLastPage()) {
-        p.turnData.direction = k.FORWARDS;
+        p.turnData.direction = dir;
         slideToCursor(boxPointX);
         liftAnimationFinished();
       }
       return true;
-    } else if (inBackwardZone(boxPointX)) {
+    } else if (dir == k.BACKWARDS) {
       p.turnData.animating = true;
       var place = getPlace();
       var rslt = setPage(
         lowerPage(),
-        place.getLocus({ direction: k.BACKWARDS }),
+        place.getLocus({ direction: dir }),
         // Callback on success
         function () {
-          p.turnData.direction = k.BACKWARDS;
+          p.turnData.direction = dir;
           deferredCall(function() {
             jumpOut(function () {
               deferredCall(function () {
@@ -483,6 +519,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
+  API.toggleInteractiveMode = toggleInteractiveMode;
 
   initialize();
 

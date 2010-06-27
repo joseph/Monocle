@@ -38,113 +38,100 @@ Monocle.Browser.Version = (function () {
 
 Monocle.Browser.touch = (typeof Touch == "object");
 
-Monocle.Browser.addContactListener = function (elem, evtType, fn) {
-  var eL = elem.offsetLeft, eT = elem.offsetTop;
-  var e = {
-    l: elem.offsetLeft,
-    t: elem.offsetTop,
-    w: elem.offsetWidth,
-    h: elem.offsetHeight
-  }
-  var cursorInfo = function (ci) {
-    return {
-      contactX: Math.min(e.w, Math.max(0, ci.pageX - e.l)),
-      contactY: Math.min(e.h, Math.max(0, ci.pageY - e.t))
-    };
-  }
-
-  if (!Monocle.Browser.touch) {
-    switch (evtType) {
-    case 'start':
-      var f = function (evt) {
-        if (evt.button != 0) { return; }
-        elem.mouseDown = true;
-        fn(cursorInfo(evt));
-      }
-      Monocle.addListener(elem, 'mousedown', f);
-      return f;
-    case 'move':
-      var f = function (evt) {
-        if (!elem.mouseDown) { return false; }
-        fn(cursorInfo(evt));
-      }
-      Monocle.addListener(elem, 'mousemove', f);
-      return f;
-    case 'end':
-      var f = function (evt) {
-        if (!elem.mouseDown) { return false; }
-        fn(cursorInfo(evt));
-      }
-      Monocle.addListener(elem, 'mouseup', f);
-      return f;
-    case 'cancel':
-      var f = function (evt) {
-        if (!elem.mouseDown) { return false; }
-        obj = evt.relatedTarget || e.fromElement;
-        while (obj && (obj = obj.parentNode)) {
-          if (obj == p.divs.box) { return; }
-        }
-        fn(cursorInfo(evt));
-      }
-      Monocle.addListener(elem, 'mouseout', f);
-      return f;
+Monocle.Browser.addContactListeners =
+  function (elem, startFn, moveFn, endFn, cancelFn) {
+    var eL = elem.offsetLeft, eT = elem.offsetTop;
+    var cursorInfo = function (evt, ci) {
+      evt.monocleData = {
+        elementX: ci.offsetX,
+        elementY: ci.offsetY,
+        pageX: ci.pageX,
+        pageY: ci.pageY
+      };
+      return evt;
     }
-  } else {
-    switch(evtType) {
-    case 'start':
-      var f = function (evt) {
-        if (evt.touches.length > 1) { return; }
-        fn(cursorInfo(evt.targetTouches[0]));
-      }
-      Monocle.addListener(elem, 'touchstart', f);
-      return f;
-    case 'move':
-      var f = function (evt) {
-        if (evt.touches.length > 1) { return; }
-        var raw = {
-          x: evt.targetTouches[0].pageX - e.l,
-          y: evt.targetTouches[0].pageY - e.t
+    listeners = {}
+
+    if (!Monocle.Browser.touch) {
+      if (startFn) {
+        listeners.mousedown = function (evt) {
+          if (evt.button != 0) { return; }
+          startFn(cursorInfo(evt, evt));
         }
-        if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
-          fn(evt, 'end'); // FIXME: how to invoke end evt?
-        } else {
-          fn(cursorInfo(evt.targetTouches[0]));
+        Monocle.addListener(elem, 'mousedown', listeners.mousedown);
+      }
+      if (moveFn) {
+        listeners.mousemove = function (evt) {
+          moveFn(cursorInfo(evt, evt));
         }
+        Monocle.addListener(elem, 'mousemove', listeners.mousemove);
       }
-      Monocle.addListener(elem, 'touchmove', f);
-      return f;
-    case 'end':
-      var f = function (evt) {
-        fn(cursorInfo(evt.changedTouches[0]));
-        evt.preventDefault();
+      if (endFn) {
+        listeners.mouseup = function (evt) {
+          endFn(cursorInfo(evt, evt));
+        }
+        Monocle.addListener(elem, 'mouseup', listeners.mouseup);
       }
-      Monocle.addListener(elem, 'touchend', f);
-      return f;
-    case 'cancel':
-      var f = function (evt) {
-        fn(cursorInfo(evt.changedTouches[0]));
+      if (cancelFn) {
+        listeners.mouseout = function (evt) {
+          // obj = evt.relatedTarget || e.fromElement;
+          // while (obj && (obj = obj.parentNode)) {
+          //   if (obj == p.divs.box) { return; }
+          // }
+          cancelFn(cursorInfo(evt, evt));
+        }
+        Monocle.addListener(elem, 'mouseout', listeners.mouseout);
       }
-      Monocle.addListener(elem, 'touchcancel', f);
-      return f;
+    } else {
+      if (startFn) {
+        listeners.touchstart = function (evt) {
+          if (evt.touches.length > 1) { return; }
+          startFn(cursorInfo(evt, evt.targetTouches[0]));
+        }
+        Monocle.addListener(elem, 'touchstart', listeners.touchstart);
+      }
+      if (moveFn) {
+        listeners.touchmove = function (evt) {
+          if (evt.touches.length > 1) { return; }
+          //var e = elemDimensions();
+          // var raw = {
+          //   x: evt.targetTouches[0].pageX - e.l,
+          //   y: evt.targetTouches[0].pageY - e.t
+          // }
+          // if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
+          //   if (endFn) {
+          //     endFn(cursorInfo(evt, evt.targetTouches[0]));
+          //   } else {
+          //     moveFn(cursorInfo(evt, evt.targetTouches[0]));
+          //   }
+          // }
+          moveFn(cursorInfo(evt, evt.targetTouches[0]));
+        }
+        Monocle.addListener(elem, 'touchmove', listeners.touchmove);
+      }
+      if (endFn) {
+        listeners.touchend = function (evt) {
+          endFn(cursorInfo(evt, evt.changedTouches[0]));
+          evt.preventDefault();
+        }
+        Monocle.addListener(elem, 'touchend', listeners.touchend);
+      }
+      if (cancelFn) {
+        listeners.touchcancel = function (evt) {
+          cancelFn(cursorInfo(evt, evt.changedTouches[0]));
+        }
+        Monocle.addListener(elem, 'touchcancel', listeners.touchcancel);
+      }
     }
+
+    return listeners;
   }
-}
 
 
-Monocle.Browser.removeContactListener = function (elem, evtType, fn) {
-  var evtTypes = {};
-  if (!Monocle.Browser.touch) {
-    evtTypes.start = 'mousedown';
-    evtTypes.move = 'mousemove';
-    evtTypes.end = 'mouseup';
-    evtTypes.cancel = 'mouseout';
-  } else {
-    evtTypes.start = 'touchstart';
-    evtTypes.move = 'touchmove';
-    evtTypes.end = 'touchend';
-    evtTypes.cancel = 'touchcancel';
+Monocle.Browser.removeContactListeners = function (elem, listeners) {
+  for (evtType in listeners) {
+    Monocle.removeListener(elem, evtType, listeners[evtType]);
   }
-  Monocle.removeListener(elem, evtTypes[evtType], fn);
 }
 
 

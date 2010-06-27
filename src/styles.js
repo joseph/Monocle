@@ -57,17 +57,9 @@ Monocle.Styles.body = {
   //"user-select": "none"
 }
 
-Monocle.Styles.controls = {
-  "position": "absolute",
-  "top": "0",
-  "bottom": "0",
-  "left": "0",
-  "right": "0",
-  "cursor": "pointer"
-}
-
 Monocle.Styles.control = {
-  "z-index": "100"
+  "z-index": "100",
+  "cursor": "pointer"
 }
 
 Monocle.Styles.overlay = {
