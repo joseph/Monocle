@@ -29,7 +29,10 @@ Monocle.Styles.sheaf = {
   "bottom": "1em",
   "left": "1em",
   "right": "1em",
-  "overflow": "hidden" // Required by MobileSafari to constrain inner iFrame.
+  "overflow": "hidden", // Required by MobileSafari to constrain inner iFrame.
+  "-webkit-user-select": "none",
+  "-moz-user-select": "none",
+  "user-select": "none"
 }
 
 Monocle.Styles.component = {
@@ -37,7 +40,10 @@ Monocle.Styles.component = {
   "height": "100%",
   "width": "100%",
   "border": "none",
-  "overflow": "hidden"
+  "overflow": "hidden",
+  "-webkit-user-select": "none",
+  "-moz-user-select": "none",
+  "user-select": "none"
 }
 
 Monocle.Styles.body = {

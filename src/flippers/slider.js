@@ -54,11 +54,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     p.panels = {
       forwards: interactionPanel(
         k.FORWARDS,
-        "left: 67%; background: rgba(255, 0, 0, 0.3);"
+        "right: 0; background: rgba(255, 0, 0, 0.1);"
       ),
       backwards: interactionPanel(
         k.BACKWARDS,
-        "left: 0%; background: rgba(0, 0, 255, 0.3);"
+        "left: 0; background: rgba(0, 0, 255, 0.1);"
       )
     }
     p.reader.addControl(p.panels.forwards);
@@ -82,11 +82,15 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function liftFn(evt) {
     var panel = evt.target || evt.srcElement;
+    if (panel.monocleData.lifting) {
+      endFn(evt);
+      return;
+    }
+    panel.monocleData.lifting = true;
     panel.monocleData.defaultCSS = panel.style.cssText;
-    panel.style.left = "0";
     panel.style.width = "100%";
+    panel.style.left = "0";
     panel.style.zIndex = 1001;
-    lift(panel.monocleData.dir, evt.monocleData.pageX);
     panel.monocleData.liftingListeners = Monocle.Browser.addContactListeners(
       panel,
       null,
@@ -94,6 +98,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       endFn,
       endFn
     );
+    lift(panel.monocleData.dir, evt.monocleData.pageX);
     evt.preventDefault();
   }
 
@@ -106,27 +111,31 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function endFn(evt) {
     var panel = evt.target || evt.srcElement;
-    drop(evt.monocleData.pageX);
     Monocle.Browser.removeContactListeners(
       panel,
       panel.monocleData.liftingListeners
     );
     panel.style.cssText = panel.monocleData.defaultCSS;
+    panel.monocleData.lifting = false;
+    drop(evt.monocleData.pageX);
     evt.preventDefault();
   }
-  /* END page panel */
 
 
   function toggleInteractiveMode() {
     if (p.interactive) {
-      p.panels.forwards.div.style.left = "67%";
-      p.panels.backwards.div.style.left = "0";
+      p.panels.forwards.div.style.width = "33%";
+      p.panels.backwards.div.style.width = "33%";
     } else {
-      p.panels.forwards.div.style.left = "90%";
-      p.panels.backwards.div.style.left = "-23%";
+      var page = p.divs.pages[0];
+      var sheaf = page.m.sheafDiv;
+      p.panels.forwards.div.style.width = sheaf.offsetLeft + "px";
+      p.panels.backwards.div.style.width =
+        page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth) + "px";
     }
     p.interactive = !p.interactive;
   }
+  /* END page panel */
 
 
   function getPlace(pageDiv) {
