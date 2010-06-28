@@ -25,6 +25,11 @@ Monocle.Reader = function (node, bookData, options) {
       Monocle.Flippers.Legacy,
     TOUCH_DEVICE: (typeof Touch == "object"),
     DEFAULT_STYLE_RULES: [
+      "body {" +
+        "user-select: none;" +
+        "-moz-user-select: none;" +
+        "-webkit-user-select: none;" +
+      "}" +
       "body * {" +
         "float: none !important;" +
         "clear: none !important;" +

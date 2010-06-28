@@ -54,11 +54,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     p.panels = {
       forwards: interactionPanel(
         k.FORWARDS,
-        "right: 0; background: rgba(255, 0, 0, 0.1);"
+        "right: 0; background: rgba(245, 245, 245, 0.75);outline: 1px solid #FFF;-webkit-box-shadow: -1px 0 3px #777; opacity: 0"
       ),
       backwards: interactionPanel(
         k.BACKWARDS,
-        "left: 0; background: rgba(0, 0, 255, 0.1);"
+        "left: 0; background: rgba(245, 245, 245, 0.75);outline: 1px solid #FFF;-webkit-box-shadow: 1px 0 3px #777; opacity: 0"
       )
     }
     p.reader.addControl(p.panels.forwards);
@@ -71,6 +71,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       createControlElements: function (cntr) {
         var panel = this.div = document.createElement('div');
         panel.style.cssText = "position: absolute; width: 33%; height: 100%;" +
+          "-webkit-transition: width linear 300ms, opacity ease-out 600ms; " +
           styleRules;
         panel.m = panel.monocleData = { 'dir': dir };
         Monocle.Browser.addContactListeners(panel, liftFn);
@@ -88,6 +89,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     }
     panel.monocleData.lifting = true;
     panel.monocleData.defaultCSS = panel.style.cssText;
+    panel.style.webkitTransition = "none";
     panel.style.width = "100%";
     panel.style.left = "0";
     panel.style.zIndex = 1001;
@@ -123,17 +125,35 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function toggleInteractiveMode() {
+    var page = p.divs.pages[0];
+    var sheaf = page.m.sheafDiv;
     if (p.interactive) {
       p.panels.forwards.div.style.width = "33%";
       p.panels.backwards.div.style.width = "33%";
     } else {
-      var page = p.divs.pages[0];
-      var sheaf = page.m.sheafDiv;
-      p.panels.forwards.div.style.width = sheaf.offsetLeft + "px";
-      p.panels.backwards.div.style.width =
-        page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth) + "px";
+      var bw = sheaf.offsetLeft;
+      var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);
+      bw -= 2;
+      fw -= 2;
+      bw /= page.offsetWidth;
+      fw /= page.offsetWidth;
+      bw *= 100;
+      fw *= 100;
+      bw += "%";
+      fw += "%";
+      console.log(bw + ", " + fw);
+      p.panels.forwards.div.style.width = fw;
+      p.panels.backwards.div.style.width = bw;
     }
     p.interactive = !p.interactive;
+
+    p.panels.forwards.div.style.opacity = 1;
+    p.panels.backwards.div.style.opacity = 1;
+    setTimeout(function () {
+      p.panels.forwards.div.style.opacity = 0;
+      p.panels.backwards.div.style.opacity = 0;
+    }, 600);
+
   }
   /* END page panel */
 
