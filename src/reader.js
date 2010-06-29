@@ -11,7 +11,7 @@ Monocle.Reader = function (node, bookData, options) {
   // Constants.
   var k = {
     durations: {
-      RESIZE_DELAY: 200
+      RESIZE_DELAY: 300
     },
     abortMessage: {
       CLASSNAME: "monocleAbortMessage",
@@ -26,9 +26,9 @@ Monocle.Reader = function (node, bookData, options) {
     TOUCH_DEVICE: (typeof Touch == "object"),
     DEFAULT_STYLE_RULES: [
       "body {" +
-        "user-select: none;" +
-        "-moz-user-select: none;" +
-        "-webkit-user-select: none;" +
+        "user-select: none !important;" +
+        "-moz-user-select: none !important;" +
+        "-webkit-user-select: none !important;" +
       "}" +
       "body * {" +
         "float: none !important;" +
@@ -308,6 +308,7 @@ Monocle.Reader = function (node, bookData, options) {
       p.flipper.overrideDimensions();
     }
 
+    console.log(locus.page);
     moveTo(locus);
   }
 
@@ -474,7 +475,6 @@ Monocle.Reader = function (node, bookData, options) {
           contactEvent(evt, "end", evt.changedTouches[0]);
         }
       );
-      Monocle.addListener(window, 'orientationchange', resized, true);
     }
 
     Monocle.addListener(
@@ -722,10 +722,12 @@ Monocle.Reader = function (node, bookData, options) {
       if (styleTag.styleSheet) {
         styleTag.styleSheet.cssText = styleRules;
       } else {
-        styleTag.replaceChild(
-          doc.createTextNode(styleRules),
-          styleTag.firstChild
-        );
+        preservingScrollPositions(function () {
+          styleTag.replaceChild(
+            doc.createTextNode(styleRules),
+            styleTag.firstChild
+          );
+        });
       }
     }
 
@@ -738,7 +740,9 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.divs.pages.length; ++i) {
       var doc = p.divs.pages[i].m.activeFrame.contentDocument;
       var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-      styleTag.parentNode.removeChild(styleTag);
+      preservingScrollPositions(function () {
+        styleTag.parentNode.removeChild(styleTag);
+      });
     }
     if (!(recalcDimensions === false)) { calcDimensions(); }
   }
@@ -772,9 +776,44 @@ Monocle.Reader = function (node, bookData, options) {
       styleTag.appendChild(doc.createTextNode(styleRules));
     }
 
-    doc.getElementsByTagName('head')[0].appendChild(styleTag);
+    preservingScrollPositions(function () {
+      doc.getElementsByTagName('head')[0].appendChild(styleTag);
+    });
 
     return styleTag;
+  }
+
+
+  // BROWSERHACK: under iOS4, adding, updating or removing a stylesheet in a
+  //  document resets scrollWidth of the containing scroller element -- but
+  //  ONLY if the scrollLeft > 0.
+  //
+  function preservingScrollPositions(fn) {
+    // console.log(
+    //   "BEFORE: " +
+    //   p.divs.pages[0].m.sheafDiv.scrollLeft + ", " +
+    //   p.divs.pages[1].m.sheafDiv.scrollLeft + ", " +
+    //   p.divs.pages[0].m.sheafDiv.scrollWidth + ", " +
+    //   p.divs.pages[1].m.sheafDiv.scrollWidth
+    // );
+    var sls = [
+      p.divs.pages[0].m.sheafDiv.scrollLeft,
+      p.divs.pages[1].m.sheafDiv.scrollLeft
+    ]
+    p.divs.pages[0].m.sheafDiv.scrollLeft = 0;
+    p.divs.pages[1].m.sheafDiv.scrollLeft = 0;
+
+    fn();
+
+    // console.log(
+    //   "AFTER: " +
+    //   p.divs.pages[0].m.sheafDiv.scrollLeft + ", " +
+    //   p.divs.pages[1].m.sheafDiv.scrollLeft + ", " +
+    //   p.divs.pages[0].m.sheafDiv.scrollWidth + ", " +
+    //   p.divs.pages[1].m.sheafDiv.scrollWidth
+    // );
+    p.divs.pages[0].m.sheafDiv.scrollLeft = sls[0];
+    p.divs.pages[1].m.sheafDiv.scrollLeft = sls[1];
   }
 
 

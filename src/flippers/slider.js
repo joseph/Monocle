@@ -180,12 +180,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData = {};
         return;
       }
-      var div = pageDiv.m.activeFrame.contentDocument.body;
-      div.scrollLeft = offset;
-      if (div.scrollLeft == 0) {
-        pageDiv.m.sheafDiv.scrollLeft = offset;
-      }
-      div.style.left = "0px"; // Webkit hack
+      //console.log("scrollLeft change to: " + offset);
+      var scroller = pageDiv.m.activeFrame.m.component.scrollerElement(pageDiv);
+      scroller.scrollLeft = offset;
       callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);
@@ -351,9 +348,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     // If successful:
     var winCallback = function () {
       jumpIn(resetTurn);
-      // FIXME: this little hack only applies to Webkit nightlies...
-      lowerPage().m.sheafDiv.style.webkitTransform = "scale(1.0)";
     }
+
     // If unsuccessful, we just assume setting to current page will succeed:
     var failCallback = function () {
       setPage(lowerPage(), place.getLocus(), winCallback);

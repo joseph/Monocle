@@ -55,28 +55,12 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
-  function scrollerDiv() {
-    var div = p.page.m.activeFrame.contentDocument.body;
-    if (div.scrollLeft > 0) {
-      return div;
-    }
-    var sl = div.scrollLeft;
-    div.scrollLeft = 1;
-    if (div.scrollLeft == 0) {
-      return p.page.m.sheafDiv;
-    } else {
-      div.scrollLeft = sl;
-      return div;
-    }
-  }
-
-
   function moveTo(locus) {
     var spCallback = function (offset) {
       if (offset == 'disallow') {
         return;
       }
-      var div = scrollerDiv();
+      var div = p.page.m.activeFrame.m.component.scrollerElement(p.page);
       var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
       clearTimeout(p.timer);
       p.timer = setInterval(

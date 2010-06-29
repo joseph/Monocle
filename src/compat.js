@@ -148,6 +148,24 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
   }
 
 
+  // A weak version of console.dir that works on iphones.
+  window.console.compatDir = function (obj) {
+    var stringify = function (o) {
+      var parts = [];
+      for (x in o) {
+        // if (["object", "function"].indexOf(typeof(o[x]))) {
+        //   parts.push("(" + x + " => " + stringify(o[x]) + ")");
+        // } else {
+          parts.push(x + ": " + o[x]);
+        //}
+      }
+      return parts.join("; ");
+    }
+
+    window.console.log(stringify(obj));
+  }
+
+
   // indexOf code for IE - ripped from the Mozilla docs.
   //
   if (!Array.prototype.indexOf) {

@@ -178,7 +178,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     destDoc.documentElement.appendChild(destHd);
     destDoc.documentElement.appendChild(destBdy);
 
-    callback(frame, false);
+    if (callback) { callback(frame, false); }
     return 'ready';
   }
 
@@ -193,8 +193,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       destDoc.documentElement
     );
 
-    callback(frame, false);
-
+    if (callback) { callback(frame, false); }
     return 'ready';
   }
 
@@ -253,11 +252,67 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function haveDimensionsChanged(pageDiv) {
     var win = pageDiv.m.activeFrame.contentWindow;
     var currStyle = win.getComputedStyle(win.document.body, null);
+    /*
     return (!p.clientDimensions) ||
       (p.clientDimensions.width != pageDiv.m.sheafDiv.clientWidth) ||
       (p.clientDimensions.height != pageDiv.m.sheafDiv.clientHeight) ||
-      (p.clientDimensions.scrollWidth != win.document.body.scrollWidth) ||
+      (p.clientDimensions.scrollWidth != scrollerElement(pageDiv).scrollWidth ||
       (p.clientDimensions.fontSize != currStyle.getPropertyValue('font-size'));
+    */
+    var newDimensions = {
+      width: pageDiv.m.sheafDiv.clientWidth,
+      height: pageDiv.m.sheafDiv.clientHeight,
+      scrollWidth: scrollerWidth(pageDiv),
+      fontSize: currStyle.getPropertyValue('font-size')
+    }
+    if (
+      (!p.clientDimensions) ||
+      (p.clientDimensions.width != newDimensions.width) ||
+      (p.clientDimensions.height != newDimensions.height) ||
+      (p.clientDimensions.scrollWidth != newDimensions.scrollWidth) ||
+      (p.clientDimensions.fontSize != newDimensions.fontSize)
+    ) {
+      console.log("DIFFERENCE!");
+      console.compatDir(p.clientDimensions);
+      console.compatDir(newDimensions);
+      return true;
+    } else {
+      console.log("NO difference");
+      return false;
+    }
+  }
+
+
+  // BROWSERHACK: iOS devices don't allow scrollbars on the frame itself.
+  // This means that it's the parent div that must be scrolled -- the sheaf.
+  function scrollerElement(pageDiv) {
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var oldSL = doc.body.scrollLeft;
+    var sl = doc.body.scrollLeft = doc.body.scrollWidth;
+    var bodyScroller = (doc.body.scrollLeft != 0);
+    doc.body.scrollLeft = oldSL;
+    return bodyScroller ? doc.body : pageDiv.m.sheafDiv;
+  }
+
+
+  // BROWSERHACK: iOS 4+ devices sometimes report incorrect scrollWidths.
+  //  1) The body scrollWidth is now always 2x what it really is.
+  //  2) The sheafDiv scrollWidth is sometimes only 2x page width, despite
+  //    body being much bigger.
+  //
+  // Other browsers (WebKit / Gecko) will always have the correct value in
+  // the body scrollwidth, which is always the scrollerElement for those
+  // browsers, so the correct value should always win out.
+  function scrollerWidth(pageDiv) {
+    // If not for iOS 4, this would just be:
+    // return scrollerElement(pageDiv).scrollWidth;
+
+    //console.log(scrollerElement(pageDiv).getBoundingClientRect().width);
+    var scroller = scrollerElement(pageDiv);
+    var oldSL = scroller.scrollLeft;
+    scroller.scrollLeft = scroller.scrollWidth + 1;
+    scroller.scrollLeft = oldSL;
+    return scrollerElement(pageDiv).scrollWidth;
   }
 
 
@@ -266,15 +321,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var doc = win.document;
     var currStyle = win.getComputedStyle(doc.body, null);
 
-    var sl = doc.body.scrollLeft = doc.body.scrollWidth;
-    if (doc.body.scrollLeft == 0) {
-      sl = pageDiv.m.sheafDiv.scrollWidth;
-    }
-
     p.clientDimensions = {
       width: pageDiv.m.sheafDiv.clientWidth,
       height: pageDiv.m.sheafDiv.clientHeight,
-      scrollWidth: sl,
+      scrollWidth: scrollerWidth(pageDiv),
       fontSize: currStyle.getPropertyValue('font-size')
     }
 
@@ -323,8 +373,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
       return;
     }
     var doc = pageDiv.m.activeFrame.contentDocument;
-    var scrollers = [doc.body, pageDiv.m.sheafDiv];
-    var scrollLefts = [scrollers[0].scrollLeft, scrollers[1].scrollLeft];
+    var scroller = scrollerElement(pageDiv);
+    var oldScrollLeft = scroller.scrollLeft;
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.percent = 0;
@@ -335,17 +385,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
         }
         if (target) {
           target.scrollIntoView();
-          chp.percent = (
-            Math.max(scrollers[0].scrollLeft, scrollers[1].scrollLeft) /
-            p.clientDimensions.scrollWidth
-          );
+          chp.percent = (scroller.scrollLeft / p.clientDimensions.scrollWidth);
         }
       }
     }
-    for (var i = 0; i < scrollers.length; ++i) {
-      scrollers[i].scrollTop = 0;
-      scrollers[i].scrollLeft = scrollLefts[i];
-    }
+    scroller.scrollTop = 0;
+    scroller.scrollLeft = oldScrollLeft;
 
     return p.chapters;
   }
@@ -391,6 +436,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;
+  API.scrollerElement = scrollerElement;
 
   initialize();
 

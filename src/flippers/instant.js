@@ -58,15 +58,8 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
       if (offset == 'disallow') {
         return;
       }
-      var div = p.page.m.activeFrame.contentDocument.body;
-      div.scrollLeft = offset;
-      if (div.scrollLeft == 0) {
-        p.page.m.sheafDiv.scrollLeft = offset;
-      }
-      // FIXME: hacks for webkit rendering artefacts.
-      div.style.left = "0px";
-      var x = Math.random() / 1000 + 1.0;
-      div.style.webkitTransform = "scale(" + x + ")";
+      var scroller = p.page.m.activeFrame.m.component.scrollerElement(p.page);
+      scroller.scrollLeft = offset;
     }
     p.setPageFn(p.page, locus, spCallback);
   }
