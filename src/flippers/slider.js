@@ -71,7 +71,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       createControlElements: function (cntr) {
         var panel = this.div = document.createElement('div');
         panel.style.cssText = "position: absolute; width: 33%; height: 100%;" +
-          "-webkit-transition: width linear 300ms, opacity ease-out 600ms; " +
+          "-webkit-transition: width ease-in 350ms, opacity ease-out 600ms; " +
           styleRules;
         panel.m = panel.monocleData = { 'dir': dir };
         Monocle.Browser.addContactListeners(panel, liftFn);
@@ -141,7 +141,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       fw *= 100;
       bw += "%";
       fw += "%";
-      console.log(bw + ", " + fw);
       p.panels.forwards.div.style.width = fw;
       p.panels.backwards.div.style.width = bw;
     }

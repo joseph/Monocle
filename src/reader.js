@@ -124,7 +124,7 @@ Monocle.Reader = function (node, bookData, options) {
     attachFlipper(options.flipper);
 
     // Clamp page frames to a set of styles that reduce Monocle breakage.
-    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES);
+    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
 
     // Create the essential DOM elements.
     createReaderElements(function () {
@@ -697,7 +697,7 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function addPageStyles(styleRules) {
+  function addPageStyles(styleRules, recalcDimensions) {
     p.pageStylesheets.push(styleRules);
     var sheetIndex = p.pageStylesheets.length - 1;
 
@@ -706,12 +706,12 @@ Monocle.Reader = function (node, bookData, options) {
       addPageStylesheet(doc, sheetIndex);
     }
 
-    if (p.divs.pages.length) { calcDimensions(); }
+    if (!(recalcDimensions === false)) { calcDimensions(); }
     return sheetIndex;
   }
 
 
-  function updatePageStyles(sheetIndex, styleRules) {
+  function updatePageStyles(sheetIndex, styleRules, recalcDimensions) {
     p.pageStylesheets[sheetIndex] = styleRules;
     if (typeof styleRules.join == "function") {
       styleRules = styleRules.join("\n");
@@ -729,18 +729,18 @@ Monocle.Reader = function (node, bookData, options) {
       }
     }
 
-    if (p.divs.pages.length) { calcDimensions(); }
+    if (!(recalcDimensions === false)) { calcDimensions(); }
   }
 
 
-  function removePageStyles(sheetIndex) {
+  function removePageStyles(sheetIndex, recalcDimensions) {
     p.pageStylesheets[sheetIndex] = null;
     for (var i = 0; i < p.divs.pages.length; ++i) {
       var doc = p.divs.pages[i].m.activeFrame.contentDocument;
       var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
       styleTag.parentNode.removeChild(styleTag);
     }
-    if (p.divs.pages.length) { calcDimensions(); }
+    if (!(recalcDimensions === false)) { calcDimensions(); }
   }
 
 
