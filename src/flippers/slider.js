@@ -4,16 +4,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
   // Constants
-  var k = {
-    FORWARDS: 1,
-    BACKWARDS: -1,
-    durations: {
-      SLIDE: 200,
-      FOLLOW_CURSOR: 100,
-      ANTI_FLICKER_DELAY: 0
-    }
-  }
-
+  var k = Monocle.Flippers.Slider;
 
   // Properties
   var p = {
@@ -27,7 +18,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
   var API = {
-    constructor: Monocle.Flippers.Slider,
+    constructor: k,
     properties: p,
     constants: k
   }
@@ -54,11 +45,15 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     p.panels = {
       forwards: interactionPanel(
         k.FORWARDS,
-        "right: 0; background: rgba(245, 245, 245, 0.75);outline: 1px solid #FFF;-webkit-box-shadow: -1px 0 3px #777; opacity: 0"
+        "right: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
+          "outline: 1px solid #FFF; -webkit-box-shadow: -1px 0 3px #777;" +
+          "-moz-box-shadow: -1px 0 3px #777; box-shadow: -1px 0 3px #777;"
       ),
       backwards: interactionPanel(
         k.BACKWARDS,
-        "left: 0; background: rgba(245, 245, 245, 0.75);outline: 1px solid #FFF;-webkit-box-shadow: 1px 0 3px #777; opacity: 0"
+        "left: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
+          "outline: 1px solid #FFF; -webkit-box-shadow: 1px 0 3px #777;" +
+          "-moz-box-shadow: 1px 0 3px #777; box-shadow: 1px 0 3px #777;"
       )
     }
     p.reader.addControl(p.panels.forwards);
@@ -71,7 +66,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       createControlElements: function (cntr) {
         var panel = this.div = document.createElement('div');
         panel.style.cssText = "position: absolute; width: 33%; height: 100%;" +
-          "-webkit-transition: width ease-in 350ms, opacity ease-out 600ms; " +
+          "-webkit-transition: width ease-in 350ms, opacity linear 200ms; " +
           styleRules;
         panel.m = panel.monocleData = { 'dir': dir };
         Monocle.Browser.addContactListeners(panel, liftFn);
@@ -137,8 +132,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       fw -= 2;
       bw /= page.offsetWidth;
       fw /= page.offsetWidth;
-      bw *= 100;
-      fw *= 100;
+      bw = Math.floor(bw * 10000) / 100;
+      fw = Math.floor(fw * 10000) / 100;
       bw += "%";
       fw += "%";
       p.panels.forwards.div.style.width = fw;
@@ -151,7 +146,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     setTimeout(function () {
       p.panels.forwards.div.style.opacity = 0;
       p.panels.backwards.div.style.opacity = 0;
-    }, 600);
+    }, 500);
 
   }
   /* END page panel */
@@ -551,6 +546,18 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   return API;
 }
+
+// Constants
+Monocle.Flippers.Slider.TURN_PANELS = Monocle.Controls.TurnPanels;
+Monocle.Flippers.Slider.FORWARDS = 1;
+Monocle.Flippers.Slider.BACKWARDS = -1;
+Monocle.Flippers.Slider.durations = {
+  SLIDE: 200,
+  FOLLOW_CURSOR: 100,
+  ANTI_FLICKER_DELAY: 0
+}
+
+
 
 
 Monocle.pieceLoaded('flippers/slider');
