@@ -180,9 +180,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData = {};
         return;
       }
-      //console.log("scrollLeft change to: " + offset);
-      var scroller = pageDiv.m.activeFrame.m.component.scrollerElement(pageDiv);
-      scroller.scrollLeft = offset;
+      var bdy = pageDiv.m.activeFrame.contentDocument.body;
+      bdy.style.webkitTransform =
+        bdy.style.MozTransform =
+          bdy.style.transform =
+            "translateX(" + (0-offset) + "px)";
       callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);

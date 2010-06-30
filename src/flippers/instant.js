@@ -58,8 +58,11 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
       if (offset == 'disallow') {
         return;
       }
-      var scroller = p.page.m.activeFrame.m.component.scrollerElement(p.page);
-      scroller.scrollLeft = offset;
+      var bdy = p.page.m.activeFrame.contentDocument.body;
+      bdy.style.webkitTransform =
+        bdy.style.MozTransform =
+          bdy.style.transform =
+            "translateX(" + (0-offset) + "px)";
     }
     p.setPageFn(p.page, locus, spCallback);
   }

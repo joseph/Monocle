@@ -206,8 +206,8 @@ Monocle.Reader = function (node, bookData, options) {
 
 
   function attachFlipper(flipperClass) {
-    // BROWSERHACK: WEBKIT + GECKO (CSS columns, basic HTML5/CSS3 support)
-    if (navigator.product != "Gecko") { // FIXME: browser sniffing is a smell
+    // BROWSERHACK: Supported browsers must do CSS columns (at least?).
+    if (!Monocle.Browser.has.columns) {
       if (!k.FLIPPER_LEGACY_CLASS) {
         var abortMsg = document.createElement('div');
         abortMsg.className = k.abortMessage.CLASSNAME;
@@ -308,7 +308,6 @@ Monocle.Reader = function (node, bookData, options) {
       p.flipper.overrideDimensions();
     }
 
-    console.log(locus.page);
     moveTo(locus);
   }
 
@@ -385,7 +384,7 @@ Monocle.Reader = function (node, bookData, options) {
   /*
   function listenForInteraction(layer) {
     // BROWSERHACK: Mobile Webkit? (Touch event support)
-    if (!k.TOUCH_DEVICE) {
+    if (Monocle.Browser.has.touch) {
       Monocle.addListener(
         layer,
         'mousedown',
@@ -722,12 +721,10 @@ Monocle.Reader = function (node, bookData, options) {
       if (styleTag.styleSheet) {
         styleTag.styleSheet.cssText = styleRules;
       } else {
-        preservingScrollPositions(function () {
-          styleTag.replaceChild(
-            doc.createTextNode(styleRules),
-            styleTag.firstChild
-          );
-        });
+        styleTag.replaceChild(
+          doc.createTextNode(styleRules),
+          styleTag.firstChild
+        );
       }
     }
 
@@ -740,9 +737,7 @@ Monocle.Reader = function (node, bookData, options) {
     for (var i = 0; i < p.divs.pages.length; ++i) {
       var doc = p.divs.pages[i].m.activeFrame.contentDocument;
       var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-      preservingScrollPositions(function () {
-        styleTag.parentNode.removeChild(styleTag);
-      });
+      styleTag.parentNode.removeChild(styleTag);
     }
     if (!(recalcDimensions === false)) { calcDimensions(); }
   }
@@ -776,44 +771,9 @@ Monocle.Reader = function (node, bookData, options) {
       styleTag.appendChild(doc.createTextNode(styleRules));
     }
 
-    preservingScrollPositions(function () {
-      doc.getElementsByTagName('head')[0].appendChild(styleTag);
-    });
+    doc.getElementsByTagName('head')[0].appendChild(styleTag);
 
     return styleTag;
-  }
-
-
-  // BROWSERHACK: under iOS4, adding, updating or removing a stylesheet in a
-  //  document resets scrollWidth of the containing scroller element -- but
-  //  ONLY if the scrollLeft > 0.
-  //
-  function preservingScrollPositions(fn) {
-    // console.log(
-    //   "BEFORE: " +
-    //   p.divs.pages[0].m.sheafDiv.scrollLeft + ", " +
-    //   p.divs.pages[1].m.sheafDiv.scrollLeft + ", " +
-    //   p.divs.pages[0].m.sheafDiv.scrollWidth + ", " +
-    //   p.divs.pages[1].m.sheafDiv.scrollWidth
-    // );
-    var sls = [
-      p.divs.pages[0].m.sheafDiv.scrollLeft,
-      p.divs.pages[1].m.sheafDiv.scrollLeft
-    ]
-    p.divs.pages[0].m.sheafDiv.scrollLeft = 0;
-    p.divs.pages[1].m.sheafDiv.scrollLeft = 0;
-
-    fn();
-
-    // console.log(
-    //   "AFTER: " +
-    //   p.divs.pages[0].m.sheafDiv.scrollLeft + ", " +
-    //   p.divs.pages[1].m.sheafDiv.scrollLeft + ", " +
-    //   p.divs.pages[0].m.sheafDiv.scrollWidth + ", " +
-    //   p.divs.pages[1].m.sheafDiv.scrollWidth
-    // );
-    p.divs.pages[0].m.sheafDiv.scrollLeft = sls[0];
-    p.divs.pages[1].m.sheafDiv.scrollLeft = sls[1];
   }
 
 

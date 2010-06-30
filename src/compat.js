@@ -20,23 +20,24 @@ Monocle.removeListener = function (elem, evtType, fn, useCapture) {
 }
 
 
-// Borrowed from Prototype.
-Monocle.Browser = {
+Monocle.Browser = {}
+
+
+Monocle.Browser.is = {
   IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
   Opera: navigator.userAgent.indexOf('Opera') > -1,
   WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
   Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
     navigator.userAgent.indexOf('KHTML') === -1,
   MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+} // ... with thanks to PrototypeJS.
+
+
+Monocle.Browser.has = {
+  touch: (typeof Touch == "object"),
+  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko
 }
 
-
-Monocle.Browser.Version = (function () {
-  // TODO
-})();
-
-
-Monocle.Browser.touch = (typeof Touch == "object");
 
 Monocle.Browser.addContactListeners =
   function (elem, startFn, moveFn, endFn, cancelFn) {
@@ -52,7 +53,7 @@ Monocle.Browser.addContactListeners =
     }
     listeners = {}
 
-    if (!Monocle.Browser.touch) {
+    if (!Monocle.Browser.has.touch) {
       if (startFn) {
         listeners.mousedown = function (evt) {
           if (evt.button != 0) { return; }

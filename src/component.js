@@ -137,7 +137,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     //src = src.replace(new RegExp(scriptFragment, 'img'), '');
 
     // BROWSERHACK: Gecko chokes on the DOCTYPE declaration.
-    if (true) {
+    if (Monocle.Browser.is.Gecko) {
       var doctypeFragment = "<!DOCTYPE[^>]*>";
       src = src.replace(new RegExp(doctypeFragment, 'm'), '');
     }
@@ -205,7 +205,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // the reader's controls div.
     // Presently required to route around MobileSafari's problems with
     // iframes. But it would be very nice to rip it out.
-    if (/WebKit/i.test(navigator.userAgent) && typeof Touch == "object") {
+    if (Monocle.Browser.is.WebKit && Monocle.Browser.has.touch) {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 
@@ -214,6 +214,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
+
+    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
+    if (Monocle.Browser.is.WebKit) {
+      frame.contentDocument.body.style.overflow = 'hidden';
+    }
 
     // Correct the body lineHeight to use a number, not a percentage, which
     // causes the text to jump upwards.
@@ -250,21 +255,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   // Returns true or false.
   function haveDimensionsChanged(pageDiv) {
-    var win = pageDiv.m.activeFrame.contentWindow;
-    var currStyle = win.getComputedStyle(win.document.body, null);
-    /*
-    return (!p.clientDimensions) ||
-      (p.clientDimensions.width != pageDiv.m.sheafDiv.clientWidth) ||
-      (p.clientDimensions.height != pageDiv.m.sheafDiv.clientHeight) ||
-      (p.clientDimensions.scrollWidth != scrollerElement(pageDiv).scrollWidth ||
-      (p.clientDimensions.fontSize != currStyle.getPropertyValue('font-size'));
-    */
-    var newDimensions = {
-      width: pageDiv.m.sheafDiv.clientWidth,
-      height: pageDiv.m.sheafDiv.clientHeight,
-      scrollWidth: scrollerWidth(pageDiv),
-      fontSize: currStyle.getPropertyValue('font-size')
-    }
+    var newDimensions = rawDimensions(pageDiv);
     if (
       (!p.clientDimensions) ||
       (p.clientDimensions.width != newDimensions.width) ||
@@ -272,64 +263,77 @@ Monocle.Component = function (book, id, index, chapters, source) {
       (p.clientDimensions.scrollWidth != newDimensions.scrollWidth) ||
       (p.clientDimensions.fontSize != newDimensions.fontSize)
     ) {
-      console.log("DIFFERENCE!");
-      console.compatDir(p.clientDimensions);
-      console.compatDir(newDimensions);
+      // console.log("DIFFERENCE!");
+      // console.compatDir(p.clientDimensions);
+      // console.compatDir(newDimensions);
       return true;
     } else {
-      console.log("NO difference");
+      //console.log("NO difference");
       return false;
     }
   }
 
 
-  // BROWSERHACK: iOS devices don't allow scrollbars on the frame itself.
-  // This means that it's the parent div that must be scrolled -- the sheaf.
+  // BROWSERHACK:
+  //   iOS devices don't allow scrollbars on the frame itself.
+  //   This means that it's the parent div that must be scrolled -- the sheaf.
   function scrollerElement(pageDiv) {
-    var doc = pageDiv.m.activeFrame.contentDocument;
-    var oldSL = doc.body.scrollLeft;
-    var sl = doc.body.scrollLeft = doc.body.scrollWidth;
-    var bodyScroller = (doc.body.scrollLeft != 0);
-    doc.body.scrollLeft = oldSL;
-    return bodyScroller ? doc.body : pageDiv.m.sheafDiv;
+    var bdy = pageDiv.m.activeFrame.contentDocument.body;
+
+    if (Monocle.Browser.is.MobileSafari) {
+      var oldSL = bdy.scrollLeft;
+      var sl = bdy.scrollLeft = bdy.scrollWidth;
+      var bodyScroller = (bdy.scrollLeft != 0);
+      bdy.scrollLeft = oldSL;
+      return bodyScroller ? bdy : pageDiv.m.sheafDiv;
+    } else {
+      return bdy;
+    }
   }
 
 
-  // BROWSERHACK: iOS 4+ devices sometimes report incorrect scrollWidths.
+  // BROWSERHACK:
+  //
+  // iOS 4+ devices sometimes report incorrect scrollWidths.
   //  1) The body scrollWidth is now always 2x what it really is.
   //  2) The sheafDiv scrollWidth is sometimes only 2x page width, despite
   //    body being much bigger.
   //
-  // Other browsers (WebKit / Gecko) will always have the correct value in
-  // the body scrollwidth, which is always the scrollerElement for those
-  // browsers, so the correct value should always win out.
+  // In Gecko browsers, translating X on the document body causes the
+  // scrollWidth of the body to change. (I think this is a bug.) Hence, we
+  // have to find the last element in the body, and get the 'right' value from
+  // its bounding rect.
+  //
+  // In other browsers, we can just use the scrollWidth of the scrollerElement.
+  //
   function scrollerWidth(pageDiv) {
-    // If not for iOS 4, this would just be:
-    // return scrollerElement(pageDiv).scrollWidth;
-
-    //console.log(scrollerElement(pageDiv).getBoundingClientRect().width);
-    var scroller = scrollerElement(pageDiv);
-    var oldSL = scroller.scrollLeft;
-    scroller.scrollLeft = scroller.scrollWidth + 1;
-    scroller.scrollLeft = oldSL;
-    return scrollerElement(pageDiv).scrollWidth;
+    var bdy = pageDiv.m.activeFrame.contentDocument.body;
+    if (Monocle.Browser.is.MobileSafari) {
+      var sew = scrollerElement(pageDiv).scrollWidth;
+      var hbw = bdy.scrollWidth / 2;
+      //console.log("page["+pageDiv.m.pageIndex+"] scrollerElement: "+sew);
+      //console.log("page["+pageDiv.m.pageIndex+"] half body scrollWidth: "+hbw);
+      return Math.max(sew, hbw);
+    } else if (Monocle.Browser.is.Gecko) {
+      var lc = bdy.lastChild;
+      while (lc && lc.nodeType != 1) {
+        lc = lc.previousSibling;
+      }
+      var bcr = lc.getBoundingClientRect();
+      //console.log("page["+pageDiv.m.pageIndex+"] bounding rect: " + bcr.right);
+      return bcr.right;
+    } else {
+      return scrollerElement(pageDiv).scrollWidth;
+    }
   }
 
 
   function measureDimensions(pageDiv) {
-    var win = pageDiv.m.activeFrame.contentWindow;
-    var doc = win.document;
-    var currStyle = win.getComputedStyle(doc.body, null);
-
-    p.clientDimensions = {
-      width: pageDiv.m.sheafDiv.clientWidth,
-      height: pageDiv.m.sheafDiv.clientHeight,
-      scrollWidth: scrollerWidth(pageDiv),
-      fontSize: currStyle.getPropertyValue('font-size')
-    }
+    p.clientDimensions = rawDimensions(pageDiv);
 
     // Detect single-page components.
     if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
+      var doc = pageDiv.m.activeFrame.contentDocument;
       var elems = doc.body.getElementsByTagName('*');
       if (!elems || elems.length == 0) {
         throw("Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id);
@@ -353,18 +357,26 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  function rawDimensions(pageDiv) {
+    var win = pageDiv.m.activeFrame.contentWindow;
+    var doc = win.document;
+    var currStyle = win.getComputedStyle(doc.body, null);
+
+    return {
+      width: pageDiv.m.sheafDiv.clientWidth,
+      height: pageDiv.m.sheafDiv.clientHeight,
+      scrollWidth: scrollerWidth(pageDiv),
+      fontSize: currStyle.getPropertyValue('font-size')
+    }
+  }
+
+
   function setColumnWidth(pageDiv) {
     var doc = pageDiv.m.activeFrame.contentDocument;
     var cw = pageDiv.m.sheafDiv.clientWidth;
     doc.body.style.columnWidth = cw+"px";
     doc.body.style.MozColumnWidth = cw+"px";
     doc.body.style.webkitColumnWidth = cw+"px";
-
-    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
-    if (/WebKit/i.test(navigator.userAgent)) {
-      // FIXME: Gecko hates this, but WebKit requires it to hide scrollbars.
-      doc.body.style.overflow = 'hidden';
-    }
   }
 
 
@@ -436,7 +448,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;
-  API.scrollerElement = scrollerElement;
 
   initialize();
 
