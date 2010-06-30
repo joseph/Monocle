@@ -135,7 +135,11 @@ Monocle.Reader = function (node, bookData, options) {
         'monocle:componentchange',
         function (evt) {
           var doc = evt.monocleData['document'];
-          applyPageStyles(doc);
+          for (var i = 0; i < p.pageStylesheets.length; ++i) {
+            if (p.pageStylesheets[i]) {
+              addPageStylesheet(doc, i);
+            }
+          }
           Monocle.Styles.applyRules(doc.body, 'body');
         }
       );
@@ -696,62 +700,93 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
+
+
+  /* PAGE STYLESHEETS */
+
+  // API for adding a new stylesheet to all components. styleRules should be
+  // a string of CSS rules. recalcDimensions defaults to true.
+  //
+  // Returns a sheet index value that can be used with updatePageStyles
+  // and removePageStyles.
+  //
   function addPageStyles(styleRules, recalcDimensions) {
-    p.pageStylesheets.push(styleRules);
-    var sheetIndex = p.pageStylesheets.length - 1;
+    return changingStylesheet(function () {
+      p.pageStylesheets.push(styleRules);
+      var sheetIndex = p.pageStylesheets.length - 1;
 
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
-      addPageStylesheet(doc, sheetIndex);
-    }
-
-    if (!(recalcDimensions === false)) { calcDimensions(); }
-    return sheetIndex;
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+        addPageStylesheet(doc, sheetIndex);
+      }
+      return sheetIndex;
+    }, recalcDimensions);
   }
 
 
+  // API for updating the styleRules in an existing page stylesheet across
+  // all components. Takes a sheet index value obtained via addPageStyles.
+  //
   function updatePageStyles(sheetIndex, styleRules, recalcDimensions) {
-    p.pageStylesheets[sheetIndex] = styleRules;
-    if (typeof styleRules.join == "function") {
-      styleRules = styleRules.join("\n");
-    }
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
-      var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-      if (styleTag.styleSheet) {
-        styleTag.styleSheet.cssText = styleRules;
-      } else {
-        styleTag.replaceChild(
-          doc.createTextNode(styleRules),
-          styleTag.firstChild
-        );
+    return changingStylesheet(function () {
+      p.pageStylesheets[sheetIndex] = styleRules;
+      if (typeof styleRules.join == "function") {
+        styleRules = styleRules.join("\n");
       }
-    }
-
-    if (!(recalcDimensions === false)) { calcDimensions(); }
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+        var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
+        if (styleTag.styleSheet) {
+          styleTag.styleSheet.cssText = styleRules;
+        } else {
+          styleTag.replaceChild(
+            doc.createTextNode(styleRules),
+            styleTag.firstChild
+          );
+        }
+      }
+    }, recalcDimensions);
   }
 
 
+  // API for removing a page stylesheet from all components. Takes a sheet
+  // index value obtained via addPageStyles.
+  //
   function removePageStyles(sheetIndex, recalcDimensions) {
-    p.pageStylesheets[sheetIndex] = null;
-    for (var i = 0; i < p.divs.pages.length; ++i) {
-      var doc = p.divs.pages[i].m.activeFrame.contentDocument;
-      var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-      styleTag.parentNode.removeChild(styleTag);
-    }
-    if (!(recalcDimensions === false)) { calcDimensions(); }
-  }
-
-
-  function applyPageStyles(doc) {
-    for (var i = 0; i < p.pageStylesheets.length; ++i) {
-      if (p.pageStylesheets[i]) {
-        addPageStylesheet(doc, i);
+    return changingStylesheet(function () {
+      p.pageStylesheets[sheetIndex] = null;
+      for (var i = 0; i < p.divs.pages.length; ++i) {
+        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+        var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
+        styleTag.parentNode.removeChild(styleTag);
       }
-    }
+    }, recalcDimensions);
   }
 
 
+  // Wraps all API-based stylesheet changes (add, update, remove) in a
+  // brace of custom events (stylesheetchanging/stylesheetchange), and
+  // recalculates component dimensions if specified (default to true).
+  //
+  function changingStylesheet(callback, recalcDimensions) {
+    recalcDimensions = (recalcDimensions === false) ? false : true;
+    if (recalcDimensions) {
+      dispatchEvent("monocle:stylesheetchanging", {});
+    }
+    var result = callback();
+    if (recalcDimensions) {
+      calcDimensions();
+      setTimeout(function () {
+        dispatchEvent("monocle:stylesheetchange", {});
+      }, 0);
+    }
+    return result;
+  }
+
+
+  // Private method for adding a stylesheet to a component. Used by
+  // addPageStyles.
+  //
   function addPageStylesheet(doc, sheetIndex) {
     var styleRules = p.pageStylesheets[sheetIndex];
     if (!styleRules) {
@@ -775,6 +810,7 @@ Monocle.Reader = function (node, bookData, options) {
 
     return styleTag;
   }
+
 
 
   API.setBook = setBook;

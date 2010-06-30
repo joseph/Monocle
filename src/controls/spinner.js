@@ -60,6 +60,8 @@ Monocle.Controls.Spinner = function () {
     Monocle.addListener(listenToElement, 'monocle:componentchange', spun);
     Monocle.addListener(listenToElement, 'monocle:resizing', resizeSpin);
     Monocle.addListener(listenToElement, 'monocle:resize', resizeSpun);
+    Monocle.addListener(listenToElement, 'monocle:stylesheetchanging', spin);
+    Monocle.addListener(listenToElement, 'monocle:stylesheetchange', spun);
   }
 
 

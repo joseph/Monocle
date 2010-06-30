@@ -2,10 +2,10 @@ Monocle.Styles.container = {
   "position": "absolute",
   "width": "100%",
   "height": "100%",
+  "background-color": "black",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
-  "user-select": "none",
-  "background-color": "black"
+  "user-select": "none"
 }
 
 Monocle.Styles.page = {
@@ -17,10 +17,10 @@ Monocle.Styles.page = {
   "background": "#FFF",
   "z-index": "1",
   "-webkit-transform-style": "preserve-3d",
+  "outline": "1px solid #999",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
-  "user-select": "none",
-  "outline": "1px solid #999"
+  "user-select": "none"
 }
 
 Monocle.Styles.sheaf = {
@@ -57,10 +57,7 @@ Monocle.Styles.body = {
   "-webkit-text-size-adjust": "none",
   "-moz-column-gap": "0",
   "column-gap": "0",
-  "column-fill": "0"//,
-  //"-webkit-user-select": "none",
-  //"-moz-user-select": "none",
-  //"user-select": "none"
+  "column-fill": "0"
 }
 
 Monocle.Styles.control = {
