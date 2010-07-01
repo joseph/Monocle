@@ -28,25 +28,38 @@ Monocle.Styles = {
     elem.style.cssText = this.ruleText(rule);
   },
   affix: function (elem, property, value) {
+    var parts = property.split('-');
+    for (var i = parts.length; i > 1; --i) {
+      parts[i] = this.capitalize(parts[i]);
+    }
+    property = parts.join();
+
     var target = elem.style ? elem.style : elem;
     target[property] = value;
+
+    parts[0] = this.capitalize(parts[0]);
+    property = parts.join();
+
     if (Monocle.Browser.is.Gecko) {
-      target['-moz-'+property] = value;
+      target['Moz'+property] = value;
     }
     if (Monocle.Browser.is.WebKit) {
-      target['-webkit-'+property] = value;
+      target['webkit'+property] = value;
     }
   },
   expand: function (property, value) {
     var out = [];
     out.push(property + ": " + value);
     if (Monocle.Browser.is.Gecko) {
-      out.push("-moz-"+property+":"+value);
+      out.push("-moz-"+property+": "+value);
     }
     if (Monocle.Browser.is.WebKit) {
-      out.push("-webkit-"+property+":"+value);
+      out.push("-webkit-"+property+": "+value);
     }
     return out.join("; ");
+  },
+  capitalize: function (wd) {
+    return wd ? wd.substring(0,1).toUpperCase() + wd.substring(1,wd.length) : "";
   }
 }
 
