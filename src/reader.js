@@ -184,7 +184,8 @@ Monocle.Reader = function (node, bookData, options) {
         'pageDiv': page
       }
       page.m.activeFrame.style.visibility = "hidden";
-      if (options.primeURL) {
+      // FIXME: options shouldn't really be in scope here.
+      if (options && options.primeURL) {
         if (callback) {
           page.m.activeFrame.onload = function () {
             p.pagesLoaded = p.pagesLoaded + 1 || 1;
@@ -203,7 +204,8 @@ Monocle.Reader = function (node, bookData, options) {
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
     dispatchEvent("monocle:loading");
-    if (callback && !options.primeURL) {
+    // FIXME: options use
+    if (callback && (!options || !options.primeURL)) {
       callback();
     }
   }

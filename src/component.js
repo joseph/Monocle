@@ -205,7 +205,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // the reader's controls div.
     // Presently required to route around MobileSafari's problems with
     // iframes. But it would be very nice to rip it out.
-    if (Monocle.Browser.is.WebKit && Monocle.Browser.has.touch) {
+    if (Monocle.Browser.has.iframeTouchBug) {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 

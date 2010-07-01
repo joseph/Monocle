@@ -35,98 +35,104 @@ Monocle.Browser.is = {
 
 Monocle.Browser.has = {
   touch: (typeof Touch == "object"),
-  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko
+  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
+  iframeTouchBug: Monocle.Browser.is.MobileSafari
 }
 
 
-Monocle.Browser.addContactListeners =
-  function (elem, startFn, moveFn, endFn, cancelFn) {
-    var eL = elem.offsetLeft, eT = elem.offsetTop;
-    var cursorInfo = function (evt, ci) {
-      evt.monocleData = {
-        elementX: ci.offsetX,
-        elementY: ci.offsetY,
-        pageX: ci.pageX,
-        pageY: ci.pageY
-      };
-      return evt;
-    }
-    listeners = {}
-
-    if (!Monocle.Browser.has.touch) {
-      if (startFn) {
-        listeners.mousedown = function (evt) {
-          if (evt.button != 0) { return; }
-          startFn(cursorInfo(evt, evt));
-        }
-        Monocle.addListener(elem, 'mousedown', listeners.mousedown);
-      }
-      if (moveFn) {
-        listeners.mousemove = function (evt) {
-          moveFn(cursorInfo(evt, evt));
-        }
-        Monocle.addListener(elem, 'mousemove', listeners.mousemove);
-      }
-      if (endFn) {
-        listeners.mouseup = function (evt) {
-          endFn(cursorInfo(evt, evt));
-        }
-        Monocle.addListener(elem, 'mouseup', listeners.mouseup);
-      }
-      if (cancelFn) {
-        listeners.mouseout = function (evt) {
-          // obj = evt.relatedTarget || e.fromElement;
-          // while (obj && (obj = obj.parentNode)) {
-          //   if (obj == p.divs.box) { return; }
-          // }
-          cancelFn(cursorInfo(evt, evt));
-        }
-        Monocle.addListener(elem, 'mouseout', listeners.mouseout);
-      }
-    } else {
-      if (startFn) {
-        listeners.touchstart = function (evt) {
-          if (evt.touches.length > 1) { return; }
-          startFn(cursorInfo(evt, evt.targetTouches[0]));
-        }
-        Monocle.addListener(elem, 'touchstart', listeners.touchstart);
-      }
-      if (moveFn) {
-        listeners.touchmove = function (evt) {
-          if (evt.touches.length > 1) { return; }
-          //var e = elemDimensions();
-          // var raw = {
-          //   x: evt.targetTouches[0].pageX - e.l,
-          //   y: evt.targetTouches[0].pageY - e.t
-          // }
-          // if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
-          //   if (endFn) {
-          //     endFn(cursorInfo(evt, evt.targetTouches[0]));
-          //   } else {
-          //     moveFn(cursorInfo(evt, evt.targetTouches[0]));
-          //   }
-          // }
-          moveFn(cursorInfo(evt, evt.targetTouches[0]));
-        }
-        Monocle.addListener(elem, 'touchmove', listeners.touchmove);
-      }
-      if (endFn) {
-        listeners.touchend = function (evt) {
-          endFn(cursorInfo(evt, evt.changedTouches[0]));
-          evt.preventDefault();
-        }
-        Monocle.addListener(elem, 'touchend', listeners.touchend);
-      }
-      if (cancelFn) {
-        listeners.touchcancel = function (evt) {
-          cancelFn(cursorInfo(evt, evt.changedTouches[0]));
-        }
-        Monocle.addListener(elem, 'touchcancel', listeners.touchcancel);
-      }
-    }
-
-    return listeners;
+Monocle.Browser.addContactListeners = function (
+  elem,
+  startFn,
+  moveFn,
+  endFn,
+  cancelFn
+) {
+  var eL = elem.offsetLeft, eT = elem.offsetTop;
+  var cursorInfo = function (evt, ci) {
+    evt.monocleData = {
+      elementX: ci.offsetX,
+      elementY: ci.offsetY,
+      pageX: ci.pageX,
+      pageY: ci.pageY
+    };
+    return evt;
   }
+  listeners = {}
+
+  if (!Monocle.Browser.has.touch) {
+    if (startFn) {
+      listeners.mousedown = function (evt) {
+        if (evt.button != 0) { return; }
+        startFn(cursorInfo(evt, evt));
+      }
+      Monocle.addListener(elem, 'mousedown', listeners.mousedown);
+    }
+    if (moveFn) {
+      listeners.mousemove = function (evt) {
+        moveFn(cursorInfo(evt, evt));
+      }
+      Monocle.addListener(elem, 'mousemove', listeners.mousemove);
+    }
+    if (endFn) {
+      listeners.mouseup = function (evt) {
+        endFn(cursorInfo(evt, evt));
+      }
+      Monocle.addListener(elem, 'mouseup', listeners.mouseup);
+    }
+    if (cancelFn) {
+      listeners.mouseout = function (evt) {
+        // obj = evt.relatedTarget || e.fromElement;
+        // while (obj && (obj = obj.parentNode)) {
+        //   if (obj == p.divs.box) { return; }
+        // }
+        cancelFn(cursorInfo(evt, evt));
+      }
+      Monocle.addListener(elem, 'mouseout', listeners.mouseout);
+    }
+  } else {
+    if (startFn) {
+      listeners.touchstart = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        startFn(cursorInfo(evt, evt.targetTouches[0]));
+      }
+      Monocle.addListener(elem, 'touchstart', listeners.touchstart);
+    }
+    if (moveFn) {
+      listeners.touchmove = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        //var e = elemDimensions();
+        // var raw = {
+        //   x: evt.targetTouches[0].pageX - e.l,
+        //   y: evt.targetTouches[0].pageY - e.t
+        // }
+        // if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
+        //   if (endFn) {
+        //     endFn(cursorInfo(evt, evt.targetTouches[0]));
+        //   } else {
+        //     moveFn(cursorInfo(evt, evt.targetTouches[0]));
+        //   }
+        // }
+        moveFn(cursorInfo(evt, evt.targetTouches[0]));
+      }
+      Monocle.addListener(elem, 'touchmove', listeners.touchmove);
+    }
+    if (endFn) {
+      listeners.touchend = function (evt) {
+        endFn(cursorInfo(evt, evt.changedTouches[0]));
+        evt.preventDefault();
+      }
+      Monocle.addListener(elem, 'touchend', listeners.touchend);
+    }
+    if (cancelFn) {
+      listeners.touchcancel = function (evt) {
+        cancelFn(cursorInfo(evt, evt.changedTouches[0]));
+      }
+      Monocle.addListener(elem, 'touchcancel', listeners.touchcancel);
+    }
+  }
+
+  return listeners;
+}
 
 
 Monocle.Browser.removeContactListeners = function (elem, listeners) {

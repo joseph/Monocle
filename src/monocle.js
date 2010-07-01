@@ -26,6 +26,27 @@ Monocle.Styles = {
       elem.className = "mon_"+rule;
     }
     elem.style.cssText = this.ruleText(rule);
+  },
+  affix: function (elem, property, value) {
+    var target = elem.style ? elem.style : elem;
+    target[property] = value;
+    if (Monocle.Browser.is.Gecko) {
+      target['-moz-'+property] = value;
+    }
+    if (Monocle.Browser.is.WebKit) {
+      target['-webkit-'+property] = value;
+    }
+  },
+  expand: function (property, value) {
+    var out = [];
+    out.push(property + ": " + value);
+    if (Monocle.Browser.is.Gecko) {
+      out.push("-moz-"+property+":"+value);
+    }
+    if (Monocle.Browser.is.WebKit) {
+      out.push("-webkit-"+property+":"+value);
+    }
+    return out.join("; ");
   }
 }
 

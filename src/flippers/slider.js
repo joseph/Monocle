@@ -46,14 +46,14 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       forwards: interactionPanel(
         k.FORWARDS,
         "right: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
-          "outline: 1px solid #FFF; -webkit-box-shadow: -1px 0 3px #777;" +
-          "-moz-box-shadow: -1px 0 3px #777; box-shadow: -1px 0 3px #777;"
+          "outline: 1px solid #FFF;" +
+          Monocle.Styles.expand("box-shadow", "-1px 0 3px #777")
       ),
       backwards: interactionPanel(
         k.BACKWARDS,
         "left: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
-          "outline: 1px solid #FFF; -webkit-box-shadow: 1px 0 3px #777;" +
-          "-moz-box-shadow: 1px 0 3px #777; box-shadow: 1px 0 3px #777;"
+          "outline: 1px solid #FFF;" +
+          Monocle.Styles.expand("box-shadow", "1px 0 3px #777")
       )
     }
     p.reader.addControl(p.panels.forwards);
@@ -120,7 +120,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function toggleInteractiveMode() {
-    var page = p.divs.pages[0];
+    var page = visiblePages()[0];
     var sheaf = page.m.sheafDiv;
     if (p.interactive) {
       p.panels.forwards.div.style.width = "33%";
@@ -176,10 +176,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         return;
       }
       var bdy = pageDiv.m.activeFrame.contentDocument.body;
-      bdy.style.webkitTransform =
-        bdy.style.MozTransform =
-          bdy.style.transform =
-            "translateX(" + (0-offset) + "px)";
+      Monocle.Styles.affix(bdy, 'transform', "translateX("+(0-offset)+"px)");
       callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);
@@ -243,12 +240,18 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     if (dir == k.FORWARDS) {
       if (!onLastPage()) {
         p.turnData.direction = dir;
+        // if (Monocle.Browser.has.iframeTouchBug) {
+        //   lowerPage().style.display = "block";
+        // }
         slideToCursor(boxPointX);
         liftAnimationFinished();
       }
       return true;
     } else if (dir == k.BACKWARDS) {
       p.turnData.animating = true;
+      // if (Monocle.Browser.has.iframeTouchBug) {
+      //   lowerPage().style.display = "block";
+      // }
       var place = getPlace();
       var rslt = setPage(
         lowerPage(),
@@ -345,6 +348,12 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     // If successful:
     var winCallback = function () {
       jumpIn(resetTurn);
+      // jumpIn(function() {
+      //   resetTurn();
+      //   if (Monocle.Browser.has.iframeTouchBug) {
+      //     lowerPage().style.display = "none";
+      //   }
+      // });
     }
 
     // If unsuccessful, we just assume setting to current page will succeed:
