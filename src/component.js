@@ -189,8 +189,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
       destDoc.documentElement
     );
 
-    if (callback) { callback(frame, false); }
-    return 'ready';
+    // DISABLED: immediate readiness - webkit has some difficulty with this.
+    // if (callback) { callback(frame, false); }
+    // return 'ready';
+
+    setTimeout(function() { if (callback) { callback(frame, true); } }, 0);
+    return 'wait';
   }
 
 

@@ -11,7 +11,7 @@ Monocle.Reader = function (node, bookData, options) {
   // Constants.
   var k = {
     durations: {
-      RESIZE_DELAY: 300
+      RESIZE_DELAY: 200
     },
     abortMessage: {
       CLASSNAME: "monocleAbortMessage",
@@ -127,7 +127,9 @@ Monocle.Reader = function (node, bookData, options) {
     p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
 
     // Create the essential DOM elements.
-    createReaderElements(function () {
+    createReaderElements();
+
+    primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
       applyStyles();
 
@@ -149,7 +151,7 @@ Monocle.Reader = function (node, bookData, options) {
 
       p.flipper.listenForInteraction();
 
-      dispatchEvent("monocle:loaded")
+      setTimeout(function () { dispatchEvent("monocle:loaded"); }, 0);
     });
   }
 
@@ -183,24 +185,6 @@ Monocle.Reader = function (node, bookData, options) {
       page.m.activeFrame.m = page.m.activeFrame.monocleData = {
         'pageDiv': page
       }
-      page.m.activeFrame.style.visibility = "hidden";
-      // FIXME: options shouldn't really be in scope here.
-      if (options && options.primeURL) {
-        if (callback) {
-          page.m.activeFrame.onload = function () {
-            // Hide scrollbars in prime document.
-            if (Monocle.Browser.is.WebKit) {
-              var doc = page.m.activeFrame.contentDocument;
-              doc.documentElement.style.overflow = "hidden";
-            }
-            p.pagesLoaded = p.pagesLoaded + 1 || 1;
-            if (p.pagesLoaded == p.flipper.pageCount) {
-              callback();
-            }
-          }
-        }
-        page.m.activeFrame.src = options.primeURL;
-      }
       page.appendChild(page.m.sheafDiv);
       page.m.sheafDiv.appendChild(page.m.activeFrame);
       p.flipper.addPage(page);
@@ -209,9 +193,34 @@ Monocle.Reader = function (node, bookData, options) {
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
     dispatchEvent("monocle:loading");
-    // FIXME: options use
-    if (callback && (!options || !options.primeURL)) {
-      callback();
+  }
+
+
+  // Opens the frame to a particular URL, so that offline-caching works with
+  // that URL, and base hrefs work.
+  function primeFrames(url, callback) {
+    if (!url) {
+      return callback();
+    }
+
+    var pageMax = p.divs.pages.length;
+    var pageCount = 0;
+    for (var i = 0; i < pageMax; ++i) {
+      var page = p.divs.pages[i];
+      page.m.activeFrame.style.visibility = "hidden";
+      page.m.activeFrame.style.position = "absolute";
+      var cb = function (evt) {
+        var frame = evt.target || evt.srcElement;
+        Monocle.Events.deafen(frame, 'load', cb);
+        if (Monocle.Browser.is.WebKit) {
+          frame.contentDocument.documentElement.style.overflow = "hidden";
+        }
+        if ((pageCount +=1) == pageMax) {
+          callback();
+        }
+      }
+      Monocle.Events.listen(page.m.activeFrame, 'load', cb);
+      page.m.activeFrame.src = url;
     }
   }
 
