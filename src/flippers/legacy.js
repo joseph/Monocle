@@ -112,12 +112,12 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function listenForInteraction() {
-    Monocle.addListener(
+    Monocle.Events.listen(
       p.divs.prevButton,
       'click',
       function () { moveTo({ percent: -0.5 }) }
     )
-    Monocle.addListener(
+    Monocle.Events.listen(
       p.divs.nextButton,
       'click',
       function () { moveTo({ percent: 1.5 }) }

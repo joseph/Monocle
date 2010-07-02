@@ -39,7 +39,8 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function listenForInteraction() {
-    p.reader.addListener(
+    // FIXME: replace with panel.
+    p.reader.listen(
       "monocle:contact:start",
       function (evt) {
         if (turn(evt.monocleData.contactX)) {

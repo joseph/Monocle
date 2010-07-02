@@ -37,7 +37,7 @@
     <script type="text/javascript">
       // Initialize the reader element.
       var initFn = function () { window.reader = Monocle.Reader('rabbit'); }
-      Monocle.addListener(window, 'load', initFn);
+      Monocle.Events.listen(window, 'load', initFn);
     </script>
 
   </head>

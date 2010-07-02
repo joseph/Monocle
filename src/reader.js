@@ -131,7 +131,7 @@ Monocle.Reader = function (node, bookData, options) {
       // Make the reader elements look pretty.
       applyStyles();
 
-      addListener(
+      listen(
         'monocle:componentchange',
         function (evt) {
           var doc = evt.monocleData['document'];
@@ -391,7 +391,7 @@ Monocle.Reader = function (node, bookData, options) {
   function listenForInteraction(layer) {
     // BROWSERHACK: Mobile Webkit? (Touch event support)
     if (Monocle.Browser.has.touch) {
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'mousedown',
         function (evt) {
@@ -402,7 +402,7 @@ Monocle.Reader = function (node, bookData, options) {
           contactEvent(evt, "start", evt);
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'mousemove',
         function (evt) {
@@ -412,7 +412,7 @@ Monocle.Reader = function (node, bookData, options) {
           contactEvent(evt, "move", evt);
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'mouseup',
         function (evt) {
@@ -422,7 +422,7 @@ Monocle.Reader = function (node, bookData, options) {
           contactEvent(evt, "end", evt);
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'mouseout',
         function (evt) {
@@ -437,7 +437,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       );
     } else {
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'touchstart',
         function (evt) {
@@ -446,7 +446,7 @@ Monocle.Reader = function (node, bookData, options) {
           evt.preventDefault();
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'touchmove',
         function (evt) {
@@ -465,7 +465,7 @@ Monocle.Reader = function (node, bookData, options) {
           evt.preventDefault();
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'touchend',
         function (evt) {
@@ -473,7 +473,7 @@ Monocle.Reader = function (node, bookData, options) {
           evt.preventDefault();
         }
       );
-      Monocle.addListener(
+      Monocle.Events.listen(
         layer,
         'touchcancel',
         function (evt) {
@@ -482,7 +482,7 @@ Monocle.Reader = function (node, bookData, options) {
       );
     }
 
-    Monocle.addListener(
+    Monocle.Events.listen(
       document,
       'keydown',
       function (evt) {
@@ -493,7 +493,7 @@ Monocle.Reader = function (node, bookData, options) {
         }
       }
     );
-    Monocle.addListener(
+    Monocle.Events.listen(
       document,
       'keyup',
       function (evt) {
@@ -634,8 +634,7 @@ Monocle.Reader = function (node, bookData, options) {
     }
     if (controlData.usesOverlay) {
       p.divs.overlay.style.display = "none";
-      var evtType = k.TOUCH_DEVICE ? "touchstart" : "mousedown";
-      Monocle.removeListener(p.divs.overlay, evtType, p.divs.overlay.clickFn);
+      Monocle.Events.deafenForContact(p.divs.overlay, p.divs.overlay.listeners);
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -660,15 +659,18 @@ Monocle.Reader = function (node, bookData, options) {
       p.divs.overlay.style.display = "block";
     }
     if (controlData.controlType == "popover") {
-      p.divs.overlay.clickFn = function (evt) {
-        obj = evt.target || window.event.srcElement;
-        do {
-          if (obj == controlData.elements[0]) { return true; }
-        } while (obj && (obj = obj.parentNode));
-        hideControl(ctrl);
-      }
-      var evtType = k.TOUCH_DEVICE ? "touchstart" : "mousedown";
-      Monocle.addListener(p.divs.overlay, evtType, p.divs.overlay.clickFn);
+      p.divs.overlay.listeners = Monocle.Events.listenForContact(
+        p.divs.overlay,
+        {
+          start: function (evt) {
+            obj = evt.target || window.event.srcElement;
+            do {
+              if (obj == controlData.elements[0]) { return true; }
+            } while (obj && (obj = obj.parentNode));
+            hideControl(ctrl);
+          }
+        }
+      );
     }
     controlData.hidden = false;
     if (ctrl.properties) {
@@ -692,15 +694,14 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  function addListener(evtType, fn, useCapture) {
-    Monocle.addListener(p.divs.box, evtType, fn, useCapture);
+  function listen(evtType, fn, useCapture) {
+    Monocle.Events.listen(p.divs.box, evtType, fn, useCapture);
   }
 
 
-  function removeListener(evtType, fn) {
-    Monocle.removeListener(p.divs.box, evtType, fn);
+  function deafen(evtType, fn) {
+    Monocle.Events.deafen(p.divs.box, evtType, fn);
   }
-
 
 
 
@@ -826,8 +827,8 @@ Monocle.Reader = function (node, bookData, options) {
   API.hideControl = hideControl;
   API.showControl = showControl;
   API.dispatchEvent = dispatchEvent;
-  API.addListener = addListener;
-  API.removeListener = removeListener;
+  API.listen = listen;
+  API.deafen = deafen;
   API.addPageStyles = addPageStyles;
   API.updatePageStyles = updatePageStyles;
   API.removePageStyles = removePageStyles;

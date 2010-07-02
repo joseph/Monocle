@@ -1,6 +1,9 @@
 /* Standardized event registration - coheres the W3C and MS event models. */
 
-Monocle.addListener = function (elem, evtType, fn, useCapture) {
+Monocle.Events = {}
+
+
+Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
   if (elem.addEventListener) {
     return elem.addEventListener(evtType, fn, useCapture || false);
   } else if (elem.attachEvent) {
@@ -9,7 +12,7 @@ Monocle.addListener = function (elem, evtType, fn, useCapture) {
 }
 
 
-Monocle.removeListener = function (elem, evtType, fn, useCapture) {
+Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
   if (elem.removeEventListener) {
     return elem.removeEventListener(evtType, fn, useCapture || false);
   } else if (elem.detachEvent) {
@@ -18,6 +21,126 @@ Monocle.removeListener = function (elem, evtType, fn, useCapture) {
     } catch(e) {}
   }
 }
+
+
+// 'fns' argument is an object like:
+//
+//   {
+//     'start': function () { ... },
+//     'move': function () { ... },
+//     'end': function () { ... },
+//     'cancel': function () { ... }
+//   }
+//
+// All of the functions in this object are optional.
+//
+// 'options' argument:
+//
+//   {
+//     'useCapture': true/false
+//   }
+//
+// Returns an object that can later be passed to Monocle.Events.deafenForContact
+//
+Monocle.Events.listenForContact = function (elem, fns, options) {
+  var listeners = {};
+
+  var cursorInfo = function (evt, ci) {
+    evt.monocleData = {
+      elementX: ci.offsetX,
+      elementY: ci.offsetY,
+      pageX: ci.pageX,
+      pageY: ci.pageY
+    };
+    return evt;
+  }
+
+  if (!Monocle.Browser.has.touch) {
+    if (fns.start) {
+      listeners.mousedown = function (evt) {
+        if (evt.button != 0) { return; }
+        fns.start(cursorInfo(evt, evt));
+      }
+      Monocle.Events.listen(elem, 'mousedown', listeners.mousedown);
+    }
+    if (fns.move) {
+      listeners.mousemove = function (evt) {
+        fns.move(cursorInfo(evt, evt));
+      }
+      Monocle.Events.listen(elem, 'mousemove', listeners.mousemove);
+    }
+    if (fns.end) {
+      listeners.mouseup = function (evt) {
+        fns.end(cursorInfo(evt, evt));
+      }
+      Monocle.Events.listen(elem, 'mouseup', listeners.mouseup);
+    }
+    if (fns.cancel) {
+      listeners.mouseout = function (evt) {
+        obj = evt.relatedTarget || e.fromElement;
+        while (obj && (obj = obj.parentNode)) {
+          if (obj == elem) { return; }
+        }
+        fns.cancel(cursorInfo(evt, evt));
+      }
+      Monocle.Events.listen(elem, 'mouseout', listeners.mouseout);
+    }
+  } else {
+    if (fns.start) {
+      listeners.touchstart = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        fns.start(cursorInfo(evt, evt.targetTouches[0]));
+      }
+      Monocle.Events.listen(elem, 'touchstart', listeners.touchstart);
+    }
+    if (fns.move) {
+      listeners.touchmove = function (evt) {
+        if (evt.touches.length > 1) { return; }
+        //var e = elemDimensions();
+        // var raw = {
+        //   x: evt.targetTouches[0].pageX - e.l,
+        //   y: evt.targetTouches[0].pageY - e.t
+        // }
+        // if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
+        //   if (fns.end) {
+        //     fns.end(cursorInfo(evt, evt.targetTouches[0]));
+        //   } else {
+        //     fns.move(cursorInfo(evt, evt.targetTouches[0]));
+        //   }
+        // }
+        fns.move(cursorInfo(evt, evt.targetTouches[0]));
+      }
+      Monocle.Events.listen(elem, 'touchmove', listeners.touchmove);
+    }
+    if (fns.end) {
+      listeners.touchend = function (evt) {
+        fns.end(cursorInfo(evt, evt.changedTouches[0]));
+        evt.preventDefault();
+      }
+      Monocle.Events.listen(elem, 'touchend', listeners.touchend);
+    }
+    if (fns.cancel) {
+      listeners.touchcancel = function (evt) {
+        fns.cancel(cursorInfo(evt, evt.changedTouches[0]));
+      }
+      Monocle.Events.listen(elem, 'touchcancel', listeners.touchcancel);
+    }
+  }
+
+  return listeners;
+}
+
+
+Monocle.Events.deafenForContact = function (elem, listeners) {
+  for (evtType in listeners) {
+    Monocle.Events.deafen(elem, evtType, listeners[evtType]);
+  }
+}
+
+
+
+
+//---------------------------------------------------------------------------
 
 
 Monocle.Browser = {}
@@ -37,108 +160,6 @@ Monocle.Browser.has = {
   touch: (typeof Touch == "object"),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
   iframeTouchBug: Monocle.Browser.is.MobileSafari
-}
-
-
-Monocle.Browser.addContactListeners = function (
-  elem,
-  startFn,
-  moveFn,
-  endFn,
-  cancelFn
-) {
-  var eL = elem.offsetLeft, eT = elem.offsetTop;
-  var cursorInfo = function (evt, ci) {
-    evt.monocleData = {
-      elementX: ci.offsetX,
-      elementY: ci.offsetY,
-      pageX: ci.pageX,
-      pageY: ci.pageY
-    };
-    return evt;
-  }
-  listeners = {}
-
-  if (!Monocle.Browser.has.touch) {
-    if (startFn) {
-      listeners.mousedown = function (evt) {
-        if (evt.button != 0) { return; }
-        startFn(cursorInfo(evt, evt));
-      }
-      Monocle.addListener(elem, 'mousedown', listeners.mousedown);
-    }
-    if (moveFn) {
-      listeners.mousemove = function (evt) {
-        moveFn(cursorInfo(evt, evt));
-      }
-      Monocle.addListener(elem, 'mousemove', listeners.mousemove);
-    }
-    if (endFn) {
-      listeners.mouseup = function (evt) {
-        endFn(cursorInfo(evt, evt));
-      }
-      Monocle.addListener(elem, 'mouseup', listeners.mouseup);
-    }
-    if (cancelFn) {
-      listeners.mouseout = function (evt) {
-        // obj = evt.relatedTarget || e.fromElement;
-        // while (obj && (obj = obj.parentNode)) {
-        //   if (obj == p.divs.box) { return; }
-        // }
-        cancelFn(cursorInfo(evt, evt));
-      }
-      Monocle.addListener(elem, 'mouseout', listeners.mouseout);
-    }
-  } else {
-    if (startFn) {
-      listeners.touchstart = function (evt) {
-        if (evt.touches.length > 1) { return; }
-        startFn(cursorInfo(evt, evt.targetTouches[0]));
-      }
-      Monocle.addListener(elem, 'touchstart', listeners.touchstart);
-    }
-    if (moveFn) {
-      listeners.touchmove = function (evt) {
-        if (evt.touches.length > 1) { return; }
-        //var e = elemDimensions();
-        // var raw = {
-        //   x: evt.targetTouches[0].pageX - e.l,
-        //   y: evt.targetTouches[0].pageY - e.t
-        // }
-        // if (raw.x < 0 || raw.y < 0 || raw.x >= e.w || raw.y >= e.h) {
-        //   if (endFn) {
-        //     endFn(cursorInfo(evt, evt.targetTouches[0]));
-        //   } else {
-        //     moveFn(cursorInfo(evt, evt.targetTouches[0]));
-        //   }
-        // }
-        moveFn(cursorInfo(evt, evt.targetTouches[0]));
-      }
-      Monocle.addListener(elem, 'touchmove', listeners.touchmove);
-    }
-    if (endFn) {
-      listeners.touchend = function (evt) {
-        endFn(cursorInfo(evt, evt.changedTouches[0]));
-        evt.preventDefault();
-      }
-      Monocle.addListener(elem, 'touchend', listeners.touchend);
-    }
-    if (cancelFn) {
-      listeners.touchcancel = function (evt) {
-        cancelFn(cursorInfo(evt, evt.changedTouches[0]));
-      }
-      Monocle.addListener(elem, 'touchcancel', listeners.touchcancel);
-    }
-  }
-
-  return listeners;
-}
-
-
-Monocle.Browser.removeContactListeners = function (elem, listeners) {
-  for (evtType in listeners) {
-    Monocle.removeListener(elem, evtType, listeners[evtType]);
-  }
 }
 
 
@@ -207,10 +228,10 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
     }
     var fn = function (evt) { Monocle.Compat.touchProxyHandler(frame, evt); }
     var doc = frame.contentWindow.document;
-    Monocle.addListener(doc, 'touchstart', fn);
-    Monocle.addListener(doc, 'touchmove', fn);
-    Monocle.addListener(doc, 'touchend', fn);
-    Monocle.addListener(doc, 'touchcancel', fn);
+    Monocle.Events.listen(doc, 'touchstart', fn);
+    Monocle.Events.listen(doc, 'touchmove', fn);
+    Monocle.Events.listen(doc, 'touchend', fn);
+    Monocle.Events.listen(doc, 'touchcancel', fn);
     frame.m.touchProxy = true;
   }
 

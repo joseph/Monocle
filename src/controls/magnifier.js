@@ -46,9 +46,7 @@ Monocle.Controls.Magnifier = function (reader) {
     btn.largeA.innerHTML = btn.smallA.innerHTML = "A";
     btn.appendChild(btn.largeA);
 
-    var evtType = typeof Touch == "object" ? "touchstart" : "mousedown";
-    Monocle.addListener(btn, evtType, toggleMagnification, true);
-
+    Monocle.Events.listenForContact(btn, { start: toggleMagnification });
     p.buttons.push(btn);
     return btn;
   }

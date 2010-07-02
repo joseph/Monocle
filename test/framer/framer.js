@@ -1,7 +1,8 @@
 function createToC(reader) {
   var toc = Monocle.Controls.Contents(reader);
   reader.addControl(toc, 'popover', { hidden: true });
-  reader.addListener(
+  // FIXME: panels?
+  reader.listen(
     'monocle:contact:start:unhandled',
     function () {
       reader.showControl(toc);

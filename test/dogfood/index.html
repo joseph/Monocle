@@ -84,7 +84,7 @@
         reader.setBook(book);
         reader.moveTo({ page: 3 });
       }
-      Monocle.addListener(window, 'load', initFn);
+      Monocle.Events.listen(window, 'load', initFn);
     </script>
   </head>
 

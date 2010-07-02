@@ -23,7 +23,7 @@ Monocle.Controls.Scrubber = function (reader) {
   function initialize() {
     p.reader = reader;
     p.book = p.reader.getBook();
-    p.reader.addListener('monocle:turn', updateNeedles);
+    p.reader.listen('monocle:turn', updateNeedles);
     updateNeedles();
   }
 
@@ -155,6 +155,28 @@ Monocle.Controls.Scrubber = function (reader) {
     var needle = createDivNamed('needle', track);
     var bubble = createDivNamed('bubble', cntr);
 
+    var listeners;
+
+    var deafenListeners = function () {
+      if (!listeners) {
+        return;
+      }
+      Monocle.Events.deafenForContact(track, listeners);
+      listeners = null;
+    }
+
+    var startEvt = function (evt) {
+      moveEvt(evt);
+      deafenListeners();
+      listeners = Monocle.Events.listenForContact(
+        track,
+        {
+          move: moveEvt,
+          end: endEvt
+        }
+      );
+    }
+
     var moveEvt = function (evt, y) {
       evt.stopPropagation();
       evt.preventDefault();
@@ -172,19 +194,10 @@ Monocle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      Monocle.removeListener(track, eventType('move'), moveEvt);
-      Monocle.removeListener(document.body, eventType('end'), endEvt);
+      deafenListeners();
     }
 
-    Monocle.addListener(
-      track,
-      eventType("start"),
-      function (evt) {
-        moveEvt(evt);
-        Monocle.addListener(track, eventType('move'), moveEvt);
-        Monocle.addListener(document.body, eventType("end"), endEvt);
-      }
-    );
+    Monocle.Events.listenForContact(track, { start: startEvt });
 
     return cntr;
   }

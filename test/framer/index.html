@@ -86,7 +86,7 @@
         framer2.constants.scripts = ["../../dist/monocle-min.js"];
         framer2.newReader('reader2');
       }
-      Monocle.addListener(window, 'load', initFn);
+      Monocle.Events.listen(window, 'load', initFn);
     </script>
   </head>
 

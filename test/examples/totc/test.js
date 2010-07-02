@@ -165,7 +165,7 @@
 
 
   // Initialize the reader element.
-  Monocle.addListener(
+  Monocle.Events.listen(
     window,
     'load',
     function () {
@@ -188,7 +188,7 @@
 
       /* Because the 'reader' element changes size on window resize,
        * we should notify it of this event. */
-      Monocle.addListener(
+      Monocle.Events.listen(
         window,
         'resize',
         function () { window.reader.resized() }
@@ -211,21 +211,22 @@
         runner.innerHTML = reader.getBook().getMetaData('title');
         cntr.appendChild(runner);
 
-        Monocle.addListener(
+        Monocle.Events.listenForContact(
           cntr,
-          typeof Touch == "object" ? "touchstart" : "mousedown",
-          function (evt) {
-            if (evt.preventDefault) {
-              evt.stopPropagation();
-              evt.preventDefault();
-            } else {
-              evt.returnValue = false;
+          {
+            start: function (evt) {
+              if (evt.preventDefault) {
+                evt.stopPropagation();
+                evt.preventDefault();
+              } else {
+                evt.returnValue = false;
+              }
+              reader.showControl(bookTitle.contentsMenu);
             }
-            reader.showControl(bookTitle.contentsMenu);
           }
         );
 
-        //Monocle.addListener(cntr, evtType, createToC, false);
+        //Monocle.Events.listen(cntr, evtType, createToC, false);
         return cntr;
       }
       reader.addControl(bookTitle, 'page');
@@ -252,7 +253,7 @@
         }
       }
       reader.addControl(chapterTitle, 'page');
-      reader.addListener(
+      reader.listen(
         'monocle:pagechange',
         function (evt) { chapterTitle.update(evt.monocleData.page); }
       );
@@ -278,7 +279,7 @@
         }
       }
       reader.addControl(pageNumber, 'page');
-      reader.addListener(
+      reader.listen(
         'monocle:pagechange',
         function (evt) {
           pageNumber.update(evt.monocleData.page, evt.monocleData.pageNumber);
@@ -294,16 +295,22 @@
         reader.showControl(scrubber);
         scrubber.updateNeedles();
       }
-      var eType = (typeof(Touch) == "object" ? "touchstart" : "mousedown");
       for (var i = 0; i < chapterTitle.runners.length; ++i) {
-        Monocle.addListener(chapterTitle.runners[i].parentNode, eType, showFn);
-        Monocle.addListener(pageNumber.runners[i].parentNode, eType, showFn);
+        Monocle.Events.listenForContact(
+          chapterTitle.runners[i].parentNode,
+          { start: showFn }
+        );
+        Monocle.Events.listenForContact(
+          pageNumber.runners[i].parentNode,
+          { start: showFn }
+        );
       }
       var hideScrubber = function (evt) {
         evt.stopPropagation();
         reader.hideControl(scrubber);
       }
-      reader.addListener('monocle:contact:start', hideScrubber);
+      // FIXME: panels?
+      reader.listen('monocle:contact:start', hideScrubber);
     }
   );
 })();

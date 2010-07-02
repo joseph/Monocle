@@ -52,16 +52,16 @@ Monocle.Controls.Spinner = function () {
         throw("No listenToElement or assigned reader.");
       }
     }
-    Monocle.addListener(listenToElement, 'monocle:bookchanging', spin);
-    Monocle.addListener(listenToElement, 'monocle:bookchange', spun);
-    Monocle.addListener(listenToElement, 'monocle:componentloading', spin);
-    Monocle.addListener(listenToElement, 'monocle:componentloaded', spun);
-    Monocle.addListener(listenToElement, 'monocle:componentchanging', spin);
-    Monocle.addListener(listenToElement, 'monocle:componentchange', spun);
-    Monocle.addListener(listenToElement, 'monocle:resizing', resizeSpin);
-    Monocle.addListener(listenToElement, 'monocle:resize', resizeSpun);
-    Monocle.addListener(listenToElement, 'monocle:stylesheetchanging', spin);
-    Monocle.addListener(listenToElement, 'monocle:stylesheetchange', spun);
+    Monocle.Events.listen(listenToElement, 'monocle:bookchanging', spin);
+    Monocle.Events.listen(listenToElement, 'monocle:bookchange', spun);
+    Monocle.Events.listen(listenToElement, 'monocle:componentloading', spin);
+    Monocle.Events.listen(listenToElement, 'monocle:componentloaded', spun);
+    Monocle.Events.listen(listenToElement, 'monocle:componentchanging', spin);
+    Monocle.Events.listen(listenToElement, 'monocle:componentchange', spun);
+    Monocle.Events.listen(listenToElement, 'monocle:resizing', resizeSpin);
+    Monocle.Events.listen(listenToElement, 'monocle:resize', resizeSpun);
+    Monocle.Events.listen(listenToElement, 'monocle:stylesheetchanging', spin);
+    Monocle.Events.listen(listenToElement, 'monocle:stylesheetchange', spun);
   }
 
 

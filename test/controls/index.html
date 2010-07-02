@@ -104,7 +104,7 @@
       }
 
       // Initialize the reader element.
-      Monocle.addListener(
+      Monocle.Events.listen(
         window,
         'load',
         function () {
@@ -132,7 +132,8 @@
           window.reader4 = Monocle.Reader('spinner', bookData);
           var spinner = Monocle.Controls.Spinner(reader4);
           reader4.addControl(spinner, 'page', { hidden: true });
-          reader4.addListener(
+          // FIXME: panels?
+          reader4.listen(
             'monocle:contact:start:unhandled',
             function () {
               if (spinner.spinning) {
@@ -148,7 +149,8 @@
           window.reader5 = Monocle.Reader('toc', bookData);
           var toc = Monocle.Controls.Contents(reader5);
           reader5.addControl(toc, 'popover');
-          reader5.addListener(
+          // FIXME: panels?
+          reader5.listen(
             'monocle:contact:start:unhandled',
             function () {
               reader5.showControl(toc);

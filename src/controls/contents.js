@@ -57,7 +57,7 @@ Monocle.Controls.Contents = function (reader) {
     span.style.paddingLeft = padLvl + "em";
     span.innerHTML = chp.title;
     li.appendChild(span);
-    Monocle.addListener(
+    Monocle.Events.listen(
       li,
       k.CHAPTER_INVOKE_EVENT,
       function () {

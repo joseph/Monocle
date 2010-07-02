@@ -20,7 +20,7 @@ Here's the simplest thing that could possibly work.
 
     <!-- Create the reader when the page has loaded -->
     <script type="text/javascript">
-      Monocle.addListener(window, 'load', function () {Monocle.Reader('rdr')});
+      Monocle.Events.listen(window, 'load', function () {Monocle.Reader('rdr')});
     </script>
 
     <!-- Somewhere in the page body, an element with a matching id... -->
@@ -208,16 +208,16 @@ preventDefault() on them if you need to.
 * monocle:loaded
 * monocle:resizing (c)
 * monocle:resize
+* monocle:componentloading
+* monocle:componentloaded
+* monocle:componentchanging
+* monocle:componentchange
 * monocle:bookchanging (c)
 * monocle:bookchange
 * monocle:pagechanging (c)
 * monocle:pagechange
-* monocle:contact:start (c)
-* monocle:contact:move (c)
-* monocle:contact:end (c)
-* monocle:contact:start:unhandled (c)
-* monocle:contact:move:unhandled (c)
-* monocle:contact:end:unhandled (c)
+* monocle:stylesheetchanging
+* monocle:stylesheetchange
 * monocle:turn
 
 
