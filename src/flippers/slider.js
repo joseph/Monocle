@@ -176,7 +176,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         return;
       }
       var bdy = pageDiv.m.activeFrame.contentDocument.body;
-      Monocle.Styles.affix(bdy, 'transform', "translateX("+(0-offset)+"px)");
+      Monocle.Styles.affix(bdy, "transform", "translateX("+(0-offset)+"px)");
       callback();
     }
     return p.setPageFn(pageDiv, locus, spCallback);
@@ -288,7 +288,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     p.turnData.points.min = Math.min(p.turnData.points.min, boxPointX);
     p.turnData.points.max = Math.max(p.turnData.points.max, boxPointX);
 
-    slideToCursor(boxPointX);
+    slideToCursor(boxPointX, null, "0");
 
     return true;
   }
@@ -379,55 +379,51 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       duration = parseInt(options['duration']);
     }
 
-    if (!callback && duration && sameDirection(parseInt(x))) {
-      p.turnData.nextX = x;
-    } else {
-      if (typeof(x) == "number") { x = x + "px"; }
+    if (typeof(x) == "number") { x = x + "px"; }
 
-      // BROWSERHACK: WEBKIT (transitions & transition events)
-      if (typeof WebKitTransitionEvent != "undefined") {
-        if (duration) {
-          transition = '-webkit-transform';
-          transition += ' ' + duration + "ms";
-          transition += ' ' + (options['timing'] || 'linear');
-          transition += ' ' + (options['delay'] || 0) + 'ms';
-        } else {
-          transition = 'none';
-        }
-        elem.style.webkitTransition = transition;
-        elem.style.webkitTransform = "translate3d("+x+",0,0)";
-
-      // BROWSERHACK: NON-WEBKIT (no transitions)
-      } else if (duration > 0) {
-        // Exit any existing transition loop.
-        clearTimeout(elem.setXTransitionInterval)
-
-        var stamp = (new Date()).getTime();
-        var frameRate = 40;
-        var finalX = parseInt(x);
-        var currX = getX(elem);
-        var step = (finalX - currX) * (frameRate / duration);
-        var stepFn = function () {
-          var destX = currX + step;
-          if (
-            (new Date()).getTime() - stamp > duration ||
-            Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
-          ) {
-            clearTimeout(elem.setXTransitionInterval)
-            elem.style.MozTransform = "translateX(" + finalX + "px)";
-            if (elem.setXTCB) {
-              elem.setXTCB();
-            }
-          } else {
-            elem.style.MozTransform = "translateX(" + destX + "px)";
-            currX = destX;
-          }
-        }
-
-        elem.setXTransitionInterval = setInterval(stepFn, frameRate);
+    // BROWSERHACK: WEBKIT (transitions & transition events)
+    if (typeof WebKitTransitionEvent != "undefined") {
+      if (duration) {
+        transition = '-webkit-transform';
+        transition += ' ' + duration + "ms";
+        transition += ' ' + (options['timing'] || 'linear');
+        transition += ' ' + (options['delay'] || 0) + 'ms';
       } else {
-        elem.style.MozTransform = "translateX("+x+")";
+        transition = 'none';
       }
+      elem.style.webkitTransition = transition;
+      elem.style.webkitTransform = "translate3d("+x+",0,0)";
+
+    // BROWSERHACK: NON-WEBKIT (no transitions)
+    } else if (duration > 0) {
+      // Exit any existing transition loop.
+      clearTimeout(elem.setXTransitionInterval)
+
+      var stamp = (new Date()).getTime();
+      var frameRate = 40;
+      var finalX = parseInt(x);
+      var currX = getX(elem);
+      var step = (finalX - currX) * (frameRate / duration);
+      var stepFn = function () {
+        var destX = currX + step;
+        if (
+          (new Date()).getTime() - stamp > duration ||
+          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
+        ) {
+          clearTimeout(elem.setXTransitionInterval)
+          elem.style.MozTransform = "translateX(" + finalX + "px)";
+          if (elem.setXTCB) {
+            elem.setXTCB();
+          }
+        } else {
+          elem.style.MozTransform = "translateX(" + destX + "px)";
+          currX = destX;
+        }
+      }
+
+      elem.setXTransitionInterval = setInterval(stepFn, frameRate);
+    } else {
+      elem.style.MozTransform = "translateX("+x+")";
     }
 
     if (elem.setXTCB) {
@@ -448,18 +444,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       }
       Monocle.addListener(elem, 'webkitTransitionEnd', elem.setXTCB);
     }
-  }
-
-
-  function sameDirection(x) {
-    if (!p.turnData) { return false; }
-    var sX = p.turnData.srcX;
-    var dX = p.turnData.destX;
-    if (!sX || !dX) { return false; }
-    if (Math.abs(x - dX) < 12) { return true; }
-    //console.log(sX + ", " + dX + ", " + x);
-    //return !(Math.min(sX,dX) < x && Math.max(sX,dX) > x);
-    return false;
   }
 
 
@@ -532,11 +516,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function slideToCursor(cursorX, callback) {
+  function slideToCursor(cursorX, callback, duration) {
     setX(
       upperPage(),
       Math.min(0, cursorX - p.reader.properties.pageWidth),
-      { duration: k.durations.FOLLOW_CURSOR },
+      { duration: duration || k.durations.FOLLOW_CURSOR },
       callback
     );
   }

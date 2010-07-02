@@ -28,23 +28,20 @@ Monocle.Styles = {
     elem.style.cssText = this.ruleText(rule);
   },
   affix: function (elem, property, value) {
-    var parts = property.split('-');
-    for (var i = parts.length; i > 1; --i) {
-      parts[i] = this.capitalize(parts[i]);
-    }
-    property = parts.join();
-
     var target = elem.style ? elem.style : elem;
-    target[property] = value;
-
-    parts[0] = this.capitalize(parts[0]);
-    property = parts.join();
 
     if (Monocle.Browser.is.Gecko) {
-      target['Moz'+property] = value;
+      var parts = property.split('-');
+      for (var i = parts.length; i > 0; --i) {
+        parts[i] = this.capitalize(parts[i]);
+      }
+      target[parts.join('')] = value;
+      parts[0] = this.capitalize(parts[0]);
+      target['Moz'+parts.join('')] = value;
     }
     if (Monocle.Browser.is.WebKit) {
-      target['webkit'+property] = value;
+      target[property] = value;
+      target['-webkit-'+property] = value;
     }
   },
   expand: function (property, value) {

@@ -16,7 +16,6 @@ Monocle.Styles.page = {
   "right": "5px",
   "background": "#FFF",
   "z-index": "1",
-  "-webkit-transform-style": "preserve-3d",
   "outline": "1px solid #999",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
