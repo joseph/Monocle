@@ -61,6 +61,7 @@ Monocle.Styles = {
 }
 
 //= require <compat>
+//= require <events>
 //= require <reader>
 //= require <book>
 //= require <place>

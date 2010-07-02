@@ -156,7 +156,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function loadFrameFromURL(url, frame, callback) {
     frame.onload = function () {
       frame.onload = null;
-      frame.cacheInitialized = true;
       if (callback) { callback(frame, true); }
     }
     frame.src = url;
@@ -184,9 +183,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
 
   function loadFrameFromDocument(srcDoc, frame, callback) {
-    if (p.source.cacheCompatible && !frame.cacheInitialized) {
-      return loadFrameFromURL(srcDoc.defaultView.location, frame, callback);
-    }
     var destDoc = frame.contentDocument;
     destDoc.replaceChild(
       destDoc.importNode(srcDoc.documentElement, true),
