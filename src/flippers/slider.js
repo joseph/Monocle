@@ -203,16 +203,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function liftAnimationFinished(boxPointX) {
-    p.turnData.animating = false;
-    turning(boxPointX);
-    if (p.turnData.dropped) {
-      drop(boxPointX);
-      p.turnData.dropped -= 1;
-    }
-  }
-
-
   function onLastPage() {
     // At the end of the book, both page numbers are the same. So this is
     // a way to test that we can advance one page.
@@ -226,7 +216,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function lift(dir, boxPointX) {
-    if (p.turnData.animating || p.turnData.direction) {
+    if (p.turnData.waiting || p.turnData.direction) {
       return true;
     }
 
@@ -238,37 +228,34 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     if (dir == k.FORWARDS) {
       if (!onLastPage()) {
-        p.turnData.animating = true;
         p.turnData.direction = dir;
         // if (Monocle.Browser.has.iframeTouchBug) {
         //   lowerPage().style.display = "block";
         // }
-        slideToCursor(
-          boxPointX,
-          function () {
-            liftAnimationFinished(boxPointX);
-          }
-        );
+        slideToCursor(boxPointX);
       }
       return true;
     } else if (dir == k.BACKWARDS) {
       // if (Monocle.Browser.has.iframeTouchBug) {
       //   lowerPage().style.display = "block";
       // }
+      p.turnData.waiting = 'flipping lowerPage backwards';
       var place = getPlace();
       var rslt = setPage(
         lowerPage(),
         place.getLocus({ direction: dir }),
         // Callback on success
         function () {
-          p.turnData.animating = true;
           p.turnData.direction = dir;
           deferredCall(function() {
             jumpOut(function () {
               deferredCall(function () {
                 flipPages();
                 slideToCursor(boxPointX);
-                liftAnimationFinished(boxPointX);
+                p.turnData.waiting = null;
+                if (p.turnData.dropped) {
+                  drop(boxPointX);
+                }
               });
             });
           });
@@ -285,7 +272,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function turning(boxPointX) {
-    if (p.turnData.animating || !p.turnData.direction) {
+    if (p.turnData.waiting || !p.turnData.direction) {
       return false;
     }
 
@@ -299,15 +286,17 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function drop(boxPointX) {
-    if (p.turnData.animating) {
+    if (p.turnData.waiting) {
       p.turnData.dropped = true;
-      return true;
+      return false;
     }
     if (!p.turnData.direction) {
       return false;
     }
 
-    p.turnData.animating = true;
+    slideToCursor(boxPointX, null, "0");
+
+    p.turnData.waiting = 'animating drop';
 
     p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
 
@@ -550,7 +539,7 @@ Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
   SLIDE: 200,
-  FOLLOW_CURSOR: 100,
+  FOLLOW_CURSOR: 300,
   ANTI_FLICKER_DELAY: 0
 }
 
