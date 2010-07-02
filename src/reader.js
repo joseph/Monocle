@@ -188,6 +188,11 @@ Monocle.Reader = function (node, bookData, options) {
       if (options && options.primeURL) {
         if (callback) {
           page.m.activeFrame.onload = function () {
+            // Hide scrollbars in prime document.
+            if (Monocle.Browser.is.WebKit) {
+              var doc = page.m.activeFrame.contentDocument;
+              doc.documentElement.style.overflow = "hidden";
+            }
             p.pagesLoaded = p.pagesLoaded + 1 || 1;
             if (p.pagesLoaded == p.flipper.pageCount) {
               callback();
@@ -387,167 +392,18 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  /*
-  function listenForInteraction(layer) {
-    // BROWSERHACK: Mobile Webkit? (Touch event support)
-    if (Monocle.Browser.has.touch) {
-      Monocle.Events.listen(
-        layer,
-        'mousedown',
-        function (evt) {
-          if (evt.button != 0) {
-            return;
-          }
-          p.interactionData.mouseDown = true;
-          contactEvent(evt, "start", evt);
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'mousemove',
-        function (evt) {
-          if (!p.interactionData.mouseDown) {
-            return false;
-          }
-          contactEvent(evt, "move", evt);
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'mouseup',
-        function (evt) {
-          if (!p.interactionData.mouseDown) {
-            return false;
-          }
-          contactEvent(evt, "end", evt);
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'mouseout',
-        function (evt) {
-          if (!p.interactionData.mouseDown) {
-            return false;
-          }
-          obj = evt.relatedTarget || e.fromElement;
-          while (obj && (obj = obj.parentNode)) {
-            if (obj == p.divs.box) { return; }
-          }
-          contactEvent(evt, 'end', evt);
-        }
-      );
-    } else {
-      Monocle.Events.listen(
-        layer,
-        'touchstart',
-        function (evt) {
-          if (evt.touches.length > 1) { return; }
-          contactEvent(evt, 'start', evt.targetTouches[0]);
-          evt.preventDefault();
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'touchmove',
-        function (evt) {
-          if (evt.touches.length > 1) { return; }
-          var raw = {
-            x: evt.targetTouches[0].pageX - p.boxDimensions.left,
-            y: evt.targetTouches[0].pageY - p.boxDimensions.top,
-            w: p.boxDimensions.width,
-            h: p.boxDimensions.height
-          }
-          if (raw.x < 0 || raw.y < 0 || raw.x >= raw.w || raw.y >= raw.h) {
-            contactEvent(evt, "end", evt.targetTouches[0]);
-          } else {
-            contactEvent(evt, "move", evt.targetTouches[0]);
-          }
-          evt.preventDefault();
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'touchend',
-        function (evt) {
-          contactEvent(evt, "end", evt.changedTouches[0]);
-          evt.preventDefault();
-        }
-      );
-      Monocle.Events.listen(
-        layer,
-        'touchcancel',
-        function (evt) {
-          contactEvent(evt, "end", evt.changedTouches[0]);
-        }
-      );
-    }
 
-    Monocle.Events.listen(
-      document,
-      'keydown',
-      function (evt) {
-        console.log(evt.keyCode);
-        if (evt.keyCode == 18) {
-          console.log("hiding control layer");
-          layer.style.display = "none";
-        }
-      }
-    );
-    Monocle.Events.listen(
-      document,
-      'keyup',
-      function (evt) {
-        console.log(evt.keyCode);
-        if (evt.keyCode == 18) {
-          console.log("showing control layer");
-          layer.style.display = "block";
-        }
-      }
-    );
-  }
-
-
-  // In general, flippers will listen for the basic contact events, and
-  // preventDefault if they use them. Controls should listen for unhandled
-  // contact events, which are triggered if the flipper does not
-  // preventDefault the event.
+  // Valid types:
+  //  - standard (an overlay above the pages)
+  //  - page (within the page)
+  //  - modal (overlay where click-away does nothing)
+  //  - popover (overlay where click-away removes the ctrl elements)
+  //  - invisible
   //
-  function contactEvent(evt, eType, cursorInfo) {
-    cData = {
-      contactX: Math.min(
-        p.boxDimensions.width,
-        Math.max(0, cursorInfo.pageX - p.boxDimensions.left)
-      ),
-      contactY: Math.min(
-        p.boxDimensions.height,
-        Math.max(0, cursorInfo.pageY - p.boxDimensions.top)
-      )
-    };
-
-    if (dispatchEvent("monocle:contact:"+eType, cData, true)) {
-      dispatchEvent("monocle:contact:"+eType+":unhandled", cData, true)
-    }
-
-    evt.preventDefault();
-
-    if (eType == "end") {
-      p.interactionData = {};
-    }
-  }
-  */
-
-
-  /* Valid types:
-   *  - standard (an overlay above the pages)
-   *  - page (within the page)
-   *  - modal (overlay where click-away does nothing)
-   *  - popover (overlay where click-away removes the ctrl elements)
-   *  - invisible
-   *
-   * Options:
-   *  - hidden -- creates and hides the ctrl elements;
-   *              use showControl to show them
-   */
+  // Options:
+  //  - hidden -- creates and hides the ctrl elements;
+  //              use showControl to show them
+  //
   function addControl(ctrl, cType, options) {
     for (var i = 0; i < p.controls.length; ++i) {
       if (p.controls[i].control == ctrl) {

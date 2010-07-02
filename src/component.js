@@ -213,7 +213,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
     if (Monocle.Browser.is.WebKit) {
-      frame.contentDocument.body.style.overflow = 'hidden';
+      frame.contentDocument.documentElement.style.overflow = 'hidden';
     }
 
     // Correct the body lineHeight to use a number, not a percentage, which
