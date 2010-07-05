@@ -539,7 +539,7 @@ Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
   SLIDE: 200,
-  FOLLOW_CURSOR: Monocle.Browser.is.MobileSafari ? 0 : 150,
+  FOLLOW_CURSOR: 150, //Monocle.Browser.is.MobileSafari ? 0 : 150,
   ANTI_FLICKER_DELAY: 0
 }
 
