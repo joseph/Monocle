@@ -57,25 +57,27 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     return evt;
   }
 
+  var capture = options && options.useCapture || false;
+
   if (!Monocle.Browser.has.touch) {
     if (fns.start) {
       listeners.mousedown = function (evt) {
         if (evt.button != 0) { return; }
         fns.start(cursorInfo(evt, evt));
       }
-      Monocle.Events.listen(elem, 'mousedown', listeners.mousedown);
+      Monocle.Events.listen(elem, 'mousedown', listeners.mousedown, capture);
     }
     if (fns.move) {
       listeners.mousemove = function (evt) {
         fns.move(cursorInfo(evt, evt));
       }
-      Monocle.Events.listen(elem, 'mousemove', listeners.mousemove);
+      Monocle.Events.listen(elem, 'mousemove', listeners.mousemove, capture);
     }
     if (fns.end) {
       listeners.mouseup = function (evt) {
         fns.end(cursorInfo(evt, evt));
       }
-      Monocle.Events.listen(elem, 'mouseup', listeners.mouseup);
+      Monocle.Events.listen(elem, 'mouseup', listeners.mouseup, capture);
     }
     if (fns.cancel) {
       listeners.mouseout = function (evt) {
@@ -85,7 +87,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
         }
         fns.cancel(cursorInfo(evt, evt));
       }
-      Monocle.Events.listen(elem, 'mouseout', listeners.mouseout);
+      Monocle.Events.listen(elem, 'mouseout', listeners.mouseout, capture);
     }
   } else {
     if (fns.start) {
@@ -93,7 +95,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
         if (evt.touches.length > 1) { return; }
         fns.start(cursorInfo(evt, evt.targetTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchstart', listeners.touchstart);
+      Monocle.Events.listen(elem, 'touchstart', listeners.touchstart, capture);
     }
     if (fns.move) {
       listeners.touchmove = function (evt) {
@@ -111,20 +113,20 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
         // }
         fns.move(cursorInfo(evt, evt.targetTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchmove', listeners.touchmove);
+      Monocle.Events.listen(elem, 'touchmove', listeners.touchmove, capture);
     }
     if (fns.end) {
       listeners.touchend = function (evt) {
         fns.end(cursorInfo(evt, evt.changedTouches[0]));
         evt.preventDefault();
       }
-      Monocle.Events.listen(elem, 'touchend', listeners.touchend);
+      Monocle.Events.listen(elem, 'touchend', listeners.touchend, capture);
     }
     if (fns.cancel) {
       listeners.touchcancel = function (evt) {
         fns.cancel(cursorInfo(evt, evt.changedTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchcancel', listeners.touchcancel);
+      Monocle.Events.listen(elem, 'touchcancel', listeners.touchcancel, capture);
     }
   }
 
