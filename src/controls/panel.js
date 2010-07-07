@@ -1,20 +1,10 @@
 Monocle.Controls.Panel = function () {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Panel();
-  }
 
-  var k = Monocle.Controls.Panel;
-
-  var p = {
+  var API = { constructor: Monocle.Controls.Panel }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     evtCallbacks: {}
   }
-
-  var API = {
-    constructor: Monocle.Controls.Panel,
-    properties: p,
-    constants: k
-  }
-
 
   function createControlElements(cntr) {
     p.div = document.createElement('div');
@@ -35,8 +25,8 @@ Monocle.Controls.Panel = function () {
       return;
     }
     p.contacted = true;
-    //evt.monocleData.offsetX += p.div.offsetLeft;
-    //evt.monocleData.offsetY += p.div.offsetTop;
+    evt.m.offsetX += p.div.offsetLeft;
+    evt.m.offsetY += p.div.offsetTop;
     expand();
     p.listeners = Monocle.Events.listenForContact(
       p.div,
@@ -73,15 +63,7 @@ Monocle.Controls.Panel = function () {
 
   function invoke(evtType, evt) {
     if (p.evtCallbacks[evtType]) {
-      p.evtCallbacks[evtType](
-        API,
-        // FIXME: should be relative to panel element, but this is broken
-        //   for touch events...
-        // evt.monocleData.offsetX,
-        // evt.monocleData.offsetY
-        evt.monocleData.pageX,
-        evt.monocleData.pageY
-      );
+      p.evtCallbacks[evtType](API, evt.m.offsetX, evt.m.offsetY);
     }
     evt.preventDefault();
   }
