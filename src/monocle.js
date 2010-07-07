@@ -53,7 +53,7 @@ Monocle.Styles = {
     if (Monocle.Browser.is.WebKit) {
       out.push("-webkit-"+property+": "+value);
     }
-    return out.join("; ");
+    return out.join("; ") + ";";
   },
   capitalize: function (wd) {
     return wd ? wd.substring(0,1).toUpperCase() + wd.substring(1,wd.length) : "";
