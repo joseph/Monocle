@@ -1,0 +1,52 @@
+Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
+  if (Monocle.Panels == this) {
+    return new Monocle.Panels.Marginal(flipper, evtCallbacks);
+  }
+
+  var k = Monocle.Panels.Marginal;
+
+  var p = { }
+
+  var API = {
+    constructor: Monocle.Panels.Marginal,
+    properties: p,
+    constants: k
+  }
+
+
+  function initialize() {
+    p.panels = {
+      forwards: new Monocle.Controls.Panel(),
+      backwards: new Monocle.Controls.Panel()
+    }
+
+    for (dir in p.panels) {
+      flipper.properties.reader.addControl(p.panels[dir]);
+      p.panels[dir].listenTo(evtCallbacks);
+      p.panels[dir].properties.direction = flipper.constants[dir.toUpperCase()];
+      with (p.panels[dir].properties.div.style) {
+        dir == "forwards" ? right = 0 : left = 0;
+      }
+    }
+    setWidths();
+  }
+
+
+  function setWidths() {
+    var page = flipper.visiblePages()[0];
+    var sheaf = page.m.sheafDiv;
+    var bw = sheaf.offsetLeft;
+    var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);
+    bw = Math.floor(((bw - 2) / page.offsetWidth) * 10000 / 100 ) + "%";
+    fw = Math.floor(((fw - 2) / page.offsetWidth) * 10000 / 100 ) + "%";
+    p.panels.forwards.properties.div.style.width = fw;
+    p.panels.backwards.properties.div.style.width = bw;
+  }
+
+
+  API.setWidths = setWidths;
+
+  initialize();
+
+  return API;
+}

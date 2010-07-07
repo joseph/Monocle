@@ -68,9 +68,12 @@ Monocle.Styles = {
 //= require <component>
 //= require <styles>
 
-Monocle.Flippers = {};
 Monocle.Controls = {};
+Monocle.Flippers = {};
+Monocle.Panels = {};
 
+//= require <controls/panel>
+//= require <panels/twopane>
 //= require <flippers/legacy>
 //= require <flippers/slider>
 

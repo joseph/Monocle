@@ -149,7 +149,7 @@ Monocle.Reader = function (node, bookData, options) {
       // Apply the book, calculating column dimensions & etc.
       setBook(bk, options.place);
 
-      p.flipper.listenForInteraction();
+      p.flipper.listenForInteraction(options.panels);
 
       setTimeout(function () { dispatchEvent("monocle:loaded"); }, 0);
     });
@@ -242,7 +242,7 @@ Monocle.Reader = function (node, bookData, options) {
         throw("No flipper class");
       }
     }
-    p.flipper = new flipperClass(API, setPage);
+    p.flipper = new flipperClass(API, setPage, p.readerOptions);
   }
 
 

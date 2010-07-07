@@ -40,114 +40,18 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  /* MOVE ALL THIS TO A PAGEPANEL CONTROL */
-  function listenForInteraction() {
-    p.panels = {
-      forwards: interactionPanel(
-        k.FORWARDS,
-        "right: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
-          "outline: 1px solid #FFF;" +
-          Monocle.Styles.expand("box-shadow", "-1px 0 3px #777")
-      ),
-      backwards: interactionPanel(
-        k.BACKWARDS,
-        "left: 0; background: rgba(255,255,255,0.9); opacity: 0;" +
-          "outline: 1px solid #FFF;" +
-          Monocle.Styles.expand("box-shadow", "1px 0 3px #777")
-      )
-    }
-    p.reader.addControl(p.panels.forwards);
-    p.reader.addControl(p.panels.backwards);
-  }
-
-
-  function interactionPanel(dir, styleRules) {
-    return {
-      createControlElements: function (cntr) {
-        var panel = this.div = document.createElement('div');
-        panel.style.cssText = "position: absolute; width: 33%; height: 100%;" +
-          "-webkit-transition: width ease-in 350ms, opacity linear 200ms; " +
-          styleRules;
-        panel.m = panel.monocleData = { 'dir': dir };
-        Monocle.Events.listenForContact(panel, { start: liftFn });
-        return panel;
-      }
-    }
-  }
-
-
-  function liftFn(evt) {
-    var panel = evt.target || evt.srcElement;
-    if (panel.monocleData.lifting) {
-      endFn(evt);
-      return;
-    }
-    panel.monocleData.lifting = true;
-    panel.monocleData.defaultCSS = panel.style.cssText;
-    panel.style.webkitTransition = "none";
-    panel.style.width = "100%";
-    panel.style.left = "0";
-    panel.style.zIndex = 1001;
-    panel.monocleData.liftingListeners = Monocle.Events.listenForContact(
-      panel,
+  function listenForInteraction(panelClass) {
+    panelClass = panelClass || k.DEFAULT_PANELS_CLASS;
+    p.panels = new panelClass(
+      API,
       {
-        move: moveFn,
-        end: endFn,
-        cancel: endFn
+        'start': function (panel, x) { lift(panel.properties.direction, x); },
+        'move': function (panel, x) { turning(panel.properties.direction, x); },
+        'end': function (panel, x) { drop(panel.properties.direction, x); },
+        'cancel': function (panel, x) { drop(panel.properties.direction, x); }
       }
     );
-    lift(panel.monocleData.dir, evt.monocleData.pageX);
-    evt.preventDefault();
   }
-
-
-  function moveFn(evt) {
-    turning(evt.monocleData.pageX);
-    evt.preventDefault();
-  }
-
-
-  function endFn(evt) {
-    var panel = evt.target || evt.srcElement;
-    Monocle.Events.deafenForContact(panel, panel.monocleData.liftingListeners);
-    panel.style.cssText = panel.monocleData.defaultCSS;
-    panel.monocleData.lifting = false;
-    drop(evt.monocleData.pageX);
-    evt.preventDefault();
-  }
-
-
-  function toggleInteractiveMode() {
-    var page = visiblePages()[0];
-    var sheaf = page.m.sheafDiv;
-    if (p.interactive) {
-      p.panels.forwards.div.style.width = "33%";
-      p.panels.backwards.div.style.width = "33%";
-    } else {
-      var bw = sheaf.offsetLeft;
-      var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);
-      bw -= 2;
-      fw -= 2;
-      bw /= page.offsetWidth;
-      fw /= page.offsetWidth;
-      bw = Math.floor(bw * 10000) / 100;
-      fw = Math.floor(fw * 10000) / 100;
-      bw += "%";
-      fw += "%";
-      p.panels.forwards.div.style.width = fw;
-      p.panels.backwards.div.style.width = bw;
-    }
-    p.interactive = !p.interactive;
-
-    p.panels.forwards.div.style.opacity = 1;
-    p.panels.backwards.div.style.opacity = 1;
-    setTimeout(function () {
-      p.panels.forwards.div.style.opacity = 0;
-      p.panels.backwards.div.style.opacity = 0;
-    }, 500);
-
-  }
-  /* END page panel */
 
 
   function getPlace(pageDiv) {
@@ -254,7 +158,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
                 slideToCursor(boxPointX);
                 p.turnData.waiting = null;
                 if (p.turnData.dropped) {
-                  drop(boxPointX);
+                  drop(dir, boxPointX);
                 }
               });
             });
@@ -271,8 +175,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function turning(boxPointX) {
-    if (p.turnData.waiting || !p.turnData.direction) {
+  function turning(dir, boxPointX) {
+    if (p.turnData.waiting || p.turnData.direction != dir) {
       return false;
     }
 
@@ -285,12 +189,12 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function drop(boxPointX) {
+  function drop(dir, boxPointX) {
     if (p.turnData.waiting) {
       p.turnData.dropped = true;
       return false;
     }
-    if (!p.turnData.direction) {
+    if (p.turnData.direction != dir) {
       return false;
     }
 
@@ -526,7 +430,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
-  API.toggleInteractiveMode = toggleInteractiveMode;
 
   initialize();
 
@@ -534,7 +437,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 }
 
 // Constants
-Monocle.Flippers.Slider.TURN_PANELS = Monocle.Controls.TurnPanels;
+Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
