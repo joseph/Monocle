@@ -29,7 +29,7 @@ Monocle.Controls.Panel = function () {
     evt.m.offsetY += p.div.offsetTop;
     expand();
     p.listeners = Monocle.Events.listenForContact(
-      p.div,
+      document.body,
       {
         'move': move,
         'end': end,
@@ -68,6 +68,9 @@ Monocle.Controls.Panel = function () {
 
 
   function expand() {
+    if (p.expanded) {
+      return;
+    }
     p.contractData = {
       left: p.div.style.left,
       width: p.div.style.width,
@@ -77,13 +80,18 @@ Monocle.Controls.Panel = function () {
     p.div.style.left = 0;
     p.div.style.width = "100%";
     p.div.style.zIndex = 1001;
+    p.expanded = true;
   }
 
 
   function contract(evt) {
+    if (!p.expanded) {
+      return;
+    }
     for (n in p.contractData) {
       p.div.style[n] = p.contractData[n];
     }
+    p.expanded = false;
   }
 
 
