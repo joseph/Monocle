@@ -57,13 +57,21 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
 
     // Touch events don't have element offet coords - so generate with GBCR.
     if (typeof ci.offsetX == "undefined") {
+      var r;
       if (evt.target.getBoundingClientRect) {
-        var r = evt.target.getBoundingClientRect();
-        evt.m.offsetX = evt.m.pageX - r.left;
-        evt.m.offsetY = evt.m.pageY - r.top;
+        r = evt.target.getBoundingClientRect();
       } else {
-        console.log("Cannot generate element offset co-ordinates.");
+        var elem = evt.target;
+        r = { left: elem.offsetLeft, top: elem.offsetTop }
+        while (elem = elem.parentNode) {
+          if (elem.offsetLeft || elem.offsetTop) {
+            r.left += elem.offsetLeft;
+            r.top += elem.offsetTop;
+          }
+        }
       }
+      evt.m.offsetX = evt.m.pageX - r.left;
+      evt.m.offsetY = evt.m.pageY - r.top;
     }
     return evt;
   }
