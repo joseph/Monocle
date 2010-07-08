@@ -25,11 +25,6 @@ Monocle.Controls.Panel = function () {
 
 
   function start(evt) {
-    if (p.contacted) {
-      cancel(evt);
-      return;
-    }
-    p.contacted = true;
     evt.m.offsetX += p.div.offsetLeft;
     evt.m.offsetY += p.div.offsetTop;
     expand();
@@ -53,7 +48,6 @@ Monocle.Controls.Panel = function () {
   function end(evt) {
     Monocle.Events.deafenForContact(p.div, p.listeners);
     contract();
-    p.contacted = false;
     invoke('end', evt);
   }
 
@@ -61,7 +55,6 @@ Monocle.Controls.Panel = function () {
   function cancel(evt) {
     Monocle.Events.deafenForContact(p.div, p.listeners);
     contract();
-    p.contacted = false;
     invoke('cancel', evt);
   }
 
@@ -75,6 +68,11 @@ Monocle.Controls.Panel = function () {
 
 
   function expand() {
+    p.contractData = {
+      left: p.div.style.left,
+      width: p.div.style.width,
+      zIndex: p.div.style.zIndex
+    }
     p.css = p.div.style.cssText;
     p.div.style.left = 0;
     p.div.style.width = "100%";
@@ -83,13 +81,17 @@ Monocle.Controls.Panel = function () {
 
 
   function contract(evt) {
-    p.div.style.cssText = p.css;
+    for (n in p.contractData) {
+      p.div.style[n] = p.contractData[n];
+    }
   }
 
 
   API.createControlElements = createControlElements;
   API.listenTo = listenTo;
   API.deafen = deafen;
+  API.expand = expand;
+  API.contract = contract;
 
   return API;
 }

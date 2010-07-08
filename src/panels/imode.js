@@ -23,8 +23,12 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
         Monocle.Styles.Panels.IMode.dirPanel
       );
     }
-    p.divs.forwards.style.right = 0;
-    p.divs.backwards.style.left = 0;
+    p.divs.backwards.style.cssText += Monocle.Styles.ruleText(
+      Monocle.Styles.Panels.IMode.leftPanel
+    );
+    p.divs.forwards.style.cssText += Monocle.Styles.ruleText(
+      Monocle.Styles.Panels.IMode.rightPanel
+    );
 
     p.panels.central = new Monocle.Controls.Panel();
     p.reader.addControl(p.panels.central);
@@ -32,7 +36,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     p.divs.central.style.cssText += Monocle.Styles.ruleText(
       Monocle.Styles.Panels.IMode.menuPanel
     );
-    p.panels.central.listenTo({ end: modeOn });
+    menuCallbacks({ end: modeOn });
 
     p.toggleIcon = {
       createControlElements: function () {
@@ -48,6 +52,12 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
   }
 
 
+  function menuCallbacks(callbacks) {
+    p.menuCallbacks = callbacks;
+    p.panels.central.listenTo(p.menuCallbacks);
+  }
+
+
   function toggle() {
     p.interactive ? modeOff() : modeOn();
   }
@@ -57,6 +67,8 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     if (p.interactive) {
       return;
     }
+
+    p.panels.central.contract();
 
     var page = flipper.visiblePages()[0];
     var sheaf = page.m.sheafDiv;
@@ -81,6 +93,8 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     if (!p.interactive) {
       return;
     }
+
+    p.panels.central.contract();
 
     deselect();
 
@@ -142,7 +156,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
       // Re-enable listeners.
       p.panels.forwards.listenTo(evtCallbacks);
       p.panels.backwards.listenTo(evtCallbacks);
-      p.panels.central.listenTo({ end: modeOn });
+      p.panels.central.listenTo(p.menuCallbacks);
     }, Monocle.Panels.IMode.LINGER_DURATION);
 
 
@@ -162,6 +176,12 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     }
   }
 
+
+  API.toggle = toggle;
+  API.modeOn = modeOn;
+  API.modeOff = modeOff;
+  API.menuCallbacks = menuCallbacks;
+
   initialize();
 
   return API;
@@ -175,20 +195,28 @@ Monocle.Panels.IMode.TOGGLE_ICON_URI = "data:image/png;base64,iVBORw0KGgoAAAANSU
 Monocle.Styles.Panels.IMode = {
   dirPanel: {
     "width": "33%",
-    "background": "rgba(255,255,255,0.9)",
-    "opacity": "0",
-    "-webkit-box-shadow": "0 0 3px #777",
-    "-moz-box-shadow": "0 0 3px #777",
-    "box-shadow": "0 0 3px #777"
+    "background": "rgba(255,255,255,0.7)",
+    "opacity": "0"
+  },
+  leftPanel: {
+    "left": "0",
+    "-webkit-box-shadow": "1px 1px 3px #777",
+    "-moz-box-shadow": "1px 1px 3px #777",
+    "box-shadow": "1px 1px 3px #777"
+  },
+  rightPanel: {
+    "right": "0",
+    "-webkit-box-shadow": "-1px 1px 3px #777",
+    "-moz-box-shadow": "-1px 1px 3px #777",
+    "box-shadow": "-1px 1px 3px #777"
   },
   menuPanel: {
     "left": "33%",
     "width": "34%",
-    "background": "rgba(255,255,255,0.9)",
+    "background": "rgba(255,255,255,0.7)",
     "opacity": "0",
-    "-webkit-box-shadow": "0 0 3px #777",
-    "-moz-box-shadow": "0 0 3px #777",
-    "box-shadow": "0 0 3px #777"
+    "border": "1px solid #CCC",
+    "border-top": "none"
   },
   toggleIcon: {
     "position": "absolute",
