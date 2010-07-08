@@ -3,21 +3,9 @@ Monocle.Controls.PlaceSaver = function (bookId) {
     return new Monocle.Controls.PlaceSaver(bookId);
   }
 
-  var k = {
-    COOKIE_NAMESPACE: "monocle.controls.placesaver.",
-    COOKIE_EXPIRES_IN_DAYS: 7 // Set to 0 for session-based expiry.
-  }
-
-  // Properties.
-  var p = {
-  }
-
-  // Public methods and properties.
-  var API = {
-    constructor: Monocle.Controls.PlaceSaver,
-    constants: k,
-    properties: p
-  }
+  var API = { constructor: Monocle.Controls.PlaceSaver }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {}
 
 
   function initialize() {
@@ -110,6 +98,9 @@ Monocle.Controls.PlaceSaver = function (bookId) {
 
   return API;
 }
+
+Monocle.Controls.PlaceSaver.COOKIE_NAMESPACE = "monocle.controls.placesaver.";
+Monocle.Controls.PlaceSaver.COOKIE_EXPIRES_IN_DAYS = 7; // Set to 0 for session-based expiry.
 
 
 Monocle.pieceLoaded('controls/placesaver');

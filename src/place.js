@@ -1,23 +1,12 @@
 /* PLACE */
 
 Monocle.Place = function () {
-  if (Monocle == this) { return new Monocle.Place(); }
 
-  // Constants.
-  var k = {
-  }
-
-  // Properties.
-  var p = {
+  var API = { constructor: Monocle.Place }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     component: null,
     percent: null
-  }
-
-  // Methods and properties available to external code.
-  var API = {
-    constructor: Monocle.Place,
-    constants: k,
-    properties: p
   }
 
 

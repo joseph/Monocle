@@ -3,18 +3,10 @@ Monocle.Controls.Contents = function (reader) {
     return new Monocle.Controls.Contents(reader);
   }
 
-  var k = {
-    CHAPTER_INVOKE_EVENT: 'click'
-  }
-
-  var p = {
+  var API = { constructor: Monocle.Controls.Contents }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     divs: []
-  }
-
-  var API = {
-    constructor: Monocle.Controls.Contents,
-    constants: k,
-    properties: p
   }
 
 
@@ -83,6 +75,8 @@ Monocle.Controls.Contents = function (reader) {
 
   return API;
 }
+
+Monocle.Controls.Contents.CHAPTER_INVOKE_EVENT = 'click';
 
 
 Monocle.Styles.Controls.Contents = {

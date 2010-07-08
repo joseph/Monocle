@@ -7,24 +7,9 @@
 Monocle.Framer = function () {
   if (Monocle == this) { return new Monocle.Framer(); }
 
-  var k = {
-    stylesheets: [],
-    documentStyles:
-      "body { margin: 0; padding: 0; border: 0; }" +
-      "#rdr { width: 100%; height: 100%; position: absolute; }",
-    scripts: ["monocle.js"],
-    waitForPiece: 'monocle'
-  }
-
-  var p = {
-  }
-
-  var API = {
-    constructor: Monocle.Framer,
-    properties: p,
-    constants: k
-  }
-
+  var API = { constructor: Monocle.Framer }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {}
 
   function initialize() {
   }
@@ -107,6 +92,14 @@ Monocle.Framer = function () {
 
   return API;
 }
+
+Monocle.Framer.stylesheets = [];
+Monocle.Framer.documentStyles =
+  "body { margin: 0; padding: 0; border: 0; }" +
+  "#rdr { width: 100%; height: 100%; position: absolute; }";
+Monocle.Framer.scripts = ["monocle.js"];
+Monocle.Framer.waitForPiece = 'monocle';
+
 
 
 Monocle.Styles.framer = {

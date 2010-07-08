@@ -1,30 +1,10 @@
 Monocle.Flippers.Legacy = function (reader, setPageFn) {
-  if (Monocle.Flippers == this) {
-    return new Monocle.Flippers.Legacy(reader, setPageFn);
-  }
 
-  // Constants
-  var k = {
-    LEGACY_MESSAGE: "Your browser doesn't support Monocle's full feature set. " +
-      'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
-      'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
-      'Google\'s <a href="http://google.com/chrome">Chrome</a>.',
-    buttonText: {
-      PREV: "... Previous part",
-      NEXT: "Next part..."
-    }
-  }
-
-  // Properties
-  var p = {
+  var API = { constructor: Monocle.Flippers.Legacy }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     pageCount: 1,
     divs: {}
-  }
-
-  var API = {
-    constructor: Monocle.Flippers.Legacy,
-    properties: p,
-    constants: k
   }
 
 
@@ -54,7 +34,6 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
     p.reader.dispatchEvent('monocle:turn');
     return rslt;
   }
-
 
 
   function overrideDimensions() {
@@ -137,6 +116,16 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
   initialize();
 
   return API;
+}
+
+Monocle.Flippers.Legacy.LEGACY_MESSAGE =
+  "Your browser doesn't support Monocle's full feature set. " +
+  'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
+  'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
+  'Google\'s <a href="http://google.com/chrome">Chrome</a>.';
+Monocle.Flippers.Legacy.buttonText = {
+  PREV: "... Previous part",
+  NEXT: "Next part..."
 }
 
 

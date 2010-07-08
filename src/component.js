@@ -3,16 +3,10 @@
 // See the properties declaration for details of constructor arguments.
 //
 Monocle.Component = function (book, id, index, chapters, source) {
-  if (Monocle == this) {
-    return new Monocle.Component(book, id, index, chapters, source);
-  }
 
-  // Constants.
-  var k = {
-  }
-
-  // Properties.
-  var p = {
+  var API = { constructor: Monocle.Component }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     // a back-reference to the public API of the book that owns this component
     book: book,
 
@@ -60,13 +54,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // Obviously, this data is invalidated by dimensional changes in the reader.
     //
     clientDimensions: []
-  }
-
-  // Methods and properties available to external code.
-  var API = {
-    constructor: Monocle.Component,
-    constants: k,
-    properties: p
   }
 
 

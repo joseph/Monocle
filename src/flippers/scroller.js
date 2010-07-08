@@ -1,24 +1,10 @@
 Monocle.Flippers.Scroller = function (reader, setPageFn) {
-  if (Monocle.Flippers == this) {
-    return new Monocle.Flippers.Scroller(reader, setPageFn);
-  }
 
-  // Constants
-  var k = {
-    speed: 200, // How long the animation takes
-    rate: 20 // frame-rate of the animation
-  }
-
-
-  // Properties
-  var p = {
-    pageCount: 1
-  }
-
-  var API = {
-    constructor: Monocle.Flippers.Scroller,
-    properties: p,
-    constants: k
+  var API = { constructor: Monocle.Flippers.Scroller }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
+    pageCount: 1,
+    duration: 200
   }
 
 
@@ -38,16 +24,21 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
-  function listenForInteraction() {
-    // FIXME: replace with panel.
-    p.reader.listen(
-      "monocle:contact:start",
-      function (evt) {
-        if (turn(evt.monocleData.contactX)) {
-          evt.preventDefault();
-        }
+  function listenForInteraction(panelClass) {
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+    }
+    p.panels = new panelClass(
+      API,
+      {
+        'end': function (panel) { turn(panel.properties.direction); }
       }
     );
+  }
+
+
+  function turn(dir) {
+    moveTo({ page: getPlace().pageNumber() + dir});
   }
 
 
@@ -57,59 +48,62 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
+    /*
     var spCallback = function (offset) {
       if (offset == 'disallow') {
         return;
       }
-      var div = p.page.m.activeFrame.m.component.scrollerElement(p.page);
-      var jump = (offset - div.scrollLeft) / (k.speed / k.rate);
-      clearTimeout(p.timer);
-      p.timer = setInterval(
-        function () {
-          div.scrollLeft += jump;
-          if (
-            (jump == 0) ||
-            (jump < 0 && div.scrollLeft < offset) ||
-            (jump > 0 && div.scrollLeft > offset)
-          ) {
-            div.scrollLeft = offset;
-            clearTimeout(p.timer);
+      var bdy = p.page.m.activeFrame.contentDocument.body;
+      bdy.style.webkitTransform =
+        bdy.style.MozTransform =
+          bdy.style.transform =
+            "translateX(" + (0-offset) + "px)";
+    }
+    p.setPageFn(p.page, locus, spCallback);
+    */
+
+    var spCallback = function (offset) {
+      if (offset == 'disallow') {
+        return;
+      }
+      var bdy = p.page.m.activeFrame.contentDocument.body;
+      if (typeof WebKitTransitionEvent != "undefined") {
+        bdy.style.webkitTransition = "-webkit-transform " +
+          p.duration + "ms ease-out 0ms";
+        bdy.style.webkitTransform = "translateX("+(0-offset)+"px)";
+        Monocle.Events.listen(
+          bdy,
+          'webkitTransitionEnd',
+          function () {
             p.reader.dispatchEvent('monocle:turn');
           }
-        },
-        k.rate
-      );
+        );
+      } else {
+        var finalX = (0 - offset);
+        var stamp = (new Date()).getTime();
+        var frameRate = 40;
+        var currX = p.currX || 0;
+        var step = (finalX - currX) * (frameRate / p.duration);
+        var stepFn = function () {
+          var destX = currX + step;
+          if (
+            (new Date()).getTime() - stamp > p.duration ||
+            Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
+          ) {
+            clearTimeout(bdy.animInterval)
+            bdy.style.MozTransform = "translateX(" + finalX + "px)";
+            p.reader.dispatchEvent('monocle:turn');
+          } else {
+            bdy.style.MozTransform = "translateX(" + destX + "px)";
+            currX = destX;
+          }
+          p.currX = destX;
+        }
+        bdy.animInterval = setInterval(stepFn, frameRate);
+      }
     }
     var rslt = p.setPageFn(p.page, locus, spCallback);
     return rslt;
-  }
-
-
-  function turn(boxPointX) {
-    if (inForwardZone(boxPointX)) {
-      moveTo({ page: getPlace().pageNumber() + 1});
-      return true;
-    } else if (inBackwardZone(boxPointX)) {
-      moveTo({ page: getPlace().pageNumber() - 1});
-      return true;
-    }
-    return false;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go forward" zone for
-  // user turning a page.
-  //
-  function inForwardZone(x) {
-    return x > p.reader.properties.pageWidth * 0.6;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go backward" zone for
-  // user turning a page.
-  //
-  function inBackwardZone(x) {
-    return x < p.reader.properties.pageWidth * 0.4;
   }
 
 
@@ -125,6 +119,14 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   return API;
 }
+
+Monocle.Flippers.Scroller.speed = 200; // How long the animation takes
+Monocle.Flippers.Scroller.rate = 20; // frame-rate of the animation
+Monocle.Flippers.Scroller.FORWARDS = 1;
+Monocle.Flippers.Scroller.BACKWARDS = -1;
+Monocle.Flippers.Scroller.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
+
+
 
 
 Monocle.pieceLoaded('flippers/scroller');

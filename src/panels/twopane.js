@@ -1,18 +1,8 @@
 Monocle.Panels.TwoPane = function (flipper, evtCallbacks) {
-  if (Monocle.Panels == this) {
-    return new Monocle.Panels.TwoPane(flipper, evtCallbacks);
-  }
 
-  var k = Monocle.Panels.TwoPane;
-
-  var p = {
-  }
-
-  var API = {
-    constructor: Monocle.Panels.TwoPane,
-    properties: p,
-    constants: Monocle.Panels.TwoPane
-  }
+  var API = { constructor: Monocle.Panels.TwoPane }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {}
 
 
   function initialize() {

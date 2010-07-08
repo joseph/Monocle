@@ -8,41 +8,9 @@
 Monocle.Reader = function (node, bookData, options) {
   if (Monocle == this) { return new Monocle.Reader(node, bookData, options); }
 
-  // Constants.
-  var k = {
-    durations: {
-      RESIZE_DELAY: 200
-    },
-    abortMessage: {
-      CLASSNAME: "monocleAbortMessage",
-      TEXT: "Your browser does not support this technology."
-    },
-    FLIPPER_DEFAULT_CLASS: (typeof(Monocle.Flippers.Slider) == "undefined") ?
-      null :
-      Monocle.Flippers.Slider,
-    FLIPPER_LEGACY_CLASS: (typeof(Monocle.Flippers.Legacy) == "undefined") ?
-      null :
-      Monocle.Flippers.Legacy,
-    TOUCH_DEVICE: (typeof Touch == "object"),
-    DEFAULT_STYLE_RULES: [
-      "body {" +
-        "user-select: none !important;" +
-        "-moz-user-select: none !important;" +
-        "-webkit-user-select: none !important;" +
-      "}" +
-      "body * {" +
-        "float: none !important;" +
-        "clear: none !important;" +
-      "}",
-      "table, img {" +
-        "max-width: 100% !important;" +
-        "max-height: 90% !important;" +
-      "}"
-    ]
-  }
-
-  // Properties.
-  var p = {
+  var API = { constructor: Monocle.Reader }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     // Divs only stores the box, the container and the two pages. But the full
     // hierarchy (at this time) is:
     //
@@ -88,13 +56,6 @@ Monocle.Reader = function (node, bookData, options) {
 
     // An array of style rules that are automatically applied to every page.
     pageStylesheets: []
-  }
-
-  // Methods and properties available to external code.
-  var API = {
-    constructor: Monocle.Reader,
-    properties: p,
-    constants: k
   }
 
 
@@ -199,9 +160,7 @@ Monocle.Reader = function (node, bookData, options) {
   // Opens the frame to a particular URL, so that offline-caching works with
   // that URL, and base hrefs work.
   function primeFrames(url, callback) {
-    if (!url) {
-      return callback();
-    }
+    url = url || "about:blank";
 
     var pageMax = p.divs.pages.length;
     var pageCount = 0;
@@ -228,16 +187,16 @@ Monocle.Reader = function (node, bookData, options) {
   function attachFlipper(flipperClass) {
     // BROWSERHACK: Supported browsers must do CSS columns (at least?).
     if (!Monocle.Browser.has.columns) {
-      if (!k.FLIPPER_LEGACY_CLASS) {
+      flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
+      if (!flipperClass) {
         var abortMsg = document.createElement('div');
         abortMsg.className = k.abortMessage.CLASSNAME;
         abortMsg.innerHTML = k.abortMessage.TEXT;
         p.divs.box.appendChild(abortMsg);
         return;
       }
-      flipperClass = k.FLIPPER_LEGACY_CLASS;
     } else if (!flipperClass) {
-      flipperClass = k.FLIPPER_DEFAULT_CLASS;
+      flipperClass = Monocle.Flippers[k.FLIPPER_DEFAULT_CLASS];
       if (!flipperClass) {
         throw("No flipper class");
       }
@@ -702,5 +661,32 @@ Monocle.Reader = function (node, bookData, options) {
 
   return API;
 }
+
+Monocle.Reader.durations = {
+  RESIZE_DELAY: 200
+}
+Monocle.Reader.abortMessage = {
+  CLASSNAME: "monocleAbortMessage",
+  TEXT: "Your browser does not support this technology."
+}
+Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
+Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
+Monocle.Reader.TOUCH_DEVICE = (typeof Touch == "object");
+Monocle.Reader.DEFAULT_STYLE_RULES = [
+  "body {" +
+    "user-select: none !important;" +
+    "-moz-user-select: none !important;" +
+    "-webkit-user-select: none !important;" +
+  "}" +
+  "body * {" +
+    "float: none !important;" +
+    "clear: none !important;" +
+  "}",
+  "table, img {" +
+    "max-width: 100% !important;" +
+    "max-height: 90% !important;" +
+  "}"
+]
+
 
 Monocle.pieceLoaded('reader');

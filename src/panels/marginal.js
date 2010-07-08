@@ -1,17 +1,8 @@
 Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
-  if (Monocle.Panels == this) {
-    return new Monocle.Panels.Marginal(flipper, evtCallbacks);
-  }
 
-  var k = Monocle.Panels.Marginal;
-
-  var p = { }
-
-  var API = {
-    constructor: Monocle.Panels.Marginal,
-    properties: p,
-    constants: k
-  }
+  var API = { constructor: Monocle.Panels.Marginal }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {}
 
 
   function initialize() {

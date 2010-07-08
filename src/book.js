@@ -12,22 +12,12 @@
 Monocle.Book = function (dataSource) {
   if (Monocle == this) { return new Monocle.Book(dataSource); }
 
-  // Constants
-  var k = {
-  }
-
-  // Properties.
-  var p = {
+  var API = { constructor: Monocle.Book }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     dataSource: dataSource,
     components: [],
     chapters: {} // flat arrays of chapters per component
-  }
-
-  // Methods and properties available to external code.
-  var API = {
-    constructor: Monocle.Book,
-    constants: k,
-    properties: p
   }
 
 

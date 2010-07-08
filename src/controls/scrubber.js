@@ -3,20 +3,10 @@ Monocle.Controls.Scrubber = function (reader) {
     return new Monocle.Controls.Scrubber(reader);
   }
 
-  // Constants.
-  var k = {
-  }
-
-  // Properties.
-  var p = {
+  var API = { constructor: Monocle.Controls.Scrubber }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     divs: {}
-  }
-
-  // Public methods and properties.
-  var API = {
-    constructor: Monocle.Controls.Scrubber,
-    constants: k,
-    properties: p
   }
 
 

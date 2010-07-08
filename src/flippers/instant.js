@@ -1,22 +1,9 @@
 Monocle.Flippers.Instant = function (reader, setPageFn) {
-  if (Monocle.Flippers == this) {
-    return new Monocle.Flippers.Instant(reader, setPageFn);
-  }
 
-  // Constants
-  var k = {
-  }
-
-
-  // Properties
-  var p = {
+  var API = { constructor: Monocle.Flippers.Instant }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     pageCount: 1
-  }
-
-  var API = {
-    constructor: Monocle.Flippers.Instant,
-    properties: p,
-    constants: k
   }
 
 
@@ -36,16 +23,21 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
   }
 
 
-  function listenForInteraction() {
-    // FIXME: replace with panel.
-    p.reader.listen(
-      "monocle:contact:start",
-      function (evt) {
-        if (turn(evt.monocleData.contactX)) {
-          evt.preventDefault();
-        }
+  function listenForInteraction(panelClass) {
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+    }
+    p.panels = new panelClass(
+      API,
+      {
+        'end': function (panel) { turn(panel.properties.direction); }
       }
     );
+  }
+
+
+  function turn(dir) {
+    moveTo({ page: getPlace().pageNumber() + dir});
   }
 
 
@@ -65,35 +57,7 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
           bdy.style.transform =
             "translateX(" + (0-offset) + "px)";
     }
-    p.setPageFn(p.page, locus, spCallback);
-  }
-
-
-  function turn(boxPointX) {
-    if (inForwardZone(boxPointX)) {
-      moveTo({ page: getPlace().pageNumber() + 1});
-      return true;
-    } else if (inBackwardZone(boxPointX)) {
-      moveTo({ page: getPlace().pageNumber() - 1});
-      return true;
-    }
-    return false;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go forward" zone for
-  // user turning a page.
-  //
-  function inForwardZone(x) {
-    return x > p.reader.properties.pageWidth * 0.6;
-  }
-
-
-  // Returns to if the box-based x point is in the "Go backward" zone for
-  // user turning a page.
-  //
-  function inBackwardZone(x) {
-    return x < p.reader.properties.pageWidth * 0.4;
+    return p.setPageFn(p.page, locus, spCallback);
   }
 
 
@@ -109,6 +73,11 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
   return API;
 }
+
+Monocle.Flippers.Instant.FORWARDS = 1;
+Monocle.Flippers.Instant.BACKWARDS = -1;
+Monocle.Flippers.Instant.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
+
 
 
 Monocle.pieceLoaded('flippers/instant');

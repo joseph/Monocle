@@ -3,23 +3,12 @@ Monocle.Controls.Magnifier = function (reader) {
     return new Monocle.Controls.Magnifier(reader);
   }
 
-  // Constants.
-  var k = {
-    LARGE_FONT_SIZE: "115%",
-    NORMAL_FONT_SIZE: Monocle.Styles.body['font-size'] || "100%"
-  }
-
-  // Properties.
-  var p = {
+  // Public methods and properties.
+  var API = { constructor: Monocle.Controls.Magnifier }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     buttons: [],
     enlarged: false
-  }
-
-  // Public methods and properties.
-  var API = {
-    constructor: Monocle.Controls.Magnifier,
-    constants: k,
-    properties: p
   }
 
 
@@ -88,6 +77,10 @@ Monocle.Controls.Magnifier = function (reader) {
 
   return API;
 }
+
+Monocle.Controls.Magnifier.LARGE_FONT_SIZE = "115%";
+Monocle.Controls.Magnifier.NORMAL_FONT_SIZE = Monocle.Styles.body['font-size'] ||
+  "100%";
 
 
 Monocle.Styles.Controls.Magnifier = {

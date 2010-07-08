@@ -3,11 +3,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     return new Monocle.Flippers.Slider(reader, setPageFn);
   }
 
-  // Constants
-  var k = Monocle.Flippers.Slider;
-
-  // Properties
-  var p = {
+  var API = { constructor: Monocle.Flippers.Slider }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
     pageCount: 2,
     activeIndex: 1,
     divs: {
@@ -15,12 +13,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     },
     // Properties relating to the current page turn interaction.
     turnData: {}
-  }
-
-  var API = {
-    constructor: k,
-    properties: p,
-    constants: k
   }
 
 
@@ -41,7 +33,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function listenForInteraction(panelClass) {
-    panelClass = panelClass || k.DEFAULT_PANELS_CLASS;
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+    }
     p.panels = new panelClass(
       API,
       {
@@ -445,7 +439,6 @@ Monocle.Flippers.Slider.durations = {
   FOLLOW_CURSOR: 150, //Monocle.Browser.is.MobileSafari ? 0 : 150,
   ANTI_FLICKER_DELAY: 0
 }
-
 
 
 

@@ -318,27 +318,21 @@ The class idiom looks like this:
     Monocle.Foo = function (args) {
       // Allows the constructor function to be an object factory itself,
       // ie: "Monocle.Foo()" is the same as "new Monocle.Foo()".
+      // (Only necessary for classes that a library user may instantiate.)
       if (Monocle == this) { return new Monocle.Foo(args); }
 
-      // Conventional name for any class constants.
-      var k = {
-        A_CONSTANT: 'Foo',
-        PI: 3.14
-      };
+      // Conventional name for the object that is returned by the constructor,
+      // allowing access to the public methods and properties by external code.
+      var API = { constructor: Monocle.Foo }
+
+      // Conventional name for any class constants. Typically this is the
+      // class constructor function itself.
+      var k = API.constants = API.constructor;
 
       // Conventional name for any publicly accessible properties (instance
       // variables).
-      var p = {
+      var p = API.properties = {
         someVariable: 'bar'
-      };
-
-      // Conventional name for the object that is returned by the constructor,
-      // allowing access to the public methods and properties by external
-      // code.
-      var API = {
-        constructor: Monocle.Foo,
-        properties: p,
-        constants: k
       };
 
 
@@ -351,12 +345,17 @@ The class idiom looks like this:
       function exampleInternalMethod() {
       }
 
+
       // Typically, public methods are attached to the API just before
       // returning, for easier scannability of the API.
       API.examplePublicMethod = examplePublicMethod;
 
       return API;
     }
+
+    // Defining some "constants" on the class. (Of course, not really constant.)
+    Monocle.Foo.A_CONSTANT = 'Foo';
+    Monocle.Foo.PI = 3.14;
 
 This allows a quite concise, clear coding style. However, it does make class
 inheritance somewhat limited. Let's see how it goes.
