@@ -19,6 +19,11 @@ Monocle.Controls.Panel = function () {
   }
 
 
+  function deafen() {
+    p.evtCallbacks = {}
+  }
+
+
   function start(evt) {
     if (p.contacted) {
       cancel(evt);
@@ -84,6 +89,7 @@ Monocle.Controls.Panel = function () {
 
   API.createControlElements = createControlElements;
   API.listenTo = listenTo;
+  API.deafen = deafen;
 
   return API;
 }

@@ -134,4 +134,8 @@ Monocle.Styles.Flippers = {
   // A separate namespace for flippers.
 }
 
+Monocle.Styles.Panels = {
+  // Likewise for panels.
+}
+
 Monocle.pieceLoaded('styles');

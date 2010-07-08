@@ -673,11 +673,11 @@ Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.TOUCH_DEVICE = (typeof Touch == "object");
 Monocle.Reader.DEFAULT_STYLE_RULES = [
-  "body {" +
-    "user-select: none !important;" +
-    "-moz-user-select: none !important;" +
-    "-webkit-user-select: none !important;" +
-  "}" +
+  // "body {" +
+  //   "user-select: none !important;" +
+  //   "-moz-user-select: none !important;" +
+  //   "-webkit-user-select: none !important;" +
+  // "}" +
   "body * {" +
     "float: none !important;" +
     "clear: none !important;" +

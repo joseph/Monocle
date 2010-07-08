@@ -19,7 +19,6 @@ Monocle.Panels.TwoPane = function (flipper, evtCallbacks) {
         width = k.WIDTH;
         dir == "forwards" ? right = 0 : left = 0;
       }
-      p.panels[dir].properties.div.style.width = k.WIDTH;
     }
   }
 
