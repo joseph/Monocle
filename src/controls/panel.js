@@ -9,7 +9,19 @@ Monocle.Controls.Panel = function () {
   function createControlElements(cntr) {
     p.div = document.createElement('div');
     p.div.style.cssText = "position: absolute; height: 100%;";
-    Monocle.Events.listenForContact(p.div, { 'start': start });
+    Monocle.Events.listenForContact(
+      p.div,
+      {
+        'start': start,
+        'move': move,
+        'end': end,
+        'cancel': cancel
+      },
+      { useCapture: false }
+    );
+    if (Monocle.Browser.has.touch) {
+      Monocle.Events.listen(document.body, 'touchend', end);
+    }
     return p.div;
   }
 
@@ -25,36 +37,43 @@ Monocle.Controls.Panel = function () {
 
 
   function start(evt) {
+    if (p.contact) {
+      end(evt);
+    }
+    p.contact = true;
     evt.m.offsetX += p.div.offsetLeft;
     evt.m.offsetY += p.div.offsetTop;
     expand();
-    p.listeners = Monocle.Events.listenForContact(
-      document.body,
-      {
-        'move': move,
-        'end': end,
-        'cancel': cancel
-      }
-    );
     invoke('start', evt);
   }
 
 
   function move(evt) {
+    if (!p.contact) {
+      return;
+    }
     invoke('move', evt);
   }
 
 
   function end(evt) {
+    if (!p.contact) {
+      return;
+    }
     Monocle.Events.deafenForContact(p.div, p.listeners);
     contract();
+    p.contact = false;
     invoke('end', evt);
   }
 
 
   function cancel(evt) {
+    if (!p.contact) {
+      return;
+    }
     Monocle.Events.deafenForContact(p.div, p.listeners);
     contract();
+    p.contact = false;
     invoke('cancel', evt);
   }
 
