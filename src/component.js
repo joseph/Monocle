@@ -196,8 +196,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
       Monocle.Compat.enableTouchProxyOnFrame(frame);
     }
 
-    // TODO: rewrite internal links
-
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);

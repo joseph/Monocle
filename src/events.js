@@ -100,7 +100,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     }
     if (fns.cancel) {
       listeners.mouseout = function (evt) {
-        obj = evt.relatedTarget || e.fromElement;
+        obj = evt.relatedTarget || evt.fromElement;
         while (obj && (obj = obj.parentNode)) {
           if (obj == elem) { return; }
         }
