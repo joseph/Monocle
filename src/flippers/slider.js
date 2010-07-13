@@ -250,6 +250,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function completedTurn() {
+    p.turnData = {}
     if (upperPage().m.pageChanging) {
       upperPage().m.completeWhenReady = completedTurn;
       p.turnData.animating = true;
@@ -258,12 +259,13 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     upperPage().m.completeWhenReady = null;
 
     jumpIn(function () {
-      p.reader.dispatchEvent('monocle:turn');
-      p.turnData = {};
-
-      var place = getPlace();
-
-      setPage(lowerPage(), place.getLocus({ direction: k.FORWARDS }));
+      setPage(
+        lowerPage(),
+        getPlace().getLocus({ direction: k.FORWARDS }),
+        function () {
+          p.reader.dispatchEvent('monocle:turn');
+        }
+      );
     });
   }
 
