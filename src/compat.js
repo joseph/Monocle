@@ -74,16 +74,16 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
 
 
   Monocle.Compat.enableTouchProxyOnFrame = function (frame) {
-    if (frame.m.touchProxy) {
+    var doc = frame.contentWindow.document;
+    if (doc.touchProxy) {
       return;
     }
     var fn = function (evt) { Monocle.Compat.touchProxyHandler(frame, evt); }
-    var doc = frame.contentWindow.document;
     Monocle.Events.listen(doc, 'touchstart', fn);
     Monocle.Events.listen(doc, 'touchmove', fn);
     Monocle.Events.listen(doc, 'touchend', fn);
     Monocle.Events.listen(doc, 'touchcancel', fn);
-    frame.m.touchProxy = true;
+    doc.touchProxy = true;
   }
 
 

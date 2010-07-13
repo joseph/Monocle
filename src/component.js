@@ -171,6 +171,16 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   function loadFrameFromDocument(srcDoc, frame, callback) {
     var destDoc = frame.contentDocument;
+
+    var srcBases = srcDoc.getElementsByTagName('base');
+    if (srcBases[0]) {
+      var head = destDoc.getElementsByTagName('head')[0];
+      var bases = destDoc.getElementsByTagName('base');
+      var base = bases[0] ? bases[0] : destDoc.createElement('base');
+      base.setAttribute('href', srcBases[0].getAttribute('href'));
+      head.appendChild(base);
+    }
+
     destDoc.replaceChild(
       destDoc.importNode(srcDoc.documentElement, true),
       destDoc.documentElement
