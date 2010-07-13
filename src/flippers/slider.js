@@ -66,7 +66,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
-      pageDiv.m.sheafDiv.style.backgroundColor = "transparent";
       pageDiv.m.activeFrame.style.visibility = "visible";
       if (pageDiv.m.completeWhenReady) {
         pageDiv.m.completeWhenReady();
@@ -81,9 +80,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       Monocle.Styles.affix(bdy, "transform", "translateX("+(0-offset)+"px)");
       if (callback) { callback(); }
     }
-    pageDiv.m.sheafDiv.style.backgroundColor = "#FCFCFC";
     pageDiv.m.activeFrame.style.visibility = "hidden";
-    return p.setPageFn(pageDiv, locus, spCallback);
+    deferredCall(function () { p.setPageFn(pageDiv, locus, spCallback); });
   }
 
 
