@@ -57,7 +57,7 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
           bdy.style.transform =
             "translateX(" + (0-offset) + "px)";
     }
-    return p.setPageFn(p.page, locus, spCallback);
+    p.setPageFn(p.page, locus, spCallback);
   }
 
 

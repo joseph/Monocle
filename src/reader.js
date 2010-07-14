@@ -112,7 +112,7 @@ Monocle.Reader = function (node, bookData, options) {
 
       p.flipper.listenForInteraction(options.panels);
 
-      setTimeout(function () { dispatchEvent("monocle:loaded"); }, 0);
+      Monocle.defer(function () { dispatchEvent("monocle:loaded"); });
     });
   }
 
@@ -342,7 +342,7 @@ Monocle.Reader = function (node, bookData, options) {
       return;
     }
 
-    var onChangePage = function (rslt) {
+    var onChange = function (rslt) {
       // The book may disallow changing to the given page.
       if (rslt === 'disallow') {
         callback(rslt);
@@ -356,9 +356,9 @@ Monocle.Reader = function (node, bookData, options) {
       dispatchEvent("monocle:pagechange", eData);
     }
 
-    return p.book.changePage(pageDiv, locus, onChangePage);
+    // Wait a moment for painting to complete before starting page turn.
+    Monocle.defer(function () { p.book.changePage(pageDiv, locus, onChange); });
   }
-
 
 
   // Valid types:
@@ -603,9 +603,9 @@ Monocle.Reader = function (node, bookData, options) {
     var result = callback();
     if (recalcDimensions) {
       calcDimensions();
-      setTimeout(function () {
-        dispatchEvent("monocle:stylesheetchange", {});
-      }, 0);
+      Monocle.defer(
+        function () { dispatchEvent("monocle:stylesheetchange", {}); }
+      );
     }
     return result;
   }
@@ -663,7 +663,7 @@ Monocle.Reader = function (node, bookData, options) {
 }
 
 Monocle.Reader.durations = {
-  RESIZE_DELAY: 200
+  RESIZE_DELAY: 100
 }
 Monocle.Reader.abortMessage = {
   CLASSNAME: "monocleAbortMessage",

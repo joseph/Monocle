@@ -102,8 +102,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
         bdy.animInterval = setInterval(stepFn, frameRate);
       }
     }
-    var rslt = p.setPageFn(p.page, locus, spCallback);
-    return rslt;
+    p.setPageFn(p.page, locus, spCallback);
   }
 
 

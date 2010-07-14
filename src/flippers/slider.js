@@ -67,6 +67,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
       pageDiv.m.activeFrame.style.visibility = "visible";
+      pageDiv.m.sheafDiv.style.background = "none";
       if (pageDiv.m.completeWhenReady) {
         pageDiv.m.completeWhenReady();
       }
@@ -80,8 +81,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       Monocle.Styles.affix(bdy, "transform", "translateX("+(0-offset)+"px)");
       if (callback) { callback(); }
     }
+    pageDiv.m.sheafDiv.style.background = "url("+k.WAITLINE+")";
     pageDiv.m.activeFrame.style.visibility = "hidden";
-    deferredCall(function () { p.setPageFn(pageDiv, locus, spCallback); });
+    p.setPageFn(pageDiv, locus, spCallback);
   }
 
 
@@ -102,11 +104,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function deferredCall(fn) {
-    setTimeout(fn, k.durations.ANTI_FLICKER_DELAY);
-  }
-
-
   function onFirstPage() {
     var place = getPlace();
     return place.properties.component.properties.index == 0 &&
@@ -123,10 +120,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function lift(dir, boxPointX) {
-    // FIXME: LIFT FAILED. UNRESPONSIVE.
     if (p.turnData.animating) {
+      p.nextAction = function () { lift(dir, boxPointX); }
       return;
     }
+    p.nextAction = null;
 
     // FIXME: LIFT FAILED. UNRESPONSIVE.
     if (upperPage().m.pageChanging) {
@@ -170,15 +168,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData.animating = true;
         jumpOut(function () {
           var place = getPlace();
-          var rslt = setPage(
-            lowerPage(),
-            place.getLocus({ direction: k.BACKWARDS }),
-            null,
-            // Callback on failure
-            function () {
-              p.turnData = {};
-            }
-          );
+          setPage(lowerPage(), place.getLocus({ direction: k.BACKWARDS }));
           flipPages();
           slideToCursor(boxPointX);
         });
@@ -248,15 +238,19 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function completedTurn() {
-    p.turnData = {}
+    p.turnData.animating = true;
     if (upperPage().m.pageChanging) {
       upperPage().m.completeWhenReady = completedTurn;
-      p.turnData.animating = true;
       return;
     }
     upperPage().m.completeWhenReady = null;
 
+    p.turnData.jumping = true;
     jumpIn(function () {
+      p.turnData = {}
+      if (p.nextAction) {
+        p.nextAction();
+      }
       setPage(
         lowerPage(),
         getPlace().getLocus({ direction: k.FORWARDS }),
@@ -334,9 +328,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       if (callback) { callback(); }
     } else {
       elem.setXTCB = function () {
-        p.turnData.animating = false;
-        if (p.nextAction) {
-          p.nextAction();
+        if (!p.turnData.jumping) {
+          p.turnData.animating = false;
+          if (p.nextAction) {
+            p.nextAction();
+          }
         }
         if (callback) { callback(); }
       }
@@ -438,10 +434,10 @@ Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
   SLIDE: 250,
-  FOLLOW_CURSOR: 150,
-  ANTI_FLICKER_DELAY: 0
+  FOLLOW_CURSOR: 150
 }
-
+Monocle.Flippers.Slider.WAITLINE = "data:image/gif;base64," +
+  "R0lGODlhAgAUAIAAAN3d3f%2F%2F%2FyH5BAEHAAEALAAAAAACABQAAAIHjI95EKyfCgA7"
 
 
 Monocle.pieceLoaded('flippers/slider');

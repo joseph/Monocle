@@ -133,7 +133,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     frame.onload = function () {
       frame.onload = null;
-      if (callback) { callback(frame, true); }
+      Monocle.defer(function () { if (callback) { callback(frame, true); } });
     }
     frame.src = src;
     return 'wait';
@@ -143,7 +143,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function loadFrameFromURL(url, frame, callback) {
     frame.onload = function () {
       frame.onload = null;
-      if (callback) { callback(frame, true); }
+      Monocle.defer(function () { if (callback) { callback(frame, true); } });
     }
     frame.src = url;
     return 'wait';
@@ -190,7 +190,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // if (callback) { callback(frame, false); }
     // return 'ready';
 
-    setTimeout(function() { if (callback) { callback(frame, true); } }, 0);
+    Monocle.defer(function() { if (callback) { callback(frame, true); } });
     return 'wait';
   }
 
