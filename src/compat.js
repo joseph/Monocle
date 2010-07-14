@@ -18,6 +18,18 @@ Monocle.Browser.has = {
 }
 
 
+if (Monocle.Browser.is.MobileSafari) {
+  (function () {
+    var ver = navigator.userAgent.match(/iPhone OS ([\d_]+)/);
+    if (ver) {
+      Monocle.Browser.iOSVersion = ver[1].replace(/_/g, '.');
+    } else {
+      throw("Unknown MobileSafari user agent string: " + navigator.userAgent);
+    }
+  })();
+}
+
+
 if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
 
   // A little console stub if not initialized in a console-equipped browser.
