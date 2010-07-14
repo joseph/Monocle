@@ -15,8 +15,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       lift: [],
       drop: []
     },
-    // Properties relating to the current page turn interaction.
-    turnData: {}
+    turnData: {},
+    waitingFor: {}
   }
 
 
@@ -59,32 +59,39 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    setPage(
-      upperPage(),
-      locus,
-      completedTurn,
-      function () { console.log("FAILED TO MOVE TO LOCUS"); }
-    );
+    whenPlaceIsKnown(function () {
+      setPage(
+        upperPage(),
+        locus,
+        completedTurn,
+        function () { console.log("FAILED TO MOVE TO LOCUS"); }
+      );
+    });
   }
 
 
   function setPage(pageDiv, locus, callback, failCallback) {
     var spCallback = function (offset) {
-      pageDiv.m.activeFrame.style.visibility = "visible";
-      pageDiv.m.sheafDiv.style.background = "none";
-      if (pageDiv.m.completeWhenReady) {
-        pageDiv.m.completeWhenReady();
-      }
-
       if (offset === 'disallow') {
         if (typeof failCallback == 'function') { failCallback(); }
         p.turnData = {};
         return;
       }
+
       var bdy = pageDiv.m.activeFrame.contentDocument.body;
       Monocle.Styles.affix(bdy, "transform", "translateX("+(0-offset)+"px)");
+
+      pageDiv.m.activeFrame.style.visibility = "visible";
+      pageDiv.m.sheafDiv.style.background = "none";
+      if (pageDiv.m.whenChanged) {
+        var fn = pageDiv.m.whenChanged;
+        pageDiv.m.whenChanged = null;
+        fn();
+      }
+
       if (callback) { callback(); }
     }
+
     pageDiv.m.sheafDiv.style.background = "url("+k.WAITLINE+")";
     pageDiv.m.activeFrame.style.visibility = "hidden";
     p.setPageFn(pageDiv, locus, spCallback);
@@ -123,10 +130,14 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
+  function busy() {
+    return p.waitingFor.animation || p.waitingFor.pageChange;
+  }
+
+
   function lift(dir, boxPointX) {
-    if (p.turnData.animating || upperPage().m.pageChanging) {
-      p.queues.lift.push([dir, boxPointX]);
-      return;
+    if (busy()) {
+      return pushQueue('lift', dir, boxPointX);
     }
 
     p.turnData.points = {
@@ -143,35 +154,26 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       }
       slideToCursor(boxPointX, shiftDropQueue);
     } else if (dir == k.BACKWARDS) {
-      var backwardsTurn = function () {
-        if (lowerPage().m.pageChanging) {
-          lowerPage().m.completeWhenReady = backwardsTurn;
-          p.turnData.animating = true;
-          return;
-        }
-        lowerPage().m.completeWhenReady = null;
-
+      whenPlaceIsKnown(function () {
         if (onFirstPage()) {
           console.log("ON FIRST PAGE");
           p.turnData = {};
           return;
         }
-
-        p.turnData.animating = true;
+        setPage(lowerPage(), getPlace().getLocus({ direction: k.BACKWARDS }));
         jumpOut(function () {
-          var place = getPlace();
-          setPage(lowerPage(), place.getLocus({ direction: k.BACKWARDS }));
           flipPages();
           slideToCursor(boxPointX, shiftDropQueue);
         });
-      }
-      backwardsTurn();
+      }, lowerPage());
+    } else {
+      throw("Invalid direction: " + dir);
     }
   }
 
 
   function turning(dir, boxPointX) {
-    if (p.turnData.animating) {
+    if (busy()) {
       return;
     }
 
@@ -187,9 +189,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function drop(dir, boxPointX) {
-    if (p.turnData.animating) {
-      p.queues.drop.push([dir, boxPointX]);
-      return;
+    if (busy()) {
+      return pushQueue('drop', dir, boxPointX);
     }
 
     if (!p.turnData.points) {
@@ -207,10 +208,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData.points.min >= boxPointX
       ) {
         // Completing forward turn
-        slideOut();
+        slideOut(flipAndCompleteTurn);
       } else {
         // Cancelling forward turn
-        slideIn();
+        slideIn(completedTurn);
       }
     } else if (dir == k.BACKWARDS) {
       if (
@@ -219,37 +220,80 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData.points.max <= boxPointX
       ) {
         // Completing backward turn
-        slideIn();
+        slideIn(completedTurn);
       } else {
         // Cancelling backward turn
-        slideOut();
+        slideOut(flipAndCompleteTurn);
       }
+    } else {
+      throw("Invalid direction: " + dir);
     }
   }
 
 
+  function flipAndCompleteTurn() {
+    flipPages();
+    completedTurn();
+  }
+
+
   function completedTurn() {
-    p.turnData.animating = true;
-    if (upperPage().m.pageChanging) {
-      upperPage().m.completeWhenReady = completedTurn;
+    jumpIn(function () {
+      whenPlaceIsKnown(function () {
+        setPage(
+          lowerPage(),
+          getPlace().getLocus({ direction: k.FORWARDS }),
+          function () {
+            p.reader.dispatchEvent('monocle:turn');
+          }
+        );
+        p.turnData = {}
+        shiftQueue('lift');
+      });
+    });
+  }
+
+
+  function pushQueue(action, dir, boxPointX) {
+    if (p.queues.direction && p.queues.direction != dir) {
+      p.queues.direction = null;
+      p.queues.lift = [];
+      p.queues.drop = [];
       return;
     }
-    upperPage().m.completeWhenReady = null;
+    p.queues.direction = dir;
+    p.queues[action].push([dir, boxPointX]);
+  }
 
-    jumpIn(function () {
-      p.turnData = {}
-      if (p.queues.lift.length) {
-        var liftData = p.queues.lift.shift();
-        lift(liftData[0], liftData[1]);
+
+  function shiftQueue(action) {
+    if (p.queues[action].length) {
+      var data = p.queues[action].shift();
+      (action == "lift") ? lift(data[0], data[1]) : drop(data[0], data[1]);
+    } else {
+      p.queues.drop = [];
+      p.queues.lift = [];
+      p.queues.direction = null;
+    }
+  }
+
+
+  function shiftDropQueue() {
+    shiftQueue('drop');
+  }
+
+
+  function whenPlaceIsKnown(callback, pageDiv) {
+    pageDiv = pageDiv || upperPage();
+    if (pageDiv.m.pageChanging) {
+      p.waitingFor.pageChange = true;
+      pageDiv.m.whenChanged = function () {
+        p.waitingFor.pageChange = false;
+        callback();
       }
-      setPage(
-        lowerPage(),
-        getPlace().getLocus({ direction: k.FORWARDS }),
-        function () {
-          p.reader.dispatchEvent('monocle:turn');
-        }
-      );
-    });
+    } else {
+      callback();
+    }
   }
 
 
@@ -318,23 +362,17 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       elem.setXTCB = null;
     }
 
+    elem.setXTCB = function () {
+      p.waitingFor.animation = false;
+      if (callback) { callback(); }
+    }
+
     var sX = getX(elem);
     if (!duration || sX == parseInt(x)) {
-      if (callback) { callback(); }
+      elem.setXTCB();
     } else {
-      elem.setXTCB = function () {
-        p.turnData.animating = false;
-        if (callback) { callback(); }
-      }
+      p.waitingFor.animation = true;
       Monocle.Events.listen(elem, 'webkitTransitionEnd', elem.setXTCB);
-    }
-  }
-
-
-  function shiftDropQueue() {
-    if (p.queues.drop.length) {
-      var dropData = p.queues.drop.shift();
-      drop(dropData[0], dropData[1]);
     }
   }
 
@@ -352,7 +390,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  /* NB: Jumps are always done by the hidden lower page. */
+  // NB: Jumps are always done by the hidden lower page.
 
   function jumpIn(callback) {
     // Duration should be 0, but is set to 1 to address a 10.6 Safari bug.
@@ -370,35 +408,22 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function jumpToCursor(cursorX, callback) {
-    setX(
-      lowerPage(),
-      Math.min(0, cursorX - p.reader.properties.pageWidth),
-      { duration: 0 },
-      callback
-    );
-  }
+  // NB: Slides are always done by the visible upper page.
 
-
-  /* NB: Slides are always done by the visible upper page. */
-
-  function slideIn() {
+  function slideIn(callback) {
     var slideOpts = {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    p.turnData.animating = true;
-    setX(upperPage(), 0, slideOpts, completedTurn);
+    setX(upperPage(), 0, slideOpts, callback);
   }
 
 
-  function slideOut() {
+  function slideOut(callback) {
     var slideOpts = {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    var callback = function () { flipPages(); completedTurn(); }
-    p.turnData.animating = true;
     setX(upperPage(), 0 - p.reader.properties.pageWidth, slideOpts, callback);
   }
 
@@ -426,13 +451,14 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   return API;
 }
 
+
 // Constants
 Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
-  SLIDE: 200,
-  FOLLOW_CURSOR: 150
+  SLIDE: 300,
+  FOLLOW_CURSOR: 100
 }
 Monocle.Flippers.Slider.WAITLINE = "data:image/gif;base64," +
   "R0lGODlhAgAUAIAAAN3d3f%2F%2F%2FyH5BAEHAAEALAAAAAACABQAAAIHjI95EKyfCgA7"
