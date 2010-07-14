@@ -11,6 +11,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     divs: {
       pages: []
     },
+    queues: {
+      lift: [],
+      drop: []
+    },
     // Properties relating to the current page turn interaction.
     turnData: {}
   }
@@ -120,14 +124,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function lift(dir, boxPointX) {
-    if (p.turnData.animating) {
-      p.nextAction = function () { lift(dir, boxPointX); }
-      return;
-    }
-    p.nextAction = null;
-
-    // FIXME: LIFT FAILED. UNRESPONSIVE.
-    if (upperPage().m.pageChanging) {
+    if (p.turnData.animating || upperPage().m.pageChanging) {
+      p.queues.lift.push([dir, boxPointX]);
       return;
     }
 
@@ -143,14 +141,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData = {};
         return;
       }
-      // if (Monocle.Browser.has.iframeTouchBug) {
-      //   lowerPage().style.display = "block";
-      // }
-      slideToCursor(boxPointX);
+      slideToCursor(boxPointX, shiftDropQueue);
     } else if (dir == k.BACKWARDS) {
-      // if (Monocle.Browser.has.iframeTouchBug) {
-      //   lowerPage().style.display = "block";
-      // }
       var backwardsTurn = function () {
         if (lowerPage().m.pageChanging) {
           lowerPage().m.completeWhenReady = backwardsTurn;
@@ -170,7 +162,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           var place = getPlace();
           setPage(lowerPage(), place.getLocus({ direction: k.BACKWARDS }));
           flipPages();
-          slideToCursor(boxPointX);
+          slideToCursor(boxPointX, shiftDropQueue);
         });
       }
       backwardsTurn();
@@ -196,10 +188,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function drop(dir, boxPointX) {
     if (p.turnData.animating) {
-      p.nextAction = function () { drop(dir, boxPointX); }
+      p.queues.drop.push([dir, boxPointX]);
       return;
     }
-    p.nextAction = null;
 
     if (!p.turnData.points) {
       return;
@@ -245,11 +236,11 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     }
     upperPage().m.completeWhenReady = null;
 
-    p.turnData.jumping = true;
     jumpIn(function () {
       p.turnData = {}
-      if (p.nextAction) {
-        p.nextAction();
+      if (p.queues.lift.length) {
+        var liftData = p.queues.lift.shift();
+        lift(liftData[0], liftData[1]);
       }
       setPage(
         lowerPage(),
@@ -276,6 +267,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     // BROWSERHACK: WEBKIT (transitions & transition events)
     if (typeof WebKitTransitionEvent != "undefined") {
       if (duration) {
+        // Accelerate durations if we have a backlog of work...
+        if (p.queues.lift.length) {
+          duration /= p.queues.lift.length + 1;
+        }
         transition = '-webkit-transform';
         transition += ' ' + duration + "ms";
         transition += ' ' + (options['timing'] || 'linear');
@@ -328,15 +323,18 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       if (callback) { callback(); }
     } else {
       elem.setXTCB = function () {
-        if (!p.turnData.jumping) {
-          p.turnData.animating = false;
-          if (p.nextAction) {
-            p.nextAction();
-          }
-        }
+        p.turnData.animating = false;
         if (callback) { callback(); }
       }
       Monocle.Events.listen(elem, 'webkitTransitionEnd', elem.setXTCB);
+    }
+  }
+
+
+  function shiftDropQueue() {
+    if (p.queues.drop.length) {
+      var dropData = p.queues.drop.shift();
+      drop(dropData[0], dropData[1]);
     }
   }
 
@@ -433,7 +431,7 @@ Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.durations = {
-  SLIDE: 250,
+  SLIDE: 200,
   FOLLOW_CURSOR: 150
 }
 Monocle.Flippers.Slider.WAITLINE = "data:image/gif;base64," +
