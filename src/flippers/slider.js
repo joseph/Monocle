@@ -259,10 +259,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function pushQueue(action, dir, boxPointX) {
-    var lastAction = null;
-    if (p.queue.length) {
-      lastAction = p.queue[p.queue.length - 1];
-    }
+    var lastAction = p.queue.length ? p.queue[p.queue.length - 1] : null;
 
     // Queueing is disabled on iOS3.1 where it causes crashes.
     if (
@@ -277,11 +274,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     // If we've changed direction, discard everything in the queue.
     if (lastAction && lastAction[0] != dir) {
-      if (action == "lift") {
-        p.queue = [[p.queue.direction, boxPointX, "drop"]];
-      }
+      p.queue = [[p.queue.direction, boxPointX, "drop"]];
       return;
     }
+
     p.queue.push([dir, boxPointX, action]);
   }
 
@@ -294,7 +290,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       } else if (data[2] == "drop") {
         drop(data[0], data[1]);
       } else {
-        console.warn("Unknown queue entry: "+data[2]);
+        console.warn("Unknown queue action: "+data[2]);
       }
     }
   }
@@ -330,7 +326,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       if (duration) {
         // Accelerate durations if we have a backlog of work...
         if (p.queue.length) {
-          duration /= p.queue.length + 1;
+          duration /= (p.queue.length + 1) * 0.33;
         }
         transition = '-webkit-transform';
         transition += ' ' + duration + "ms";
