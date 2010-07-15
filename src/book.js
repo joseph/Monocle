@@ -55,7 +55,8 @@ Monocle.Book = function (dataSource) {
     }
     if (pageDiv.m.pageChanging) {
       console.warn("Page is already changing.");
-      return 'wait';
+      callback("disallow");
+      return "disallow";
     }
 
     var cIndex = p.componentIds.indexOf(locus.componentId);

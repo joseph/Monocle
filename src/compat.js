@@ -20,7 +20,7 @@ Monocle.Browser.has = {
 
 if (Monocle.Browser.is.MobileSafari) {
   (function () {
-    var ver = navigator.userAgent.match(/iPhone OS ([\d_]+)/);
+    var ver = navigator.userAgent.match(/ OS ([\d_]+)/);
     if (ver) {
       Monocle.Browser.iOSVersion = ver[1].replace(/_/g, '.');
     } else {

@@ -92,6 +92,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       var bdy = pageDiv.m.activeFrame.contentDocument.body;
       Monocle.Styles.affix(bdy, "transform", "translateX("+(0-offset)+"px)");
 
+      pageDiv.m.settingPage = false;
       pageDiv.m.activeFrame.style.visibility = "visible";
       pageDiv.m.sheafDiv.style.background = "none";
       if (pageDiv.m.whenChanged) {
@@ -103,9 +104,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       if (callback) { callback(); }
     }
 
+    pageDiv.m.settingPage = true;
     pageDiv.m.sheafDiv.style.background = "url("+k.WAITLINE+")";
     pageDiv.m.activeFrame.style.visibility = "hidden";
-    p.setPageFn(pageDiv, locus, spCallback);
+    Monocle.defer(function () { p.setPageFn(pageDiv, locus, spCallback) });
   }
 
 
@@ -147,7 +149,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function lift(dir, boxPointX) {
-    p.lifted = true;
     p.turnData.points = {
       start: boxPointX,
       min: boxPointX,
@@ -176,7 +177,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           flipPages();
           slideToCursor(boxPointX, shiftQueue);
         });
-      });
+      }, lowerPage());
     } else {
       console.warn("Invalid direction: " + dir);
     }
@@ -202,7 +203,6 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     slideToCursor(boxPointX, null, "0");
 
-    p.lifted = false;
     p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
 
     if (dir == k.FORWARDS) {
@@ -259,42 +259,42 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function pushQueue(action, dir, boxPointX) {
+    var lastAction = null;
+    if (p.queue.length) {
+      lastAction = p.queue[p.queue.length - 1];
+    }
+
     // Queueing is disabled on iOS3.1 where it causes crashes.
     if (
       Monocle.Browser.is.MobileSafari &&
       Monocle.Browser.iOSVersion < "3.2" &&
-      p.queue.length &&
-      p.queue.lastAction == "drop"
+      lastAction &&
+      lastAction[2] == "drop"
     ) {
       //console.log("Threw away queue push: "+action);
       return;
     }
 
     // If we've changed direction, discard everything in the queue.
-    if (p.queue.direction && p.queue.direction != dir) {
+    if (lastAction && lastAction[0] != dir) {
       if (action == "lift") {
         p.queue = [[p.queue.direction, boxPointX, "drop"]];
-        p.queue.direction = p.queue[0][0];
-        p.queue.lastAction = 'drop';
       }
       return;
     }
-    p.queue.direction = dir;
-    p.queue.push([dir, boxPointX]);
-    p.queue.lastAction = action;
+    p.queue.push([dir, boxPointX, action]);
   }
 
 
   function shiftQueue() {
     if (p.queue.length) {
       data = p.queue.shift();
-      if (p.lifted) {
-        drop(data[0], data[1]);
-      } else if (data[2] != "drop") {
+      if (data[2] == "lift") {
         lift(data[0], data[1]);
-      }
-      if (!p.queue.length) {
-        p.queue = [];
+      } else if (data[2] == "drop") {
+        drop(data[0], data[1]);
+      } else {
+        console.warn("Unknown queue entry: "+data[2]);
       }
     }
   }
@@ -302,7 +302,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function whenPlaceIsKnown(callback, pageDiv) {
     pageDiv = pageDiv || upperPage();
-    if (pageDiv.m.pageChanging) {
+    if (pageDiv.m.settingPage) {
       p.waitingFor.pageChange = true;
       pageDiv.m.whenChanged = function () {
         p.waitingFor.pageChange = false;
