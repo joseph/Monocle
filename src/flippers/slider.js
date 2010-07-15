@@ -137,6 +137,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       return pushQueue(dir, boxPointX);
     }
 
+    p.lifted = true;
     p.turnData.points = {
       start: boxPointX,
       min: boxPointX,
@@ -187,7 +188,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function drop(dir, boxPointX) {
     if (busy()) {
-      if (!p.queue.length) { pushQueue(dir, boxPointX); }
+      pushQueue(dir, boxPointX);
       return;
     }
 
@@ -197,6 +198,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     slideToCursor(boxPointX, null, "0");
 
+    p.lifted = false;
     p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
 
     if (dir == k.FORWARDS) {
@@ -246,16 +248,23 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
           }
         );
         p.turnData = {}
-        shiftQueue('lift');
+        shiftQueue();
       });
     });
   }
 
 
   function pushQueue(dir, boxPointX) {
+    // More than a couple of queued-up turns causes iOS3.1 to crash.
+    if (
+      Monocle.Browser.is.MobileSafari &&
+      Monocle.Browser.iOSVersion < "3.2" &&
+      p.queue.length >= (p.lifted ? 9 : 8)
+    ) { console.warn("Threw away queue push"); return; }
+
+    // If we've changed direction, discard everything in the queue.
     if (p.queue.direction && p.queue.direction != dir) {
       p.queue = [];
-      return;
     }
     p.queue.direction = dir;
     p.queue.push([dir, boxPointX]);
@@ -264,16 +273,12 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
   function shiftQueue() {
     if (p.queue.length) {
-      var dir = p.queue.shift()[0];
-      if (dir == k.FORWARDS) {
-        slideOut(flipAndCompleteTurn);
-      } else if (dir == k.BACKWARDS) {
-        slideIn(completedTurn);
+      data = p.queue.shift();
+      if (p.lifted) {
+        drop(data[0], data[1]);
       } else {
-        throw("Invalid direction: " + dir);
+        lift(data[0], data[1]);
       }
-    } else {
-      p.queue = [];
     }
   }
 

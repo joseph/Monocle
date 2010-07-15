@@ -356,8 +356,7 @@ Monocle.Reader = function (node, bookData, options) {
       dispatchEvent("monocle:pagechange", eData);
     }
 
-    // Wait a moment for painting to complete before starting page turn.
-    Monocle.defer(function () { p.book.changePage(pageDiv, locus, onChange); });
+    p.book.changePage(pageDiv, locus, onChange);
   }
 
 

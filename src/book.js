@@ -51,19 +51,12 @@ Monocle.Book = function (dataSource) {
   function changePage(pageDiv, locus, callback) {
     var tryAgain = function () {
       pageDiv.m.pageChanging = false;
-      // TODO: pageDiv.m.changePageQueue?
       changePage(pageDiv, locus, callback);
     }
     if (pageDiv.m.pageChanging) {
       console.log("WARNING: page is already in process of changing...");
-      // TODO: queue it up?
       return 'wait';
     }
-
-    // console.log(
-    //   "Changing page for pageDiv[" + pageDiv.m.pageIndex + "] within '" +
-    //   locus.componentId + "'"
-    // );
 
     var cIndex = p.componentIds.indexOf(locus.componentId);
     var place = pageDiv.m.place;
