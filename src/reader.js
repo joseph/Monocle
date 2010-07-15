@@ -374,7 +374,7 @@ Monocle.Reader = function (node, bookData, options) {
   function addControl(ctrl, cType, options) {
     for (var i = 0; i < p.controls.length; ++i) {
       if (p.controls[i].control == ctrl) {
-        console.log("Already added control: " + ctrl);
+        console.warn("Already added control: " + ctrl);
         return;
       }
     }
@@ -414,7 +414,7 @@ Monocle.Reader = function (node, bookData, options) {
         ctrlData.elements.push(ctrlElem);
       }
     } else {
-      console.log("Unknown control type: " + cType);
+      console.warn("Unknown control type: " + cType);
     }
 
     for (var i = 0; i < ctrlData.elements.length; ++i) {
@@ -447,7 +447,8 @@ Monocle.Reader = function (node, bookData, options) {
   function hideControl(ctrl) {
     var controlData = dataForControl(ctrl);
     if (!controlData) {
-      throw("No data for control: " + ctrl);
+      console.warn("No data for control: " + ctrl);
+      return;
     }
     if (controlData.hidden) {
       return;
@@ -470,7 +471,8 @@ Monocle.Reader = function (node, bookData, options) {
   function showControl(ctrl) {
     var controlData = dataForControl(ctrl);
     if (!controlData) {
-      throw("No data for control: " + ctrl);
+      console.warn("No data for control: " + ctrl);
+      return;
     }
     if (controlData.hidden == false) {
       return;

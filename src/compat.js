@@ -24,7 +24,7 @@ if (Monocle.Browser.is.MobileSafari) {
     if (ver) {
       Monocle.Browser.iOSVersion = ver[1].replace(/_/g, '.');
     } else {
-      throw("Unknown MobileSafari user agent string: " + navigator.userAgent);
+      console.warn("Unknown MobileSafari user agent: "+navigator.userAgent);
     }
   })();
 }
@@ -106,7 +106,7 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
       touch.screenY
     );
     if (!target) {
-      console.log('No target for ' + evt.type);
+      console.warn('No target for ' + evt.type);
       return;
     }
     if (target == frame) {

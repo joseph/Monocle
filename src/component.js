@@ -251,21 +251,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Returns true or false.
   function haveDimensionsChanged(pageDiv) {
     var newDimensions = rawDimensions(pageDiv);
-    if (
+    return (
       (!p.clientDimensions) ||
       (p.clientDimensions.width != newDimensions.width) ||
       (p.clientDimensions.height != newDimensions.height) ||
       (p.clientDimensions.scrollWidth != newDimensions.scrollWidth) ||
       (p.clientDimensions.fontSize != newDimensions.fontSize)
-    ) {
-      // console.log("DIFFERENCE!");
-      // console.compatDir(p.clientDimensions);
-      // console.compatDir(newDimensions);
-      return true;
-    } else {
-      //console.log("NO difference");
-      return false;
-    }
+    );
   }
 
 
@@ -331,7 +323,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
       var doc = pageDiv.m.activeFrame.contentDocument;
       var elems = doc.body.getElementsByTagName('*');
       if (!elems || elems.length == 0) {
-        throw("Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id);
+        console.warn(
+          "Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id
+        );
+        return;
       }
       var elem = elems[elems.length - 1];
       var lcEnd = elem.offsetTop + elem.offsetHeight;

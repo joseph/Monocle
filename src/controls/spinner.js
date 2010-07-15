@@ -41,7 +41,8 @@ Monocle.Controls.Spinner = function () {
       if (p.reader) {
         listenToElement = p.reader.properties.divs.box;
       } else {
-        throw("No listenToElement or assigned reader.");
+        console.warn("No listenToElement or assigned reader.");
+        return;
       }
     }
     Monocle.Events.listen(listenToElement, 'monocle:bookchanging', spin);

@@ -54,7 +54,7 @@ Monocle.Book = function (dataSource) {
       changePage(pageDiv, locus, callback);
     }
     if (pageDiv.m.pageChanging) {
-      console.log("WARNING: page is already in process of changing...");
+      console.warn("Page is already changing.");
       return 'wait';
     }
 
@@ -131,16 +131,15 @@ Monocle.Book = function (dataSource) {
   function shiftIntoComponent(pageDiv, cIndex, locus, callback) {
     var shift = function (cmpt) {
       pageDiv.m.pageChanging = false;
-      //var locus = { componentId: cmpt.properties.id, page: pageOffset };
       locus.componentId = cmpt.properties.id;
       return changePage(pageDiv, locus, callback);
     }
 
     if (p.components[cIndex]) {
-      console.log("Already loaded for shift: " + cIndex);
+      //console.log("Already loaded for shift: " + cIndex);
       return shift(p.components[cIndex]);
     } else {
-      console.log("Loading on shift: " + cIndex);
+      //console.log("Loading on shift: " + cIndex);
       pageDiv.m.pageChanging = true;
       loadComponent(cIndex, shift, pageDiv);
       return 'wait';
@@ -160,7 +159,7 @@ Monocle.Book = function (dataSource) {
       pageN = locus.page;
     } else if (typeof(locus.pagesBack) == "number") {
       pageN = component.lastPageNumber() + locus.pagesBack;
-      console.log("Going backwards by " + locus.pagesBack + " to " + pageN);
+      //console.log("Going backwards by " + locus.pagesBack + " to " + pageN);
     } else if (typeof(locus.percent) == "number") {
       place = setPlaceFor(pageDiv, component, 1);
       pageN = place.pageAtPercentageThrough(locus.percent);
@@ -176,7 +175,7 @@ Monocle.Book = function (dataSource) {
         pageN = component.lastPageNumber();
       }
     } else {
-      console.log("Unrecognised locus: " + locus);
+      console.warn("Unrecognised locus: " + locus);
     }
 
     // If the dimensions of the pageDiv have changed, we should multiply the
