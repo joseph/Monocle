@@ -162,6 +162,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         p.turnData = {};
         return;
       }
+      showAdditionalPages(pagesToTurn);
       slideToCursor(boxPointX, shiftQueue);
     } else if (dir == k.BACKWARDS) {
       whenPlaceIsKnown(function () {
@@ -176,6 +177,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         );
         jumpOut(function () {
           flipPages();
+          showAdditionalPages(pagesToTurn);
           slideToCursor(boxPointX, shiftQueue);
         });
       }, lowerPage());
@@ -242,6 +244,36 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
+  function showAdditionalPages(n) {
+    if (n <= 1) { return; }
+    var up = upperPage();
+    if (!up.m.additionalPages) {
+      var div = up.m.additionalPages = document.createElement('div');
+      div.style.cssText = "position: absolute; top: 0; left: 100%; bottom: 0;" +
+        "-webkit-border-top-right-radius: 10px 6px;" +
+        "-webkit-border-bottom-right-radius: 10px 6px;" +
+        "border-top: 1px solid #AAA; border-bottom: 1px solid #AAA;" +
+        "background: url("+
+          "data:image/gif;base64,R0lGODlhAwABAJEAAJmZmfn59%2BDf1QAAACH5BAAHAP8ALAAAAAADAAEAAAIChFIAOw%3D%3D"+"); top right";
+      up.appendChild(div);
+    }
+    up.m.additionalPages.style.display = "block";
+    up.m.additionalPages.style.right = (0 - (n*3)) + "px";
+  }
+
+
+  function hideAdditionalPages() {
+    var lp = lowerPage();
+    if (lp.m.additionalPages) {
+      lp.m.additionalPages.style.display = "none";
+    }
+    var up = upperPage();
+    if (up.m.additionalPages) {
+      up.m.additionalPages.style.display = "none";
+    }
+  }
+
+
   function flipAndCompleteTurn() {
     flipPages();
     completedTurn();
@@ -249,6 +281,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function completedTurn() {
+    hideAdditionalPages();
     jumpIn(function () {
       whenPlaceIsKnown(function () {
         setPage(
