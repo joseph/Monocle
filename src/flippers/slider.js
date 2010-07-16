@@ -189,8 +189,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       return;
     }
 
-    p.turnData.points.min = Math.min(p.turnData.points.min, boxPointX);
-    p.turnData.points.max = Math.max(p.turnData.points.max, boxPointX);
+    checkPoint(boxPointX);
 
     slideToCursor(boxPointX, null, "0");
   }
@@ -203,7 +202,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     slideToCursor(boxPointX, null, "0");
 
-    p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
+    checkPoint(boxPointX);
 
     if (dir == k.FORWARDS) {
       if (
@@ -232,6 +231,13 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     } else {
       console.warn("Invalid direction: " + dir);
     }
+  }
+
+
+  function checkPoint(boxPointX) {
+    p.turnData.points.min = Math.min(p.turnData.points.min, boxPointX);
+    p.turnData.points.max = Math.max(p.turnData.points.max, boxPointX);
+    p.turnData.points.tap = p.turnData.points.max - p.turnData.points.min < 10;
   }
 
 

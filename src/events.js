@@ -110,25 +110,8 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     }
   } else {
     if (fns.start) {
-      // The touch proxy objects can result in a second touchstart notification,
-      // when a touch moves out of the proxy and into the main document.
-      // This prevents the touchstart from propagating.
-      if (Monocle.Browser.has.iframeTouchBug && !Monocle.Events.touchMonitor) {
-        var startFn = function () { Monocle.Events.touching = true; }
-        var endFn = function () { Monocle.Events.touching = false; }
-        Monocle.Events.listen(document.body, 'touchstart', startFn);
-        Monocle.Events.listen(document.body, 'touchend', endFn);
-        Monocle.Events.listen(document.body, 'touchcancel', endFn);
-        Monocle.Events.touchMonitor = true;
-      }
-
       listeners.touchstart = function (evt) {
         if (evt.touches.length > 1) { return; }
-        if (Monocle.Browser.has.iframeTouchBug && Monocle.Events.touching) {
-          evt.preventDefault();
-          evt.stopPropagation();
-          return;
-        }
         fns.start(cursorInfo(evt, evt.targetTouches[0]));
       }
       Monocle.Events.listen(elem, 'touchstart', listeners.touchstart, capture);

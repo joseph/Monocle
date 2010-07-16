@@ -37,12 +37,20 @@ Monocle.Controls.Panel = function () {
 
 
   function start(evt) {
-    if (p.contact) {
-      end(evt);
+    if (Monocle.Browser.has.iframeTouchBug) {
+      if (p.contact && p.proxiedContact != evt.proxied) { return; }
+      p.proxiedContact = evt.proxied;
     }
     p.contact = true;
-    evt.m.offsetX += p.div.offsetLeft;
-    evt.m.offsetY += p.div.offsetTop;
+    if (evt.m) {
+      evt.m.offsetX += p.div.offsetLeft;
+      evt.m.offsetY += p.div.offsetTop;
+    } else if (typeof evt.offsetX != 'undefined') {
+      evt.m = evt.monocleData = {
+        offsetX: evt.offsetX + p.div.offsetLeft,
+        offsetY: evt.offsetY + p.div.offsetTop
+      }
+    }
     expand();
     invoke('start', evt);
   }
@@ -80,6 +88,12 @@ Monocle.Controls.Panel = function () {
 
   function invoke(evtType, evt) {
     if (p.evtCallbacks[evtType]) {
+      if (!evt.m) {
+        evt.m = evt.monocleData = {
+          offsetX: evt.offsetX,
+          offsetY: evt.offsetY
+        }
+      }
       p.evtCallbacks[evtType](API, evt.m.offsetX, evt.m.offsetY);
     }
     evt.preventDefault();

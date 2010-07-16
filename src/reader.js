@@ -65,6 +65,7 @@ Monocle.Reader = function (node, bookData, options) {
     p.divs.box = typeof(node) == "string" ?
       document.getElementById(node) :
       node;
+    p.divs.box.setAttribute('monocle', 'reader');
 
     options = options || {}
 

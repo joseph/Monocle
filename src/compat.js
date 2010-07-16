@@ -11,13 +11,6 @@ Monocle.Browser.is = {
 } // ... with thanks to PrototypeJS.
 
 
-Monocle.Browser.has = {
-  touch: (typeof Touch == "object"),
-  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
-  iframeTouchBug: Monocle.Browser.is.MobileSafari
-}
-
-
 if (Monocle.Browser.is.MobileSafari) {
   (function () {
     var ver = navigator.userAgent.match(/ OS ([\d_]+)/);
@@ -27,6 +20,14 @@ if (Monocle.Browser.is.MobileSafari) {
       console.warn("Unknown MobileSafari user agent: "+navigator.userAgent);
     }
   })();
+}
+
+
+Monocle.Browser.has = {
+  touch: (typeof Touch == "object"),
+  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
+  iframeTouchBug: Monocle.Browser.is.MobileSafari &&
+    Monocle.Browser.iOSVersion < "4.1"
 }
 
 
@@ -177,6 +178,7 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
       evt.scale,
       evt.rotation
     );
+    mimicEvt.proxied = true;
 
     if (!target.dispatchEvent(mimicEvt)) {
       evt.preventDefault();
