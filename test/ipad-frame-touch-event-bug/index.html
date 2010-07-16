@@ -15,10 +15,14 @@
       (function () {
         function init() {
           var layer = document.getElementById('layer');
-          layer.addEventListener('touchstart', layerTouched, false);
+          layer.addEventListener('touchstart', touchEvt, false);
+          layer.addEventListener('touchmove', touchEvt, false);
+          layer.addEventListener('touchend', touchEvt, false);
+          layer.addEventListener('touchcancel', touchEvt, false);
         }
-        function layerTouched(evt) {
-          alert('touched');
+        function touchEvt(evt) {
+          document.getElementById('out').innerHTML += evt.type + "<br />";
+          evt.preventDefault();
         }
         window.addEventListener('load', init, false);
       })();
@@ -30,19 +34,30 @@
       }
       iframe {
         position: absolute;
-        top: 100px;
-        left: 100px;
+        top: 60px;
+        left: 60px;
         width: 100px;
         height: 100px;
         background: #CCC;
+        z-index: 1;
       }
       div#layer {
         position: absolute;
-        top: 50px;
-        left: 50px;
+        top: 10px;
+        left: 10px;
         width: 100px;
         height: 100px;
         background: #000;
+        overflow: hidden;
+        z-index: 2;
+        color: white;
+      }
+      div#out {
+        position: absolute;
+        top: 175px;
+        width: 300px;
+        height: 100px;
+        font: 9px Helvetica;
       }
     </style>
   </head>
@@ -50,13 +65,15 @@
   <body>
 
     <div id="container">
-      <iframe src="javascript:'';"></iframe>
-      <div id="layer"></div>
+      <div id="layer">
+        This is the text of the layer above.
+        This is the text of the layer above.
+        This is the text of the layer above.
+        This is the text of the layer above.
+      </div>
+      <iframe src="javascript:'This is the text of the iframe.';"></iframe>
+      <div id="out"></div>
     </div>
-    <p>
-      Touching any part of the black div that is NOT over the iframe will
-      display an alert.
-    </p>
 
   </body>
 
