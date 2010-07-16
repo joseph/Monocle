@@ -23,6 +23,13 @@ if (Monocle.Browser.is.MobileSafari) {
 }
 
 
+Monocle.Browser.on = {
+  iPhone: navigator.userAgent.indexOf("iPhone") != -1,
+  iPad: navigator.userAgent.indexOf("iPad") != -1
+  // TODO: Mac, Windows, etc
+}
+
+
 Monocle.Browser.has = {
   touch: (typeof Touch == "object"),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
