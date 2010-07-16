@@ -175,6 +175,14 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var srcBases = srcDoc.getElementsByTagName('base');
     if (srcBases[0]) {
       var head = destDoc.getElementsByTagName('head')[0];
+      if (!head) {
+        head = destDoc.createElement('head');
+        if (destDoc.body) {
+          destDoc.insertBefore(head, destDoc.body);
+        } else {
+          destDoc.appendChild(head);
+        }
+      }
       var bases = destDoc.getElementsByTagName('base');
       var base = bases[0] ? bases[0] : destDoc.createElement('base');
       base.setAttribute('href', srcBases[0].getAttribute('href'));

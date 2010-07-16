@@ -158,8 +158,8 @@ Monocle.Reader = function (node, bookData, options) {
   }
 
 
-  // Opens the frame to a particular URL, so that offline-caching works with
-  // that URL, and base hrefs work.
+  // Opens the frame to a particular URL (usually 'about:blank').
+  //
   function primeFrames(url, callback) {
     url = url || "about:blank";
 
