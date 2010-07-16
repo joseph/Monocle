@@ -148,7 +148,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function lift(dir, boxPointX) {
+  function lift(dir, boxPointX, pagesToTurn) {
+    pagesToTurn = pagesToTurn || 1;
     p.turnData.points = {
       start: boxPointX,
       min: boxPointX,
@@ -171,7 +172,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         }
         setPage(
           lowerPage(),
-          getPlace().getLocus({ direction: k.BACKWARDS })
+          getPlace().getLocus({ direction: k.BACKWARDS * pagesToTurn })
         );
         jumpOut(function () {
           flipPages();
@@ -252,7 +253,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       whenPlaceIsKnown(function () {
         setPage(
           lowerPage(),
-          getPlace().getLocus({ direction: k.FORWARDS }),
+          getPlace().getLocus({ direction: k.FORWARDS * (turnsQueued() || 1)}),
           function () {
             p.reader.dispatchEvent('monocle:turn');
           }
@@ -292,13 +293,24 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
     if (p.queue.length) {
       data = p.queue.shift();
       if (data[2] == "lift") {
-        lift(data[0], data[1]);
+        var qd = turnsQueued();
+        while (p.queue.length > 1 || (p.queue[0] && p.queue[0][2] == "lift")) {
+          p.queue.shift();
+        }
+        lift(data[0], data[1], qd);
       } else if (data[2] == "drop") {
         drop(data[0], data[1]);
       } else {
         console.warn("Unknown queue action: "+data[2]);
       }
     }
+  }
+
+
+  function turnsQueued() {
+    var rslt = p.queue.length;
+    if (!rslt) { return 0; }
+    return Math.floor(rslt * 0.5);
   }
 
 
