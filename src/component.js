@@ -176,11 +176,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (srcBases[0]) {
       var head = destDoc.getElementsByTagName('head')[0];
       if (!head) {
-        head = destDoc.createElement('head');
-        if (destDoc.body) {
-          destDoc.insertBefore(head, destDoc.body);
-        } else {
-          destDoc.appendChild(head);
+        try {
+          head = destDoc.createElement('head');
+          if (destDoc.body) {
+            destDoc.insertBefore(head, destDoc.body);
+          } else {
+            destDoc.appendChild(head);
+          }
+        } catch (e) {
+          head = destDoc.body;
         }
       }
       var bases = destDoc.getElementsByTagName('base');
