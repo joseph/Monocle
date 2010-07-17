@@ -198,7 +198,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   }
 
 
-  function drop(dir, boxPointX) {
+  function drop(dir, boxPointX, forceComplete) {
     if (!p.turnData.points) {
       return;
     }
@@ -209,6 +209,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
     if (dir == k.FORWARDS) {
       if (
+        forceComplete ||
         p.turnData.points.tap ||
         p.turnData.points.start - boxPointX > 60 ||
         p.turnData.points.min >= boxPointX
@@ -221,6 +222,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
       }
     } else if (dir == k.BACKWARDS) {
       if (
+        forceComplete ||
         p.turnData.points.tap ||
         boxPointX - p.turnData.points.start > 60 ||
         p.turnData.points.max <= boxPointX
@@ -253,12 +255,14 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         "-webkit-border-top-right-radius: 10px 6px;" +
         "-webkit-border-bottom-right-radius: 10px 6px;" +
         "border-top: 1px solid #AAA; border-bottom: 1px solid #AAA;" +
-        "background: url("+
-          "data:image/gif;base64,R0lGODlhAwABAJEAAJmZmfn59%2BDf1QAAACH5BAAHAP8ALAAAAAADAAEAAAIChFIAOw%3D%3D"+"); top right";
+        "background-position: top right;" +
+        "background-image: url("+
+          "data:image/gif;base64,R0lGODlhAwABAJEAAJmZmfn59%2BDf1QAAACH5BAAHAP8ALAAAAAADAAEAAAIChFIAOw%3D%3D"+");";
       up.appendChild(div);
     }
     up.m.additionalPages.style.display = "block";
-    up.m.additionalPages.style.right = (0 - (n*3)) + "px";
+    up.m.backgroundColor = n > 6 ? "#BBB" : "#FFF";
+    up.m.additionalPages.style.right = (0 - (Math.min(n,6)*3)) + "px";
   }
 
 
@@ -332,7 +336,7 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         }
         lift(data[0], data[1], qd);
       } else if (data[2] == "drop") {
-        drop(data[0], data[1]);
+        drop(data[0], data[1], true);
       } else {
         console.warn("Unknown queue action: "+data[2]);
       }
@@ -341,9 +345,10 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
 
 
   function turnsQueued() {
-    var rslt = p.queue.length;
-    if (!rslt) { return 0; }
-    return Math.floor(rslt * 0.5);
+    for (var i = 0, rslt = 0; i < p.queue.length; ++i) {
+      if (p.queue[i][2] == "drop") { rslt += 1; }
+    }
+    return rslt;
   }
 
 
