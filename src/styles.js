@@ -12,9 +12,6 @@ Monocle.Styles = {
     return parts.join(" ");
   },
   applyRules: function (elem, rule) {
-    if (typeof rule == "string") {
-      elem.className = "mon_"+rule;
-    }
     elem.style.cssText = this.ruleText(rule);
   },
   affix: function (elem, property, value) {

@@ -99,6 +99,7 @@ Monocle.Reader = function (node, bookData, options) {
         'monocle:componentchange',
         function (evt) {
           var doc = evt.monocleData['document'];
+          doc.documentElement.id = options.system_id || "RS:monocle";
           for (var i = 0; i < p.pageStylesheets.length; ++i) {
             if (p.pageStylesheets[i]) {
               addPageStylesheet(doc, i);
@@ -680,9 +681,13 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   //   "-moz-user-select: none !important;" +
   //   "-webkit-user-select: none !important;" +
   // "}" +
-  "body * {" +
-    "float: none !important;" +
-    "clear: none !important;" +
+  // "body * {" +
+  //   "float: none !important;" +
+  //   "clear: none !important;" +
+  // "}",
+  "html * {" +
+    "text-rendering: optimizeSpeed !important;" +
+    "word-wrap: break-word !important;" +
   "}",
   "table, img {" +
     "max-width: 100% !important;" +
