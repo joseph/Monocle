@@ -34,7 +34,9 @@ Monocle.Browser.has = {
   touch: (typeof Touch == "object"),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
-    Monocle.Browser.iOSVersion < "4.1"
+    Monocle.Browser.iOSVersion < "4.1",
+  floatColumnBug: Monocle.Browser.is.MobileSafari &&
+    Monocle.Browser.iOSVersion >= "4.0"
 }
 
 

@@ -688,6 +688,7 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html * {" +
     "text-rendering: optimizeSpeed !important;" +
     "word-wrap: break-word !important;" +
+    (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
   "table, img {" +
     "max-width: 100% !important;" +
