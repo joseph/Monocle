@@ -36,6 +36,9 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
   function listenForInteraction(panelClass) {
     if (typeof panelClass != "function") {
       panelClass = k.DEFAULT_PANELS_CLASS;
+      if (!panelClass) {
+        console.log("Invalid panel class.")
+      }
     }
     var q = function (action, panel, x) {
       var dir = panel.properties.direction;
@@ -257,7 +260,8 @@ Monocle.Flippers.Slider = function (reader, setPageFn) {
         "border-top: 1px solid #AAA; border-bottom: 1px solid #AAA;" +
         "background-position: top right;" +
         "background-image: url("+
-          "data:image/gif;base64,R0lGODlhAwABAJEAAJmZmfn59%2BDf1QAAACH5BAAHAP8ALAAAAAADAAEAAAIChFIAOw%3D%3D"+");";
+          "data:image/gif;base64,R0lGODlhAwABAJEAAJmZmfn59%2BDf1QAAACH5BAAHAP8ALAAAAAADAAEAAAIChFIAOw%3D%3D" +
+        ");";
       up.appendChild(div);
     }
     up.m.additionalPages.style.display = "block";

@@ -121,10 +121,12 @@
           "../../src/component.js",
           "../../src/place.js",
           "../../src/styles.js",
+          "../../src/controls/panel.js",
+          "../../src/panels/twopane.js",
           "../../src/flippers/slider.js",
           "../../src/flippers/legacy.js"
         ]
-        framer.constants.waitForPiece = 'flippers/legacy';
+        framer.constants.waitForPiece = 'panels/twopane';
         return window['reader'+num] = framer.newReader('reader'+num, bd);
       }
 

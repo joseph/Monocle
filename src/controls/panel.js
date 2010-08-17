@@ -136,3 +136,5 @@ Monocle.Controls.Panel = function () {
 
   return API;
 }
+
+Monocle.pieceLoaded('controls/panel');

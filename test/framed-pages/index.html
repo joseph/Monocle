@@ -59,15 +59,10 @@
           return [];
         },
         getComponent: function (cmptId, callback) {
-          setTimeout(
-            function () {
-              var ajReq = new XMLHttpRequest();
-              ajReq.open("GET", cmptId, false);
-              ajReq.send(null);
-              callback(ajReq.responseText);
-            },
-            cmptId == '2.html' ? 4000 : 400
-          );
+          var ajReq = new XMLHttpRequest();
+          ajReq.open("GET", cmptId, false);
+          ajReq.send(null);
+          callback(ajReq.responseText);
         },
         getMetaData: function(key) {
           return {

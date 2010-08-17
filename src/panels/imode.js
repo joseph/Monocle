@@ -226,3 +226,6 @@ Monocle.Styles.Panels.IMode = {
       "no-repeat center center"
   }
 }
+
+
+Monocle.pieceLoaded('panels/imode');

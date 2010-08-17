@@ -41,3 +41,5 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
 
   return API;
 }
+
+Monocle.pieceLoaded('panels/marginal');
