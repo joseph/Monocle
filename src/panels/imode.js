@@ -214,9 +214,7 @@ Monocle.Styles.Panels.IMode = {
     "left": "33%",
     "width": "34%",
     "background": "rgba(255,255,255,0.7)",
-    "opacity": "0",
-    "border": "1px solid #CCC",
-    "border-top": "none"
+    "opacity": "0"
   },
   toggleIcon: {
     "position": "absolute",
