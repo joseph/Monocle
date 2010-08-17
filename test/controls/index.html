@@ -23,7 +23,7 @@
 
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/controls/panel.js"></script>
-    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/panels/marginal.js"></script>
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
@@ -72,6 +72,18 @@
       #part1, #part2 {
         display: none;
       }
+      .bookTitle {
+        position: absolute;
+        top: 1%;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+      }
+      .runner {
+        font-variant: small-caps;
+        font-size: 87%;
+        color: #900;
+      }
     </style>
 
     <script type="text/javascript">
@@ -106,59 +118,90 @@
         }
       }
 
+
+      function createBookTitle(reader, contactListeners) {
+        var bt = {}
+        bt.createControlElements = function () {
+          cntr = document.createElement('div');
+          cntr.className = "bookTitle";
+          runner = document.createElement('div');
+          runner.className = "runner";
+          runner.innerHTML = reader.getBook().getMetaData('title');
+          cntr.appendChild(runner);
+          if (contactListeners) {
+            Monocle.Events.listenForContact(cntr, contactListeners);
+          }
+          return cntr;
+        }
+        reader.addControl(bt, 'page');
+        return bt;
+      }
+
       // Initialize the reader element.
       Monocle.Events.listen(
         window,
         'load',
         function () {
-          var readerOptions = {};
+          var readerOptions = {
+            panels: Monocle.Panels.Marginal
+          };
 
           // PLACESAVER
           var placeSaver = new Monocle.Controls.PlaceSaver('placesaver');
           readerOptions.place = placeSaver.savedPlace();
-
-          // The Reader itself
-          window.reader1 = Monocle.Reader('placesaver', bookData, readerOptions);
-          reader1.addControl(placeSaver, 'invisible');
+          Monocle.Reader('placesaver', bookData, readerOptions, function (rdr) {
+            window.reader1 = rdr;
+            rdr.addControl(placeSaver, 'invisible');
+          });
 
           // MAGNIFIER
-          window.reader2 = Monocle.Reader('magnifier', bookData);
-          var magnifier = new Monocle.Controls.Magnifier(reader2);
-          reader2.addControl(magnifier, 'page');
+          Monocle.Reader('magnifier', bookData, readerOptions, function (rdr) {
+            window.reader2 = rdr;
+            var magnifier = new Monocle.Controls.Magnifier(rdr);
+            rdr.addControl(magnifier);
+          });
 
           // SCRUBBER
-          window.reader3 = Monocle.Reader('scrubber', bookData);
-          var scrubber = new Monocle.Controls.Scrubber(reader3);
-          reader3.addControl(scrubber, 'standard');
+          Monocle.Reader('scrubber', bookData, readerOptions, function (rdr) {
+            window.reader3 = rdr;
+            var scrubber = new Monocle.Controls.Scrubber(rdr);
+            rdr.addControl(scrubber, 'popover');
+          });
 
           // SPINNER
-          window.reader4 = Monocle.Reader('spinner', bookData);
-          var spinner = Monocle.Controls.Spinner(reader4);
-          reader4.addControl(spinner, 'page', { hidden: true });
-          // FIXME: panels?
-          reader4.listen(
-            'monocle:contact:start:unhandled',
-            function () {
-              if (spinner.spinning) {
-                spinner.spun();
-                spinner.spinning = false;
-              } else {
-                spinner.spin();
-                spinner.spinning = true;
+          Monocle.Reader('spinner', bookData, readerOptions, function (rdr) {
+            window.reader4 = rdr;
+            var spinner = Monocle.Controls.Spinner(rdr);
+            rdr.addControl(spinner, 'page', { hidden: true });
+            bookTitle = createBookTitle(
+              rdr,
+              {
+                start: function () {
+                  if (spinner.spinning) {
+                    spinner.spun();
+                    spinner.spinning = false;
+                  } else {
+                    spinner.spin();
+                    spinner.spinning = true;
+                  }
+                }
               }
-            }
-          );
+            );
+          });
 
-          window.reader5 = Monocle.Reader('toc', bookData);
-          var toc = Monocle.Controls.Contents(reader5);
-          reader5.addControl(toc, 'popover');
-          // FIXME: panels?
-          reader5.listen(
-            'monocle:contact:start:unhandled',
-            function () {
-              reader5.showControl(toc);
-            }
-          );
+          Monocle.Reader('toc', bookData, readerOptions, function (rdr) {
+            window.reader5 = rdr;
+            var toc = Monocle.Controls.Contents(rdr);
+            rdr.addControl(toc, 'popover', { hidden: true });
+            createBookTitle(
+              rdr,
+              {
+                start: function () {
+                  rdr.showControl(toc);
+                }
+              }
+            );
+          });
         }
       );
     </script>
@@ -179,7 +222,7 @@
       <h2>Font Magnifier</h2>
       <div class="reader" id="magnifier"></div>
       <p>
-        Tap the AA icon in the top right corner to toggle large/normal fonts.
+        Click the AA icon in the top right corner to toggle large/normal fonts.
       </p>
     </div>
 
@@ -195,7 +238,7 @@
       <h2>Spinner</h2>
       <div class="reader" id="spinner"></div>
       <p>
-        Tap in middle of page to invoke a page-embedded spinner.
+        Click the book title to invoke a page-embedded spinner.
       </p>
     </div>
 
@@ -203,7 +246,8 @@
       <h2>Table of Contents</h2>
       <div class="reader" id="toc"></div>
       <p>
-        Tap middle of page to invoke modal window. Tap modal window to dismiss.
+        Click the book title to invoke modal window.
+        Click outside modal window to dismiss.
       </p>
     </div>
 

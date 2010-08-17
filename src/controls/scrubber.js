@@ -12,7 +12,6 @@ Monocle.Controls.Scrubber = function (reader) {
 
   function initialize() {
     p.reader = reader;
-    p.book = p.reader.getBook();
     p.reader.listen('monocle:turn', updateNeedles);
     updateNeedles();
   }
@@ -195,12 +194,13 @@ Monocle.Controls.Scrubber = function (reader) {
 
   function updateBubbleWithPlace(bubble, place) {
     primeComponentIds();
-    var chps = p.book.chaptersForComponent(place.componentId);
+    var book = p.reader.getBook();
+    var chps = book.chaptersForComponent(place.componentId);
     var cmptIndex = p.componentIds.indexOf(place.componentId);
     var chp = chps[Math.floor(chps.length * place.percentageThrough)];
-    if (cmptIndex > -1 && p.book.properties.components[cmptIndex]) {
+    if (cmptIndex > -1 && book.properties.components[cmptIndex]) {
       var actualPlace = Monocle.Place.FromPercentageThrough(
-        p.book.properties.components[cmptIndex],
+        book.properties.components[cmptIndex],
         place.percentageThrough
       );
       chp = actualPlace.chapterInfo() || chp;
@@ -247,8 +247,7 @@ Monocle.Styles.Controls.Scrubber = {
     "-webkit-border-radius": "26px",
     "-moz-border-radius": "26px",
     "border-radius": "100px",
-    "border": "3px solid #333",
-    "opacity": "0.7"
+    "border": "3px solid #333"
   },
   needle: {
     "position": "absolute",

@@ -5,8 +5,10 @@
 //  flipper: The class of page flipper to use.
 //  place: A book locus for the page to open to when the reader is initialized.
 //
-Monocle.Reader = function (node, bookData, options) {
-  if (Monocle == this) { return new Monocle.Reader(node, bookData, options); }
+Monocle.Reader = function (node, bookData, options, onLoadCallback) {
+  if (Monocle == this) {
+    return new Monocle.Reader(node, bookData, options, onLoadCallback);
+  }
 
   var API = { constructor: Monocle.Reader }
   var k = API.constants = API.constructor;
@@ -61,7 +63,7 @@ Monocle.Reader = function (node, bookData, options) {
 
   // Sets up the container and internal elements.
   //
-  function initialize(node, bookData, options) {
+  function initialize(node, bookData, options, onLoadCallback) {
     p.divs.box = typeof(node) == "string" ?
       document.getElementById(node) :
       node;
@@ -114,7 +116,13 @@ Monocle.Reader = function (node, bookData, options) {
 
       p.flipper.listenForInteraction(options.panels);
 
-      Monocle.defer(function () { dispatchEvent("monocle:loaded"); });
+      Monocle.defer(function () {
+        if (onLoadCallback) {
+          console.log("dialling back");
+          onLoadCallback(API);
+        }
+        dispatchEvent("monocle:loaded");
+      });
     });
   }
 
@@ -241,7 +249,7 @@ Monocle.Reader = function (node, bookData, options) {
     }
     p.book = bk;
     calcDimensions(locus);
-    dispatchEvent("monocle:bookchange");
+    dispatchEvent("monocle:bookchange", { book: p.book });
     return p.book;
   }
 
@@ -660,7 +668,7 @@ Monocle.Reader = function (node, bookData, options) {
   API.updatePageStyles = updatePageStyles;
   API.removePageStyles = removePageStyles;
 
-  initialize(node, bookData, options);
+  initialize(node, bookData, options, onLoadCallback);
 
   return API;
 }
