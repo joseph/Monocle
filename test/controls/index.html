@@ -165,7 +165,7 @@
           Monocle.Reader('scrubber', bookData, readerOptions, function (rdr) {
             window.reader3 = rdr;
             var scrubber = new Monocle.Controls.Scrubber(rdr);
-            rdr.addControl(scrubber, 'popover');
+            rdr.addControl(scrubber);
           });
 
           // SPINNER
@@ -230,7 +230,7 @@
       <h2>Scrubber</h2>
       <div class="reader" id="scrubber"></div>
       <p>
-        Drag along the white rectangle at the base of page to change location.
+        Drag along the circle at the base of page to change location.
       </p>
     </div>
 

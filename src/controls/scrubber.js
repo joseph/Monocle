@@ -17,79 +17,63 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function calcTopBound(track) {
-    if (p.bottomBound == track.offsetHeight) {
+  function calcLeftBound(cntr) {
+    if (p.rightBound == cntr.offsetWidth) {
       return;
     }
-    p.bottomBound = track.offsetHeight;
-    var ot = track.offsetTop;
-    var node = track.parentNode;
-    while (node) {
-      if (node.offsetTop) {
-        ot += node.offsetTop;
-      }
-      node = node.parentNode;
+    p.rightBound = cntr.offsetWidth;
+    p.leftBound = p.reader.properties.boxDimensions.left;
+    var box = cntr;
+    while (box && box != p.reader.properties.divs.box) {
+      p.leftBound += box.offsetLeft;
+      box = box.parentNode;
     }
-    p.topBound = ot + 8; // FIXME: track border + needle margin
   }
 
 
-  function rebaseY(evt, track) {
-    calcTopBound(track);
-    var y = evt.pageY;
+  function rebaseX(evt, cntr) {
+    calcLeftBound(cntr);
+    var x = evt.pageX;
     if (evt.changedTouches) {
-      y = evt.changedTouches[0].pageY;
+      x = evt.changedTouches[0].pageX;
     }
-    return Math.max(Math.min(p.bottomBound, y - p.topBound), 0);
+    return Math.max(Math.min(p.rightBound, x - p.leftBound), 0);
   }
 
 
-  function pixelToPlace(y, track) {
-    primeComponentIds();
-    var pc = (y / track.offsetHeight) * 100;
-    var cmpt = p.componentIds[Math.floor(pc / p.componentHeight)];
-    var cmptPc = ((pc % p.componentHeight) / p.componentHeight);
+  function pixelToPlace(x, cntr) {
+    if (!p.componentIds) {
+      p.componentIds = p.reader.getBook().properties.componentIds;
+      p.componentWidth = 100 / p.componentIds.length;
+    }
+    var pc = (x / cntr.offsetWidth) * 100;
+    var cmpt = p.componentIds[Math.floor(pc / p.componentWidth)];
+    var cmptPc = ((pc % p.componentWidth) / p.componentWidth);
     return { componentId: cmpt, percentageThrough: cmptPc };
   }
 
 
-  function placeToPixel(place, track) {
-    primeComponentIds();
-    var componentIndex = p.componentIds.indexOf(place.componentId());
-    var pc = p.componentHeight * componentIndex;
-    pc += place.percentageThrough() * p.componentHeight;
-    return Math.round((pc / 100) * track.offsetHeight);
-  }
-
-
-  function primeComponentIds() {
+  function placeToPixel(place, cntr) {
     if (!p.componentIds) {
       p.componentIds = p.reader.getBook().properties.componentIds;
-      p.componentHeight = 100 / p.componentIds.length;
+      p.componentWidth = 100 / p.componentIds.length;
     }
+    var componentIndex = p.componentIds.indexOf(place.componentId());
+    var pc = p.componentWidth * componentIndex;
+    pc += place.percentageThrough() * p.componentWidth;
+    return Math.round((pc / 100) * cntr.offsetWidth);
   }
 
 
   function updateNeedles() {
-    if (p.hidden || !p.divs.track) {
+    if (p.hidden || !p.divs.container) {
       return;
     }
     var place = p.reader.getPlace();
-    var track = p.divs.track[0];
-    var y = placeToPixel(place, track);
+    var x = placeToPixel(place, p.divs.container[0]);
     for (var i = 0; i < p.divs.needle.length; ++i) {
-      var halfHeight = p.divs.needle[i].offsetHeight / 2;
-      setY(p.divs.needle[i], y - halfHeight);
-      // FIXME: remove these magic numbers
-      p.divs.needleTrail[i].style.height =
-        Math.min((track.offsetHeight + 17 - y), track.offsetHeight - 8) + "px";
-      updateBubbleWithPlace(
-        p.divs.bubble[i],
-        {
-          componentId: place.componentId(),
-          percentageThrough: place.percentageThrough()
-        }
-      );
+      setX(p.divs.needle[i], x - p.divs.needle[i].offsetWidth / 2);
+      p.divs.needleTrail[i].style.width = x + "px";
     }
   }
 
@@ -128,102 +112,73 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
-  function setY(node, y) {
-    y = Math.min(p.divs.track[0].offsetHeight - node.offsetHeight, y);
-    y = Math.max(y, 0);
+  function setX(node, x) {
+    x = Math.min(p.divs.container[0].offsetWidth - node.offsetWidth, x);
+    x = Math.max(x, 0);
     node.style.webkitTransform =
       node.style.MozTransform =
-        "translateY(" + y + "px)";
+        "translateX(" + x + "px)";
   }
 
 
   function createControlElements() {
     var cntr = createDivNamed('container');
     var track = createDivNamed('track', cntr);
-    var needleTrail = createDivNamed('needleTrail', track);
-    var needle = createDivNamed('needle', track);
+    var needleTrail = createDivNamed('needleTrail', cntr);
+    var needle = createDivNamed('needle', cntr);
     var bubble = createDivNamed('bubble', cntr);
 
-    var listeners;
-
-    var deafenListeners = function () {
-      if (!listeners) {
-        return;
-      }
-      Monocle.Events.deafenForContact(track, listeners);
-      listeners = null;
-    }
-
-    var startEvt = function (evt) {
-      moveEvt(evt);
-      deafenListeners();
-      listeners = Monocle.Events.listenForContact(
-        track,
-        {
-          move: moveEvt,
-          end: endEvt
-        }
-      );
-    }
-
-    var moveEvt = function (evt, y) {
+    var moveEvt = function (evt, x) {
       evt.stopPropagation();
       evt.preventDefault();
-      y = y || rebaseY(evt, track);
-      setY(needle, y - needle.offsetHeight / 2);
-      var place = pixelToPlace(y, track);
-      updateBubbleWithPlace(bubble, place);
-      p.lastY = y;
+      x = x || rebaseX(evt, cntr);
+      var place = pixelToPlace(x, cntr);
+      setX(needle, x - needle.offsetWidth / 2);
+      var book = p.reader.getBook();
+      var chps = book.chaptersForComponent(place.componentId);
+      var cmptIndex = p.componentIds.indexOf(place.componentId);
+      var chp = chps[Math.floor(chps.length * place.percentageThrough)];
+      if (cmptIndex > -1 && book.properties.components[cmptIndex]) {
+        var actualPlace = Monocle.Place.FromPercentageThrough(
+          book.properties.components[cmptIndex],
+          place.percentageThrough
+        );
+        chp = actualPlace.chapterInfo() || chp;
+      }
+
+      if (chp) {
+        bubble.innerHTML = chp.title;
+      }
+      setX(bubble, x - bubble.offsetWidth / 2);
+
+      p.lastX = x;
       return place;
     }
 
     var endEvt = function (evt) {
-      var place = moveEvt(evt, p.lastY);
+      var place = moveEvt(evt, p.lastX);
       p.reader.moveTo({
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      deafenListeners();
+      Monocle.Events.deafen(cntr, eventType('move'), moveEvt);
+      Monocle.Events.deafen(document.body, eventType('end'), endEvt);
+      bubble.style.display = "none";
     }
 
-    Monocle.Events.listenForContact(track, { start: startEvt });
+    Monocle.Events.listen(
+      cntr,
+      eventType("start"),
+      function (evt) {
+        bubble.style.display = "block";
+        moveEvt(evt);
+        Monocle.Events.listen(cntr, eventType('move'), moveEvt);
+        Monocle.Events.listen(document.body, eventType("end"), endEvt);
+      }
+    );
 
     return cntr;
   }
-
-
-  function updateBubbleWithPlace(bubble, place) {
-    primeComponentIds();
-    var book = p.reader.getBook();
-    var chps = book.chaptersForComponent(place.componentId);
-    var cmptIndex = p.componentIds.indexOf(place.componentId);
-    var chp = chps[Math.floor(chps.length * place.percentageThrough)];
-    if (cmptIndex > -1 && book.properties.components[cmptIndex]) {
-      var actualPlace = Monocle.Place.FromPercentageThrough(
-        book.properties.components[cmptIndex],
-        place.percentageThrough
-      );
-      chp = actualPlace.chapterInfo() || chp;
-    }
-
-    if (chp) {
-      if (!bubble.chapterTitle) {
-        var bCT = createDivNamed("bubbleChapterTitle", bubble);
-        bCT.appendChild(bubble.chapterTitle = document.createTextNode(''));
-        var bCP = createDivNamed("bubbleChapterPage", bubble);
-        bCP.appendChild(bubble.chapterPage = document.createTextNode(''));
-      }
-
-      bubble.chapterTitle.nodeValue = chp.title;
-      if (actualPlace) {
-        bubble.chapterPage.nodeValue = "Page " + actualPlace.pageNumber();
-        bubble.chapterPage.parentNode.style.visibility = "visible";
-      } else {
-        bubble.chapterPage.parentNode.style.visibility = "hidden";
-      }
-    }
-  }
-
 
   API.createControlElements = createControlElements;
   API.updateNeedles = updateNeedles;
@@ -236,55 +191,56 @@ Monocle.Controls.Scrubber = function (reader) {
 
 Monocle.Styles.Controls.Scrubber = {
   container: {
-    "width": "100%",
-    "height": "100%"
+    "position": "absolute",
+    "left": "1em",
+    "right": "1em",
+    "bottom": "8px",
+    "height": "30px",
+    "background": "rgba(255,255,255,0.8)",
+    "-webkit-border-radius": "6px",
+    "-moz-border-radius": "6px",
+    "border-radius": "6px",
+    "-webkit-box-shadow": "0px 0px 8px rgba(255,255,255,1)"
   },
   track: {
-    "position": "relative",
-    "margin": "0 20px 0 auto",
-    "width": "52px",
-    "height": "98%",
-    "-webkit-border-radius": "26px",
-    "-moz-border-radius": "26px",
-    "border-radius": "100px",
-    "border": "3px solid #333"
+    "margin-top": "10px",
+    "height": "5px",
+    "border": "1px solid #999"
   },
   needle: {
     "position": "absolute",
-    "margin": "1px",
-    "width": "50px",
-    "height": "50px",
-    "background": "#333",
-    "-webkit-border-radius": "24px",
-    "-moz-border-radius": "24px"
+    "width": "14px",
+    "height": "14px",
+    "top": "5px",
+    "background": "#CCC",
+    "border": "1px solid #999",
+    "-webkit-border-radius": "8px",
+    "-moz-border-radius": "8px"
   },
   needleTrail: {
     "position": "absolute",
-    "bottom": "0",
-    "background": "#333",
-    "opacity": "0.67",
-    "-webkit-border-radius": "24px",
-    "-moz-border-radius": "24px",
-    "margin": "1px",
-    "width": "50px",
-    "height": "50px",
-    "-webkit-transition": "height ease-in 100ms"
+    "height": "4px",
+    "background": "#DDD",
+    "top": "11px",
+    "left": "1px",
+    "height": "5px"
   },
   bubble: {
     "position": "absolute",
-    "top": "2%",
-    "left": "0",
-    "margin-right": "75px",
-    "display": "block",
-    "background": "rgba(245,245,245,0.65)",
-    "padding": "0.2em 1em",
-    "-webkit-border-radius": "6px"
-  },
-  bubbleChapterTitle: {
-    "font-weight": "bold"
-  },
-  bubbleChapterPage: {
-    "font": "9pt Helvetica, Arial, sans-serif"
+    "bottom": "2.5em",
+    "background": "rgba(0, 0, 0, 0.9)",
+    "-webkit-border-radius": "10px",
+    "-moz-border-radius": "10px",
+    "padding": "1em",
+    "display": "none",
+    "white-space": "nowrap",
+    "text-overflow": "ellipsis",
+    "overflow": "hidden",
+    "-webkit-transform-style": "preserve-3d",
+    "min-width": "20%",
+    "max-width": "30%",
+    "color": "#CCC",
+    "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
   }
 }
 
