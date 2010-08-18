@@ -211,7 +211,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         throw("No flipper class");
       }
     }
-    p.flipper = new flipperClass(API, setPage, p.readerOptions);
+    p.flipper = new flipperClass(API, null, p.readerOptions);
   }
 
 
@@ -344,30 +344,30 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // This method is handed over to the flipper, which calls it with a
   // callback to do the actual display change.
   //
-  function setPage(pageDiv, locus, callback) {
-    var eData = { page: pageDiv, locus: locus }
+  // function setPage(pageDiv, locus, callback) {
+  //   var eData = { page: pageDiv, locus: locus }
 
-    // Other things may disallow page change.
-    if (!dispatchEvent('monocle:pagechanging', eData, true)) {
-      return;
-    }
+  //   // Other things may disallow page change.
+  //   if (!dispatchEvent('monocle:pagechanging', eData, true)) {
+  //     return;
+  //   }
 
-    var onChange = function (rslt) {
-      // The book may disallow changing to the given page.
-      if (rslt === 'disallow') {
-        callback(rslt);
-        return rslt;
-      }
+  //   var onChange = function (rslt) {
+  //     // The book may disallow changing to the given page.
+  //     if (rslt === 'disallow') {
+  //       callback(rslt);
+  //       return rslt;
+  //     }
 
-      callback(rslt.offset);
+  //     callback(rslt.offset);
 
-      eData.pageNumber = rslt.page;
-      eData.componentId = rslt.componentId;
-      dispatchEvent("monocle:pagechange", eData);
-    }
+  //     eData.pageNumber = rslt.page;
+  //     eData.componentId = rslt.componentId;
+  //     dispatchEvent("monocle:pagechange", eData);
+  //   }
 
-    p.book.changePage(pageDiv, locus, onChange);
-  }
+  //   p.book.changePage(pageDiv, locus, onChange);
+  // }
 
 
   // Valid types:

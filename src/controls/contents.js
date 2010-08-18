@@ -36,7 +36,7 @@ Monocle.Controls.Contents = function (reader) {
       Monocle.Styles.Controls.Contents.list
     );
 
-    var contents = book.chapterTree();
+    var contents = book.properties.contents;
     for (var i = 0; i < contents.length; ++i) {
       chapterBuilder(list, contents[i], 0);
     }

@@ -1,4 +1,4 @@
-Monocle.Flippers.Instant = function (reader, setPageFn) {
+Monocle.Flippers.Instant = function (reader) {
 
   var API = { constructor: Monocle.Flippers.Instant }
   var k = API.constants = API.constructor;
@@ -9,7 +9,6 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
   function initialize() {
     p.reader = reader;
-    p.setPageFn = setPageFn;
   }
 
 
@@ -47,17 +46,19 @@ Monocle.Flippers.Instant = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    var spCallback = function (offset) {
-      if (offset == 'disallow') {
-        return;
-      }
-      var bdy = p.page.m.activeFrame.contentDocument.body;
-      bdy.style.webkitTransform =
-        bdy.style.MozTransform =
-          bdy.style.transform =
-            "translateX(" + (0-offset) + "px)";
-    }
-    p.setPageFn(p.page, locus, spCallback);
+    p.reader.getBook().setOrLoadPageAt(p.page, locus, frameToLocus);
+  }
+
+
+  function frameToLocus(locus) {
+    var mult = locus.page - 1;
+    var pw = p.page.m.sheafDiv.clientWidth;
+    var x = 0 - pw * mult;
+    var bdy = p.page.m.activeFrame.contentDocument.body;
+    bdy.style.webkitTransform =
+      bdy.style.MozTransform =
+        bdy.style.transform =
+          "translateX("+x+"px)";
   }
 
 

@@ -10,7 +10,9 @@ Monocle.pieceLoaded = function (piece) {
 
 
 Monocle.defer = function (fn, time) {
-  return setTimeout(fn, time || 0);
+  if (fn && typeof fn == "function") {
+    return setTimeout(fn, time || 0);
+  }
 }
 
 //= require <compat>

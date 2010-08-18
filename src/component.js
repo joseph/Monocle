@@ -57,21 +57,25 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  function initialize() {
-  }
-
-
+  // Returns true if this component is the active component for the pageDiv.
+  //
   function currentlyApplyingTo(pageDiv) {
     return pageDiv.m.activeFrame.m.component == API;
   }
 
 
-  function applyTo(pageDiv, waitCallback) {
+  // Makes this component the active component for the pageDiv. There are
+  // several strategies for this (see loadFrame).
+  //
+  // Some strategies are time-consuming (and usually asynchronous), some are
+  // not. When the component has been loaded into the pageDiv's frame, the
+  // callback will be invoked with the pageDiv and this component as arguments.
+  //
+  function applyTo(pageDiv, callback) {
     if (currentlyApplyingTo(pageDiv)) {
       return;
     }
 
-    //console.log(id+" -> pageDiv["+pageDiv.m.pageIndex+"]");
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
     var evtData = { 'page': pageDiv, 'source': p.source };
@@ -79,14 +83,22 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     return loadFrame(
       pageDiv,
-      function (frame, waiting) {
-        setupFrame(pageDiv, frame);
-        if (waiting) { waitCallback(); }
+      function () {
+        setupFrame(pageDiv, pageDiv.m.activeFrame);
+        callback(pageDiv, API);
       }
     );
   }
 
 
+  // Loads this component into the given frame, using one of the following
+  // strategies:
+  //
+  // * HTML - a HTML string
+  // * URL - a URL string
+  // * Nodes - an array of DOM body nodes (NB: no way to populate head)
+  // * Document - a DOM DocumentElement object
+  //
   function loadFrame(pageDiv, callback) {
     var frame = pageDiv.m.activeFrame;
 
@@ -112,6 +124,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // LOAD STRATEGY: HTML
+  // Loads a HTML string into the given frame, invokes the callback once loaded.
+  //
   function loadFrameFromHTML(src, frame, callback) {
     // Compress whitespace.
     src = src.replace(/\s+/g, ' ');
@@ -133,23 +148,28 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     frame.onload = function () {
       frame.onload = null;
-      Monocle.defer(function () { if (callback) { callback(frame, true); } });
+      Monocle.defer(callback);
     }
     frame.src = src;
-    return 'wait';
   }
 
 
+  // LOAD STRATEGY: URL
+  // Loads the URL into the given frame, invokes callback once loaded.
+  //
   function loadFrameFromURL(url, frame, callback) {
     frame.onload = function () {
       frame.onload = null;
-      Monocle.defer(function () { if (callback) { callback(frame, true); } });
+      Monocle.defer(callback);
     }
     frame.src = url;
-    return 'wait';
   }
 
 
+  // LOAD STRATEGY: NODES
+  // Loads the array of DOM nodes into the body of the frame (replacing all
+  // existing nodes), then invokes the callback.
+  //
   function loadFrameFromNodes(nodes, frame, callback) {
     var destDoc = frame.contentDocument;
     destDoc.documentElement.innerHTML = "";
@@ -164,11 +184,14 @@ Monocle.Component = function (book, id, index, chapters, source) {
     destDoc.documentElement.appendChild(destHd);
     destDoc.documentElement.appendChild(destBdy);
 
-    if (callback) { callback(frame, false); }
-    return 'ready';
+    if (callback) { callback(); }
   }
 
 
+  // LOAD STRATEGY: DOCUMENT
+  // Replaces the DocumentElement of the given frame with the given srcDoc.
+  // Invokes the callback when loaded.
+  //
   function loadFrameFromDocument(srcDoc, frame, callback) {
     var destDoc = frame.contentDocument;
 
@@ -199,14 +222,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
     );
 
     // DISABLED: immediate readiness - webkit has some difficulty with this.
-    // if (callback) { callback(frame, false); }
-    // return 'ready';
+    // if (callback) { callback(); }
 
-    Monocle.defer(function() { if (callback) { callback(frame, true); } });
-    return 'wait';
+    Monocle.defer(callback);
   }
 
 
+  // Once a frame is loaded with this component, call this method to style
+  // and measure its contents.
+  //
   function setupFrame(pageDiv, frame) {
     // BROWSERHACK: WEBKIT (touch events on iframe not sent to higher elems)
     //
@@ -245,6 +269,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Checks whether the pageDiv dimensions have changed. If they have,
+  // calculates a new column width, re-measures the pageDiv dimensions and
+  // returns true.
+  //
+  // Otherwise returns false.
+  //
   function updateDimensions(pageDiv) {
     if (haveDimensionsChanged(pageDiv)) {
       for (var i = 0; i < p.pageDivs.length; ++i) {
@@ -260,7 +290,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Checks whether the dimensions of the pageDiv have changed (due to
+  // browser resize, reorientation, font-size change or other).
+  //
   // Returns true or false.
+  //
   function haveDimensionsChanged(pageDiv) {
     var newDimensions = rawDimensions(pageDiv);
     return (
@@ -273,9 +307,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  // BROWSERHACK:
+  // Returns the element that is offset to the left in order to display
+  // a particular page.
+  //
+  // This is a BROWSERHACK:
   //   iOS devices don't allow scrollbars on the frame itself.
   //   This means that it's the parent div that must be scrolled -- the sheaf.
+  //
   function scrollerElement(pageDiv) {
     var bdy = pageDiv.m.activeFrame.contentDocument.body;
 
@@ -291,6 +329,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Returns the width of the offsettable area of the scroller element. By
+  // definition, the number of pages is always this number divided by the
+  // width of a single page (eg, the client area of the scroller element).
+  //
   // BROWSERHACK:
   //
   // iOS 4+ devices sometimes report incorrect scrollWidths.
@@ -327,6 +369,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Calculate the dimensions of the component within the given pageDiv.
+  // Includes the number of pages.
+  //
   function measureDimensions(pageDiv) {
     p.clientDimensions = rawDimensions(pageDiv);
 
@@ -359,6 +404,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Gets the basic dimensions of the component within the pageDiv, not
+  // including advanced calculations like the number of pages.
+  //
   function rawDimensions(pageDiv) {
     var win = pageDiv.m.activeFrame.contentWindow;
     var doc = win.document;
@@ -382,6 +430,14 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // Iterates over all the chapters that are within this component
+  // (according to the array we were provided on initialization) and finds
+  // their location (in percentage terms) within the text.
+  //
+  // Location is calculated using scrollIntoView.
+  //
+  // Stores this percentage with the chapter object in the chapters array.
+  //
   function locateChapters(pageDiv) {
     if (p.chapters[0] && typeof p.chapters[0].percent == "number") {
       return;
@@ -410,6 +466,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // For a given page number within the component, return the chapter that
+  // starts on or most-recently-before this page.
+  //
+  // Useful, for example, in displaying the current chapter title as a
+  // running head on the page.
+  //
   function chapterForPage(pageN) {
     var cand = null;
     var percent = (pageN - 1) / p.clientDimensions.pages;
@@ -424,6 +486,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  // For a given chapter fragment (the bit after the hash
+  // in eg, "index.html#foo"), return the page number on which
+  // the chapter starts. If the fragment is null or blank, will
+  // return the first page of the component.
+  //
   function pageForChapter(fragment) {
     if (!fragment) {
       return 1;
@@ -450,8 +517,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.lastPageNumber = lastPageNumber;
-
-  initialize();
 
   return API;
 }

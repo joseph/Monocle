@@ -106,11 +106,13 @@
         window,
         'load',
         function () {
+          /*
           window.reader1 = Monocle.Reader(
             'slider',
             bookData,
             { flipper: Monocle.Flippers.Slider }
           );
+          */
           window.reader2 = Monocle.Reader(
             'scroller',
             bookData,
@@ -121,11 +123,13 @@
             bookData,
             { flipper: Monocle.Flippers.Instant }
           );
+          /*
           window.reader4 = Monocle.Reader(
             'legacy',
             bookData,
             { flipper: Monocle.Flippers.Legacy }
           );
+          */
         }
       );
     </script>

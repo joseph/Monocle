@@ -48,61 +48,50 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    /*
-    var spCallback = function (offset) {
-      if (offset == 'disallow') {
-        return;
-      }
-      var bdy = p.page.m.activeFrame.contentDocument.body;
-      bdy.style.webkitTransform =
-        bdy.style.MozTransform =
-          bdy.style.transform =
-            "translateX(" + (0-offset) + "px)";
-    }
-    p.setPageFn(p.page, locus, spCallback);
-    */
+    p.reader.getBook().setOrLoadPageAt(p.page, locus, frameToLocus);
+  }
 
-    var spCallback = function (offset) {
-      if (offset == 'disallow') {
-        return;
-      }
-      var bdy = p.page.m.activeFrame.contentDocument.body;
-      if (typeof WebKitTransitionEvent != "undefined") {
-        bdy.style.webkitTransition = "-webkit-transform " +
-          p.duration + "ms ease-out 0ms";
-        bdy.style.webkitTransform = "translateX("+(0-offset)+"px)";
-        Monocle.Events.listen(
-          bdy,
-          'webkitTransitionEnd',
-          function () {
-            p.reader.dispatchEvent('monocle:turn');
-          }
-        );
-      } else {
-        var finalX = (0 - offset);
-        var stamp = (new Date()).getTime();
-        var frameRate = 40;
-        var currX = p.currX || 0;
-        var step = (finalX - currX) * (frameRate / p.duration);
-        var stepFn = function () {
-          var destX = currX + step;
-          if (
-            (new Date()).getTime() - stamp > p.duration ||
-            Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
-          ) {
-            clearTimeout(bdy.animInterval)
-            bdy.style.MozTransform = "translateX(" + finalX + "px)";
-            p.reader.dispatchEvent('monocle:turn');
-          } else {
-            bdy.style.MozTransform = "translateX(" + destX + "px)";
-            currX = destX;
-          }
-          p.currX = destX;
+
+  function frameToLocus(locus) {
+    var mult = locus.page - 1;
+    var pw = p.page.m.sheafDiv.clientWidth;
+    var x = 0 - pw * mult;
+
+    var bdy = p.page.m.activeFrame.contentDocument.body;
+    if (typeof WebKitTransitionEvent != "undefined") {
+      bdy.style.webkitTransition = "-webkit-transform " +
+        p.duration + "ms ease-out 0ms";
+      bdy.style.webkitTransform = "translateX("+x+"px)";
+      Monocle.Events.listen(
+        bdy,
+        'webkitTransitionEnd',
+        function () {
+          p.reader.dispatchEvent('monocle:turn');
         }
-        bdy.animInterval = setInterval(stepFn, frameRate);
+      );
+    } else {
+      var finalX = x;
+      var stamp = (new Date()).getTime();
+      var frameRate = 40;
+      var currX = p.currX || 0;
+      var step = (finalX - currX) * (frameRate / p.duration);
+      var stepFn = function () {
+        var destX = currX + step;
+        if (
+          (new Date()).getTime() - stamp > p.duration ||
+          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
+        ) {
+          clearTimeout(bdy.animInterval)
+          bdy.style.MozTransform = "translateX(" + finalX + "px)";
+          p.reader.dispatchEvent('monocle:turn');
+        } else {
+          bdy.style.MozTransform = "translateX(" + destX + "px)";
+          currX = destX;
+        }
+        p.currX = destX;
       }
+      bdy.animInterval = setInterval(stepFn, frameRate);
     }
-    p.setPageFn(p.page, locus, spCallback);
   }
 
 
@@ -124,8 +113,6 @@ Monocle.Flippers.Scroller.rate = 20; // frame-rate of the animation
 Monocle.Flippers.Scroller.FORWARDS = 1;
 Monocle.Flippers.Scroller.BACKWARDS = -1;
 Monocle.Flippers.Scroller.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
-
-
 
 
 Monocle.pieceLoaded('flippers/scroller');
