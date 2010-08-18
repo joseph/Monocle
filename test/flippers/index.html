@@ -107,24 +107,20 @@
         'load',
         function () {
           window.reader1 = Monocle.Reader(
-            'slider',
+            'instant',
             bookData,
-            { flipper: Monocle.Flippers.Slider }
+            { flipper: Monocle.Flippers.Instant }
           );
-          /*
           window.reader2 = Monocle.Reader(
             'scroller',
             bookData,
             { flipper: Monocle.Flippers.Scroller }
           );
-          */
-          /*
           window.reader3 = Monocle.Reader(
-            'instant',
+            'slider',
             bookData,
-            { flipper: Monocle.Flippers.Instant }
+            { flipper: Monocle.Flippers.Slider }
           );
-          */
           /*
           window.reader4 = Monocle.Reader(
             'legacy',
@@ -139,13 +135,11 @@
   </head>
 
   <body>
-
     <div class="readerInfo">
-      <h2>Slider</h2>
-      <div class="reader" id="slider"></div>
+      <h2>Instant</h2>
+      <div class="reader" id="instant"></div>
       <p>
-        Pages slide out of view to left (forwards) and
-        into view from left (back).
+        Click to turn to next/previous page instantly, with no animation.
       </p>
     </div>
 
@@ -158,10 +152,11 @@
     </div>
 
     <div class="readerInfo">
-      <h2>Instant</h2>
-      <div class="reader" id="instant"></div>
+      <h2>Slider</h2>
+      <div class="reader" id="slider"></div>
       <p>
-        Click to turn to next/previous page instantly, with no animation.
+        Pages slide out of view to left (forwards) and
+        into view from left (back).
       </p>
     </div>
 
