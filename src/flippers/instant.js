@@ -55,10 +55,7 @@ Monocle.Flippers.Instant = function (reader) {
     var pw = p.page.m.sheafDiv.clientWidth;
     var x = 0 - pw * mult;
     var bdy = p.page.m.activeFrame.contentDocument.body;
-    bdy.style.webkitTransform =
-      bdy.style.MozTransform =
-        bdy.style.transform =
-          "translateX("+x+"px)";
+    Monocle.Styles.affix(bdy, "transform", "translateX("+x+"px)");
   }
 
 

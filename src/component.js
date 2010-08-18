@@ -395,10 +395,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
       p.clientDimensions.scrollWidth / p.clientDimensions.width
     );
 
-    console.log(
-      ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
-      p.clientDimensions.pages
-    );
+    // console.log(
+    //   ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
+    //   p.clientDimensions.pages
+    // );
 
     return p.clientDimensions;
   }

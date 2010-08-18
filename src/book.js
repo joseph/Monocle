@@ -200,7 +200,11 @@ Monocle.Book = function (dataSource) {
 
     var findPageNumber = function () {
       locus = setPageAt(pageDiv, locus);
-      locus.load ? loadPageAt(pageDiv, locus, callback) : callback(locus);
+      if (locus.load) {
+        loadPageAt(pageDiv, locus, callback)
+      } else {
+        callback(locus);
+      }
     }
 
     loadComponent(cIndex, applyComponent, pageDiv);
