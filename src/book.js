@@ -192,7 +192,17 @@ Monocle.Book = function (dataSource) {
   // As with setPageAt, if you call this you're obliged to move the frame
   // offset to the given page in the locus passed to the callback.
   //
-  function loadPageAt(pageDiv, locus, callback) {
+  // If you pass a function as the progressCallback argument, the logic of this
+  // function will be in your control. The function will be invoked between:
+  //
+  // a) loading the component and
+  // b) applying the component to the frame and
+  // c) loading any further components if required
+  //
+  // with a function argument that performs the next step in the process. So
+  // if you need to do some special handling during the load process, you can.
+  //
+  function loadPageAt(pageDiv, locus, callback, progressCallback) {
     var cIndex = p.componentIds.indexOf(locus.componentId);
     if (!locus.load || cIndex < 0) {
       locus = pageNumberAt(pageDiv, locus);
@@ -203,30 +213,40 @@ Monocle.Book = function (dataSource) {
       return;
     }
 
-    var applyComponent = function (component) {
-      component.applyTo(pageDiv, findPageNumber);
-    }
-
     var findPageNumber = function () {
       locus = setPageAt(pageDiv, locus);
       if (locus.load) {
-        loadPageAt(pageDiv, locus, callback)
+        loadPageAt(pageDiv, locus, callback, progressCallback)
       } else {
         callback(locus);
       }
     }
 
-    loadComponent(cIndex, applyComponent, pageDiv);
+    var pgFindPageNumber = function () {
+      progressCallback ? progressCallback(findPageNumber) : findPageNumber();
+    }
+
+    var applyComponent = function (component) {
+      component.applyTo(pageDiv, pgFindPageNumber);
+    }
+
+    var pgApplyComponent = function (component) {
+      progressCallback ?
+        progressCallback(function () { applyComponent(component) }) :
+        applyComponent(component);
+    }
+
+    loadComponent(cIndex, pgApplyComponent, pageDiv);
   }
 
 
   // If your flipper doesn't care whether a component needs to be
   // loaded before the page can be set, you can use this shortcut.
   //
-  function setOrLoadPageAt(pageDiv, locus, callback) {
+  function setOrLoadPageAt(pageDiv, locus, callback, progressCallback) {
     locus = setPageAt(pageDiv, locus);
     if (locus.load) {
-      loadPageAt(pageDiv, locus, callback);
+      loadPageAt(pageDiv, locus, callback, progressCallback);
     } else {
       callback(locus);
     }
