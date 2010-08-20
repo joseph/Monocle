@@ -67,7 +67,6 @@
         }
 
         var framer = Monocle.Framer();
-        framer.constants.stylesheets = ["framer.css"];
         framer.constants.scripts = [
           "../../src/monocle.js",
           "../../src/events.js",
@@ -100,11 +99,6 @@
     <p>
       Loads the reader in a dynamically generated iframe element (to sandbox
       the JavaScript and CSS).
-    </p>
-    <p>
-      Paragraphs should be #F0F, demonstrating custom CSS.
-      A Table of Contents dialog should appear when clicking in the middle
-      of the reader, demonstrating custom JS within the frame.
     </p>
 
     <div id="reader1" class="reader"></div>
