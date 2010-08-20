@@ -325,38 +325,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
-  // Private method that tells the book to update the given pageElement to
-  // the given page.
-  //
-  // This method is handed over to the flipper, which calls it with a
-  // callback to do the actual display change.
-  //
-  // function setPage(pageDiv, locus, callback) {
-  //   var eData = { page: pageDiv, locus: locus }
-
-  //   // Other things may disallow page change.
-  //   if (!dispatchEvent('monocle:pagechanging', eData, true)) {
-  //     return;
-  //   }
-
-  //   var onChange = function (rslt) {
-  //     // The book may disallow changing to the given page.
-  //     if (rslt === 'disallow') {
-  //       callback(rslt);
-  //       return rslt;
-  //     }
-
-  //     callback(rslt.offset);
-
-  //     eData.pageNumber = rslt.page;
-  //     eData.componentId = rslt.componentId;
-  //     dispatchEvent("monocle:pagechange", eData);
-  //   }
-
-  //   p.book.changePage(pageDiv, locus, onChange);
-  // }
-
-
   // Valid types:
   //  - standard (an overlay above the pages)
   //  - page (within the page)

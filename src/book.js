@@ -168,6 +168,14 @@ Monocle.Book = function (dataSource) {
       var component = p.components[p.componentIds.indexOf(locus.componentId)];
       pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
       pageDiv.m.place.setPlace(component, locus.page);
+
+      var evtData = {
+        page: pageDiv,
+        locus: locus,
+        pageNumber: pageDiv.m.place.pageNumber(),
+        componentId: locus.componentId
+      }
+      pageDiv.m.reader.dispatchEvent("monocle:pagechange", evtData);
     }
     return locus;
   }

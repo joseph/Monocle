@@ -205,7 +205,6 @@ preventDefault() on them if you need to.
 * monocle:componentloaded
 * monocle:componentchanging
 * monocle:componentchange
-* monocle:pagechanging (c)
 * monocle:pagechange
 * monocle:stylesheetchanging
 * monocle:stylesheetchange
