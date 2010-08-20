@@ -53,13 +53,14 @@ Monocle.Book = function (dataSource) {
   // The locus result will be an object with the following properties:
   //
   //  - load: boolean, true if loading component required, false otherwise
-  //  - componentId: the component to load (current componentId if load is false)
+  //  - componentId: component to load (current componentId if load is false)
   //  - if load is false:
   //    - page
   //  - if load is true:
   //    - one of page / pagesBack / percent / direction / position / anchor
   //
   function pageNumberAt(pageDiv, locus) {
+    locus.load = false;
     var currComponent = pageDiv.m.activeFrame ?
       pageDiv.m.activeFrame.m.component :
       null;
@@ -222,146 +223,6 @@ Monocle.Book = function (dataSource) {
       callback(locus);
     }
   }
-
-
-  /*
-  function changePage(pageDiv, locus, callback) {
-    var tryAgain = function () {
-      pageDiv.m.pageChanging = false;
-      changePage(pageDiv, locus, callback);
-    }
-    if (pageDiv.m.pageChanging) {
-      console.warn("Page is already changing.");
-      callback("disallow");
-      return "disallow";
-    }
-
-    var cIndex = p.componentIds.indexOf(locus.componentId);
-    var place = pageDiv.m.place;
-    if (!place) {
-      var loadIndex = cIndex > 0 ? cIndex : 0;
-      if (p.components[loadIndex]) {
-        place = setPlaceFor(pageDiv, p.components[loadIndex], 1);
-      } else {
-        pageDiv.m.pageChanging = true;
-        loadComponent(loadIndex, tryAgain, pageDiv);
-        return 'wait';
-      }
-    }
-
-    var component;
-    if (cIndex == -1 || cIndex == place.properties.component.index) {
-      component = place.properties.component;
-    } else if (p.components[cIndex]) {
-      component = p.components[cIndex];
-    } else {
-      pageDiv.m.pageChanging = true;
-      loadComponent(cIndex, tryAgain, pageDiv);
-      return 'wait';
-    }
-
-    if (!component.currentlyApplyingTo(pageDiv)) {
-      pageDiv.m.pageChanging = true;
-      if (component.applyTo(pageDiv, tryAgain) == 'wait') {
-        return 'wait';
-      }
-      pageDiv.m.pageChanging = false;
-    }
-
-    var pageN = locusToPage(pageDiv, locus);
-
-    // Determine whether we need to apply a new component to the div, and
-    // adjust the pageN accordingly.
-    var cIndex = component.properties.index;
-    var lpn = component.lastPageNumber();
-    if (cIndex == 0 && pageN < 1) {
-      // Before first page of book. Disallow.
-      callback('disallow');
-      return 'disallow';
-    } else if (cIndex == p.lastCIndex && pageN > component.lastPageNumber()) {
-      // After last page of book. Disallow.
-      callback('disallow');
-      return 'disallow';
-    } else if (pageN > component.lastPageNumber()) {
-      pageN -= component.lastPageNumber();
-      return shiftIntoComponent(pageDiv, cIndex + 1, { page: pageN }, callback);
-    } else if (pageN < 1) {
-      return shiftIntoComponent(pageDiv, cIndex - 1, { pagesBack: pageN }, callback);
-    }
-
-    // Do it.
-    setPlaceFor(pageDiv, component, pageN);
-
-    callback({
-      componentId: component.properties.id,
-      page: pageN,
-      offset: (pageN - 1) * pageDiv.m.sheafDiv.clientWidth
-    });
-
-    return 'ready';
-  }
-
-
-  function shiftIntoComponent(pageDiv, cIndex, locus, callback) {
-    var shift = function (cmpt) {
-      pageDiv.m.pageChanging = false;
-      locus.componentId = cmpt.properties.id;
-      return changePage(pageDiv, locus, callback);
-    }
-
-    if (p.components[cIndex]) {
-      //console.log("Already loaded for shift: " + cIndex);
-      return shift(p.components[cIndex]);
-    } else {
-      //console.log("Loading on shift: " + cIndex);
-      pageDiv.m.pageChanging = true;
-      loadComponent(cIndex, shift, pageDiv);
-      return 'wait';
-    }
-  }
-
-
-  function locusToPage(pageDiv, locus) {
-    var component = pageDiv.m.activeFrame.m.component;
-    var oldCmptLPN = component.lastPageNumber();
-    var changedDims = component.updateDimensions(pageDiv);
-
-    // Now that the component has been activated within the pageDiv, we can
-    // deduce the page number for the given locus.
-    var pageN = 1;
-    if (typeof(locus.page) == "number") {
-      pageN = locus.page;
-    } else if (typeof(locus.pagesBack) == "number") {
-      pageN = component.lastPageNumber() + locus.pagesBack;
-      //console.log("Going backwards by " + locus.pagesBack + " to " + pageN);
-    } else if (typeof(locus.percent) == "number") {
-      place = setPlaceFor(pageDiv, component, 1);
-      pageN = place.pageAtPercentageThrough(locus.percent);
-    } else if (typeof(locus.direction) == "number") {
-      pageN = pageDiv.m.place.pageNumber();
-      pageN += locus.direction;
-    } else if (typeof(locus.anchor) == "string") {
-      pageN = component.pageForChapter(locus.anchor);
-    } else if (typeof(locus.position) == "string") {
-      if (locus.position == "start") {
-        pageN = 1;
-      } else if (locus.position == "end") {
-        pageN = component.lastPageNumber();
-      }
-    } else {
-      console.warn("Unrecognised locus: " + locus);
-    }
-
-    // If the dimensions of the pageDiv have changed, we should multiply the
-    // pageN against the difference between the old number of pages in the
-    // component and the new number of pages in the component.
-    if (changedDims && parseInt(oldCmptLPN)) {
-      pageN = Math.round(component.lastPageNumber() * (pageN / oldCmptLPN));
-    }
-
-    return pageN;
-  }
-  */
 
 
   // Fetches the component source from the dataSource.

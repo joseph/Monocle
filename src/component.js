@@ -57,13 +57,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  // Returns true if this component is the active component for the pageDiv.
-  //
-  function currentlyApplyingTo(pageDiv) {
-    return pageDiv.m.activeFrame.m.component == API;
-  }
-
-
   // Makes this component the active component for the pageDiv. There are
   // several strategies for this (see loadFrame).
   //
@@ -72,10 +65,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // callback will be invoked with the pageDiv and this component as arguments.
   //
   function applyTo(pageDiv, callback) {
-    if (currentlyApplyingTo(pageDiv)) {
-      return;
-    }
-
     p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
 
     var evtData = { 'page': pageDiv, 'source': p.source };
@@ -511,7 +500,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  API.currentlyApplyingTo = currentlyApplyingTo;
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;

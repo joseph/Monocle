@@ -119,17 +119,6 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     if (fns.move) {
       listeners.touchmove = function (evt) {
         if (evt.touches.length > 1) { return; }
-        // cursorInfo(evt, evt.targetTouches[0]);
-        // if (
-        //   evt.m.offsetX <= 0 ||
-        //   evt.m.offsetY <= 0 ||
-        //   evt.m.offsetX >= elem.offsetWidth ||
-        //   evt.m.offsetY >= elem.offsetHeight
-        // ) {
-        //   return fns.cancel ? fns.cancel(evt) : null;
-        // } else {
-        //   fns.move(evt);
-        // }
         fns.move(cursorInfo(evt, evt.targetTouches[0]));
       }
       Monocle.Events.listen(elem, 'touchmove', listeners.touchmove, capture);

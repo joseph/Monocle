@@ -1,4 +1,4 @@
-/* PLACE */
+// PLACE
 
 Monocle.Place = function () {
 

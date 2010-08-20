@@ -2,6 +2,7 @@ Monocle = {
   VERSION: "1.0.0"
 };
 
+
 Monocle.pieceLoaded = function (piece) {
   if (typeof onMonoclePiece == 'function') {
     onMonoclePiece(piece);
@@ -14,6 +15,7 @@ Monocle.defer = function (fn, time) {
     return setTimeout(fn, time || 0);
   }
 }
+
 
 //= require <compat>
 //= require <events>

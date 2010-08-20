@@ -1,9 +1,12 @@
-/* READER */
+// READER
 
 // Options:
 //
 //  flipper: The class of page flipper to use.
-//  place: A book locus for the page to open to when the reader is initialized.
+//  panels: The class of panels to use
+//  place: A book locus for the page to open to when the reader is
+//    initialized. (See comments at Book#pageNumberAt for more about
+//    the locus option).
 //
 Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   if (Monocle == this) {
@@ -112,13 +115,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       );
 
       // Apply the book, calculating column dimensions & etc.
-      setBook(bk, options.place);
+      p.book = bk;
+      calcDimensions(options.place)
 
       p.flipper.listenForInteraction(options.panels);
 
       Monocle.defer(function () {
         if (onLoadCallback) {
-          console.log("dialling back");
           onLoadCallback(API);
         }
         dispatchEvent("monocle:loaded");
@@ -235,22 +238,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function reapplyStyles() {
     applyStyles();
     calcDimensions();
-  }
-
-
-  // Changes the current book for this reader.
-  //
-  //  bk - must be a valid book-data object
-  //  locus - OPTIONAL. The locus (see book.js) to open the book to.
-  //
-  function setBook(bk, locus) {
-    if (!dispatchEvent("monocle:bookchanging", {}, true)) {
-      return;
-    }
-    p.book = bk;
-    calcDimensions(locus);
-    dispatchEvent("monocle:bookchange", { book: p.book });
-    return p.book;
   }
 
 
@@ -651,7 +638,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
 
-  API.setBook = setBook;
   API.getBook = getBook;
   API.reapplyStyles = reapplyStyles;
   API.getPlace = getPlace;

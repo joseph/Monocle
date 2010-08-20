@@ -1,8 +1,6 @@
-/* FRAMER
- *
- * Loads a reader into a dynamically generated iframe.
- *
- */
+// FRAMER
+//
+// Loads a reader into a dynamically generated iframe.
 
 Monocle.Framer = function () {
   if (Monocle == this) { return new Monocle.Framer(); }

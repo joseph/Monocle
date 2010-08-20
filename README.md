@@ -135,16 +135,9 @@ callback for asynchronous data retrieval.
     }
 
     // Initialize the reader element.
-    var reader = Monocle.Reader('reader');
-
-    // Initialize a book object. (Of course we could have just passed it in
-    // as the second argument to the reader constructor, which would also
-    // obviate the need for the setBook call below. This is the scenic route.)
-    var book = Monocle.Book(bookData);
-
-    // Assign the book to the reader and go to the 3rd page.
-    reader.setBook(book);
-    reader.moveTo({ page: 3 });
+    Monocle.Reader('reader', bookData, {}, function (reader) {
+      reader.moveTo({ page: 3 });
+    });
 
 
 ## Building Monocle for production
@@ -212,8 +205,6 @@ preventDefault() on them if you need to.
 * monocle:componentloaded
 * monocle:componentchanging
 * monocle:componentchange
-* monocle:bookchanging (c)
-* monocle:bookchange
 * monocle:pagechanging (c)
 * monocle:pagechange
 * monocle:stylesheetchanging
@@ -303,6 +294,31 @@ Methods:
 * `listenForInteraction()`
 
 
+### Panels — turning pages and interacting with page content
+
+Panels are the controls that provide the interface to flippers. There's three
+built-in:
+
+* TwoPane: clicking or swiping on the left half moves backwards, clicking or
+    swiping on the right half moves forwards.
+* Marginal: clicking/swiping left margin moves backwards, right margin moves
+    forwards. This leaves the text open for interaction, such as selection or
+    clicking links.
+* IMode: the screen is initially divided into thirds. Left third -> backwards,
+  right third -> forwards. The middle third, when tapped, causes the left and
+  right panels to recede to the margins, opening the text to interaction.
+  Clicking the little (i) interactive mode indicator restores the panels to
+  their original positions. This is a good choice for small screens.
+
+For most flippers, you can set the preferred panel class with the 'panels'
+option to the reader. For eg:
+
+  Monocle.reader('reader', bookData, { panels: Monocle.Panels.IMode });
+
+Of course, you can create your own panel classes too. Take a look at the
+TwoPane class for the simplest example code.
+
+
 ### Javascript Object Style
 
 In this incarnation at least, Monocle uses a Javascript idiom for defining
@@ -357,5 +373,5 @@ The class idiom looks like this:
     Monocle.Foo.A_CONSTANT = 'Foo';
     Monocle.Foo.PI = 3.14;
 
-This allows a quite concise, clear coding style. However, it does make class
-inheritance somewhat limited. Let's see how it goes.
+This allows a quite concise, clear coding style. There's a trade-off against
+class inheritance, but JS offers other ways to share logic between classes.

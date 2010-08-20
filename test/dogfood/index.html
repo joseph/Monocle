@@ -10,7 +10,6 @@
     />
     <meta http-equiv="Content-Type" content="text/htmlcharset=utf-8"/>
     <title>Dogfood test</title>
-
     <!-- We'll also take the opportunity to test the minified script -->
     <script type="text/javascript" src="../../dist/monocle-min.js"></script>
 
@@ -25,11 +24,16 @@
         margin: 2em;
         float: left;
       }
+      #theCode {
+        clear: both;
+      }
+      #theCode h3, #theCode pre {
+        margin: 0;
+      }
     </style>
 
 
-    <script type="text/javascript">
-
+    <script type="text/javascript" id="code">
       var initFn = function () {
         var bookData = {
           getComponents: function () {
@@ -75,14 +79,9 @@
         }
 
         // Initialize the reader element.
-        var reader = Monocle.Reader('reader');
-
-        // Initialize a book object.
-        var book = Monocle.Book(bookData);
-
-        // Assign the book to the reader and go to the 3rd page.
-        reader.setBook(book);
-        reader.moveTo({ page: 3 });
+        Monocle.Reader('reader', bookData, {}, function (reader) {
+          reader.moveTo({ page: 3 });
+        });
       }
       Monocle.Events.listen(window, 'load', initFn);
     </script>
@@ -101,5 +100,16 @@
     </p>
 
     <div id="reader"></div>
+
+
+    <div id="theCode">
+      <h3>The code:</h3>
+      <pre><code id="codeBox">Failed to load?</code></pre>
+      <script type="text/javascript">
+        var str = document.getElementById('code').innerHTML;
+        str = str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        document.getElementById('codeBox').innerHTML = str;
+      </script>
+    </div>
   </body>
 </html>

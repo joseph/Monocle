@@ -343,7 +343,7 @@ Monocle.Flippers.Slider = function (reader) {
     setX(
       lowerPage(),
       0 - p.reader.properties.pageWidth,
-      { duration: 0 },
+      { duration: 1 },
       callback
     );
   }
