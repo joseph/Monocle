@@ -1,4 +1,4 @@
-Monocle.Flippers.Legacy = function (reader, setPageFn) {
+Monocle.Flippers.Legacy = function (reader) {
 
   var API = { constructor: Monocle.Flippers.Legacy }
   var k = API.constants = API.constructor;
@@ -10,7 +10,6 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
 
   function initialize() {
     p.reader = reader;
-    p.setPageFn = setPageFn;
   }
 
 
@@ -30,9 +29,8 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
 
 
   function moveTo(locus) {
-    var rslt = p.setPageFn(p.page, locus, updateButtons);
+    p.reader.getBook().setOrLoadPageAt(p.page, locus, updateButtons);
     p.reader.dispatchEvent('monocle:turn');
-    return rslt;
   }
 
 
@@ -42,6 +40,11 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
     p.page.m.activeFrame.style.position = "relative";
     p.page.m.activeFrame.style.width = "100%";
     p.page.m.activeFrame.style.minWidth = "0%";
+    Monocle.Styles.affix(p.page.m.activeFrame, 'column-width', 'auto');
+    alert(
+      p.page.m.activeFrame.style.height =
+        p.page.m.activeFrame.contentDocument.body.scrollHeight * 6 + "px"
+    );
 
     if (!p.divs.legacyMessage) {
       p.divs.legacyMessage = document.createElement('div');
@@ -94,12 +97,12 @@ Monocle.Flippers.Legacy = function (reader, setPageFn) {
     Monocle.Events.listen(
       p.divs.prevButton,
       'click',
-      function () { moveTo({ percent: -0.5 }) }
+      function () { moveTo({ direction: -1 }) }
     )
     Monocle.Events.listen(
       p.divs.nextButton,
       'click',
-      function () { moveTo({ percent: 1.5 }) }
+      function () { moveTo({ direction: 1 }) }
     )
   }
 
@@ -150,7 +153,8 @@ Monocle.Styles.Flippers.Legacy = {
     "border-radius": "5px",
     "margin-right": "3px",
     "margin-bottom": "3px",
-    "margin-top": "3px"
+    "margin-top": "3px",
+    "cursor": "pointer"
   }
 }
 
