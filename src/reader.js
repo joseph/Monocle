@@ -7,6 +7,7 @@
 //  place: A book locus for the page to open to when the reader is
 //    initialized. (See comments at Book#pageNumberAt for more about
 //    the locus option).
+//  systemId: the id for root elements of components, defaults to "RS:monocle"
 //
 Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   if (Monocle == this) {
@@ -104,7 +105,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         'monocle:componentchange',
         function (evt) {
           var doc = evt.monocleData['document'];
-          doc.documentElement.id = options.system_id || "RS:monocle";
+          doc.documentElement.id = options.systemId || "RS:monocle";
           for (var i = 0; i < p.pageStylesheets.length; ++i) {
             if (p.pageStylesheets[i]) {
               addPageStylesheet(doc, i);

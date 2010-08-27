@@ -159,7 +159,7 @@ small, and you can simply select which ones you want to include on the page.
 They're in `src/controls`.
 
 
-### Advanced Monocle
+## Advanced Monocle
 
 Monocle is built to be extended. It's pretty flexible. You can create custom
 controls and custom page-turning interactions (called 'flippers' in Monocle).
@@ -250,7 +250,7 @@ although again, this is optional for invisible controls. You should not
 insert the DOM element into the parentNode - the Reader will do this for you.
 
 
-### Alternative page flipping mechanisms
+## Alternative page flipping mechanisms
 
 Flippers are objects that follow a defined interface, and do the hard labour
 of actually turning the page. They typically listen for user interaction of
@@ -293,7 +293,7 @@ Methods:
 * `listenForInteraction()`
 
 
-### Panels — turning pages and interacting with page content
+## Panels — turning pages and interacting with page content
 
 Panels are the controls that provide the interface to flippers. There's three
 built-in:
@@ -318,7 +318,7 @@ Of course, you can create your own panel classes too. Take a look at the
 TwoPane class for the simplest example code.
 
 
-### Javascript Object Style
+## Javascript Object Style
 
 In this incarnation at least, Monocle uses a Javascript idiom for defining
 many of the core classes. This is designed to declutter the classes, clarify

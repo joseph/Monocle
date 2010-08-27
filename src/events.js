@@ -76,7 +76,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     return evt;
   }
 
-  var capture = options && options.useCapture || false;
+  var capture = (options && options.useCapture) || false;
 
   if (!Monocle.Browser.has.touch) {
     if (fns.start) {

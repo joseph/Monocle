@@ -77,7 +77,7 @@
               src: "part1-V"
             },
             {
-              title: "V. The Shoemaker",
+              title: "VI. The Shoemaker",
               src: "part1-VI"
             }
           ]
