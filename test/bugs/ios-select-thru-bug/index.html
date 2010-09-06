@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <title>Bug: Selecting text in overlapping iframes</title>
+
+    <style>
+      p {
+        color: #bbb;
+      }
+      p.description {
+        color: #000;
+      }
+      p.agents {
+        color: #000;
+        font-style: italic;
+      }
+      .iframesCntr {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        float: left;
+        margin: 1em;
+      }
+      .iframesCntr iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 300px;
+        height: 400px;
+        background: white;
+      }
+      #iframe1 {
+        border: 1px solid #0C0;
+      }
+      #iframe2 {
+        border: 1px solid #C00;
+      }
+
+      #iframe3 {
+        border: 1px solid #0C0;
+        z-index: 2;
+      }
+      #iframe4 {
+        border: 1px solid #C00;
+        z-index: 1;
+      }
+      textarea {
+        clear: left;
+        width: 98%;
+        height: 4em;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <div>
+      <h1>Bug: Selecting text in overlapping iframes</h1>
+
+      <p class="agents">
+        This bug has been observed in MobileSafari for iOS versions 3.1&rarr;4.1.
+      </p>
+
+      <p class="description">
+        <strong>Description of bug:</strong>
+        Both boxes below display two iframes stacked on top of each other.
+        Selecting text in the left box will actually select from the iframe
+        <em>underneath</em>.
+      </p>
+      <p class="description">
+        In the box on the left, the natural z-order is unchanged. The first
+        iframe is underneath, the second is on top. <em>This is the box that
+        exhibits the bug.</em>
+      </p>
+      <p class="description">
+        In the box on the right, the z order has been reversed, so that the
+        first iframe is raised to the top and the second iframe goes
+        underneath. Text selection in this box behaves as expected.
+      </p>
+    </div>
+
+    <hr />
+
+    <textarea>Paste stuff here if you need to...</textarea>
+
+    <div class="iframesCntr">
+
+      <iframe id="iframe1" src="lorem1.html"></iframe>
+      <iframe id="iframe2" src="lorem2.html"></iframe>
+
+    </div>
+
+    <div class="iframesCntr">
+
+      <iframe id="iframe3" src="lorem1.html"></iframe>
+      <iframe id="iframe4" src="lorem2.html"></iframe>
+
+    </div>
+
+
+  </body>
+</html>
