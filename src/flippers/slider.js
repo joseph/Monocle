@@ -64,16 +64,11 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function moveTo(locus) {
-    setPage(
-      upperPage(),
-      locus,
-      completedTurn,
-      function () { console.warn("Failed to move to locus."); }
-    );
+    setPage(upperPage(), locus, completedTurn);
   }
 
 
-  function setPage(pageDiv, locus, callback, failCallback) {
+  function setPage(pageDiv, locus, callback) {
     p.reader.getBook().setOrLoadPageAt(
       pageDiv,
       locus,
@@ -141,21 +136,14 @@ Monocle.Flippers.Slider = function (reader) {
         resetTurnData();
         return;
       }
-      slideToCursor(boxPointX);
+      beforeGoingForward(function () { slideToCursor(boxPointX); });
     } else if (dir == k.BACKWARDS) {
       if (onFirstPage()) {
         //console.log("ON FIRST PAGE");
         resetTurnData();
         return;
       }
-      setPage(
-        lowerPage(),
-        getPlace().getLocus({ direction: k.BACKWARDS })
-      );
-      jumpOut(function () {
-        flipPages();
-        slideToCursor(boxPointX);
-      });
+      beforeGoingBackward(function () { slideToCursor(boxPointX); });
     } else {
       console.warn("Invalid direction: " + dir);
     }
@@ -163,18 +151,18 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function turning(dir, boxPointX) {
-    if (p.turnData.completing) { return; }
     if (!p.turnData.points) { return; }
+    if (p.turnData.completing) { return; }
     checkPoint(boxPointX);
     slideToCursor(boxPointX, null, "0");
   }
 
 
   function drop(dir, boxPointX, forceComplete) {
-    if (p.turnData.completing) {
+    if (!p.turnData.points) {
       return;
     }
-    if (!p.turnData.points) {
+    if (p.turnData.completing) {
       return;
     }
 
@@ -192,10 +180,10 @@ Monocle.Flippers.Slider = function (reader) {
         p.turnData.points.min >= boxPointX
       ) {
         // Completing forward turn
-        slideOut(flipAndCompleteTurn);
+        slideOut(afterGoingForward);
       } else {
         // Cancelling forward turn
-        slideIn(completedTurn);
+        slideIn(afterCancellingForward);
       }
     } else if (dir == k.BACKWARDS) {
       if (
@@ -205,10 +193,10 @@ Monocle.Flippers.Slider = function (reader) {
         p.turnData.points.max <= boxPointX
       ) {
         // Completing backward turn
-        slideIn(completedTurn);
+        slideIn(afterGoingBackward);
       } else {
         // Cancelling backward turn
-        slideOut(flipAndCompleteTurn);
+        slideOut(afterCancellingBackward);
       }
     } else {
       console.warn("Invalid direction: " + dir);
@@ -223,23 +211,95 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
-  function flipAndCompleteTurn() {
-    flipPages();
-    completedTurn();
+  function beforeGoingForward(callback) {
+    callback();
+  }
+
+
+  function beforeGoingBackward(callback) {
+    var lp = lowerPage();
+    jumpOut(lp, // move lower page off-screen
+      function () {
+        setPage( // set lower page to previous
+          lp,
+          getPlace().getLocus({ direction: k.BACKWARDS }),
+          function () {
+            flipPages(); // flip lower to upper
+            callback();
+          }
+        );
+      }
+    );
+  }
+
+
+  function afterGoingForward() {
+    var up = upperPage();
+    if (Monocle.Browser.has.selectThruBug) {
+      setPage( // set upper (off screen) to current
+        up,
+        getPlace().getLocus({ direction: k.FORWARDS }),
+        function () {
+          jumpIn(up, // move upper back onto screen
+            completedTurn // set lower to next and reset turn
+          );
+        }
+      );
+    } else {
+      flipPages();
+      jumpIn(up, completedTurn);
+    }
+  }
+
+
+  function afterGoingBackward() {
+    if (Monocle.Browser.has.selectThruBug) {
+      setPage( // set lower page to current
+        lowerPage(),
+        getPlace().getLocus(),
+        function () {
+          flipPages(); // flip lower to upper
+          completedTurn(); // set lower to next and reset turn
+        }
+      );
+    } else {
+      completedTurn();
+    }
+  }
+
+
+  function afterCancellingForward() {
+    cancelledTurn(); // set lower to next (FIXME: already done?) and reset turn
+  }
+
+
+  function afterCancellingBackward() {
+    flipPages(); // flip upper to lower
+    jumpIn( // move lower back onto screen
+      lowerPage(),
+      cancelledTurn // set lower to next and reset turn
+    );
   }
 
 
   function completedTurn() {
-    jumpIn(function () {
-      setPage(
-        lowerPage(),
-        getPlace().getLocus({ direction: k.FORWARDS }),
-        function () {
-          p.reader.dispatchEvent('monocle:turn');
-        }
-      );
-      resetTurnData();
-    });
+    setPage(
+      lowerPage(),
+      getPlace().getLocus({ direction: k.FORWARDS }),
+      function () {
+        p.reader.dispatchEvent('monocle:turn');
+        resetTurnData();
+      }
+    );
+  }
+
+
+  function cancelledTurn() {
+    setPage(
+      lowerPage(),
+      getPlace().getLocus({ direction: k.FORWARDS }),
+      resetTurnData
+    );
   }
 
 
@@ -331,17 +391,15 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
-  // NB: Jumps are always done by the hidden lower page.
-
-  function jumpIn(callback) {
+  function jumpIn(pageDiv, callback) {
     // Duration should be 0, but is set to 1 to address a 10.6 Safari bug.
-    setX(lowerPage(), 0, { duration: 1 }, callback);
+    setX(pageDiv, 0, { duration: 1 }, callback);
   }
 
 
-  function jumpOut(callback) {
+  function jumpOut(pageDiv, callback) {
     setX(
-      lowerPage(),
+      pageDiv,
       0 - p.reader.properties.pageWidth,
       { duration: 1 },
       callback

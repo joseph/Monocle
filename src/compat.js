@@ -36,7 +36,8 @@ Monocle.Browser.has = {
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion < "4.1",
   floatColumnBug: Monocle.Browser.is.MobileSafari &&
-    Monocle.Browser.iOSVersion >= "4.0"
+    Monocle.Browser.iOSVersion >= "4.0",
+  selectThruBug: Monocle.Browser.is.MobileSafari
 }
 
 

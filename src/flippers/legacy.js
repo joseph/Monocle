@@ -41,10 +41,6 @@ Monocle.Flippers.Legacy = function (reader) {
     p.page.m.activeFrame.style.width = "100%";
     p.page.m.activeFrame.style.minWidth = "0%";
     Monocle.Styles.affix(p.page.m.activeFrame, 'column-width', 'auto');
-    alert(
-      p.page.m.activeFrame.style.height =
-        p.page.m.activeFrame.contentDocument.body.scrollHeight * 6 + "px"
-    );
 
     if (!p.divs.legacyMessage) {
       p.divs.legacyMessage = document.createElement('div');
