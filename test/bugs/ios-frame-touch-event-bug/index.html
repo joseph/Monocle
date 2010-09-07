@@ -6,72 +6,46 @@
       name="viewport"
       content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
     />
-    <title>iPad frame touch event bug</title>
-
-    <script>
-      (function () {
-        function init() {
-          var layer = document.getElementById('layer');
-          layer.addEventListener('touchstart', touchEvt, false);
-          layer.addEventListener('touchmove', touchEvt, false);
-          layer.addEventListener('touchend', touchEvt, false);
-          layer.addEventListener('touchcancel', touchEvt, false);
-        }
-        function touchEvt(evt) {
-          document.getElementById('out').innerHTML += evt.type + "<br />";
-          evt.preventDefault();
-        }
-        window.addEventListener('load', init, false);
-      })();
-    </script>
-
-    <style>
-      div#container {
-        position: relative;
-      }
-      iframe {
-        position: absolute;
-        top: 60px;
-        left: 60px;
-        width: 100px;
-        height: 100px;
-        background: #CCC;
-        z-index: 1;
-      }
-      div#layer {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 100px;
-        height: 100px;
-        background: #000;
-        overflow: hidden;
-        z-index: 2;
-        color: white;
-      }
-      div#out {
-        position: absolute;
-        top: 175px;
-        width: 300px;
-        height: 100px;
-        font: 9px Helvetica;
-      }
-    </style>
+    <link rel="stylesheet" href="common.css" />
+    <title>Bug: touch events on iframes and overlapping elements</title>
   </head>
 
-  <body>
+  <body id="body">
 
-    <div id="container">
-      <div id="layer">
-        This is the text of the layer above.
-        This is the text of the layer above.
-        This is the text of the layer above.
-        This is the text of the layer above.
-      </div>
-      <iframe src="javascript:'This is the text of the iframe.';"></iframe>
-      <div id="out"></div>
+    <div class="description">
+      <h1>Bug: touch events on iframes and overlapping elements</h1>
+      <p class="agents">
+        Observed in MobileSafari for all iOS versions, different in 4.1.
+      </p>
+
+      <p>
+        <strong>Description of bug:</strong>
+        Touch events on iframes are broken in all versions of iOS: if
+        an element sits over an iframe, touch events will fire on the iframe
+        underneath - which is incorrect, and differs from WebKit mouse event
+        behaviour.
+      </p>
+      <p>
+        In iOS 4.1, the behaviour is much worse: <em>touchend</em> events are
+        not fired at the correct time, and unpaired <em>touchstart</em> events
+        fire on lower DOM elements and higher z-index elements at the end
+        of a touch.
+      </p>
+      <p>
+        There are several tests in this suite:
+      </p>
+
+      <ul>
+        <li><a href="1.html">A single iframe</a></li>
+        <li><a href="2.html">An iframe with an overlapping div</a></li>
+        <li><a href="3.html">Two overlapping iframes, with a div above</a></li>
+      </ul>
+
+      <p>
+        NB: in all the tests, you can tap on the coloured event output
+        to start a new "event section".
+      </p>
     </div>
-
   </body>
 
 </html>

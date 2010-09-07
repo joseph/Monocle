@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <title>Bug: touch events on elements overlapping iframes - 2</title>
+
+    <link rel="stylesheet" type="text/css" href="common.css" />
+    <script type="text/javascript" src="common.js"></script>
+
+    <script>
+      function init() {
+        var layer = registerElem(document.getElementById('layer'), 'layer');
+        var frame = registerElem(document.getElementById('frame'), 'frame');
+        var fbody = registerElem(frame.contentDocument.body, 'fbody');
+      }
+      window.addEventListener('load', init, false);
+    </script>
+
+    <style>
+      iframe {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100px;
+        height: 100px;
+        background: blue;
+      }
+      div#layer {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 100px;
+        height: 100px;
+        background: red;
+        overflow: hidden;
+        opacity: 0.8;
+      }
+      div#out span.layerEvt {
+        color: red;
+      }
+      div#out span.frameEvt {
+        color: green;
+      }
+      div#out span.fbodyEvt {
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body id="body">
+    <p class="description">
+      An iframe (in blue). A div over the top (in red). In all versions of
+      iOS, touch events on the overlapping part incorrectly fire on the iframe
+      underneath. In iOS 4.1, the events are essentially random: touchstart
+      events fire on the layer above at the end of a swipe or tap, but are
+      not followed by a touchend.
+      <a href="index.html">Return to bug description</a>.
+    </p>
+
+    <hr />
+
+    <div id="container">
+      <iframe id="frame" src=""></iframe>
+      <div id="layer"></div>
+      <div id="out" onclick="evtSection(); return false;">
+        Tip: click here to start a new section.
+      </div>
+    </div>
+
+  </body>
+
+</html>

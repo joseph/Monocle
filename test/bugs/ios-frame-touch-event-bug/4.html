@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <title>Bug: touch events on elements overlapping iframes - 3</title>
+
+    <link rel="stylesheet" type="text/css" href="common.css" />
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="monitor.js"></script>
+
+    <style>
+      iframe {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+      }
+      iframe#frame1 {
+        background: blue;
+        top: 0px;
+        left: 0px;
+      }
+      iframe#frame2 {
+        background: green;
+        top: 0px;
+        left: 50px;
+        opacity: 0.8;
+      }
+      div#layer {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        width: 100px;
+        height: 100px;
+        background: red;
+        overflow: hidden;
+        opacity: 0.8;
+      }
+      div#out span.layerEvt {
+        color: red;
+      }
+      div#out span.frame1Evt {
+        color: blue;
+      }
+      div#out span.frame2Evt {
+        color: green;
+      }
+    </style>
+  </head>
+
+  <body id="body">
+    <p class="description">
+      Two iframes (blue, green). A div over the top (in red).
+      Even where the three layers overlap, touch events all fire on the
+      first iframe, except for mostly random events on the div at the end
+      of a touch.
+      <a href="index.html">Return to bug description</a>.
+    </p>
+
+    <hr />
+
+    <div id="container">
+      <iframe id="frame1" src=""></iframe>
+      <iframe id="frame2" src=""></iframe>
+      <div id="layer"></div>
+      <div id="out" onclick="evtSection(); return false;">
+        Tip: click here to start a new section.
+      </div>
+    </div>
+
+  </body>
+
+</html>

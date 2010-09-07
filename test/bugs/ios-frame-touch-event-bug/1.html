@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"
+    />
+    <title>Bug: touch events on elements overlapping iframes - 1</title>
+
+    <link rel="stylesheet" type="text/css" href="common.css" />
+    <script type="text/javascript" src="common.js"></script>
+
+    <script>
+      function init() {
+        var frame = registerElem(document.getElementById('frame'), 'frame');
+        var fbody = registerElem(frame.contentDocument.body, 'fbody');
+      }
+      window.addEventListener('load', init, false);
+    </script>
+
+    <style>
+      iframe {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100px;
+        height: 100px;
+        background: blue;
+        z-index: 1;
+      }
+      span.frameEvt { color: green; }
+      span.fbodyEvt { color: blue; }
+    </style>
+  </head>
+
+  <body id="body">
+
+    <p class="description">
+      A blue iframe. In iOS &lt; 4.1, a "swipe" registers as a <em>start</em>,
+      a series of <em>move</em> and an <em>end</em>.
+      In iOS 4.1, the same swipe registers as a <em>start</em> and series of
+      <em>move</em> on the frame body, then a <em>start</em> on the iframe.
+      If you repeat the swipe, an <em>end</em> may fire on the frame body
+      before the normal sequence of events. When the sequence completes, you may
+      get a <em>start</em>, <em>end</em> or both on the iframe itself.
+      <a href="index.html">Return to bug description</a>.
+    </p>
+
+    <hr />
+
+    <div id="container">
+      <iframe id="frame" src=""></iframe>
+      <div id="out" onclick="evtSection(); return false;">
+        Tip: click here to start a new section.
+      </div>
+    </div>
+
+  </body>
+
+</html>

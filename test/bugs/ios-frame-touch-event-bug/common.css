@@ -1,0 +1,33 @@
+div#container {
+  position: relative;
+  height: 3000px;
+}
+
+div#out {
+  position: absolute;
+  top: 0px;
+  left: 200px;
+  overflow: visible;
+  font: 9px Helvetica;
+}
+div#out div {
+  border-bottom: 1px solid #C00;
+}
+div#out span {
+  display: block;
+}
+
+iframe {
+  border: none;
+}
+
+.agents {
+  font-style: italic;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .description {
+    font-size: 10px;
+    -webkit-text-size-adjust: none;
+  }
+}
