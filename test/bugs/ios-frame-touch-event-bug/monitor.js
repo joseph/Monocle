@@ -16,14 +16,26 @@
 //
 // Only needs to do elementFromPoint if iframe is the currentTarget.
 
-var touching = null; // element currently being touched.
-var edataPrev = null;
+var p = {
+  touching: null,
+  edataPrev: null,
+  originator: null,
+  brokenModel_4_1: navigator.userAgent.match(/ OS 4_1/)
+}
 
 function init() {
   var iframes = document.getElementsByTagName('iframe');
   for (var i = 0; i < iframes.length; ++i) {
     enableTouchProxy(iframes[i].contentDocument.body);
     iframes[i].contentDocument.body.isTouchFrame = true;
+
+    // IN 4.1 ONLY, a touchstart/end/both fires on the *frame* itself when a
+    // touch completes on a part of the iframe body that is not overlapped
+    // by anything. This should be translated to a touchend on the touching
+    // object.
+    if (p.brokenModel_4_1) {
+      enableTouchProxy(iframes[i]);
+    }
   }
   monitor(
     document.getElementById('layer'),
@@ -39,7 +51,10 @@ function init() {
 
 
 function monitor(element, listeners) {
-  element.listeners = listeners;
+  element.addEventListener('contactstart', listeners.start, false);
+  element.addEventListener('contactmove', listeners.move, false);
+  element.addEventListener('contactend', listeners.end, false);
+  element.addEventListener('contactcancel', listeners.cancel, false);
   enableTouchProxy(element);
 }
 
@@ -54,89 +69,113 @@ function enableTouchProxy(tgt) {
 }
 
 
-function touchProxyHandler(target, evt) {
-  var touch = evt.touches[0] || evt.changedTouches[0];
-
-  edata = {
+function touchProxyHandler(element, evt) {
+  var edata = {
     start: evt.type == "touchstart",
     move: evt.type == "touchmove",
     end: evt.type == "touchend" || evt.type == "touchcancel",
     time: new Date().getTime(),
-    frame: target.isTouchFrame
+    frame: element.isTouchFrame
   }
 
+  if (!p.touching) {
+    p.originator = element;
+  }
+
+  var target = element;
+  var touch = evt.touches[0] || evt.changedTouches[0];
   if (edata.frame) {
     target = document.elementFromPoint(touch.screenX, touch.screenY);
   }
 
   // FIXME! How to allow selections?
+  // Only preventDefault if there is a touching object at the end of this
+  // action?
   evt.preventDefault();
 
   if (!target) {
     return;
   }
 
-  if (!touching && typeof target.listeners == "undefined") {
-    console.log(evt.type+' touch: target is not being listened to.');
-    return;
-  }
+  // if (!touching && typeof target.listeners == "undefined") {
+  //   console.log(evt.type+' touch: target is not being listened to.');
+  //   return;
+  // }
 
   var fireStart = function () {
-    window.touching = target;
-    window.edataPrev = edata;
-    return fireTouchEvent(touching, 'start', evt);
+    p.touching = target;
+    p.edataPrev = edata;
+    return fireTouchEvent(p.touching, 'start', evt);
   }
 
   var fireMove = function () {
-    window.edataPrev = edata;
-    return fireTouchEvent(touching, 'move', evt);
+    p.edataPrev = edata;
+    return fireTouchEvent(p.touching, 'move', evt);
   }
 
   var fireEnd = function () {
-    var result = fireTouchEvent(touching, 'end', evt);
-    window.edataPrev = edata;
-    window.touching = null;
+    var result = fireTouchEvent(p.touching, 'end', evt);
+    p.edataPrev = edata;
+    p.touching = null;
     return result;
   }
 
-
-  // If we have a touch start on the layer, and it's been almost no time since
-  // we had a touch end on the layer, discard the start. (This is the most
-  // broken thing about 4.1.)
+  // IN 4.1 ONLY, if we have a touch start on the layer, and it's been
+  // almost no time since we had a touch end on the layer, discard the start.
+  // (This is the most broken thing about 4.1.)
+  // FIXME: this seems to discard all "taps" on a naked iframe.
   if (
+    p.brokenModel_4_1 &&
     !edata.frame &&
-    !touching &&
+    !p.touching &&
     edata.start &&
-    window.edataPrev &&
-    window.edataPrev.end &&
-    (edata.time - window.edataPrev.time) < 50
+    p.edataPrev &&
+    p.edataPrev.end &&
+    (edata.time - p.edataPrev.time) < 30
   ) {
-    console.log("discarded: " + (edata.time - window.edataPrev.time));
+    console.log("discarded: " + (edata.time - p.edataPrev.time));
     return;
   }
 
   // If we don't have a touch and we see a start or a move on anything, start
   // a touch.
-  if (!touching && !edata.end) {
+  if (!p.touching && !edata.end) {
     return fireStart();
   }
 
   // If this is a move event and we already have a touch, continue the move.
-  if (edata.move && touching) {
+  if (edata.move && p.touching) {
     return fireMove();
   }
 
-  // If we have a touch (and the event must be a start or end due to
-  // previous rule), and the event is not on the iframe, fire end of touch.
-  if (touching && !edata.frame) {
+  // If we have a touch (and the event must be a start or end due to our
+  // previous rule), and the event is not on the iframe, end the touch.
+  if (p.touching && !edata.frame) {
     return fireEnd();
   }
 
-  // If we see a touch end on the frame, and the touch is not over the original
-  // layer, then fire a touch end on the original layer.
-  if (edata.frame && edata.end && touching && touching != target) {
+  // IN 4.1 ONLY, a touch that has started outside an iframe should not be
+  // endable by the iframe.
+  if (
+    p.brokenModel_4_1 &&
+    p.originator != element &&
+    edata.frame &&
+    edata.end
+  ) {
+    return;
+  }
+
+  // If we see a touch end on the frame, end the touch.
+  if (edata.frame && edata.end && p.touching) {
     return fireEnd();
   }
+
+  // Unsolved:
+  // A touch start fires on the layer when moving out of the overlap
+  // with the frame. This triggers end of touch. The next move starts a new
+  // touch.
+  //
+  //
 }
 
 
@@ -181,7 +220,7 @@ function fireTouchEvent(target, newtype, evt) {
 
   var mimicEvt = document.createEvent('TouchEvent');
   mimicEvt.initTouchEvent(
-    "touch"+newtype,
+    "contact"+newtype,
     true,
     true,
     document.defaultView,
@@ -202,10 +241,7 @@ function fireTouchEvent(target, newtype, evt) {
   );
   mimicEvt.proxied = true;
 
-  mimicEvt.target = target;
-  mimicEvt.currTarget = target;
-  target.listeners[newtype](mimicEvt);
-  if (mimicEvt.cancelled) {
+  if (!target.dispatchEvent(mimicEvt)) {
     evt.preventDefault();
   }
 }
