@@ -17,6 +17,7 @@
 // Only needs to do elementFromPoint if iframe is the currentTarget.
 
 var touching = null; // element currently being touched.
+var edataPrev = null;
 
 function init() {
   var iframes = document.getElementsByTagName('iframe');
@@ -55,13 +56,24 @@ function enableTouchProxy(tgt) {
 
 function touchProxyHandler(target, evt) {
   var touch = evt.touches[0] || evt.changedTouches[0];
-  var frameTouch = target.isTouchFrame;
-  if (frameTouch) {
+
+  edata = {
+    start: evt.type == "touchstart",
+    move: evt.type == "touchmove",
+    end: evt.type == "touchend" || evt.type == "touchcancel",
+    time: new Date().getTime(),
+    frame: target.isTouchFrame
+  }
+
+  if (edata.frame) {
     target = document.elementFromPoint(touch.screenX, touch.screenY);
-    // if (!target) {
-    //   console.warn('No target for ' + evt.type);
-    //   return;
-    // }
+  }
+
+  // FIXME! How to allow selections?
+  evt.preventDefault();
+
+  if (!target) {
+    return;
   }
 
   if (!touching && typeof target.listeners == "undefined") {
@@ -69,32 +81,61 @@ function touchProxyHandler(target, evt) {
     return;
   }
 
-  // console.log(
-  //   evt.type + ' touch: target is "' +
-  //   target.tagName + "#" +  target.id + '"'
-  // );
+  var fireStart = function () {
+    window.touching = target;
+    window.edataPrev = edata;
+    return fireTouchEvent(touching, 'start', evt);
+  }
 
-  evt.preventDefault();
+  var fireMove = function () {
+    window.edataPrev = edata;
+    return fireTouchEvent(touching, 'move', evt);
+  }
 
-  if (!touching) {
-    if (!frameTouch) {
-      return;
-    }
-    touching = target;
-    return fireTouchEvent(target, 'start', evt);
-  } else {
-    if (!frameTouch || target != touching || evt.type == "touchend") {
-      fireTouchEvent(touching, 'end', evt);
-      window.touching = null;
-      return;
-    }
+  var fireEnd = function () {
+    var result = fireTouchEvent(touching, 'end', evt);
+    window.edataPrev = edata;
+    window.touching = null;
+    return result;
+  }
 
-    if (evt.type == "touchstart" && frameTouch) {
-      return;
-    }
-    if (evt.type == "touchmove") {
-      return fireTouchEvent(touching, 'move', evt);
-    }
+
+  // If we have a touch start on the layer, and it's been almost no time since
+  // we had a touch end on the layer, discard the start. (This is the most
+  // broken thing about 4.1.)
+  if (
+    !edata.frame &&
+    !touching &&
+    edata.start &&
+    window.edataPrev &&
+    window.edataPrev.end &&
+    (edata.time - window.edataPrev.time) < 50
+  ) {
+    console.log("discarded: " + (edata.time - window.edataPrev.time));
+    return;
+  }
+
+  // If we don't have a touch and we see a start or a move on anything, start
+  // a touch.
+  if (!touching && !edata.end) {
+    return fireStart();
+  }
+
+  // If this is a move event and we already have a touch, continue the move.
+  if (edata.move && touching) {
+    return fireMove();
+  }
+
+  // If we have a touch (and the event must be a start or end due to
+  // previous rule), and the event is not on the iframe, fire end of touch.
+  if (touching && !edata.frame) {
+    return fireEnd();
+  }
+
+  // If we see a touch end on the frame, and the touch is not over the original
+  // layer, then fire a touch end on the original layer.
+  if (edata.frame && edata.end && touching && touching != target) {
+    return fireEnd();
   }
 }
 

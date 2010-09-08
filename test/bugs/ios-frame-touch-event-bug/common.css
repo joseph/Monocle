@@ -17,6 +17,15 @@ div#out span {
   display: block;
 }
 
+div#out span em {
+  margin-left: 3px;
+  padding: 0 4px;
+  font-size: 7px;
+  background: #999;
+  color: white;
+  -webkit-border-radius: 3px;
+}
+
 iframe {
   border: none;
 }
