@@ -174,8 +174,6 @@ function touchProxyHandler(element, evt) {
   // A touch start fires on the layer when moving out of the overlap
   // with the frame. This triggers end of touch. The next move starts a new
   // touch.
-  //
-  //
 }
 
 
