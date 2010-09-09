@@ -302,7 +302,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function scrollerElement(pageDiv) {
     var bdy = pageDiv.m.activeFrame.contentDocument.body;
 
-    if (Monocle.Browser.is.MobileSafari) {
+    if (Monocle.Browser.has.iframeWidthBug) {
       var oldSL = bdy.scrollLeft;
       var sl = bdy.scrollLeft = bdy.scrollWidth;
       var bodyScroller = (bdy.scrollLeft != 0);
@@ -334,14 +334,16 @@ Monocle.Component = function (book, id, index, chapters, source) {
   //
   function scrollerWidth(pageDiv) {
     var bdy = pageDiv.m.activeFrame.contentDocument.body;
-    if (Monocle.Browser.is.MobileSafari) {
-      var hbw = bdy.scrollWidth / 2;
-      //if (Monocle.Browser.iOSVersion < "4.1") {
+    if (Monocle.Browser.has.iframeWidthBug) {
+      if (Monocle.Browser.iOSVersion < "4.1") {
+        var hbw = bdy.scrollWidth / 2;
         var sew = scrollerElement(pageDiv).scrollWidth;
         return Math.max(sew, hbw);
-      //} else {
-      //  return hbw;
-      //}
+      } else {
+        bdy.scrollWidth; // Throw one away. WTF!
+        console.log(p.id + ": " + hbw + "px");
+        return bdy.scrollWidth / 2;
+      }
     } else if (Monocle.Browser.is.Gecko) {
       var lc = bdy.lastChild;
       while (lc && lc.nodeType != 1) {
