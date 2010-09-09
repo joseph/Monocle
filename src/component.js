@@ -223,9 +223,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function setupFrame(pageDiv, frame) {
     // BROWSERHACK: iOS touch events on iframes are busted. See comments in
     // events.js for an explanation of this hack.
-    if (Monocle.Browser.has.iframeTouchBug && Monocle.Events.tMonitor) {
-      Monocle.Events.tMonitor.listenOnIframe(frame);
-    }
+    Monocle.Events.listenOnIframe(frame);
 
     // Announce that the component has changed.
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };

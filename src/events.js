@@ -438,3 +438,13 @@ Monocle.Events.TouchMonitor = function () {
 
   return API;
 }
+
+
+Monocle.Events.listenOnIframe = function (frame) {
+  if (!Monocle.Browser.has.iframeTouchBug) {
+    return;
+  }
+  Monocle.Events.tMonitor = Monocle.Events.tMonitor ||
+    new Monocle.Events.TouchMonitor();
+  Monocle.Events.tMonitor.listenOnIframe(frame);
+}
