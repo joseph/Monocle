@@ -58,6 +58,16 @@ Monocle.Place = function () {
   }
 
 
+  function chapterSrc() {
+    var src = componentId();
+    var cinfo = chapterInfo();
+    if (cinfo && cinfo.fragment) {
+      src += "#" + cinfo.fragment;
+    }
+    return src;
+  }
+
+
   function getLocus(options) {
     options = options || {};
     var locus = {
@@ -79,6 +89,7 @@ Monocle.Place = function () {
   API.pageNumber = pageNumber;
   API.chapterInfo = chapterInfo;
   API.chapterTitle = chapterTitle;
+  API.chapterSrc = chapterSrc;
   API.getLocus = getLocus;
 
   return API;
