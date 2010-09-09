@@ -1,3 +1,15 @@
+// A panel is an invisible column of interactivity. When contact occurs
+// (mousedown, touchstart), the panel expands to the full width of its
+// container, to catch all interaction events and prevent them from hitting
+// other things.
+//
+// Panels are used primarily to provide hit zones for page flipping
+// interactions, but you can do whatever you like with them.
+//
+// After instantiating a panel and adding it to the reader as a control,
+// you can call listenTo() with a hash of methods for any of 'start', 'move'
+// 'end' and 'cancel'.
+//
 Monocle.Controls.Panel = function () {
 
   var API = { constructor: Monocle.Controls.Panel }
@@ -19,9 +31,6 @@ Monocle.Controls.Panel = function () {
       },
       { useCapture: false }
     );
-    if (Monocle.Browser.has.touch) {
-      Monocle.Events.listen(document.body, 'touchend', end);
-    }
     return p.div;
   }
 
@@ -37,10 +46,6 @@ Monocle.Controls.Panel = function () {
 
 
   function start(evt) {
-    if (Monocle.Browser.has.iframeTouchBug) {
-      if (p.contact && p.proxiedContact != evt.proxied) { return; }
-      p.proxiedContact = evt.proxied;
-    }
     p.contact = true;
     if (evt.m) {
       evt.m.offsetX += p.div.offsetLeft;

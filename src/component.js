@@ -221,14 +221,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // and measure its contents.
   //
   function setupFrame(pageDiv, frame) {
-    // BROWSERHACK: WEBKIT (touch events on iframe not sent to higher elems)
-    //
-    // On MobileSafari, translates a click on the iframe into a click on
-    // the reader's controls div.
-    // Presently required to route around MobileSafari's problems with
-    // iframes. But it would be very nice to rip it out.
-    if (Monocle.Browser.has.iframeTouchBug) {
-      Monocle.Compat.enableTouchProxyOnFrame(frame);
+    // BROWSERHACK: iOS touch events on iframes are busted. See comments in
+    // events.js for an explanation of this hack.
+    if (Monocle.Browser.has.iframeTouchBug && Monocle.Events.tMonitor) {
+      Monocle.Events.tMonitor.listenOnIframe(frame);
     }
 
     // Announce that the component has changed.
@@ -339,11 +335,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function scrollerWidth(pageDiv) {
     var bdy = pageDiv.m.activeFrame.contentDocument.body;
     if (Monocle.Browser.is.MobileSafari) {
-      var sew = scrollerElement(pageDiv).scrollWidth;
       var hbw = bdy.scrollWidth / 2;
-      //console.log("page["+pageDiv.m.pageIndex+"] scrollerElement: "+sew);
-      //console.log("page["+pageDiv.m.pageIndex+"] half body scrollWidth: "+hbw);
-      return Math.max(sew, hbw);
+      //if (Monocle.Browser.iOSVersion < "4.1") {
+        var sew = scrollerElement(pageDiv).scrollWidth;
+        return Math.max(sew, hbw);
+      //} else {
+      //  return hbw;
+      //}
     } else if (Monocle.Browser.is.Gecko) {
       var lc = bdy.lastChild;
       while (lc && lc.nodeType != 1) {

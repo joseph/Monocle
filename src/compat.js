@@ -54,7 +54,7 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
   }
 
 
-  // A weak version of console.dir that works on iphones.
+  // A weak version of console.dir that works on iOS.
   window.console.compatDir = function (obj) {
     var stringify = function (o) {
       var parts = [];
@@ -91,109 +91,6 @@ if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
     };
   }
 
-
-  // A namespace for browser-specific methods.
-  Monocle.Compat = {}
-
-
-  Monocle.Compat.enableTouchProxyOnFrame = function (frame) {
-    var doc = frame.contentWindow.document;
-    if (doc.touchProxy) {
-      return;
-    }
-    var fn = function (evt) { Monocle.Compat.touchProxyHandler(frame, evt); }
-    Monocle.Events.listen(doc, 'touchstart', fn);
-    Monocle.Events.listen(doc, 'touchmove', fn);
-    Monocle.Events.listen(doc, 'touchend', fn);
-    Monocle.Events.listen(doc, 'touchcancel', fn);
-    doc.touchProxy = true;
-  }
-
-
-  Monocle.Compat.touchProxyHandler = function (frame, evt) {
-    var touch = evt.touches[0] || evt.changedTouches[0];
-    var target = document.elementFromPoint(
-      touch.screenX,
-      touch.screenY
-    );
-    if (!target) {
-      console.warn('No target for ' + evt.type);
-      return;
-    }
-    if (target == frame) {
-      //console.log(evt.type + ' touch: target is component frame.');
-      return;
-    }
-    // console.log(
-    //   evt.type + ' touch: target is "' +
-    //   target.tagName + "#" +  target.id + '"'
-    // );
-
-    var cloneTouch = function (t) {
-      return document.createTouch(
-        document.defaultView,
-        target,
-        t.identifier,
-        t.screenX,
-        t.screenY,
-        t.screenX,
-        t.screenY
-      );
-    }
-
-    var findTouch = function (id) {
-      for (var i = 0; i < touches.all.length; ++i) {
-        if (touches.all[i].identifier == id) {
-          return touches.all[i];
-        }
-      }
-    }
-
-    // Mimic the event data, dispatching it on the new target.
-    var touches = { all: [], target: [], changed: [] };
-    for (var i = 0; i < evt.touches.length; ++i) {
-      touches.all.push(cloneTouch(evt.touches[i]));
-    }
-    for (var i = 0; i < evt.targetTouches.length; ++i) {
-      touches.target.push(
-        findTouch(evt.targetTouches[i].identifier) ||
-        cloneTouch(evt.targetTouches[i])
-      );
-    }
-    for (var i = 0; i < evt.changedTouches.length; ++i) {
-      touches.changed.push(
-        findTouch(evt.changedTouches[i].identifier) ||
-        cloneTouch(evt.changedTouches[i])
-      );
-    }
-
-    var mimicEvt = document.createEvent('TouchEvent');
-    mimicEvt.initTouchEvent(
-      evt.type,
-      true,
-      true,
-      document.defaultView,
-      evt.detail,
-      evt.screenX,
-      evt.screenY,
-      evt.screenX,
-      evt.screenY,
-      evt.ctrlKey,
-      evt.altKey,
-      evt.shiftKey,
-      evt.metaKey,
-      document.createTouchList.apply(document, touches.all),
-      document.createTouchList.apply(document, touches.target),
-      document.createTouchList.apply(document, touches.changed),
-      evt.scale,
-      evt.rotation
-    );
-    mimicEvt.proxied = true;
-
-    if (!target.dispatchEvent(mimicEvt)) {
-      evt.preventDefault();
-    }
-  }
 
 }
 

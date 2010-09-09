@@ -1,3 +1,10 @@
+// Provides page-flipping panels only in the margins of the book. This is not
+// entirely suited to small screens with razor-thin margins, but is an
+// appropriate panel class for larger screens (like, say, an iPad).
+//
+// Since the flipper hit zones are only in the margins, the actual text content
+// of the book is always selectable.
+//
 Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
 
   var API = { constructor: Monocle.Panels.Marginal }

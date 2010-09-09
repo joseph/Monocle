@@ -1,3 +1,7 @@
+// The simplest page-flipping interaction system: contact to the left half of
+// the reader turns back one page, contact to the right half turns forward
+// one page.
+//
 Monocle.Panels.TwoPane = function (flipper, evtCallbacks) {
 
   var API = { constructor: Monocle.Panels.TwoPane }

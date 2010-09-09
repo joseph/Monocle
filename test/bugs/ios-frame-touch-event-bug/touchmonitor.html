@@ -12,7 +12,6 @@
     <script type="text/javascript" src="../../../src/monocle.js"></script>
     <script type="text/javascript" src="../../../src/compat.js"></script>
     <script type="text/javascript" src="../../../src/events.js"></script>
-    <script type="text/javascript" src="../../../src/touchmonitor.js"></script>
     <script type="text/javascript" src="common.js"></script>
 
     <script type="text/javascript">
@@ -23,8 +22,7 @@
           function () {
             var layer = document.getElementById('layer');
             layer.evtClass = "layer";
-            var monitor = Monocle.Events.TouchMonitor();
-            monitor.monitor(
+            Monocle.Events.listenForContact(
               layer,
               {
                 start: touchEvt,
@@ -32,6 +30,12 @@
                 end: touchEvt,
                 cancel: touchEvt
               }
+            );
+            Monocle.Events.tMonitor.listenOnIframe(
+              document.getElementById('frame1')
+            );
+            Monocle.Events.tMonitor.listenOnIframe(
+              document.getElementById('frame2')
             );
           }
         );
@@ -79,7 +83,11 @@
 
   <body id="body">
     <p class="description">
-      An attempted fix.
+      Testing the TouchMonitor hack, which transposes iframe touch events onto
+      the overlapping layer where appropriate. Try clicking in any red box,
+      swiping from the 3-color box to the pure red box, swiping back up,
+      and a hook-shaped swipe from the green-red box through the 3-color box
+      and into the red box. Et cetera.
       <a href="index.html">Return to bug description</a>.
     </p>
 

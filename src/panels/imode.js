@@ -1,3 +1,10 @@
+// A three-pane system of page interaction. The left 33% turns backwards, the
+// right 33% turns forwards, and contact on the middle third causes the
+// system to go into "interactive mode". In this mode, the page-flipping panels
+// are only active in the margins, and all of the actual text content of the
+// book is selectable. The user can exit "interactive mode" by hitting the little
+// IMode icon in the lower right corner of the reader.
+//
 Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
   var API = { constructor: Monocle.Panels.IMode }

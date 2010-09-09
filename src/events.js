@@ -55,7 +55,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
       pageY: ci.pageY
     };
 
-    // Touch events don't have element offet coords - so generate with GBCR.
+    // Touch events don't have element offset coords - so generate with GBCR.
     if (typeof ci.offsetX == "undefined") {
       var r;
       if (evt.target.getBoundingClientRect) {
@@ -110,31 +110,37 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     }
   } else {
     if (fns.start) {
-      listeners.touchstart = function (evt) {
+      listeners.start = function (evt) {
         if (evt.touches.length > 1) { return; }
         fns.start(cursorInfo(evt, evt.targetTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchstart', listeners.touchstart, capture);
     }
     if (fns.move) {
-      listeners.touchmove = function (evt) {
+      listeners.move = function (evt) {
         if (evt.touches.length > 1) { return; }
         fns.move(cursorInfo(evt, evt.targetTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchmove', listeners.touchmove, capture);
     }
     if (fns.end) {
-      listeners.touchend = function (evt) {
+      listeners.end = function (evt) {
         fns.end(cursorInfo(evt, evt.changedTouches[0]));
         evt.preventDefault();
       }
-      Monocle.Events.listen(elem, 'touchend', listeners.touchend, capture);
     }
     if (fns.cancel) {
-      listeners.touchcancel = function (evt) {
+      listeners.cancel = function (evt) {
         fns.cancel(cursorInfo(evt, evt.changedTouches[0]));
       }
-      Monocle.Events.listen(elem, 'touchcancel', listeners.touchcancel, capture);
+    }
+
+    if (Monocle.Browser.has.iframeTouchBug) {
+      Monocle.Events.tMonitor = Monocle.Events.tMonitor ||
+        new Monocle.Events.TouchMonitor();
+      Monocle.Events.tMonitor.listen(elem, listeners, options);
+    } else {
+      for (etype in listeners) {
+        Monocle.Events.listen(elem, 'touch'+etype, listeners[etype], capture);
+      }
     }
   }
 
@@ -149,4 +155,286 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
   for (evtType in listeners) {
     Monocle.Events.deafen(elem, evtType, listeners[evtType]);
   }
+}
+
+
+
+// BROWSERHACK: iOS touch events on iframes are busted. The TouchMonitor,
+// transposes touch events on underlying iframes onto the elements that
+// sit above them. It's a massive hack.
+Monocle.Events.TouchMonitor = function () {
+  if (Monocle.Events == this) {
+    return new Monocle.Events.TouchMonitor();
+  }
+
+  var API = { constructor: Monocle.Events.TouchMonitor }
+  var k = API.constants = API.constructor;
+  var p = API.properties = {
+    touching: null,
+    edataPrev: null,
+    originator: null,
+    brokenModel_4_1: navigator.userAgent.match(/ OS 4_1/)
+  }
+
+
+  function listenOnIframe(iframe) {
+    if (iframe.contentDocument) {
+      enableTouchProxy(iframe.contentDocument);
+      iframe.contentDocument.isTouchFrame = true;
+    }
+
+    // IN 4.1 ONLY, a touchstart/end/both fires on the *frame* itself when a
+    // touch completes on a part of the iframe that is not overlapped by
+    // anything. This should be translated to a touchend on the touching
+    // object.
+    if (p.brokenModel_4_1) {
+      enableTouchProxy(iframe);
+    }
+  }
+
+
+  function listen(element, fns, useCapture) {
+    for (etype in fns) {
+      Monocle.Events.listen(element, 'contact'+etype, fns[etype], useCapture);
+    }
+    enableTouchProxy(element, useCapture);
+  }
+
+
+  function enableTouchProxy(element, useCapture) {
+    if (element.monocleTouchProxy) {
+      return;
+    }
+    element.monocleTouchProxy = true;
+
+    var fn = function (evt) { touchProxyHandler(element, evt) }
+    Monocle.Events.listen(element, "touchstart", fn, useCapture);
+    Monocle.Events.listen(element, "touchmove", fn, useCapture);
+    Monocle.Events.listen(element, "touchend", fn, useCapture);
+    Monocle.Events.listen(element, "touchcancel", fn, useCapture);
+  }
+
+
+  function touchProxyHandler(element, evt) {
+    var edata = {
+      start: evt.type == "touchstart",
+      move: evt.type == "touchmove",
+      end: evt.type == "touchend" || evt.type == "touchcancel",
+      time: new Date().getTime(),
+      frame: element.isTouchFrame
+    }
+
+    if (!p.touching) {
+      p.originator = element;
+    }
+
+    var target = element;
+    var touch = evt.touches[0] || evt.changedTouches[0];
+    if (edata.frame) {
+      target = document.elementFromPoint(touch.screenX, touch.screenY);
+    }
+
+    if (target) {
+      translateTouchEvent(element, target, evt, edata);
+    }
+  }
+
+
+  function translateTouchEvent(element, target, evt, edata) {
+    // IN 4.1 ONLY, if we have a touch start on the layer, and it's been
+    // almost no time since we had a touch end on the layer, discard the start.
+    // (This is the most broken thing about 4.1.)
+    // FIXME: this seems to discard all "taps" on a naked iframe.
+    if (
+      p.brokenModel_4_1 &&
+      !edata.frame &&
+      !p.touching &&
+      edata.start &&
+      p.edataPrev &&
+      p.edataPrev.end &&
+      (edata.time - p.edataPrev.time) < 30
+    ) {
+      evt.preventDefault();
+      return;
+    }
+
+    // If we don't have a touch and we see a start or a move on anything, start
+    // a touch.
+    if (!p.touching && !edata.end) {
+      return fireStart(evt, target, edata);
+    }
+
+    // If this is a move event and we already have a touch, continue the move.
+    if (edata.move && p.touching) {
+      return fireMove(evt, edata);
+    }
+
+    if (p.brokenModel_4_1) {
+      // IN 4.1 ONLY, if we have a touch in progress, and we see a start, end
+      // or cancel event (moves are covered in previous rule), and the event
+      // is not on the iframe, end the touch.
+      // (This is because 4.1 bizarrely sends a random event to the layer
+      // above the iframe, rather than an end event to the iframe itself.)
+      if (p.touching && !edata.frame) {
+        // However, a touch start will fire on the layer when moving out of
+        // the overlap with the frame. This would trigger the end of the touch.
+        // And the immediately subsequent move starts a new touch.
+        //
+        // To get around this, we only provisionally end the touch - if we get
+        // a touchmove momentarily, we'll cancel this touchend.
+        return fireProvisionalEnd(evt, edata);
+      }
+    } else {
+      // In older versions of MobileSafari, if the touch ends when we're
+      // touching something, just fire it.
+      if (edata.end && p.touching) {
+        return fireProvisionalEnd(evt, edata);
+      }
+    }
+
+    // IN 4.1 ONLY, a touch that has started outside an iframe should not be
+    // endable by the iframe.
+    if (
+      p.brokenModel_4_1 &&
+      p.originator != element &&
+      edata.frame &&
+      edata.end
+    ) {
+      evt.preventDefault();
+      return;
+    }
+
+    // If we see a touch end on the frame, end the touch.
+    if (edata.frame && edata.end && p.touching) {
+      return fireProvisionalEnd(evt, edata);
+    }
+  }
+
+
+  function fireStart(evt, target, edata) {
+    p.touching = target;
+    p.edataPrev = edata;
+    return fireTouchEvent(p.touching, 'start', evt);
+  }
+
+
+  function fireMove(evt, edata) {
+    clearProvisionalEnd();
+    p.edataPrev = edata;
+    return fireTouchEvent(p.touching, 'move', evt);
+  }
+
+
+  function fireEnd(evt, edata) {
+    var result = fireTouchEvent(p.touching, 'end', evt);
+    p.edataPrev = edata;
+    p.touching = null;
+    return result;
+  }
+
+
+  function fireProvisionalEnd(evt, edata) {
+    clearProvisionalEnd();
+    var mimicEvt = mimicTouchEvent(p.touching, 'end', evt);
+    p.edataPrev = edata;
+
+    p.provisionalEnd = setTimeout(
+      function() {
+        if (p.touching) {
+          p.touching.dispatchEvent(mimicEvt);
+          p.touching = null;
+        }
+      },
+      30
+    );
+  }
+
+
+  function clearProvisionalEnd() {
+    if (p.provisionalEnd) {
+      clearTimeout(p.provisionalEnd);
+      p.provisionalEnd = null;
+    }
+  }
+
+
+  function mimicTouchEvent(target, newtype, evt) {
+    var cloneTouch = function (t) {
+      return document.createTouch(
+        document.defaultView,
+        target,
+        t.identifier,
+        t.screenX,
+        t.screenY,
+        t.screenX,
+        t.screenY
+      );
+    }
+
+    var findTouch = function (id) {
+      for (var i = 0; i < touches.all.length; ++i) {
+        if (touches.all[i].identifier == id) {
+          return touches.all[i];
+        }
+      }
+    }
+
+    // Mimic the event data, dispatching it on the new target.
+    var touches = { all: [], target: [], changed: [] };
+    for (var i = 0; i < evt.touches.length; ++i) {
+      touches.all.push(cloneTouch(evt.touches[i]));
+    }
+    for (var i = 0; i < evt.targetTouches.length; ++i) {
+      touches.target.push(
+        findTouch(evt.targetTouches[i].identifier) ||
+        cloneTouch(evt.targetTouches[i])
+      );
+    }
+    for (var i = 0; i < evt.changedTouches.length; ++i) {
+      touches.changed.push(
+        findTouch(evt.changedTouches[i].identifier) ||
+        cloneTouch(evt.changedTouches[i])
+      );
+    }
+
+    var mimicEvt = document.createEvent('TouchEvent');
+    mimicEvt.initTouchEvent(
+      "contact"+newtype,
+      true,
+      true,
+      document.defaultView,
+      evt.detail,
+      evt.screenX,
+      evt.screenY,
+      evt.screenX,
+      evt.screenY,
+      evt.ctrlKey,
+      evt.altKey,
+      evt.shiftKey,
+      evt.metaKey,
+      document.createTouchList.apply(document, touches.all),
+      document.createTouchList.apply(document, touches.target),
+      document.createTouchList.apply(document, touches.changed),
+      evt.scale,
+      evt.rotation
+    );
+
+    return mimicEvt;
+  }
+
+
+  function fireTouchEvent(target, newtype, evt) {
+    var mimicEvt = mimicTouchEvent(target, newtype, evt);
+    var result = target.dispatchEvent(mimicEvt);
+    if (!result) {
+      evt.preventDefault();
+    }
+    return result;
+  }
+
+
+  API.listen = listen;
+  API.listenOnIframe = listenOnIframe;
+
+  return API;
 }
