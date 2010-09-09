@@ -25,19 +25,29 @@ if (Monocle.Browser.is.MobileSafari) {
 
 Monocle.Browser.on = {
   iPhone: navigator.userAgent.indexOf("iPhone") != -1,
-  iPad: navigator.userAgent.indexOf("iPad") != -1
+  iPad: navigator.userAgent.indexOf("iPad") != -1,
+  BlackBerry: navigator.userAgent.indexOf("BlackBerry") != -1
   // TODO: Mac, Windows, etc
 }
 
 
 Monocle.Browser.has = {
-  touch: (typeof Touch == "object"),
+  touch: (function () {
+    try {
+      document.createEvent("TouchEvent");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  })(),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
-    Monocle.Browser.iOSVersion < "4.2",
+    Monocle.Browser.iOSVersion < "4.2" &&
+    !Monocle.Browser.on.BlackBerry,
   floatColumnBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion >= "4.0",
-  selectThruBug: Monocle.Browser.is.MobileSafari
+  selectThruBug: Monocle.Browser.is.MobileSafari &&
+    !Monocle.Browser.on.BlackBerry
 }
 
 
