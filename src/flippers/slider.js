@@ -41,8 +41,8 @@ Monocle.Flippers.Slider = function (reader) {
       var dir = panel.properties.direction;
       if (action == "lift") {
         lift(dir, x);
-      } else if (action == "drop") {
-        drop(dir, x);
+      } else if (action == "release") {
+        release(dir, x);
       }
     }
     p.panels = new panelClass(
@@ -50,8 +50,8 @@ Monocle.Flippers.Slider = function (reader) {
       {
         'start': function (panel, x) { q('lift', panel, x); },
         'move': function (panel, x) { turning(panel.properties.direction, x); },
-        'end': function (panel, x) { q('drop', panel, x); },
-        'cancel': function (panel, x) { q('drop', panel, x); }
+        'end': function (panel, x) { q('release', panel, x); },
+        'cancel': function (panel, x) { q('release', panel, x); }
       }
     );
   }
@@ -64,7 +64,11 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function moveTo(locus) {
-    setPage(upperPage(), locus, completedTurn);
+    setPage(
+      upperPage(),
+      locus,
+      function () { prepareNextPage(announceTurn); }
+    );
   }
 
 
@@ -111,24 +115,22 @@ Monocle.Flippers.Slider = function (reader) {
   function onLastPage() {
     var place = getPlace();
     var cmpt = place.properties.component;
-    return cmpt.properties.index == cmpt.properties.book.properties.lastCIndex &&
-      place.pageNumber() == cmpt.lastPageNumber();
-  }
-
-
-  function resetTurnData() {
-    p.turnData = {};
+    return (
+      cmpt.properties.index == cmpt.properties.book.properties.lastCIndex &&
+      place.pageNumber() == cmpt.lastPageNumber()
+    );
   }
 
 
   function lift(dir, boxPointX) {
-    if (p.turnData.completing) { return; }
+    if (p.turnData.lifting || p.turnData.releasing) { return; }
 
     p.turnData.points = {
       start: boxPointX,
       min: boxPointX,
       max: boxPointX
     }
+    p.turnData.lifting = true;
 
     if (dir == k.FORWARDS) {
       if (onLastPage()) {
@@ -136,14 +138,14 @@ Monocle.Flippers.Slider = function (reader) {
         resetTurnData();
         return;
       }
-      beforeGoingForward(function () { slideToCursor(boxPointX); });
+      onGoingForward(boxPointX);
     } else if (dir == k.BACKWARDS) {
       if (onFirstPage()) {
         //console.log("ON FIRST PAGE");
         resetTurnData();
         return;
       }
-      beforeGoingBackward(function () { slideToCursor(boxPointX); });
+      onGoingBackward(boxPointX);
     } else {
       console.warn("Invalid direction: " + dir);
     }
@@ -152,29 +154,30 @@ Monocle.Flippers.Slider = function (reader) {
 
   function turning(dir, boxPointX) {
     if (!p.turnData.points) { return; }
-    if (p.turnData.completing) { return; }
+    if (p.turnData.lifting || p.turnData.releasing) { return; }
     checkPoint(boxPointX);
     slideToCursor(boxPointX, null, "0");
   }
 
 
-  function drop(dir, boxPointX, forceComplete) {
+  function release(dir, boxPointX) {
     if (!p.turnData.points) {
       return;
     }
-    if (p.turnData.completing) {
+    if (p.turnData.lifting) {
+      p.turnData.releaseArgs = [dir, boxPointX];
+      return;
+    }
+    if (p.turnData.releasing) {
       return;
     }
 
-    slideToCursor(boxPointX, null, "0");
-
     checkPoint(boxPointX);
 
-    p.turnData.completing = true;
+    p.turnData.releasing = true;
 
     if (dir == k.FORWARDS) {
       if (
-        forceComplete ||
         p.turnData.points.tap ||
         p.turnData.points.start - boxPointX > 60 ||
         p.turnData.points.min >= boxPointX
@@ -187,7 +190,6 @@ Monocle.Flippers.Slider = function (reader) {
       }
     } else if (dir == k.BACKWARDS) {
       if (
-        forceComplete ||
         p.turnData.points.tap ||
         boxPointX - p.turnData.points.start > 60 ||
         p.turnData.points.max <= boxPointX
@@ -211,22 +213,20 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
-  function beforeGoingForward(callback) {
-    callback();
+  function onGoingForward(x) {
+    lifted(x);
   }
 
 
-  function beforeGoingBackward(callback) {
+  function onGoingBackward(x) {
     var lp = lowerPage();
     jumpOut(lp, // move lower page off-screen
       function () {
-        setPage( // set lower page to previous
+        flipPages(); // flip lower to upper
+        setPage( // set upper page to previous
           lp,
-          getPlace().getLocus({ direction: k.BACKWARDS }),
-          function () {
-            flipPages(); // flip lower to upper
-            callback();
-          }
+          getPlace(lowerPage()).getLocus({ direction: k.BACKWARDS }),
+          function () { lifted(x); }
         );
       }
     );
@@ -240,15 +240,16 @@ Monocle.Flippers.Slider = function (reader) {
         up,
         getPlace().getLocus({ direction: k.FORWARDS }),
         function () {
-          jumpIn(up, // move upper back onto screen
-            completedTurn // set lower to next and reset turn
-          );
+          // move upper back onto screen
+          // then set lower to next and reset turn
+          jumpIn(up, function () { prepareNextPage(announceTurn); });
         }
       );
     } else {
       flipPages();
-      jumpIn(up, completedTurn);
+      jumpIn(up, function () { prepareNextPage(announceTurn); });
     }
+
   }
 
 
@@ -259,17 +260,18 @@ Monocle.Flippers.Slider = function (reader) {
         getPlace().getLocus(),
         function () {
           flipPages(); // flip lower to upper
-          completedTurn(); // set lower to next and reset turn
+          // set lower to next and reset turn:
+          prepareNextPage(announceTurn);
         }
       );
     } else {
-      completedTurn();
+      announceTurn();
     }
   }
 
 
   function afterCancellingForward() {
-    cancelledTurn(); // set lower to next (FIXME: already done?) and reset turn
+    resetTurnData();
   }
 
 
@@ -277,29 +279,40 @@ Monocle.Flippers.Slider = function (reader) {
     flipPages(); // flip upper to lower
     jumpIn( // move lower back onto screen
       lowerPage(),
-      cancelledTurn // set lower to next and reset turn
+      function () { prepareNextPage(resetTurnData); }
     );
   }
 
 
-  function completedTurn() {
+  function prepareNextPage(callback) {
     setPage(
       lowerPage(),
       getPlace().getLocus({ direction: k.FORWARDS }),
-      function () {
-        p.reader.dispatchEvent('monocle:turn');
-        resetTurnData();
-      }
+      callback
     );
   }
 
 
-  function cancelledTurn() {
-    setPage(
-      lowerPage(),
-      getPlace().getLocus({ direction: k.FORWARDS }),
-      resetTurnData
-    );
+  function lifted(x) {
+    p.turnData.lifting = false;
+    var releaseArgs = p.turnData.releaseArgs;
+    if (releaseArgs) {
+      p.turnData.releaseArgs = null;
+      release(releaseArgs[0], releaseArgs[1]);
+    } else if (x) {
+      slideToCursor(x);
+    }
+  }
+
+
+  function announceTurn() {
+    p.reader.dispatchEvent('monocle:turn');
+    resetTurnData();
+  }
+
+
+  function resetTurnData() {
+    p.turnData = {};
   }
 
 
