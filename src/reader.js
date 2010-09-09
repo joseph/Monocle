@@ -164,6 +164,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       page.m.sheafDiv.appendChild(page.m.activeFrame);
       p.flipper.addPage(page);
       p.divs.container.appendChild(page);
+      // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
+      if (Monocle.Browser.has.iframeTouchBug && Monocle.Events.tMonitor) {
+        Monocle.Events.tMonitor.listenOnIframe(page.m.activeFrame);
+      }
     }
     p.divs.overlay = document.createElement('div');
     p.divs.box.appendChild(p.divs.overlay);
