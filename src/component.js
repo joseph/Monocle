@@ -339,8 +339,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
         return Math.max(sew, hbw);
       } else {
         bdy.scrollWidth; // Throw one away. WTF!
+        var hbw = bdy.scrollWidth / 2;
         console.log(p.id + ": " + hbw + "px");
-        return bdy.scrollWidth / 2;
+        return hbw;
       }
     } else if (Monocle.Browser.is.Gecko) {
       var lc = bdy.lastChild;

@@ -152,8 +152,13 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
 // are registered to them -- de-registers the functions from the events.
 //
 Monocle.Events.deafenForContact = function (elem, listeners) {
+  var prefix = "";
+  if (Monocle.Browser.has.touch) {
+    prefix = Monocle.Browser.has.iframeTouchBug ? "contact" : "touch";
+  }
+
   for (evtType in listeners) {
-    Monocle.Events.deafen(elem, evtType, listeners[evtType]);
+    Monocle.Events.deafen(elem, prefix + evtType, listeners[evtType]);
   }
 }
 
