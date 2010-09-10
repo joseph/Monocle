@@ -115,11 +115,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         }
       );
 
+      p.flipper.listenForInteraction(options.panels);
+
       // Apply the book, calculating column dimensions & etc.
       p.book = bk;
       calcDimensions(options.place)
-
-      p.flipper.listenForInteraction(options.panels);
 
       Monocle.defer(function () {
         if (onLoadCallback) {

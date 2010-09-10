@@ -48,7 +48,7 @@ Monocle.Browser.has = {
     Monocle.Browser.on.iPad,
   floatColumnBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion >= "4.0",
-  selectThruBug: false && Monocle.Browser.is.MobileSafari &&
+  selectThruBug: Monocle.Browser.is.MobileSafari &&
     !Monocle.Browser.on.BlackBerry
 }
 

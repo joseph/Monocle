@@ -31,6 +31,10 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function listenForInteraction(panelClass) {
+    // BROWSERHACK: Firstly, prime interactiveMode for buggy iOS WebKit.
+    interactiveMode(true);
+    interactiveMode(false);
+
     if (typeof panelClass != "function") {
       panelClass = k.DEFAULT_PANELS_CLASS;
       if (!panelClass) {
@@ -54,6 +58,32 @@ Monocle.Flippers.Slider = function (reader) {
         'cancel': function (panel, x) { q('release', panel, x); }
       }
     );
+  }
+
+
+  // A panel can call this with true/false to indicate that the user needs
+  // to be able to select or otherwise interact with text.
+  function interactiveMode(bState) {
+    if (!Monocle.Browser.has.selectThruBug) {
+      return;
+    }
+    if (p.interactive = bState) {
+      if (p.activeIndex != 0) {
+        var place = getPlace();
+        if (place) {
+          setPage(
+            p.divs.pages[0],
+            place.getLocus(),
+            function () {
+              flipPages();
+              prepareNextPage();
+            }
+          );
+        } else {
+          flipPages();
+        }
+      }
+    }
   }
 
 
@@ -235,7 +265,7 @@ Monocle.Flippers.Slider = function (reader) {
 
   function afterGoingForward() {
     var up = upperPage();
-    if (Monocle.Browser.has.selectThruBug) {
+    if (p.interactive) {
       setPage( // set upper (off screen) to current
         up,
         getPlace().getLocus({ direction: k.FORWARDS }),
@@ -249,12 +279,11 @@ Monocle.Flippers.Slider = function (reader) {
       flipPages();
       jumpIn(up, function () { prepareNextPage(announceTurn); });
     }
-
   }
 
 
   function afterGoingBackward() {
-    if (Monocle.Browser.has.selectThruBug) {
+    if (p.interactive) {
       setPage( // set lower page to current
         lowerPage(),
         getPlace().getLocus(),
@@ -457,6 +486,7 @@ Monocle.Flippers.Slider = function (reader) {
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
+  API.interactiveMode = interactiveMode;
 
   initialize();
 
