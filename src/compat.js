@@ -42,14 +42,14 @@ Monocle.Browser.has = {
   })(),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
-    Monocle.Browser.iOSVersion < "4.2" &&
-    !Monocle.Browser.on.BlackBerry,
+    Monocle.Browser.iOSVersion &&
+    Monocle.Browser.iOSVersion < "4.2",
+  selectThruBug: Monocle.Browser.is.MobileSafari &&
+    Monocle.Browser.iOSVersion &&
+    Monocle.Browser.iOSVersion < "4.2",
   iframeWidthBug: Monocle.Browser.on.iPhone ||
     Monocle.Browser.on.iPad,
-  floatColumnBug: Monocle.Browser.is.MobileSafari &&
-    Monocle.Browser.iOSVersion >= "4.0",
-  selectThruBug: Monocle.Browser.is.MobileSafari &&
-    !Monocle.Browser.on.BlackBerry
+  floatColumnBug: Monocle.Browser.is.WebKit
 }
 
 

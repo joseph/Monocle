@@ -340,7 +340,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       } else {
         bdy.scrollWidth; // Throw one away. WTF!
         var hbw = bdy.scrollWidth / 2;
-        console.log(p.id + ": " + hbw + "px");
+        //console.log(p.id + ": " + hbw + "px");
         return hbw;
       }
     } else if (Monocle.Browser.is.Gecko) {
