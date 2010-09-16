@@ -17,21 +17,21 @@ Monocle.defer = function (fn, time) {
 }
 
 
-//= require <compat>
-//= require <events>
-//= require <styles>
-//= require <reader>
-//= require <book>
-//= require <place>
-//= require <component>
+//= require "compat"
+//= require "events"
+//= require "styles"
+//= require "reader"
+//= require "book"
+//= require "place"
+//= require "component"
 
 Monocle.Controls = {};
 Monocle.Flippers = {};
 Monocle.Panels = {};
 
-//= require <controls/panel>
-//= require <panels/twopane>
-//= require <flippers/legacy>
-//= require <flippers/slider>
+//= require "controls/panel"
+//= require "panels/twopane"
+//= require "flippers/legacy"
+//= require "flippers/slider"
 
 Monocle.pieceLoaded('monocle');
