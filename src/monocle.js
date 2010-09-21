@@ -18,6 +18,7 @@ Monocle.defer = function (fn, time) {
 
 
 //= require "compat"
+//= require "factory"
 //= require "events"
 //= require "styles"
 //= require "reader"

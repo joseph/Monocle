@@ -1,5 +1,20 @@
 // READER
-
+//
+//
+// The full DOM hierarchy created by Reader is:
+//
+//   box
+//    -> container
+//      -> pages (the number of page elements is determined by the flipper)
+//        -> sheaf (basically just sets the margins)
+//          -> component (an iframe created by the current component)
+//            -> body (the document.body of the iframe)
+//        -> page controls
+//      -> standard controls
+//    -> overlay
+//      -> modal/popover controls
+//
+//
 // Options:
 //
 //  flipper: The class of page flipper to use.
@@ -9,6 +24,7 @@
 //    the locus option).
 //  systemId: the id for root elements of components, defaults to "RS:monocle"
 //
+//
 Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   if (Monocle == this) {
     return new Monocle.Reader(node, bookData, options, onLoadCallback);
@@ -17,27 +33,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   var API = { constructor: Monocle.Reader }
   var k = API.constants = API.constructor;
   var p = API.properties = {
-    // Divs only stores the box, the container and the two pages. But the full
-    // hierarchy (at this time) is:
-    //
-    //   box
-    //    -> container
-    //      -> pages (the number of page elements is determined by the flipper)
-    //        -> sheaf (basically just sets the margins)
-    //          -> component (an iframe created by the current component)
-    //            -> body (the document.body of the iframe)
-    //        -> page controls
-    //      -> standard controls
-    //    -> overlay
-    //      -> modal/popover controls
-    //
-    divs: {
-      box: null,
-      container: null,
-      overlay: null,
-      pages: []
-    },
-
     // Registered control objects (see addControl). Hashes of the form:
     //   {
     //     control: <control instance>,
@@ -61,17 +56,22 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     resizeTimer: null,
 
     // An array of style rules that are automatically applied to every page.
-    pageStylesheets: []
+    pageStylesheets: [],
+
+    // DOM graph of factory-generated objects.
+    graph: {},
+
+    // Prefix for classnames for any created element.
+    classPrefix: k.DEFAULT_CLASS_PREFIX
   }
+  var dom;
 
 
   // Sets up the container and internal elements.
   //
   function initialize(node, bookData, options, onLoadCallback) {
-    p.divs.box = typeof(node) == "string" ?
-      document.getElementById(node) :
-      node;
-    p.divs.box.setAttribute('monocle', 'reader');
+    var box = typeof(node) == "string" ?  document.getElementById(node) : node;
+    dom = API.dom = new Monocle.Factory(box, 'box', 0, API);
 
     options = options || {}
 
@@ -81,9 +81,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (bookData) {
       bk = new Monocle.Book(bookData);
     } else {
-      bk = Monocle.Book.fromNodes([p.divs.box.cloneNode(true)]);
+      bk = Monocle.Book.fromNodes([box.cloneNode(true)]);
     }
-    p.divs.box.innerHTML = "";
+    box.innerHTML = "";
 
     // Make sure the box div is absolutely or relatively positioned.
     positionBox();
@@ -91,11 +91,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // Attach the page-flipping gadget.
     attachFlipper(options.flipper);
 
-    // Clamp page frames to a set of styles that reduce Monocle breakage.
-    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
-
     // Create the essential DOM elements.
     createReaderElements();
+
+    // Clamp page frames to a set of styles that reduce Monocle breakage.
+    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
 
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
@@ -111,7 +111,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
               addPageStylesheet(doc, i);
             }
           }
-          Monocle.Styles.applyRules(doc.body, 'body');
+          Monocle.Styles.applyRules(doc.body, Monocle.Styles.body);
         }
       );
 
@@ -133,42 +133,32 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function positionBox() {
     var currPosVal;
+    var box = dom.find('box');
     if (document.defaultView) {
-      var currStyle = document.defaultView.getComputedStyle(p.divs.box, null);
+      var currStyle = document.defaultView.getComputedStyle(box, null);
       currPosVal = currStyle.getPropertyValue('position');
-    } else if (p.divs.box.currentStyle) {
-      currPosVal = p.divs.box.currentStyle.position
+    } else if (box.currentStyle) {
+      currPosVal = box.currentStyle.position
     }
     if (["absolute", "relative"].indexOf(currPosVal) == -1) {
-      p.divs.box.style.position = "relative";
+      box.style.position = "relative";
     }
   }
 
 
-  function createReaderElements(callback) {
-    p.divs.container = document.createElement('div');
-    p.divs.box.appendChild(p.divs.container);
+  function createReaderElements() {
+    var cntr = dom.append('div', 'container');
     for (var i = 0; i < p.flipper.pageCount; ++i) {
-      var page = p.divs.pages[i] = document.createElement('div');
-      page.m = page.monocleData = {
-        reader: API,
-        pageIndex: i,
-        sheafDiv: document.createElement('div'),
-        activeFrame: document.createElement('iframe'),
-        place: null
-      }
-      page.m.activeFrame.m = page.m.activeFrame.monocleData = {
-        'pageDiv': page
-      }
-      page.appendChild(page.m.sheafDiv);
-      page.m.sheafDiv.appendChild(page.m.activeFrame);
-      p.flipper.addPage(page);
-      p.divs.container.appendChild(page);
+      var page = cntr.dom.append('div', 'page', i);
+      page.m = { reader: API, pageIndex: i, place: null }
+      page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
+      page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
+      // FIXME: clunky
+      page.m.activeFrame.m = page.m.activeFrame.monocleData = { 'pageDiv': page }
       // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
       Monocle.Events.listenOnIframe(page.m.activeFrame);
     }
-    p.divs.overlay = document.createElement('div');
-    p.divs.box.appendChild(p.divs.overlay);
+    dom.append('div', 'overlay');
     dispatchEvent("monocle:loading");
   }
 
@@ -178,10 +168,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function primeFrames(url, callback) {
     url = url || "about:blank";
 
-    var pageMax = p.divs.pages.length;
+    var pageMax = p.flipper.pageCount;
     var pageCount = 0;
     for (var i = 0; i < pageMax; ++i) {
-      var page = p.divs.pages[i];
+      var page = dom.find('page', i);
       page.m.activeFrame.style.visibility = "hidden";
       page.m.activeFrame.style.position = "absolute";
       var cb = function (evt) {
@@ -205,10 +195,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (!Monocle.Browser.has.columns) {
       flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
       if (!flipperClass) {
-        var abortMsg = document.createElement('div');
-        abortMsg.className = k.abortMessage.CLASSNAME;
-        abortMsg.innerHTML = k.abortMessage.TEXT;
-        p.divs.box.appendChild(abortMsg);
+        return dom.append(
+          'div',
+          'abortMsg',
+          { 'class': k.abortMessage.CLASSNAME, 'html': k.abortMessage.TEXT }
+        );
         return;
       }
     } else if (!flipperClass) {
@@ -222,18 +213,16 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function applyStyles() {
-    Monocle.Styles.applyRules(p.divs.container, 'container');
+    dom.find('container').dom.setStyle(Monocle.Styles.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
-      var page = p.divs.pages[i];
-      Monocle.Styles.applyRules(page, 'page');
-      Monocle.Styles.applyRules(page.m.sheafDiv, 'sheaf');
-      Monocle.Styles.applyRules(page.m.activeFrame, 'component');
-      Monocle.Styles.applyRules(
-        page.m.activeFrame.contentDocument.body,
-        'body'
-      );
+      var page = dom.find('page', i);
+      page.dom.setStyle(Monocle.Styles.page);
+      dom.find('sheaf', i).dom.setStyle(Monocle.Styles.sheaf);
+      var cmpt = dom.find('component', i)
+      cmpt.dom.setStyle(Monocle.Styles.component);
+      Monocle.Styles.applyRules(cmpt.contentDocument.body, Monocle.Styles.body);
     }
-    Monocle.Styles.applyRules(p.divs.overlay, 'overlay');
+    dom.find('overlay').dom.setStyle(Monocle.Styles.overlay);
     dispatchEvent('monocle:styles');
   }
 
@@ -268,20 +257,24 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   //
   function calcDimensions(locus) {
     locus = locus || { page: pageNumber() };
+    var box = dom.find('box');
     p.boxDimensions = {
       left: 0,
       top: 0,
-      width: p.divs.box.offsetWidth,
-      height: p.divs.box.offsetHeight
+      width: box.offsetWidth,
+      height: box.offsetHeight
     }
-    var o = p.divs.box;
+    var o = box;
     do {
       p.boxDimensions.left += o.offsetLeft;
       p.boxDimensions.top += o.offsetTop;
     } while (o = o.offsetParent);
 
     if (typeof(p.flipper.overrideDimensions) != 'function') {
-      var measuringPage = p.flipper.visiblePages()[0];
+      var measuringPage = dom.find('page');
+      if (p.flipper.visiblePages) {
+        measuringPage = p.flipper.visiblePages()[0];
+      }
       p.pageWidth = measuringPage.offsetWidth;
     } else {
       p.flipper.overrideDimensions();
@@ -357,28 +350,29 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.controls.push(ctrlData);
 
     var ctrlElem;
+    var cntr = dom.find('container'), overlay = dom.find('overlay');
     if (!cType || cType == "standard") {
-      ctrlElem = ctrl.createControlElements(p.divs.container);
-      p.divs.container.appendChild(ctrlElem);
+      ctrlElem = ctrl.createControlElements(cntr);
+      cntr.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
-      for (var i = 0; i < p.divs.pages.length; ++i) {
-        var cDiv = p.divs.pages[i];
-        var runner = ctrl.createControlElements(cDiv);
-        cDiv.appendChild(runner);
+      for (var i = 0; i < p.flipper.pageCount; ++i) {
+        var page = dom.find('page', i);
+        var runner = ctrl.createControlElements(page);
+        page.appendChild(runner);
         ctrlData.elements.push(runner);
       }
     } else if (cType == "modal" || cType == "popover") {
-      ctrlElem = ctrl.createControlElements(p.divs.overlay);
-      p.divs.overlay.appendChild(ctrlElem);
+      ctrlElem = ctrl.createControlElements(overlay);
+      overlay.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
       ctrlData.usesOverlay = true;
     } else if (cType == "invisible") {
       if (
         typeof(ctrl.createControlElements) == "function" &&
-        (ctrlElem = ctrl.createControlElements(p.divs.container))
+        (ctrlElem = ctrl.createControlElements(cntr))
       ) {
-        p.divs.container.appendChild(ctrlElem);
+        cntr.appendChild(ctrlElem);
         ctrlData.elements.push(ctrlElem);
       }
     } else {
@@ -386,7 +380,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
 
     for (var i = 0; i < ctrlData.elements.length; ++i) {
-      ctrlData.elements[i].style.cssText += Monocle.Styles.ruleText('control');
+      Monocle.Styles.applyRules(ctrlData.elements[i], Monocle.Styles.control);
     }
 
     if (options.hidden) {
@@ -425,8 +419,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       controlData.elements[i].style.display = "none";
     }
     if (controlData.usesOverlay) {
-      p.divs.overlay.style.display = "none";
-      Monocle.Events.deafenForContact(p.divs.overlay, p.divs.overlay.listeners);
+      var overlay = dom.find('overlay');
+      overlay.style.display = "none";
+      Monocle.Events.deafenForContact(overlay, overlay.listeners);
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -448,12 +443,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     for (var i = 0; i < controlData.elements.length; ++i) {
       controlData.elements[i].style.display = "block";
     }
+    var overlay = dom.find('overlay');
     if (controlData.usesOverlay) {
-      p.divs.overlay.style.display = "block";
+      overlay.style.display = "block";
     }
     if (controlData.controlType == "popover") {
-      p.divs.overlay.listeners = Monocle.Events.listenForContact(
-        p.divs.overlay,
+      overlay.listeners = Monocle.Events.listenForContact(
+        overlay,
         {
           start: function (evt) {
             obj = evt.target || window.event.srcElement;
@@ -483,17 +479,17 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var evt = document.createEvent("Events");
     evt.initEvent(evtType, false, cancelable || false);
     evt.m = evt.monocleData = data;
-    return p.divs.box.dispatchEvent(evt);
+    return dom.find('box').dispatchEvent(evt);
   }
 
 
   function listen(evtType, fn, useCapture) {
-    Monocle.Events.listen(p.divs.box, evtType, fn, useCapture);
+    Monocle.Events.listen(dom.find('box'), evtType, fn, useCapture);
   }
 
 
   function deafen(evtType, fn) {
-    Monocle.Events.deafen(p.divs.box, evtType, fn);
+    Monocle.Events.deafen(dom.find('box'), evtType, fn);
   }
 
 
@@ -511,8 +507,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       p.pageStylesheets.push(styleRules);
       var sheetIndex = p.pageStylesheets.length - 1;
 
-      for (var i = 0; i < p.divs.pages.length; ++i) {
-        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      for (var i = 0; i < p.flipper.pageCount; ++i) {
+        var doc = dom.find('component', i).contentDocument;
         addPageStylesheet(doc, sheetIndex);
       }
       return sheetIndex;
@@ -529,8 +525,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       if (typeof styleRules.join == "function") {
         styleRules = styleRules.join("\n");
       }
-      for (var i = 0; i < p.divs.pages.length; ++i) {
-        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      for (var i = 0; i < p.flipper.pageCount; ++i) {
+        var doc = dom.find('component', i).contentDocument;
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         if (styleTag.styleSheet) {
           styleTag.styleSheet.cssText = styleRules;
@@ -551,8 +547,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function removePageStyles(sheetIndex, recalcDimensions) {
     return changingStylesheet(function () {
       p.pageStylesheets[sheetIndex] = null;
-      for (var i = 0; i < p.divs.pages.length; ++i) {
-        var doc = p.divs.pages[i].m.activeFrame.contentDocument;
+      for (var i = 0; i < p.flippers.pageCount; ++i) {
+        var doc = dom.find('component', i).contentDocument;
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         styleTag.parentNode.removeChild(styleTag);
       }
@@ -637,19 +633,11 @@ Monocle.Reader.abortMessage = {
   CLASSNAME: "monocleAbortMessage",
   TEXT: "Your browser does not support this technology."
 }
+Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.TOUCH_DEVICE = (typeof Touch == "object");
 Monocle.Reader.DEFAULT_STYLE_RULES = [
-  // "body {" +
-  //   "user-select: none !important;" +
-  //   "-moz-user-select: none !important;" +
-  //   "-webkit-user-select: none !important;" +
-  // "}" +
-  // "body * {" +
-  //   "float: none !important;" +
-  //   "clear: none !important;" +
-  // "}",
   "html * {" +
     "text-rendering: optimizeSpeed !important;" +
     "word-wrap: break-word !important;" +

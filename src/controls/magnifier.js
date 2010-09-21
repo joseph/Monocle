@@ -18,25 +18,11 @@ Monocle.Controls.Magnifier = function (reader) {
 
 
   function createControlElements(holder) {
-    var btn = document.createElement('div');
-    p.ctrlHolder = btn;
-    btn.style.cssText = Monocle.Styles.ruleText(
-      Monocle.Styles.Controls.Magnifier.button
-    );
-    btn.smallA = document.createElement('span');
-    btn.smallA.style.cssText = Monocle.Styles.ruleText(
-      Monocle.Styles.Controls.Magnifier.smallA
-    )
-    btn.appendChild(btn.smallA);
-    btn.largeA = document.createElement('span');
-    btn.largeA.style.cssText = Monocle.Styles.ruleText(
-      Monocle.Styles.Controls.Magnifier.largeA
-    )
-    btn.largeA.innerHTML = btn.smallA.innerHTML = "A";
-    btn.appendChild(btn.largeA);
-
-    Monocle.Events.listenForContact(btn, { start: toggleMagnification });
+    var btn = holder.dom.make('div', 'controls_magnifier_button');
+    btn.smallA = btn.dom.append('span', 'controls_magnifier_a', { text: 'A' });
+    btn.largeA = btn.dom.append('span', 'controls_magnifier_A', { text: 'A' });
     p.buttons.push(btn);
+    Monocle.Events.listenForContact(btn, { start: toggleMagnification });
     return btn;
   }
 
@@ -68,7 +54,7 @@ Monocle.Controls.Magnifier = function (reader) {
 
     // Reapplying styles may hide overlay. FIXME: this could be done more
     // delicately...
-    p.ctrlHolder.parentNode.style.display = "block";
+    //p.ctrlHolder.parentNode.style.display = "block";
   }
 
   API.createControlElements = createControlElements;
@@ -79,26 +65,5 @@ Monocle.Controls.Magnifier = function (reader) {
 }
 
 Monocle.Controls.Magnifier.LARGE_FONT_SIZE = "115%";
-Monocle.Controls.Magnifier.NORMAL_FONT_SIZE = Monocle.Styles.body['font-size'] ||
-  "100%";
-
-
-Monocle.Styles.Controls.Magnifier = {
-  button: {
-    "cursor": "pointer",
-    "color": "#555",
-    "position": "absolute",
-    "top": "2px",
-    "right": "10px",
-    "padding": "0 2px"
-  },
-  largeA: {
-    "font-size": "18px",
-    "opacity": "0.3"
-  },
-  smallA: {
-    "font-size": "11px"
-  }
-}
-
+Monocle.Controls.Magnifier.NORMAL_FONT_SIZE = "100%";
 Monocle.pieceLoaded('controls/magnifier');

@@ -21,7 +21,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function addPage(pageDiv) {
-    p.divs.pages.push(pageDiv);
+    //p.divs.pages.push(pageDiv);
   }
 
 
@@ -72,7 +72,7 @@ Monocle.Flippers.Slider = function (reader) {
         var place = getPlace();
         if (place) {
           setPage(
-            p.divs.pages[0],
+            p.reader.dom.find('page', 0),
             place.getLocus(),
             function () {
               flipPages();
@@ -119,12 +119,12 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function upperPage() {
-    return p.divs.pages[p.activeIndex];
+    return p.reader.dom.find('page', p.activeIndex);
   }
 
 
   function lowerPage() {
-    return p.divs.pages[(p.activeIndex + 1) % 2];
+    return p.reader.dom.find('page', (p.activeIndex + 1) % 2);
   }
 
 
@@ -481,11 +481,12 @@ Monocle.Flippers.Slider = function (reader) {
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
-  API.addPage = addPage;
-  API.visiblePages = visiblePages;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
+
+  // OPTIONAL API - WILL BE INVOKED (WHERE RELEVANT) IF PROVIDED.
+  API.visiblePages = visiblePages;
   API.interactiveMode = interactiveMode;
 
   initialize();

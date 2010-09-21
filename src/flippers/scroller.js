@@ -14,16 +14,6 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
-  function addPage(pageDiv) {
-    p.page = pageDiv;
-  }
-
-
-  function visiblePages() {
-    return [p.page];
-  }
-
-
   function listenForInteraction(panelClass) {
     if (typeof panelClass != "function") {
       panelClass = k.DEFAULT_PANELS_CLASS;
@@ -42,22 +32,26 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
+  function page() {
+    return p.reader.dom.find('page');
+  }
+
   function getPlace() {
-    return p.page.m.place;
+    return page().m.place;
   }
 
 
   function moveTo(locus) {
-    p.reader.getBook().setOrLoadPageAt(p.page, locus, frameToLocus);
+    p.reader.getBook().setOrLoadPageAt(page(), locus, frameToLocus);
   }
 
 
   function frameToLocus(locus) {
     var mult = locus.page - 1;
-    var pw = p.page.m.sheafDiv.clientWidth;
+    var pw = page().m.sheafDiv.clientWidth;
     var x = 0 - pw * mult;
 
-    var bdy = p.page.m.activeFrame.contentDocument.body;
+    var bdy = page().m.activeFrame.contentDocument.body;
     if (typeof WebKitTransitionEvent != "undefined") {
       bdy.style.webkitTransition = "-webkit-transform " +
         p.duration + "ms ease-out 0ms";
@@ -97,8 +91,6 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
-  API.addPage = addPage;
-  API.visiblePages = visiblePages;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;

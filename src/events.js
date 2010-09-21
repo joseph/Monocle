@@ -453,3 +453,5 @@ Monocle.Events.listenOnIframe = function (frame) {
     new Monocle.Events.TouchMonitor();
   Monocle.Events.tMonitor.listenOnIframe(frame);
 }
+
+Monocle.pieceLoaded('events');

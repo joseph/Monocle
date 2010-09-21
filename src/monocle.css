@@ -1,0 +1,259 @@
+/*===========================================================================
+
+This is a base-level Monocle stylesheet. It assumes no class-prefix has been
+given to the Reader during initialisation - if one has, you can copy and
+modify this stylesheet accordingly.
+
+---------------------------------------------------------------------------*/
+
+/* The reader object that holds pretty much everything.
+ * (A direct child of the element passed to reader initialisation). */
+div.monelem_container {
+  background-color: black;
+}
+
+
+/* The div that mimics a leaf of paper in a book. */
+div.monelem_page {
+  background: white;
+  top: 0;
+  left: 0;
+  bottom: 3px;
+  right: 5px;
+  outline: 1px solid #999;
+}
+
+
+/* The div within the page that determines page margins. */
+div.monelem_sheaf {
+  top: 1em;
+  left: 1em;
+  bottom: 1em;
+  right: 1em;
+}
+
+
+/* The iframe within the page that loads the content of the book. */
+div.monelem_component {
+}
+
+
+/* A panel that sits above the entire reader object, holding controls. */
+div.monelem_overlay {
+}
+
+
+/*===========================================================================
+  FLIPPERS
+---------------------------------------------------------------------------*/
+
+/* Legacy */
+
+.monelem_flipper_legacy_message {
+  border: 1px solid #987;
+  background: #FFC;
+  color: #333;
+  font-family: Helvetica; Arial; sans-serif;
+  font-size: 11px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  padding: 0.5em 1em;
+}
+
+.monelem_flipper_legacy_button {
+  background: #DDD;
+  padding: 6px;
+  border: 1px solid #666;
+  color: #009;
+  font: bold 12px Helvetica; Arial; sans-serif;
+  text-shadow: -1px -1px #EEE;
+  border-radius: 5px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+
+/*===========================================================================
+  PANELS
+---------------------------------------------------------------------------*/
+
+
+.monelem_panels_imode_panel {
+  width: 33%;
+  background: rgba(255,255,255,0.7);
+  opacity: 0;
+}
+
+.monelem_panels_imode_backwardsPanel {
+  left: 0;
+  -webkit-box-shadow: 1px 1px 3px #777;
+  -moz-box-shadow: 1px 1px 3px #777;
+  box-shadow: 1px 1px 3px #777;
+}
+
+.monelem_panels_imode_forwardsPanel {
+  right: 0;
+  -webkit-box-shadow: -1px 1px 3px #777;
+  -moz-box-shadow: -1px 1px 3px #777;
+  box-shadow: -1px 1px 3px #777;
+}
+
+.monelem_panels_imode_centralPanel {
+  left: 33%;
+  width: 34%;
+}
+
+.monelem_panels_imode_toggleIcon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 50px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+/*===========================================================================
+  CONTROLS
+---------------------------------------------------------------------------*/
+
+/* Panel */
+
+
+/* Beware: if you modify this class you could significantly change the
+ * behaviour of panels. */
+div.monelem_controls_panel_expanded {
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1001 !important;
+}
+
+
+/* Contents */
+
+div.monelem_controls_contents_container {
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  left: 12.5%;
+  top: 12.5%;
+  background: #EEE;
+  border: 2px solid #F7F7F7;
+  overflow-y: auto;
+  border-radius: 9px;
+  -moz-border-radius: 9px;
+  -webkit-border-radius: 9px;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.5);
+  -moz-box-shadow: 1px 2px 6px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 1px 2px 6px rgba(0,0,0,0.5);
+}
+
+ol.monelem_controls_contents_list {
+  margin: 6px;
+  padding: 0;
+}
+
+li.monelem_controls_contents_chapter {
+  list-style: none;
+  line-height: 220%;
+  padding-left: 1em;
+  padding-right: 2em;
+  border-bottom: 2px groove #FEFEFE;
+  cursor: pointer;
+}
+
+
+/* Magnifier */
+
+.monelem_controls_magnifier_button {
+  cursor: pointer;
+  color: #555;
+  position: absolute;
+  top: 2px;
+  right: 10px;
+  padding: 0 2px;
+}
+
+.monelem_controls_magnifier_a {
+  font-size: 11px;
+}
+
+.monelem_controls_magnifier_A {
+  font-size: 18px;
+  opacity: 0.3;
+}
+
+
+/* Spinner */
+
+.monelem_controls_spinner_anim {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+/* Scrubber */
+
+.monelem_controls_scrubber_container {
+  position: absolute;
+  left: 1em;
+  right: 1em;
+  bottom: 8px;
+  height: 30px;
+  background: rgba(255,255,255,0.8);
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 0px 0px 8px rgba(255,255,255,1)
+}
+
+.monelem_controls_scrubber_track {
+  margin-top: 10px;
+  height: 5px;
+  border: 1px solid #999
+}
+
+.monelem_controls_scrubber_needle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  top: 5px;
+  background: #CCC;
+  border: 1px solid #999;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px
+}
+
+.monelem_controls_scrubber_trail {
+  position: absolute;
+  height: 4px;
+  background: #DDD;
+  top: 11px;
+  left: 1px;
+  height: 5px
+}
+
+.monelem_controls_scrubber_bubble {
+  position: absolute;
+  bottom: 2.5em;
+  background: rgba(0, 0, 0, 0.9);
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  padding: 1em;
+  display: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  -webkit-transform-style: preserve-3d;
+  min-width: 20%;
+  max-width: 30%;
+  color: #CCC;
+  font: bold 12px Lucida Grande, Helvetica, sans-serif;
+}

@@ -10,8 +10,9 @@
 
     <!-- MONOCLE CORE -->
     <script type="text/javascript" src="../../src/monocle.js"></script>
-    <script type="text/javascript" src="../../src/events.js"></script>
     <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/factory.js"></script>
+    <script type="text/javascript" src="../../src/events.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
     <script type="text/javascript" src="../../src/reader.js"></script>
     <script type="text/javascript" src="../../src/book.js"></script>
@@ -24,6 +25,8 @@
     <script type="text/javascript" src="../../src/panels/twopane.js"></script>
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
 
     <style type="text/css">
       .readerInfo {
@@ -111,8 +114,9 @@
         var framer = Monocle.Framer();
         framer.constants.scripts = [
           "../../src/monocle.js",
-          "../../src/events.js",
           "../../src/compat.js",
+          "../../src/events.js",
+          "../../src/factory.js",
           "../../src/reader.js",
           "../../src/book.js",
           "../../src/component.js",

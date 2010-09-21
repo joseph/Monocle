@@ -17,6 +17,8 @@ Monocle.Controls.Scrubber = function (reader) {
   }
 
 
+  /* FIXME: evt.m.offsetX should make these redundant, right */
+
   function calcLeftBound(cntr) {
     if (p.rightBound == cntr.offsetWidth) {
       return;
@@ -24,7 +26,7 @@ Monocle.Controls.Scrubber = function (reader) {
     p.rightBound = cntr.offsetWidth;
     p.leftBound = p.reader.properties.boxDimensions.left;
     var box = cntr;
-    while (box && box != p.reader.properties.divs.box) {
+    while (box && box != p.reader.dom.find('box')) {
       p.leftBound += box.offsetLeft;
       box = box.parentNode;
     }
@@ -66,71 +68,38 @@ Monocle.Controls.Scrubber = function (reader) {
 
 
   function updateNeedles() {
-    if (p.hidden || !p.divs.container) {
+    if (p.hidden || !p.reader.dom.find(k.CLS.container)) {
       return;
     }
     var place = p.reader.getPlace();
-    var x = placeToPixel(place, p.divs.container[0]);
-    for (var i = 0; i < p.divs.needle.length; ++i) {
-      setX(p.divs.needle[i], x - p.divs.needle[i].offsetWidth / 2);
-      p.divs.needleTrail[i].style.width = x + "px";
+    var x = placeToPixel(place, p.reader.dom.find(k.CLS.container));
+    var needle, i = 0;
+    while (needle = p.reader.dom.find(k.CLS.needle, i)) {
+      setX(needle, x - needle.offsetWidth / 2);
+      p.reader.dom.find(k.CLS.trail, i).style.width = x + "px";
+      i += 1;
     }
-  }
-
-
-  function eventType(str) {
-    var evtTypeMap;
-    if (typeof Touch == "object") {
-      evtTypeMap = {
-        "start": "touchstart",
-        "move": "touchmove",
-        "end": "touchend"
-      }
-    } else {
-      evtTypeMap = {
-        "start": "mousedown",
-        "move": "mousemove",
-        "end": "mouseup"
-      }
-    }
-    return evtTypeMap[str];
-  }
-
-
-  function createDivNamed(name, parentNode) {
-    var div = document.createElement('div');
-    div.style.cssText = Monocle.Styles.ruleText(
-      Monocle.Styles.Controls.Scrubber[name]
-    );
-    if (parentNode) {
-      parentNode.appendChild(div)
-    }
-    p.divs[name] = p.divs[name] || [];
-    p.divs[name].push(div);
-
-    return div;
   }
 
 
   function setX(node, x) {
-    x = Math.min(p.divs.container[0].offsetWidth - node.offsetWidth, x);
+    var cntr = p.reader.dom.find(k.CLS.container);
+    x = Math.min(cntr.offsetWidth - node.offsetWidth, x);
     x = Math.max(x, 0);
-    node.style.webkitTransform =
-      node.style.MozTransform =
-        "translateX(" + x + "px)";
+    Monocle.Styles.affix(node, 'transform', 'translateX('+x+'px)');
   }
 
 
-  function createControlElements() {
-    var cntr = createDivNamed('container');
-    var track = createDivNamed('track', cntr);
-    var needleTrail = createDivNamed('needleTrail', cntr);
-    var needle = createDivNamed('needle', cntr);
-    var bubble = createDivNamed('bubble', cntr);
+  function createControlElements(holder) {
+    var cntr = holder.dom.make('div', k.CLS.container);
+    var track = cntr.dom.append('div', k.CLS.track);
+    var needle = cntr.dom.append('div', k.CLS.needle);
+    var needleTrail = cntr.dom.append('div', k.CLS.trail);
+    var bubble = cntr.dom.append('div', k.CLS.bubble);
+
+    var listeners;
 
     var moveEvt = function (evt, x) {
-      evt.stopPropagation();
-      evt.preventDefault();
       x = x || rebaseX(evt, cntr);
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
@@ -161,24 +130,24 @@ Monocle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      Monocle.Events.deafen(cntr, eventType('move'), moveEvt);
-      Monocle.Events.deafen(document.body, eventType('end'), endEvt);
+      Monocle.Events.deafenForContact(document.body, listeners);
       bubble.style.display = "none";
     }
 
-    Monocle.Events.listen(
-      cntr,
-      eventType("start"),
-      function (evt) {
-        bubble.style.display = "block";
-        moveEvt(evt);
-        Monocle.Events.listen(cntr, eventType('move'), moveEvt);
-        Monocle.Events.listen(document.body, eventType("end"), endEvt);
-      }
-    );
+    var startFn = function (evt) {
+      bubble.style.display = "block";
+      moveEvt(evt);
+      listeners = Monocle.Events.listenForContact(
+        document.body,
+        { move: moveEvt, end: endEvt }
+      );
+    }
+
+    Monocle.Events.listenForContact(cntr, { start: startFn });
 
     return cntr;
   }
+
 
   API.createControlElements = createControlElements;
   API.updateNeedles = updateNeedles;
@@ -188,61 +157,12 @@ Monocle.Controls.Scrubber = function (reader) {
   return API;
 }
 
-
-Monocle.Styles.Controls.Scrubber = {
-  container: {
-    "position": "absolute",
-    "left": "1em",
-    "right": "1em",
-    "bottom": "8px",
-    "height": "30px",
-    "background": "rgba(255,255,255,0.8)",
-    "-webkit-border-radius": "6px",
-    "-moz-border-radius": "6px",
-    "border-radius": "6px",
-    "-webkit-box-shadow": "0px 0px 8px rgba(255,255,255,1)"
-  },
-  track: {
-    "margin-top": "10px",
-    "height": "5px",
-    "border": "1px solid #999"
-  },
-  needle: {
-    "position": "absolute",
-    "width": "14px",
-    "height": "14px",
-    "top": "5px",
-    "background": "#CCC",
-    "border": "1px solid #999",
-    "-webkit-border-radius": "8px",
-    "-moz-border-radius": "8px"
-  },
-  needleTrail: {
-    "position": "absolute",
-    "height": "4px",
-    "background": "#DDD",
-    "top": "11px",
-    "left": "1px",
-    "height": "5px"
-  },
-  bubble: {
-    "position": "absolute",
-    "bottom": "2.5em",
-    "background": "rgba(0, 0, 0, 0.9)",
-    "-webkit-border-radius": "10px",
-    "-moz-border-radius": "10px",
-    "padding": "1em",
-    "display": "none",
-    "white-space": "nowrap",
-    "text-overflow": "ellipsis",
-    "overflow": "hidden",
-    "-webkit-transform-style": "preserve-3d",
-    "min-width": "20%",
-    "max-width": "30%",
-    "color": "#CCC",
-    "font": "bold 12px Lucida Grande, Helvetica, sans-serif"
-  }
+Monocle.Controls.Scrubber.CLS = {
+  container: 'controls_scrubber_container',
+  track: 'controls_scrubber_track',
+  needle: 'controls_scrubber_needle',
+  trail: 'controls_scrubber_trail',
+  bubble: 'controls_scrubber_bubble'
 }
-
 
 Monocle.pieceLoaded('controls/scrubber');

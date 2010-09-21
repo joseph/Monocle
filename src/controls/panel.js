@@ -19,8 +19,8 @@ Monocle.Controls.Panel = function () {
   }
 
   function createControlElements(cntr) {
-    p.div = document.createElement('div');
-    p.div.style.cssText = "position: absolute; height: 100%;";
+    p.div = cntr.dom.make('div', 'panel');
+    p.div.dom.setStyle({ position: 'absolute', height: '100%' });
     Monocle.Events.listenForContact(
       p.div,
       {
@@ -109,15 +109,7 @@ Monocle.Controls.Panel = function () {
     if (p.expanded) {
       return;
     }
-    p.contractData = {
-      left: p.div.style.left,
-      width: p.div.style.width,
-      zIndex: p.div.style.zIndex
-    }
-    p.css = p.div.style.cssText;
-    p.div.style.left = 0;
-    p.div.style.width = "100%";
-    p.div.style.zIndex = 1001;
+    p.div.dom.addClass('controls_panel_expanded');
     p.expanded = true;
   }
 
@@ -126,9 +118,7 @@ Monocle.Controls.Panel = function () {
     if (!p.expanded) {
       return;
     }
-    for (n in p.contractData) {
-      p.div.style[n] = p.contractData[n];
-    }
+    p.div.dom.removeClass('controls_panel_expanded');
     p.expanded = false;
   }
 

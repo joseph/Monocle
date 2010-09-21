@@ -10,8 +10,9 @@
 
     <!-- MONOCLE CORE -->
     <script type="text/javascript" src="../../src/monocle.js"></script>
-    <script type="text/javascript" src="../../src/events.js"></script>
     <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/events.js"></script>
+    <script type="text/javascript" src="../../src/factory.js"></script>
     <script type="text/javascript" src="../../src/styles.js"></script>
     <script type="text/javascript" src="../../src/reader.js"></script>
     <script type="text/javascript" src="../../src/book.js"></script>
@@ -30,6 +31,8 @@
     <script type="text/javascript" src="../../src/controls/scrubber.js"></script>
     <script type="text/javascript" src="../../src/controls/spinner.js"></script>
     <script type="text/javascript" src="../../src/controls/contents.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
 
     <style type="text/css">
       .readerInfo {
@@ -145,11 +148,15 @@
 
           // PLACESAVER
           var placeSaver = new Monocle.Controls.PlaceSaver('placesaver');
-          readerOptions.place = placeSaver.savedPlace();
-          Monocle.Reader('placesaver', bookData, readerOptions, function (rdr) {
-            window.reader1 = rdr;
-            rdr.addControl(placeSaver, 'invisible');
-          });
+          Monocle.Reader(
+            'placesaver',
+            bookData,
+            { panels: Monocle.Panels.Marginal, place: placeSaver.savedPlace() },
+            function (rdr) {
+              window.reader1 = rdr;
+              rdr.addControl(placeSaver, 'invisible');
+            }
+          );
 
           // MAGNIFIER
           Monocle.Reader('magnifier', bookData, readerOptions, function (rdr) {

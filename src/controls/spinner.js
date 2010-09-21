@@ -1,60 +1,35 @@
-Monocle.Controls.Spinner = function () {
+Monocle.Controls.Spinner = function (reader) {
   if (Monocle.Controls == this) {
-    return new Monocle.Controls.Spinner();
+    return new Monocle.Controls.Spinner(reader);
   }
 
   var API = { constructor: Monocle.Controls.Spinner }
   var k = API.constants = API.constructor;
   var p = API.properties = {
+    reader: reader,
     divs: [],
     spinCount: 0
   }
 
 
-  function initialize() {
-  }
-
-
-  function assignToReader(reader) {
-    p.reader = reader;
-    if (p.spinCount > 0) {
-      p.spinCount -= 1;
-      spin();
-    }
-  }
-
-
-  function createControlElements() {
-    var anim = document.createElement('div');
-    anim.style.cssText = Monocle.Styles.ruleText(
-      Monocle.Styles.Controls.Spinner.anim
-    );
+  function createControlElements(cntr) {
+    var anim = cntr.dom.make('div', 'controls_spinner_anim');
     anim.style.backgroundImage = "url(" + k.imgURI + ")";
     p.divs.push(anim);
     return anim;
   }
 
 
-  // Registers spin/spun event handlers for: loading, bookchanging, resizing.
-  function listenForUsualDelays(listenToElement) {
-    if (!listenToElement) {
-      if (p.reader) {
-        listenToElement = p.reader.properties.divs.box;
-      } else {
-        console.warn("No listenToElement or assigned reader.");
-        return;
-      }
-    }
-    Monocle.Events.listen(listenToElement, 'monocle:bookchanging', spin);
-    Monocle.Events.listen(listenToElement, 'monocle:bookchange', spun);
-    Monocle.Events.listen(listenToElement, 'monocle:componentloading', spin);
-    Monocle.Events.listen(listenToElement, 'monocle:componentloaded', spun);
-    Monocle.Events.listen(listenToElement, 'monocle:componentchanging', spin);
-    Monocle.Events.listen(listenToElement, 'monocle:componentchange', spun);
-    Monocle.Events.listen(listenToElement, 'monocle:resizing', resizeSpin);
-    Monocle.Events.listen(listenToElement, 'monocle:resize', resizeSpun);
-    Monocle.Events.listen(listenToElement, 'monocle:stylesheetchanging', spin);
-    Monocle.Events.listen(listenToElement, 'monocle:stylesheetchange', spun);
+  // Registers spin/spun event handlers for: loading,componentchanging,resizing.
+  function listenForUsualDelays() {
+    p.reader.listen('monocle:componentloading', spin);
+    p.reader.listen('monocle:componentloaded', spun);
+    p.reader.listen('monocle:componentchanging', spin);
+    p.reader.listen('monocle:componentchange', spun);
+    p.reader.listen('monocle:resizing', resizeSpin);
+    p.reader.listen('monocle:resize', resizeSpun);
+    p.reader.listen('monocle:stylesheetchanging', spin);
+    p.reader.listen('monocle:stylesheetchange', spun);
   }
 
 
@@ -74,7 +49,7 @@ Monocle.Controls.Spinner = function () {
 
 
   function spin(evt) {
-    //console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
+    console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
     p.spinCount += 1;
     if (!p.reader) {
       return;
@@ -89,7 +64,7 @@ Monocle.Controls.Spinner = function () {
 
 
   function spun(evt) {
-    //console.log('Spun on ' + (evt ? evt.type : 'unknown'));
+    console.log('Spun on ' + (evt ? evt.type : 'unknown'));
     p.spinCount -= 1;
     if (p.spinCount > 0 || !p.reader) {
       return;
@@ -97,30 +72,15 @@ Monocle.Controls.Spinner = function () {
     p.reader.hideControl(API);
   }
 
-  API.assignToReader = assignToReader;
   API.createControlElements = createControlElements;
   API.listenForUsualDelays = listenForUsualDelays;
   API.spin = spin;
   API.spun = spun;
 
-  initialize();
-
   return API;
 }
 
+// FIXME: move to stylesheet
 Monocle.Controls.Spinner.imgURI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAA0CAMAAAANBM47AAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAsSAAALEgHS3X78AAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M1cbXjNgAAABV0RVh0Q3JlYXRpb24gVGltZQAxNy81LzEwnOhoKAAAAE5QTFRFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxKKmWQAAABp0Uk5TAAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBl0wLilAAAC8klEQVQYGZXBB2LjOAADQFCimtVFEoD//9HLbrJxipzoZoBToYptUwV8V/Xrsc8RP6i7aduPXHI69mWIAR9UY6Is5rnCuTBsWXeLkijbTFOLf7okW6R8zxEnwphskfIrifJdW4u/RtlpbGLsdjoHfDNkSZTSNg192w3jchSJEtcawCRzDvgjLPINX1SbSSvNXcC7eNuLXpQuTFbp8CZkH/isyS68H0PAF+0iUzxoNni33HPAR51UxDHgRLObslLEw3TPFT7oKPqIeOImURs+WJ0CHlqKXgLOxL4NgyRqxbuqeMNDXURPOBNWSokquRRP+GeVOzwcLlpwJmx3WVJuY2ZRi1ezfOBhdNGGU52ZhrloBzqSucKLerdLxLtIKlc4Nd9LA6wuNTC5aAbQZzs3eFhE9Tg3mw2wqkQgHCZrTJK3iIcoasMTvXX0E30EAK2k+Wbrho8mky2eCLslSz3+2ERKucVHIZsbnqp2WWXEX60ossMnrakeP+jGocabg9SGzyaXHHDRpOIO/zRjDWCTNlzVsLjFm4bODapE33BZoke8mVy8oqXY4rLNXvFmEnXDKJYaly3SjlchkSOwiCngstFMeDXLE4CVygGX3e6FawUgzFIKANbiHHDZ7U4qL7c5SWzxYqFywGXjvVD3F3Zu8ccs5gqXzeYx7CTTWOOvnmTEZZu0ItSxrvAmZrrHZYme8dkhLbiqLkUDPlvMA1cNIiM+613Y4KJNSviiprTgmrrQM75arVzhkllUxFetqBlXVEXa8d0hMeKCxVSH73rRG37XidpxZlXRiN9UhYUtztRFVI+fhUPFE851KlSHn4TNxTueGU2yx3PVbipVeGpxIaeAJ2IynRv8YHEp3iNOjRRdGvxotGjONb7pD7M4RfyiK6ZclhYf1bdDprRW+FW9SZSUlqGtq1BVTTftRaKce1zS7bIpWyW/oK0i38tU4apupWyRsijKVhoj/o+6W45cJEoqaR+bgP8txH5a1nUZ2gq/+Q/51T5MhuG3fQAAAABJRU5ErkJggg==";
-
-
-Monocle.Styles.Controls.Spinner = {
-  anim: {
-    "position": "absolute",
-    "width": "100%",
-    "height": "100%",
-    "background-color": "#FFF",
-    "background-repeat": "no-repeat",
-    "background-position": "center center"
-  }
-}
-
 
 Monocle.pieceLoaded('controls/spinner');

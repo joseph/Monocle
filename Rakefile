@@ -11,6 +11,7 @@ task :dist do
   )
   out = sec.concatenation
 
+=begin
   begin
     require 'yui/compressor'
     compressor = YUI::JavaScriptCompressor.new(:munge => true)
@@ -19,6 +20,7 @@ task :dist do
     puts "You do not have the yui-compressor gem installed; " +
       "compression phase skipped."
   end
+=end
 
   require 'fileutils'
   FileUtils.mkdir_p('dist')

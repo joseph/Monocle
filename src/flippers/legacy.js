@@ -13,100 +13,95 @@ Monocle.Flippers.Legacy = function (reader) {
   }
 
 
-  function addPage(pageDiv) {
-    p.page = pageDiv;
-  }
-
-
-  function visiblePages() {
-    return [p.page];
+  function page() {
+    return p.reader.dom.find('page');
   }
 
 
   function getPlace() {
-    return p.page.m.place;
+    return page().m.place;
   }
 
 
   function moveTo(locus) {
-    p.reader.getBook().setOrLoadPageAt(p.page, locus, updateButtons);
+    p.reader.getBook().setOrLoadPageAt(page(), locus, updateButtons);
     p.reader.dispatchEvent('monocle:turn');
   }
 
 
   function overrideDimensions() {
-    p.page.m.sheafDiv.style.right = "0";
-    p.page.m.sheafDiv.style.overflow = "auto";
-    p.page.m.activeFrame.style.position = "relative";
-    p.page.m.activeFrame.style.width = "100%";
-    p.page.m.activeFrame.style.minWidth = "0%";
-    Monocle.Styles.affix(p.page.m.activeFrame, 'column-width', 'auto');
+    var sheaf = p.reader.dom.find('sheaf');
+    var cmpt = p.reader.dom.find('component');
 
-    if (!p.divs.legacyMessage) {
-      p.divs.legacyMessage = document.createElement('div');
-      p.divs.legacyMessage.innerHTML = k.LEGACY_MESSAGE;
-      p.divs.legacyMessage.style.cssText = Monocle.Styles.ruleText(
-        Monocle.Styles.Flippers.Legacy.message
-      );
-      p.page.m.sheafDiv.insertBefore(p.divs.legacyMessage, p.page.m.activeFrame);
-    }
-
-    if (!p.divs.prevButton) {
-      p.divs.prevButton = document.createElement('div');
-      p.divs.prevButton.innerHTML = k.buttonText.PREV;
-      p.divs.prevButton.style.cssText = Monocle.Styles.ruleText(
-        Monocle.Styles.Flippers.Legacy.button
-      );
-      p.page.m.sheafDiv.insertBefore(p.divs.prevButton, p.page.m.activeFrame);
-    }
-
-    if (!p.divs.nextButton) {
-      p.divs.nextButton = document.createElement('div');
-      p.divs.nextButton.innerHTML = k.buttonText.NEXT;
-      p.divs.nextButton.style.cssText = Monocle.Styles.ruleText(
-        Monocle.Styles.Flippers.Legacy.button
-      );
-      p.page.m.sheafDiv.appendChild(p.divs.nextButton);
-    }
+    // FIXME
+    sheaf.style.right = "0";
+    sheaf.style.overflow = "auto";
+    cmpt.style.position = "relative";
+    cmpt.style.width = "100%";
+    cmpt.style.minWidth = "0%";
+    Monocle.Styles.affix(cmpt, 'column-width', 'auto');
   }
 
 
   function updateButtons() {
     var cIndex = getPlace().properties.component.properties.index;
+    var dom = p.reader.dom;
     if (cIndex == 0) {
-      p.divs.legacyMessage.style.display = "block";
-      p.divs.prevButton.style.display = "none";
+      dom.find('flipper_legacy_message').style.display = "block";
+      dom.find('flipper_legacy_buttonPrev').style.display = "none";
     } else {
-      p.divs.legacyMessage.style.display = "none";
-      p.divs.prevButton.style.display = "block";
+      dom.find('flipper_legacy_message').style.display = "none";
+      dom.find('flipper_legacy_buttonPrev').style.display = "block";
     }
 
     if (cIndex == p.reader.getBook().properties.lastCIndex) {
-      p.divs.nextButton.style.display = "none";
+      dom.find('flipper_legacy_buttonNext').style.display = "none";
     } else {
-      p.divs.nextButton.style.display = "block";
+      dom.find('flipper_legacy_buttonNext').style.display = "block";
     }
   }
 
 
   function listenForInteraction() {
+    var dom = p.reader.dom;
+    var sheaf = dom.find('sheaf');
+    var cmpt = dom.find('component');
+
+    // Sanctimonious little message about upgrading your browser. Sorry.
+    sheaf.insertBefore(
+      dom.make('div', 'flipper_legacy_message', { html: k.LEGACY_MESSAGE }),
+      cmpt
+    );
+
+    // 'previous component' button
+    var prevBtn = dom.make(
+      'div',
+      'flipper_legacy_buttonPrev',
+      { 'class': 'flipper_legacy_button', html: k.buttonText.PREV }
+    )
+    sheaf.insertBefore(prevBtn, cmpt);
     Monocle.Events.listen(
-      p.divs.prevButton,
+      prevBtn,
       'click',
       function () { moveTo({ direction: -1 }) }
-    )
+    );
+
+    // 'next component' button
+    var nextBtn = sheaf.dom.append(
+      'div',
+      'flipper_legacy_buttonNext',
+      { 'class': 'flipper_legacy_button', html: k.buttonText.NEXT }
+    );
     Monocle.Events.listen(
-      p.divs.nextButton,
+      nextBtn,
       'click',
       function () { moveTo({ direction: 1 }) }
-    )
+    );
   }
 
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
-  API.addPage = addPage;
-  API.visiblePages = visiblePages;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
@@ -126,33 +121,5 @@ Monocle.Flippers.Legacy.buttonText = {
   PREV: "... Previous part",
   NEXT: "Next part..."
 }
-
-
-Monocle.Styles.Flippers.Legacy = {
-  message: {
-    "border": "1px solid #987",
-    "background": "#FFC",
-    "color": "#333",
-    "font-family": "Helvetica, Arial, sans-serif",
-    "font-size": "11px",
-    "margin-right": "3px",
-    "margin-bottom": "3px",
-    "padding": "0.5em 1em"
-  },
-  button: {
-    "background": "#DDD",
-    "padding": "6px",
-    "border": "1px solid #666",
-    "color": "#009",
-    "font": "bold 12px Helvetica, Arial, sans-serif",
-    "text-shadow": "-1px -1px #EEE",
-    "border-radius": "5px",
-    "margin-right": "3px",
-    "margin-bottom": "3px",
-    "margin-top": "3px",
-    "cursor": "pointer"
-  }
-}
-
 
 Monocle.pieceLoaded('flippers/legacy');

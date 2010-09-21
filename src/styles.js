@@ -1,29 +1,37 @@
 Monocle.Styles = {
-  ruleText: function (rule) {
-    if (typeof rule == "string") {
-      rule = this[rule];
+  // Takes a hash or string of CSS property assignments and applies them
+  // to the element.
+  //
+  applyRules: function (elem, rules) {
+    if (typeof rules != 'string') {
+      var parts = [];
+      for (var declaration in rules) {
+        parts.push(declaration+": "+rules[declaration]+";")
+      }
+      rules = parts.join(" ");
     }
-    if (!rule) { return ""; }
+    elem.style.cssText += ';'+rules;
+    return elem.style.cssText;
+  },
 
-    var parts = [];
-    for (var declaration in rule) {
-      parts.push(declaration + ": " + rule[declaration] + ";")
-    }
-    return parts.join(" ");
-  },
-  applyRules: function (elem, rule) {
-    elem.style.cssText = this.ruleText(rule);
-  },
+  // Generates cross-browser properties for a given property.
+  // ie, affix(<elem>, 'transition', 'linear 100ms') would apply that value
+  // to webkitTransition for WebKit browsers, and to MozTransition for Gecko.
+  //
   affix: function (elem, property, value) {
     var target = elem.style ? elem.style : elem;
+
+    var capitalize = function (wd) {
+      return wd ? wd.substring(0,1).toUpperCase()+wd.substring(1,wd.length) : "";
+    }
 
     if (Monocle.Browser.is.Gecko) {
       var parts = property.split('-');
       for (var i = parts.length; i > 0; --i) {
-        parts[i] = this.capitalize(parts[i]);
+        parts[i] = capitalize(parts[i]);
       }
       target[parts.join('')] = value;
-      parts[0] = this.capitalize(parts[0]);
+      parts[0] = capitalize(parts[0]);
       target['Moz'+parts.join('')] = value;
     }
     if (Monocle.Browser.is.WebKit) {
@@ -31,6 +39,12 @@ Monocle.Styles = {
       target['-webkit-'+property] = value;
     }
   },
+
+  // Generates cross-browser CSS rule (in text) for a given property.
+  // Ie, expand('transition', 'linear 100ms') will return
+  // '-moz-transition: linear 100ms' for Gecko browsers,
+  // and '-webkit-transition: linear 100ms' for WebKit.
+  //
   expand: function (property, value) {
     var out = [];
     out.push(property + ": " + value);
@@ -41,18 +55,18 @@ Monocle.Styles = {
       out.push("-webkit-"+property+": "+value);
     }
     return out.join("; ") + ";";
-  },
-  capitalize: function (wd) {
-    return wd ? wd.substring(0,1).toUpperCase() + wd.substring(1,wd.length) : "";
   }
 }
 
 
+// These rule definitions are more or less compulsory for Monocle to behave
+// as expected. Which is why they appear here and not in the stylesheet.
+// Adjust them if you know what you're doing.
+//
 Monocle.Styles.container = {
   "position": "absolute",
   "width": "100%",
   "height": "100%",
-  "background-color": "black",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
   "user-select": "none"
@@ -60,13 +74,7 @@ Monocle.Styles.container = {
 
 Monocle.Styles.page = {
   "position": "absolute",
-  "top": "0",
-  "left": "0",
-  "bottom": "3px",
-  "right": "5px",
-  "background": "#FFF",
   "z-index": "1",
-  "outline": "1px solid #999",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
   "user-select": "none"
@@ -74,10 +82,6 @@ Monocle.Styles.page = {
 
 Monocle.Styles.sheaf = {
   "position": "absolute",
-  "top": "1em",
-  "bottom": "1em",
-  "left": "1em",
-  "right": "1em",
   "overflow": "hidden", // Required by MobileSafari to constrain inner iFrame.
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
@@ -86,8 +90,8 @@ Monocle.Styles.sheaf = {
 
 Monocle.Styles.component = {
   "display": "block",
-  "height": "100%",
   "width": "100%",
+  "height": "100%",
   "border": "none",
   "overflow": "hidden",
   "-webkit-user-select": "none",
@@ -100,14 +104,17 @@ Monocle.Styles.body = {
   "padding": "0",
   "position": "absolute",
   "height": "100%",
+  "-webkit-text-size-adjust": "none",
+
+  // FIXME: COLUMN RULES DON"T APPLY TO SOME FLIPPERS?
   "min-width": "200%",
   "-webkit-column-gap": "0",
   "-webkit-column-fill": "auto",
-  "-webkit-text-size-adjust": "none",
   "-moz-column-gap": "0",
   "column-gap": "0",
   "column-fill": "0"
 }
+
 
 Monocle.Styles.control = {
   "z-index": "100",
@@ -122,17 +129,6 @@ Monocle.Styles.overlay = {
   "z-index": "1000"
 }
 
-Monocle.Styles.Controls = {
-  // A separate namespace for optional control styles, populated by those
-  // optional scripts.
-}
 
-Monocle.Styles.Flippers = {
-  // A separate namespace for flippers.
-}
-
-Monocle.Styles.Panels = {
-  // Likewise for panels.
-}
 
 Monocle.pieceLoaded('styles');
