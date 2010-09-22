@@ -7,8 +7,7 @@ Monocle.Controls.Magnifier = function (reader) {
   var API = { constructor: Monocle.Controls.Magnifier }
   var k = API.constants = API.constructor;
   var p = API.properties = {
-    buttons: [],
-    enlarged: false
+    buttons: []
   }
 
 
@@ -28,33 +27,22 @@ Monocle.Controls.Magnifier = function (reader) {
 
 
   function toggleMagnification(evt) {
-    if (evt.preventDefault) {
-      evt.preventDefault();
-      evt.stopPropagation();
-    } else {
-      evt.returnValue = false;
-    }
     var opacities;
-    if (!p.enlarged) {
-      Monocle.Styles.body['font-size'] = k.LARGE_FONT_SIZE;
+    if (!p.sheetIndex) {
       opacities = [0.3, 1]
-      p.enlarged = true;
+      var reset = k.RESET_STYLESHEET;
+      reset += "body { font-size: " + k.MAGNIFICATION * 100 + "%; }";
+      p.sheetIndex = p.reader.addPageStyles(reset);
     } else {
-      Monocle.Styles.body['font-size'] = k.NORMAL_FONT_SIZE;
       opacities = [1, 0.3]
-      p.enlarged = false;
+      p.reader.removePageStyles(p.sheetIndex);
+      p.sheetIndex = null;
     }
 
     for (var i = 0; i < p.buttons.length; i++) {
       p.buttons[i].smallA.style.opacity = opacities[0];
       p.buttons[i].largeA.style.opacity = opacities[1];
     }
-
-    p.reader.reapplyStyles();
-
-    // Reapplying styles may hide overlay. FIXME: this could be done more
-    // delicately...
-    //p.ctrlHolder.parentNode.style.display = "block";
   }
 
   API.createControlElements = createControlElements;
@@ -64,6 +52,30 @@ Monocle.Controls.Magnifier = function (reader) {
   return API;
 }
 
-Monocle.Controls.Magnifier.LARGE_FONT_SIZE = "115%";
-Monocle.Controls.Magnifier.NORMAL_FONT_SIZE = "100%";
+
+Monocle.Controls.Magnifier.MAGNIFICATION = 1.15;
+
+// NB: If you don't like the reset, you could set this to an empty string.
+Monocle.Controls.Magnifier.RESET_STYLESHEET =
+  "html, body, div, span," +
+  "h1, h2, h3, h4, h5, h6, p, blockquote, pre," +
+  "abbr, address, cite, code," +
+  "del, dfn, em, img, ins, kbd, q, samp," +
+  "small, strong, sub, sup, var," +
+  "b, i," +
+  "dl, dt, dd, ol, ul, li," +
+  "fieldset, form, label, legend," +
+  "table, caption, tbody, tfoot, thead, tr, th, td," +
+  "article, aside, details, figcaption, figure," +
+  "footer, header, hgroup, menu, nav, section, summary," +
+  "time, mark " +
+  "{ font-size: 100%; }" +
+  "h1 { font-size: 2em }" +
+  "h2 { font-size: 1.8em }" +
+  "h3 { font-size: 1.6em }" +
+  "h4 { font-size: 1.4em }" +
+  "h5 { font-size: 1.2em }" +
+  "h6 { font-size: 1.0em }";
+
+
 Monocle.pieceLoaded('controls/magnifier');

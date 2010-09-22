@@ -76,7 +76,7 @@ Monocle.Factory = function (element, label, index, reader) {
       oElement.innerHTML = options['html'];
     }
     if (options['text']) {
-      oElement.innerText = options['text'];
+      oElement.appendChild(document.createTextNode(options['text']));
     }
 
     return oElement;

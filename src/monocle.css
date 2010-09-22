@@ -201,26 +201,23 @@ li.monelem_controls_contents_chapter {
 
 /* Scrubber */
 
-.monelem_controls_scrubber_container {
+div.monelem_controls_scrubber_container {
   position: absolute;
   left: 1em;
   right: 1em;
-  bottom: 8px;
+  bottom: 4px;
   height: 30px;
   background: rgba(255,255,255,0.8);
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  -webkit-box-shadow: 0px 0px 8px rgba(255,255,255,1)
 }
 
-.monelem_controls_scrubber_track {
+div.monelem_controls_scrubber_track {
   margin-top: 10px;
   height: 5px;
-  border: 1px solid #999
+  border: 1px solid #999;
+  cursor: pointer;
 }
 
-.monelem_controls_scrubber_needle {
+div.monelem_controls_scrubber_needle {
   position: absolute;
   width: 14px;
   height: 14px;
@@ -228,32 +225,31 @@ li.monelem_controls_contents_chapter {
   background: #CCC;
   border: 1px solid #999;
   -webkit-border-radius: 8px;
-  -moz-border-radius: 8px
+  -moz-border-radius: 8px;
 }
 
-.monelem_controls_scrubber_trail {
+div.monelem_controls_scrubber_trail {
   position: absolute;
-  height: 4px;
   background: #DDD;
   top: 11px;
   left: 1px;
-  height: 5px
+  height: 5px;
 }
 
-.monelem_controls_scrubber_bubble {
+div.monelem_controls_scrubber_bubble {
+  display: none;
   position: absolute;
+  padding: 1em;
+  min-width: 20%;
+  max-width: 30%;
   bottom: 2.5em;
   background: rgba(0, 0, 0, 0.9);
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  padding: 1em;
-  display: none;
+  color: #CCC;
+  font: bold 12px Lucida Grande, Helvetica, sans-serif;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  -webkit-transform-style: preserve-3d;
-  min-width: 20%;
-  max-width: 30%;
-  color: #CCC;
-  font: bold 12px Lucida Grande, Helvetica, sans-serif;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
 }

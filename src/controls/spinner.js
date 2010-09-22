@@ -55,7 +55,7 @@ Monocle.Controls.Spinner = function (reader) {
       return;
     }
     p.reader.showControl(API);
-    var pNode = evt && evt.monocleData.page ? evt.monocleData.page : null;
+    var pNode = evt && evt.m.page ? evt.m.page : null;
     for (var i = 0; i < p.divs.length; ++i) {
       p.divs[i].style.display =
         (!pNode || pNode == p.divs[i].parentNode.parentNode) ? 'block' : 'none'

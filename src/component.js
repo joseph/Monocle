@@ -170,8 +170,17 @@ Monocle.Component = function (book, id, index, chapters, source) {
       destBdy.appendChild(node);
     }
 
-    destDoc.documentElement.appendChild(destHd);
-    destDoc.documentElement.appendChild(destBdy);
+    var oldHead = destDoc.getElementsByTagName('head')[0];
+    if (oldHead) {
+      destDoc.documentElement.replaceChild(destHd, oldHead);
+    } else {
+      destDoc.documentElement.appendChild(destHd);
+    }
+    if (destDoc.body) {
+      destDoc.documentElement.replaceChild(destBdy, destDoc.body);
+    } else {
+      destDoc.documentElement.appendChild(destBdy);
+    }
 
     if (callback) { callback(); }
   }
@@ -348,12 +357,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
       while (lc && lc.nodeType != 1) {
         lc = lc.previousSibling;
       }
-      var bcr = lc.getBoundingClientRect();
-      //console.log("page["+pageDiv.m.pageIndex+"] bounding rect: " + bcr.right);
-      return bcr.right;
-    } else {
-      return scrollerElement(pageDiv).scrollWidth;
+      if (lc && lc.getBoundingClientRect) {
+        return lc.getBoundingClientRect().right;
+      }
     }
+    return scrollerElement(pageDiv).scrollWidth;
   }
 
 
@@ -371,12 +379,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
         console.warn(
           "Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id
         );
-        return;
+        p.clientDimensions.scrollWidth = p.clientDimensions.width;
+      } else {
+        var elem = elems[elems.length - 1];
+        var lcEnd = elem.offsetTop + elem.offsetHeight;
+        p.clientDimensions.scrollWidth = p.clientDimensions.width *
+          (lcEnd > p.clientDimensions.height ? 2 : 1);
       }
-      var elem = elems[elems.length - 1];
-      var lcEnd = elem.offsetTop + elem.offsetHeight;
-      p.clientDimensions.scrollWidth = p.clientDimensions.width *
-        (lcEnd > p.clientDimensions.height ? 2 : 1);
     }
 
     p.clientDimensions.pages = Math.ceil(

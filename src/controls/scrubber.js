@@ -5,41 +5,13 @@ Monocle.Controls.Scrubber = function (reader) {
 
   var API = { constructor: Monocle.Controls.Scrubber }
   var k = API.constants = API.constructor;
-  var p = API.properties = {
-    divs: {}
-  }
+  var p = API.properties = {}
 
 
   function initialize() {
     p.reader = reader;
     p.reader.listen('monocle:turn', updateNeedles);
     updateNeedles();
-  }
-
-
-  /* FIXME: evt.m.offsetX should make these redundant, right */
-
-  function calcLeftBound(cntr) {
-    if (p.rightBound == cntr.offsetWidth) {
-      return;
-    }
-    p.rightBound = cntr.offsetWidth;
-    p.leftBound = p.reader.properties.boxDimensions.left;
-    var box = cntr;
-    while (box && box != p.reader.dom.find('box')) {
-      p.leftBound += box.offsetLeft;
-      box = box.parentNode;
-    }
-  }
-
-
-  function rebaseX(evt, cntr) {
-    calcLeftBound(cntr);
-    var x = evt.pageX;
-    if (evt.changedTouches) {
-      x = evt.changedTouches[0].pageX;
-    }
-    return Math.max(Math.min(p.rightBound, x - p.leftBound), 0);
   }
 
 
@@ -93,14 +65,14 @@ Monocle.Controls.Scrubber = function (reader) {
   function createControlElements(holder) {
     var cntr = holder.dom.make('div', k.CLS.container);
     var track = cntr.dom.append('div', k.CLS.track);
-    var needle = cntr.dom.append('div', k.CLS.needle);
     var needleTrail = cntr.dom.append('div', k.CLS.trail);
+    var needle = cntr.dom.append('div', k.CLS.needle);
     var bubble = cntr.dom.append('div', k.CLS.bubble);
 
-    var listeners;
+    var cntrListeners, bodyListeners;
 
     var moveEvt = function (evt, x) {
-      x = x || rebaseX(evt, cntr);
+      x = x || evt.m.offsetX;
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
       var book = p.reader.getBook();
@@ -130,16 +102,21 @@ Monocle.Controls.Scrubber = function (reader) {
         percent: place.percentageThrough,
         componentId: place.componentId
       });
-      Monocle.Events.deafenForContact(document.body, listeners);
+      Monocle.Events.deafenForContact(cntr, cntrListeners);
+      Monocle.Events.deafenForContact(document.body, bodyListeners);
       bubble.style.display = "none";
     }
 
     var startFn = function (evt) {
       bubble.style.display = "block";
       moveEvt(evt);
-      listeners = Monocle.Events.listenForContact(
+      cntrListeners = Monocle.Events.listenForContact(
+        cntr,
+        { move: moveEvt }
+      );
+      bodyListeners = Monocle.Events.listenForContact(
         document.body,
-        { move: moveEvt, end: endEvt }
+        { end: endEvt }
       );
     }
 

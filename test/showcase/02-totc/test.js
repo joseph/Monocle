@@ -260,7 +260,7 @@
           reader.addControl(chapterTitle, 'page');
           reader.listen(
             'monocle:pagechange',
-            function (evt) { chapterTitle.update(evt.monocleData.page); }
+            function (evt) { chapterTitle.update(evt.m.page); }
           );
 
 
@@ -287,7 +287,7 @@
           reader.listen(
             'monocle:pagechange',
             function (evt) {
-              pageNumber.update(evt.monocleData.page, evt.monocleData.pageNumber);
+              pageNumber.update(evt.m.page, evt.m.pageNumber);
             }
           );
 

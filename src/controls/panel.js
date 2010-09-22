@@ -19,8 +19,8 @@ Monocle.Controls.Panel = function () {
   }
 
   function createControlElements(cntr) {
-    p.div = cntr.dom.make('div', 'panel');
-    p.div.dom.setStyle({ position: 'absolute', height: '100%' });
+    p.div = cntr.dom.make('div', k.CLS.panel);
+    p.div.dom.setStyle(k.DEFAULT_STYLES);
     Monocle.Events.listenForContact(
       p.div,
       {
@@ -47,15 +47,8 @@ Monocle.Controls.Panel = function () {
 
   function start(evt) {
     p.contact = true;
-    if (evt.m) {
-      evt.m.offsetX += p.div.offsetLeft;
-      evt.m.offsetY += p.div.offsetTop;
-    } else if (typeof evt.offsetX != 'undefined') {
-      evt.m = evt.monocleData = {
-        offsetX: evt.offsetX + p.div.offsetLeft,
-        offsetY: evt.offsetY + p.div.offsetTop
-      }
-    }
+    evt.m.offsetX += p.div.offsetLeft;
+    evt.m.offsetY += p.div.offsetTop;
     expand();
     invoke('start', evt);
   }
@@ -93,12 +86,6 @@ Monocle.Controls.Panel = function () {
 
   function invoke(evtType, evt) {
     if (p.evtCallbacks[evtType]) {
-      if (!evt.m) {
-        evt.m = evt.monocleData = {
-          offsetX: evt.offsetX,
-          offsetY: evt.offsetY
-        }
-      }
       p.evtCallbacks[evtType](API, evt.m.offsetX, evt.m.offsetY);
     }
     evt.preventDefault();
@@ -109,7 +96,7 @@ Monocle.Controls.Panel = function () {
     if (p.expanded) {
       return;
     }
-    p.div.dom.addClass('controls_panel_expanded');
+    p.div.dom.addClass(k.CLS.expanded);
     p.expanded = true;
   }
 
@@ -118,7 +105,7 @@ Monocle.Controls.Panel = function () {
     if (!p.expanded) {
       return;
     }
-    p.div.dom.removeClass('controls_panel_expanded');
+    p.div.dom.removeClass(k.CLS.expanded);
     p.expanded = false;
   }
 
@@ -131,5 +118,16 @@ Monocle.Controls.Panel = function () {
 
   return API;
 }
+
+
+Monocle.Controls.Panel.CLS = {
+  panel: 'panel',
+  expanded: 'controls_panel_expanded'
+}
+Monocle.Controls.Panel.DEFAULT_STYLES = {
+  position: 'absolute',
+  height: '100%'
+}
+
 
 Monocle.pieceLoaded('controls/panel');

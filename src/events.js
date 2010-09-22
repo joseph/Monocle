@@ -48,31 +48,27 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
   var listeners = {};
 
   var cursorInfo = function (evt, ci) {
-    evt.m = evt.monocleData = {
-      offsetX: ci.offsetX,
-      offsetY: ci.offsetY,
+    evt.m = {
       pageX: ci.pageX,
       pageY: ci.pageY
     };
 
-    // Touch events don't have element offset coords - so generate with GBCR.
-    if (typeof ci.offsetX == "undefined") {
-      var r;
-      if (evt.target.getBoundingClientRect) {
-        r = evt.target.getBoundingClientRect();
-      } else {
-        var elem = evt.target;
-        r = { left: elem.offsetLeft, top: elem.offsetTop }
-        while (elem = elem.parentNode) {
-          if (elem.offsetLeft || elem.offsetTop) {
-            r.left += elem.offsetLeft;
-            r.top += elem.offsetTop;
-          }
+    var r;
+    if (evt.currentTarget.getBoundingClientRect) {
+      r = evt.currentTarget.getBoundingClientRect();
+    } else {
+      var elem = evt.currentTarget;
+      r = { left: elem.offsetLeft, top: elem.offsetTop }
+      while (elem = elem.parentNode) {
+        if (elem.offsetLeft || elem.offsetTop) {
+          r.left += elem.offsetLeft;
+          r.top += elem.offsetTop;
         }
       }
-      evt.m.offsetX = evt.m.pageX - r.left;
-      evt.m.offsetY = evt.m.pageY - r.top;
     }
+    evt.m.offsetX = evt.m.pageX - r.left;
+    evt.m.offsetY = evt.m.pageY - r.top;
+
     return evt;
   }
 

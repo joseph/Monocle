@@ -104,7 +104,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       listen(
         'monocle:componentchange',
         function (evt) {
-          var doc = evt.monocleData['document'];
+          var doc = evt.m['document'];
           doc.documentElement.id = options.systemId || "RS:monocle";
           for (var i = 0; i < p.pageStylesheets.length; ++i) {
             if (p.pageStylesheets[i]) {
@@ -154,7 +154,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
       // FIXME: clunky
-      page.m.activeFrame.m = page.m.activeFrame.monocleData = { 'pageDiv': page }
+      page.m.activeFrame.m = { 'pageDiv': page }
       // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
       Monocle.Events.listenOnIframe(page.m.activeFrame);
     }
@@ -224,12 +224,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     dom.find('overlay').dom.setStyle(Monocle.Styles.overlay);
     dispatchEvent('monocle:styles');
-  }
-
-
-  function reapplyStyles() {
-    applyStyles();
-    calcDimensions();
   }
 
 
@@ -478,7 +472,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     var evt = document.createEvent("Events");
     evt.initEvent(evtType, false, cancelable || false);
-    evt.m = evt.monocleData = data;
+    evt.m = data;
     return dom.find('box').dispatchEvent(evt);
   }
 
@@ -547,7 +541,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function removePageStyles(sheetIndex, recalcDimensions) {
     return changingStylesheet(function () {
       p.pageStylesheets[sheetIndex] = null;
-      for (var i = 0; i < p.flippers.pageCount; ++i) {
+      for (var i = 0; i < p.flipper.pageCount; ++i) {
         var doc = dom.find('component', i).contentDocument;
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         styleTag.parentNode.removeChild(styleTag);
@@ -606,7 +600,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   API.getBook = getBook;
-  API.reapplyStyles = reapplyStyles;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.skipToChapter = skipToChapter;

@@ -18,7 +18,7 @@ Monocle.Controls.PlaceSaver = function (bookId) {
     p.reader.listen(
       'monocle:bookchange',
       function (evt) {
-        applyToBook(evt.monocleData.book.getMetaData('title'));
+        applyToBook(evt.m.book.getMetaData('title'));
       }
     );
   }
