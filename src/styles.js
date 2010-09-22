@@ -38,23 +38,6 @@ Monocle.Styles = {
       target[property] = value;
       target['-webkit-'+property] = value;
     }
-  },
-
-  // Generates cross-browser CSS rule (in text) for a given property.
-  // Ie, expand('transition', 'linear 100ms') will return
-  // '-moz-transition: linear 100ms' for Gecko browsers,
-  // and '-webkit-transition: linear 100ms' for WebKit.
-  //
-  expand: function (property, value) {
-    var out = [];
-    out.push(property + ": " + value);
-    if (Monocle.Browser.is.Gecko) {
-      out.push("-moz-"+property+": "+value);
-    }
-    if (Monocle.Browser.is.WebKit) {
-      out.push("-webkit-"+property+": "+value);
-    }
-    return out.join("; ") + ";";
   }
 }
 

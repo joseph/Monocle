@@ -30,6 +30,10 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Finds an element that has been created in the context of the current
+  // reader, with the given label. If oIndex is not provided, returns first.
+  // If oIndex is provided (eg, n), returns the nth element with the label.
+  //
   function find(oLabel, oIndex) {
     if (!p.reader.properties.graph[oLabel]) {
       return null;
@@ -38,6 +42,13 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Takes an elements and assimilates it into the reader -- essentially
+  // giving it a "dom" object of it's own. It will then be accessible via find.
+  //
+  // Note that (as per comments for initialize), if oIndex is provided and
+  // there is no free slot in the array for this label at that index, an
+  // error will be thrown.
+  //
   function claim(oElement, oLabel, oIndex) {
     return oElement.dom = new Monocle.Factory(
       oElement,
@@ -48,6 +59,17 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Create an element with the given label.
+  //
+  // The last argument (whether third or fourth) is the options hash. Your
+  // options are:
+  //
+  //   class - the classname for the element. Must only be one name.
+  //   html - the innerHTML for the element.
+  //   text - the innerText for the element (an alternative to html, simpler).
+  //
+  // Returns the created element.
+  //
   function make(tagName, oLabel, index_or_options, or_options) {
     var oIndex, options;
     if (arguments.length == 2) {
@@ -83,6 +105,9 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Creates an element by passing all the given arguments to make. Then
+  // appends the element as a child of the current element.
+  //
   function append(tagName, oLabel, index_or_options, or_options) {
     var oElement = make.apply(this, arguments);
     p.element.appendChild(oElement);
@@ -90,18 +115,27 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Returns an array of [label, index, reader] for the given element.
+  // A simple way to introspect the arguments required for #find, for eg.
+  //
   function address() {
     return [p.label, p.index, p.reader];
   }
 
 
+  // Apply a set of style rules (hash or string) to the current element.
+  // See Monocle.Styles.applyRules for more info.
+  //
   function setStyle(rules) {
     Monocle.Styles.applyRules(p.element, rules);
   }
 
 
-  // With thanks to prototype.js!
+  // ClassName manipulation functions - with thanks to prototype.js!
 
+  // Returns true if one of the current element's classnames matches name --
+  // classPrefix aware (so don't concate the prefix onto it).
+  //
   function hasClass(name) {
     name = p.prefix + name;
     var klass = p.element.className;
@@ -111,6 +145,9 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Adds name to the classnames of the current element (prepending the
+  // reader's classPrefix first).
+  //
   function addClass(name) {
     if (hasClass(name)) { return; }
     var gap = p.element.className ? ' ' : '';
@@ -118,6 +155,8 @@ Monocle.Factory = function (element, label, index, reader) {
   }
 
 
+  // Removes (classPrefix+)name from the classnames of the current element.
+  //
   function removeClass(name) {
     var reName = new RegExp("(^|\\s+)"+p.prefix+name+"(\\s+|$)");
     var reTrim = /^\s+|\s+$/g;
