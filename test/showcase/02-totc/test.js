@@ -1,43 +1,5 @@
 (function () {
 
-  with (Monocle.Styles) {
-    container.background = "none";
-    container.right = "24px";
-    container.left = '0';
-    container.width = 'auto';
-    page.top = page.bottom = "6px";
-    page["outline"] = "none";
-    page["-webkit-box-shadow"] = "1px 0 2px #997";
-    page["-moz-box-shadow"] = "1px 0 2px #997";
-    page["-webkit-border-top-left-radius"] = "26px 4px";
-    page["-webkit-border-bottom-left-radius"] = "26px 4px";
-    page["-moz-border-radius-topleft"] = "26px 4px";
-    page["-moz-border-radius-bottomleft"] = "26px 4px";
-    page['background-color'] = "#FFFEFC";
-    page['background-image'] =
-      "-moz-linear-gradient(0deg, #EDEAE8 0px, #FFFEFC 24px)";
-    page.background =
-      "-webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFEFC))";
-    sheaf.top = sheaf.bottom = "8%";
-    sheaf.left = "6%";
-    sheaf.right = "8%";
-    body.color = "#310";
-    body["font-family"] = "Palatino, Georgia, serif";
-    body["line-height"] = "1.2";
-    Controls.Magnifier.button.color = "#632";
-    Controls.Magnifier.button.padding = "2%";
-    Controls.Magnifier.button['-webkit-border-radius'] = "3px";
-    Controls.Magnifier.button.background = "#FFF";
-    Controls.Magnifier.button.top = "1%";
-    Controls.Magnifier.button.right = "6%";
-    Controls.Contents.container.background = "#E0D3C0";
-    Controls.Contents.container.border = "1px solid #EEd";
-    Controls.Contents.list.font = "11pt Georgia, serif";
-    Controls.Contents.list.color = "#642";
-    Controls.Contents.list['text-shadow'] = "1px 1px #FFF6E0";
-    Controls.Contents.chapter['border-bottom'] = "2px groove #FFF6E9";
-  }
-
   var bookData = {
     getComponents: function () {
       var componentDiv = document.getElementById('components');
@@ -118,62 +80,12 @@
   }
 
 
-  function createToC(evt) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    var controlLayer = document.getElementById('readerCntr');
-
-    tocList = document.createElement('ul');
-    tocList.className = 'root';
-    var listBuilder = function (chp, padLvl) {
-      var li = document.createElement('li');
-      var span = document.createElement('span');
-      span.style.paddingLeft = padLvl + "em";
-      li.appendChild(span);
-      span.innerHTML = chp.title;
-      li.onclick = function () {
-        window.reader.skipToChapter(chp.src);
-        controlLayer.removeChild(controlLayer.tocMenu);
-      }
-      tocList.appendChild(li);
-      if (chp.children) {
-        for (var i = 0; i < chp.children.length; ++i) {
-          listBuilder(chp.children[i], padLvl + 1);
-        }
-      }
-    }
-
-    var contents = bookData.getContents();
-    for (var i = 0; i < contents.length; ++i) {
-      listBuilder(contents[i], 0);
-    }
-
-    if (!controlLayer.tocMenu) {
-      controlLayer.tocMenu = document.createElement('div');
-      controlLayer.tocMenu.id = "toc";
-      controlLayer.tocMenu.appendChild(tocList);
-      var arrow = document.createElement('div');
-      arrow.className = "tocArrow";
-      controlLayer.tocMenu.appendChild(arrow);
-    }
-    if (controlLayer.tocMenu.parentNode) {
-      controlLayer.removeChild(controlLayer.tocMenu);
-    } else {
-      controlLayer.appendChild(controlLayer.tocMenu);
-    }
-  }
-
-
   // Initialize the reader element.
   Monocle.Events.listen(
     window,
     'load',
     function () {
       var readerOptions = {};
-
-      /* SPINNER */
-      var spinner = Monocle.Controls.Spinner();
-      spinner.listenForUsualDelays('reader');
 
       /* PLACE SAVER */
       var bkTitle = bookData.getMetaData('title');
@@ -188,8 +100,12 @@
         bookData,
         readerOptions,
         function(reader) {
-          reader.addControl(spinner, 'page', { hidden: true });
           reader.addControl(placeSaver, 'invisible');
+
+          /* SPINNER */
+          var spinner = Monocle.Controls.Spinner(reader);
+          reader.addControl(spinner, 'page', { hidden: true });
+          spinner.listenForUsualDelays('reader');
 
           /* Because the 'reader' element changes size on window resize,
            * we should notify it of this event. */
@@ -231,7 +147,6 @@
               }
             );
 
-            //Monocle.Events.listen(cntr, evtType, createToC, false);
             return cntr;
           }
           reader.addControl(bookTitle, 'page');
@@ -291,10 +206,15 @@
             }
           );
 
+          reader.addPageStyles("body { " +
+            "color: #210;" +
+            "font-family: Palatino, Georgia, serif;" +
+            "line-height: 1.2;" +
+          "}");
 
           /* Scrubber */
           var scrubber = new Monocle.Controls.Scrubber(reader);
-          reader.addControl(scrubber, 'page', { hidden: true });
+          reader.addControl(scrubber, 'popover', { hidden: true });
           var showFn = function (evt) {
             evt.stopPropagation();
             reader.showControl(scrubber);
@@ -310,11 +230,6 @@
               { start: showFn }
             );
           }
-          var hideScrubber = function (evt) {
-            evt.stopPropagation();
-            reader.hideControl(scrubber);
-          }
-          reader.listen('monocle:pagechange', hideScrubber);
         }
       );
     }

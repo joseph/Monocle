@@ -48,14 +48,14 @@ Monocle.Controls.Spinner = function (reader) {
 
 
   function spin(evt) {
-    console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
+    //console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
     p.spinCount += 1;
     p.reader.showControl(API);
   }
 
 
   function spun(evt) {
-    console.log('Spun on ' + (evt ? evt.type : 'unknown'));
+    //console.log('Spun on ' + (evt ? evt.type : 'unknown'));
     p.spinCount -= 1;
     if (p.spinCount > 0) { return; }
     p.reader.hideControl(API);

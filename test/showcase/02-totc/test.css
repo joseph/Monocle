@@ -84,7 +84,7 @@ body {
 }
 
 .runner {
-  color: #976;
+  color: #542;
   text-transform: uppercase;
   font-size: 82%;
 }
@@ -130,7 +130,7 @@ body {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   overflow-y: auto;
-  color: #642;
+  color: #432;
   font: 11pt Georgia, serif;
   text-shadow: 1px 1px #EEE6D0;
   border: 1px solid #EED;
@@ -171,4 +171,85 @@ body {
 }
 #toc ul.root {
   border-top: none;
+}
+
+
+
+/* Overrides to core elements */
+
+div.monelem_container {
+  background: none;
+  left: 0;
+  width: auto;
+}
+
+div.monelem_page {
+  top: 6px;
+  bottom: 6px;
+  right: 24px;
+  outline: none;
+  -webkit-box-shadow: 1px 0 2px #997;
+  -moz-box-shadow: 1px 0 2px #997;
+  box-shadow: 1px 0 2px #997;
+  -webkit-border-top-left-radius: 26px 4px;
+  -webkit-border-bottom-left-radius: 26px 4px;
+  -moz-border-radius-topleft: 26px 4px;
+  -moz-border-radius-bottomleft: 26px 4px;
+  background-color: #FFFFFE;
+  background-image: -moz-linear-gradient(0deg, #EDEAE8 0px, #FFFFFE 24px);
+  background: -webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFFFE));
+}
+
+div.monelem_sheaf {
+  left: 6%;
+  right: 8%;
+  top: 8%;
+  bottom: 8%;
+}
+
+
+/* Overriding magnifier button display */
+
+div.monelem_controls_magnifier_button {
+  color: #632;
+  padding: 2%;
+  top: 1%;
+  right: 6%;
+}
+
+
+/* Overriding table of contents display */
+
+div.monelem_controls_contents_container {
+  background: #E0D3C0;
+  border: 1px solid #EED;
+  font: 11pt Georgia, serif;
+  color: #432;
+  text-shadow: 1px 1px #FFF6E0;
+}
+
+div.monelem_controls_contents_chapter {
+  border-bottom: 2px groove #FFF6E9;
+}
+
+
+/* Overriding the scrubber display */
+div.monelem_controls_scrubber_container {
+  left: 5.5%;
+  right: 9%;
+  bottom: 2%;
+  background: #FFFEFC;
+}
+
+div.monelem_controls_scrubber_track {
+  border-color: #432;
+}
+
+div.monelem_controls_scrubber_needle {
+  border-color: #432;
+  background: #E0D3C0;
+}
+
+div.monelem_controls_scrubber_trail {
+  background: #E0D3C0;
 }

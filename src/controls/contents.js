@@ -37,7 +37,7 @@ Monocle.Controls.Contents = function (reader) {
       'span',
       'controls_contents_chapterTitle',
       index,
-      { text: chp.title }
+      { html: chp.title }
     );
     span.style.paddingLeft = padLvl + "em";
 
