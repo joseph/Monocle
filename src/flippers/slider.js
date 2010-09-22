@@ -420,6 +420,63 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
+  // This is a replacement setX with better cross-browser support.
+  // Two problems keep it from going in:
+  //
+  // * It removes the simulated transition support required for Moz less that 4.
+  // * getX is still not cross-browser, so it sometimes fails to detect when
+  //   a transition has already occurred. Resulting in freezes.
+  /*
+  function setX(elem, x, options, callback) {
+    var duration, transition;
+
+    // NB: if the browser lacks transition support, moves immediately to x.
+    if (!Monocle.Browser.has.transitions) {
+      duration = 0;
+    } else if (!options.duration) {
+      duration = 0;
+    } else {
+      duration = parseInt(options['duration']);
+    }
+
+    if (typeof(x) == "number") { x = x + "px"; }
+
+    if (duration) {
+      transition = duration + "ms";
+      transition += ' ' + (options['timing'] || 'linear');
+      transition += ' ' + (options['delay'] || 0) + 'ms';
+    } else {
+      transition = "none";
+    }
+
+    if (elem.setXTCB) {
+      Monocle.Events.deafen(elem, 'webkitTransitionEnd', elem.setXTCB);
+      Monocle.Events.deafen(elem, 'transitionend', elem.setXTCB);
+      elem.setXTCB = null;
+    }
+
+    elem.setXTCB = function () {
+      if (callback) { callback(); }
+    }
+
+    // Set the styles
+    elem.dom.setBetaStyle('transition', transition);
+    if (Monocle.Browser.has.transform3d) {
+      elem.dom.setBetaStyle('transform', 'translate3d('+x+',0,0)');
+    } else {
+      elem.dom.setBetaStyle('transform', 'translateX('+x+')');
+    }
+
+    if (!duration) {
+      elem.setXTCB();
+    } else {
+      Monocle.Events.listen(elem, 'webkitTransitionEnd', elem.setXTCB);
+      Monocle.Events.listen(elem, 'transitionend', elem.setXTCB);
+    }
+  }
+  */
+
+
   function getX(elem) {
     if (typeof WebKitCSSMatrix == "object") {
       var matrix = window.getComputedStyle(elem).webkitTransform;

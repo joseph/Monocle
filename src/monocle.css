@@ -20,7 +20,7 @@ div.monelem_page {
   left: 0;
   bottom: 3px;
   right: 5px;
-  outline: 1px solid #999;
+  border-right: 1px solid #999;
 }
 
 

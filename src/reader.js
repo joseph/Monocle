@@ -213,16 +213,16 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function applyStyles() {
-    dom.find('container').dom.setStyle(Monocle.Styles.container);
+    dom.find('container').dom.setStyles(Monocle.Styles.container);
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = dom.find('page', i);
-      page.dom.setStyle(Monocle.Styles.page);
-      dom.find('sheaf', i).dom.setStyle(Monocle.Styles.sheaf);
+      page.dom.setStyles(Monocle.Styles.page);
+      dom.find('sheaf', i).dom.setStyles(Monocle.Styles.sheaf);
       var cmpt = dom.find('component', i)
-      cmpt.dom.setStyle(Monocle.Styles.component);
+      cmpt.dom.setStyles(Monocle.Styles.component);
       Monocle.Styles.applyRules(cmpt.contentDocument.body, Monocle.Styles.body);
     }
-    dom.find('overlay').dom.setStyle(Monocle.Styles.overlay);
+    dom.find('overlay').dom.setStyles(Monocle.Styles.overlay);
     dispatchEvent('monocle:styles');
   }
 

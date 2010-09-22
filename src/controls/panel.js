@@ -20,7 +20,7 @@ Monocle.Controls.Panel = function () {
 
   function createControlElements(cntr) {
     p.div = cntr.dom.make('div', k.CLS.panel);
-    p.div.dom.setStyle(k.DEFAULT_STYLES);
+    p.div.dom.setStyles(k.DEFAULT_STYLES);
     Monocle.Events.listenForContact(
       p.div,
       {

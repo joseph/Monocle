@@ -126,8 +126,13 @@ Monocle.Factory = function (element, label, index, reader) {
   // Apply a set of style rules (hash or string) to the current element.
   // See Monocle.Styles.applyRules for more info.
   //
-  function setStyle(rules) {
-    Monocle.Styles.applyRules(p.element, rules);
+  function setStyles(rules) {
+    return Monocle.Styles.applyRules(p.element, rules);
+  }
+
+
+  function setBetaStyle(property, value) {
+    return Monocle.Styles.affix(p.element, property, value);
   }
 
 
@@ -172,7 +177,8 @@ Monocle.Factory = function (element, label, index, reader) {
   API.append = append;
   API.address = address;
 
-  API.setStyle = setStyle;
+  API.setStyles = setStyles;
+  API.setBetaStyle = setBetaStyle;
   API.hasClass = hasClass;
   API.addClass = addClass;
   API.removeClass = removeClass;

@@ -40,7 +40,8 @@ Monocle.Browser.has = {
       return false;
     }
   })(),
-  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko,
+  columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko, // FIXME!
+  transform3d: Monocle.Browser.is.WebKit, // FIXME!
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion &&
     Monocle.Browser.iOSVersion < "4.2",

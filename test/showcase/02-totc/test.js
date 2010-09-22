@@ -1,5 +1,7 @@
 (function () {
 
+  Monocle.Styles.container.right = "24px";
+
   var bookData = {
     getComponents: function () {
       var componentDiv = document.getElementById('components');

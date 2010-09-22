@@ -179,18 +179,18 @@ body {
 
 div.monelem_container {
   background: none;
-  left: 0;
   width: auto;
 }
 
 div.monelem_page {
   top: 6px;
   bottom: 6px;
-  right: 24px;
+  right: 4px;
+  border-color: #CBA;
   outline: none;
-  -webkit-box-shadow: 1px 0 2px #997;
-  -moz-box-shadow: 1px 0 2px #997;
-  box-shadow: 1px 0 2px #997;
+  -webkit-box-shadow: 1px 0 1px #CBA;
+  -moz-box-shadow: 1px 0 1px #CBA;
+  box-shadow: 1px 0 2px #CBA;
   -webkit-border-top-left-radius: 26px 4px;
   -webkit-border-bottom-left-radius: 26px 4px;
   -moz-border-radius-topleft: 26px 4px;
