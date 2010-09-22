@@ -24,7 +24,7 @@ Monocle.Flippers.Legacy = function (reader) {
 
 
   function moveTo(locus) {
-    p.reader.getBook().setOrLoadPageAt(page(), locus, updateButtons);
+    p.reader.getBook().setOrLoadPageAt(page(), locus, function () {});
     p.reader.dispatchEvent('monocle:turn');
   }
 
@@ -33,69 +33,118 @@ Monocle.Flippers.Legacy = function (reader) {
     var sheaf = p.reader.dom.find('sheaf');
     var cmpt = p.reader.dom.find('component');
 
+    sheaf.style.overflow = "none";
+    cmpt.dom.setStyles({
+      position: 'relative',
+      width: '100%',
+      minWidth: '0%',
+      overflow: 'none'
+    });
+    cmpt.contentDocument.documentElement.style.overflow = 'hidden';
+
     // FIXME
-    sheaf.style.right = "0";
-    sheaf.style.overflow = "auto";
-    cmpt.style.position = "relative";
-    cmpt.style.width = "100%";
-    cmpt.style.minWidth = "0%";
-    Monocle.Styles.affix(cmpt, 'column-width', 'auto');
+    Monocle.Styles.affix(cmpt.contentDocument.body, 'column-width', 'auto');
   }
 
 
-  function updateButtons() {
-    var cIndex = getPlace().properties.component.properties.index;
-    var dom = p.reader.dom;
-    if (cIndex == 0) {
-      dom.find('flipper_legacy_message').style.display = "block";
-      dom.find('flipper_legacy_buttonPrev').style.display = "none";
-    } else {
-      dom.find('flipper_legacy_message').style.display = "none";
-      dom.find('flipper_legacy_buttonPrev').style.display = "block";
+  function listenForInteraction(panelClass) {
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+      if (!panelClass) {
+        console.warn("Invalid panel class.")
+      }
     }
-
-    if (cIndex == p.reader.getBook().properties.lastCIndex) {
-      dom.find('flipper_legacy_buttonNext').style.display = "none";
-    } else {
-      dom.find('flipper_legacy_buttonNext').style.display = "block";
-    }
+    p.panels = new panelClass(
+      API,
+      {
+        'end': function (panel, x) { turn(panel.properties.direction); }
+      }
+    );
   }
 
 
-  function listenForInteraction() {
-    var dom = p.reader.dom;
-    var sheaf = dom.find('sheaf');
-    var cmpt = dom.find('component');
-
-    // Sanctimonious little message about upgrading your browser. Sorry.
-    sheaf.insertBefore(
-      dom.make('div', 'flipper_legacy_message', { html: k.LEGACY_MESSAGE }),
-      cmpt
+  function turn(dir) {
+    var cmpt = p.reader.dom.find('component');
+    var startY = scrollPos(cmpt.contentWindow);
+    showIndicator(
+      cmpt.contentWindow,
+      dir > 0 ? startY + k.TMP : startY
     );
-
-    // 'previous component' button
-    var prevBtn = dom.make(
-      'div',
-      'flipper_legacy_buttonPrev',
-      { 'class': 'flipper_legacy_button', html: k.buttonText.PREV }
-    )
-    sheaf.insertBefore(prevBtn, cmpt);
-    Monocle.Events.listen(
-      prevBtn,
-      'click',
-      function () { moveTo({ direction: -1 }) }
+    Monocle.defer(
+      function () {
+        smoothScroll(
+          cmpt.contentWindow,
+          startY,
+          startY + k.TMP * dir,
+          300,
+          hideIndicator
+        );
+      },
+      150
     );
+  }
 
-    // 'next component' button
-    var nextBtn = sheaf.dom.append(
-      'div',
-      'flipper_legacy_buttonNext',
-      { 'class': 'flipper_legacy_button', html: k.buttonText.NEXT }
-    );
-    Monocle.Events.listen(
-      nextBtn,
-      'click',
-      function () { moveTo({ direction: 1 }) }
+
+  function scrollPos(win) {
+    // Firefox, Chrome, Opera, Safari
+    if (win.pageYOffset) return win.pageYOffset;
+    // Internet Explorer 6 - standards mode
+    if (win.document.documentElement && win.document.documentElement.scrollTop)
+        return win.document.documentElement.scrollTop;
+    // Internet Explorer 6, 7 and 8
+    if (win.document.body.scrollTop) return win.document.body.scrollTop;
+    return 0;
+  }
+
+
+  function smoothScroll(win, currY, finalY, duration, callback) {
+    clearTimeout(win.smoothScrollInterval);
+    var stamp = (new Date()).getTime();
+    var frameRate = 40;
+    var step = (finalY - currY) * (frameRate / duration);
+    var stepFn = function () {
+      var destY = currY + step;
+      if (
+        (new Date()).getTime() - stamp > duration ||
+        Math.abs(currY - finalY) < Math.abs((currY + step) - finalY)
+      ) {
+        clearTimeout(win.smoothScrollInterval);
+        win.scrollTo(0, finalY);
+        if (callback) { callback(win); }
+      } else {
+        win.scrollTo(0, destY);
+        currY = destY;
+      }
+    }
+    win.smoothScrollInterval = setInterval(stepFn, frameRate);
+  }
+
+
+  function showIndicator(win, pos) {
+    if (p.hideTO) { clearTimeout(p.hideTO); }
+
+    if (!win.indicator) {
+      var doc = win.document;
+      win.indicator = doc.createElement('div');
+      Monocle.Styles.applyRules(win.indicator, {
+        position: 'absolute',
+        right: 0,
+        'border-top': '2px dashed #F00'
+      });
+      doc.body.appendChild(win.indicator);
+    }
+    win.indicator.style.top = pos+"px";
+    win.indicator.style.width = '100%';
+  }
+
+
+  function hideIndicator(win) {
+    p.hideTO = Monocle.defer(
+      function () {
+        win.indicator.style.top = (win.indicator.offsetTop + k.TMP) + "px";
+        win.indicator.style.width = "10px";
+      },
+      600
     );
   }
 
@@ -112,14 +161,14 @@ Monocle.Flippers.Legacy = function (reader) {
   return API;
 }
 
+Monocle.Flippers.Legacy.TMP = 350;
+Monocle.Flippers.Legacy.FORWARDS = 1;
+Monocle.Flippers.Legacy.BACKWARDS = -1;
+Monocle.Flippers.Legacy.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Legacy.LEGACY_MESSAGE =
   "Your browser doesn't support Monocle's full feature set. " +
   'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
   'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
   'Google\'s <a href="http://google.com/chrome">Chrome</a>.';
-Monocle.Flippers.Legacy.buttonText = {
-  PREV: "... Previous part",
-  NEXT: "Next part..."
-}
 
 Monocle.pieceLoaded('flippers/legacy');

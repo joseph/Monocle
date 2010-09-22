@@ -88,16 +88,16 @@ Monocle.Styles.body = {
   "margin": "0",
   "padding": "0",
   "position": "absolute",
-  "height": "100%",
-  "-webkit-text-size-adjust": "none",
+  "-webkit-text-size-adjust": "none"
 
   // FIXME: COLUMN RULES DON"T APPLY TO SOME FLIPPERS?
-  "min-width": "200%",
-  "-webkit-column-gap": "0",
-  "-webkit-column-fill": "auto",
-  "-moz-column-gap": "0",
-  "column-gap": "0",
-  "column-fill": "0"
+  // "height": "100%",
+  // "min-width": "200%",
+  // "-webkit-column-gap": "0",
+  // "-webkit-column-fill": "auto",
+  // "-moz-column-gap": "0",
+  // "column-gap": "0",
+  // "column-fill": "0"
 }
 
 
