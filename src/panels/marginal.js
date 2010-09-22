@@ -35,7 +35,7 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
 
 
   function setWidths() {
-    var page = flipper.visiblePages()[0];
+    var page = flipper.properties.reader.dom.find('page');
     var sheaf = page.m.sheafDiv;
     var bw = sheaf.offsetLeft;
     var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);
