@@ -12,6 +12,7 @@ Monocle.Controls.PlaceSaver = function (bookId) {
     applyToBook(bookId);
   }
 
+
   function assignToReader(reader) {
     p.reader = reader;
     p.reader.listen('monocle:turn', savePlaceToCookie);

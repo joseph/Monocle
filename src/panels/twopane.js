@@ -19,10 +19,9 @@ Monocle.Panels.TwoPane = function (flipper, evtCallbacks) {
       flipper.properties.reader.addControl(p.panels[dir]);
       p.panels[dir].listenTo(evtCallbacks);
       p.panels[dir].properties.direction = flipper.constants[dir.toUpperCase()];
-      with (p.panels[dir].properties.div.style) {
-        width = k.WIDTH;
-        dir == "forwards" ? right = 0 : left = 0;
-      }
+      var style = { "width": k.WIDTH };
+      style[(dir == "forwards" ? "right" : "left")] = 0;
+      p.panels[dir].properties.div.dom.setStyle(style);
     }
   }
 
