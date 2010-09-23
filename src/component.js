@@ -35,25 +35,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     // The array of pageDivs that have applied this component. Indexed by
     // their pageIndex.
-    pageDivs: [],
-
-    // The current dimensions of the client node that holds the elements of
-    // this component. (The assumption is that all client nodes will have
-    // identical dimensions — otherwise nothing will work as expected.)
-    //
-    // Defined as:
-    //
-    //   {
-    //     width: n,            // in pixels
-    //     height: n,           // in pixels
-    //     scrollWidth: n,      // in pixels
-    //     fontSize: s,         // css style property value of the node
-    //     pages: n             // number of pages in this component
-    //   }
-    //
-    // Obviously, this data is invalidated by dimensional changes in the reader.
-    //
-    clientDimensions: []
+    pageDivs: []
   }
 
 
@@ -238,11 +220,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
-    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
-    if (Monocle.Browser.is.WebKit) {
-      frame.contentDocument.documentElement.style.overflow = 'hidden';
-    }
-
     // Correct the body lineHeight to use a number, not a percentage, which
     // causes the text to jump upwards.
     var doc = frame.contentDocument;
@@ -252,9 +229,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var fs = parseFloat(currStyle.getPropertyValue('font-size'));
     doc.body.style.lineHeight = lh / fs;
 
-    setColumnWidth(pageDiv);
+    p.pageLength = pageDiv.m.dimensions.measure();
     frame.style.visibility = "visible";
-    measureDimensions(pageDiv);
 
     // Find the place of any chapters in the component.
     locateChapters(pageDiv);
@@ -262,19 +238,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
 
   // Checks whether the pageDiv dimensions have changed. If they have,
-  // calculates a new column width, re-measures the pageDiv dimensions and
-  // returns true.
-  //
-  // Otherwise returns false.
+  // remeasures dimensions and returns true. Otherwise returns false.
   //
   function updateDimensions(pageDiv) {
-    if (haveDimensionsChanged(pageDiv)) {
-      for (var i = 0; i < p.pageDivs.length; ++i) {
-        if (p.pageDivs[i]) {
-          setColumnWidth(p.pageDivs[i]);
-        }
-      }
-      measureDimensions(pageDiv);
+    if (pageDiv.m.dimensions.hasChanged()) {
+      p.pageLength = pageDiv.m.dimensions.measure();
       return true;
     } else {
       return false;
@@ -282,156 +250,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  // Checks whether the dimensions of the pageDiv have changed (due to
-  // browser resize, reorientation, font-size change or other).
-  //
-  // Returns true or false.
-  //
-  function haveDimensionsChanged(pageDiv) {
-    var newDimensions = rawDimensions(pageDiv);
-    return (
-      (!p.clientDimensions) ||
-      (p.clientDimensions.width != newDimensions.width) ||
-      (p.clientDimensions.height != newDimensions.height) ||
-      (p.clientDimensions.scrollWidth != newDimensions.scrollWidth) ||
-      (p.clientDimensions.fontSize != newDimensions.fontSize)
-    );
-  }
-
-
-  // Returns the element that is offset to the left in order to display
-  // a particular page.
-  //
-  // This is a BROWSERHACK:
-  //   iOS devices don't allow scrollbars on the frame itself.
-  //   This means that it's the parent div that must be scrolled -- the sheaf.
-  //
-  function scrollerElement(pageDiv) {
-    var bdy = pageDiv.m.activeFrame.contentDocument.body;
-
-    if (Monocle.Browser.has.iframeWidthBug) {
-      var oldSL = bdy.scrollLeft;
-      var sl = bdy.scrollLeft = bdy.scrollWidth;
-      var bodyScroller = (bdy.scrollLeft != 0);
-      bdy.scrollLeft = oldSL;
-      return bodyScroller ? bdy : pageDiv.m.sheafDiv;
-    } else {
-      return bdy;
-    }
-  }
-
-
-  // Returns the width of the offsettable area of the scroller element. By
-  // definition, the number of pages is always this number divided by the
-  // width of a single page (eg, the client area of the scroller element).
-  //
-  // BROWSERHACK:
-  //
-  // iOS 4+ devices sometimes report incorrect scrollWidths.
-  //  1) The body scrollWidth is now always 2x what it really is.
-  //  2) The sheafDiv scrollWidth is sometimes only 2x page width, despite
-  //    body being much bigger.
-  //
-  // In Gecko browsers, translating X on the document body causes the
-  // scrollWidth of the body to change. (I think this is a bug.) Hence, we
-  // have to find the last element in the body, and get the 'right' value from
-  // its bounding rect.
-  //
-  // In other browsers, we can just use the scrollWidth of the scrollerElement.
-  //
-  function scrollerWidth(pageDiv) {
-    var bdy = pageDiv.m.activeFrame.contentDocument.body;
-    if (Monocle.Browser.has.iframeWidthBug) {
-      if (Monocle.Browser.iOSVersion < "4.1") {
-        var hbw = bdy.scrollWidth / 2;
-        var sew = scrollerElement(pageDiv).scrollWidth;
-        return Math.max(sew, hbw);
-      } else {
-        bdy.scrollWidth; // Throw one away. WTF!
-        var hbw = bdy.scrollWidth / 2;
-        //console.log(p.id + ": " + hbw + "px");
-        return hbw;
-      }
-    } else if (Monocle.Browser.is.Gecko) {
-      var lc = bdy.lastChild;
-      while (lc && lc.nodeType != 1) {
-        lc = lc.previousSibling;
-      }
-      if (lc && lc.getBoundingClientRect) {
-        return lc.getBoundingClientRect().right;
-      }
-    }
-    return scrollerElement(pageDiv).scrollWidth;
-  }
-
-
-  // Calculate the dimensions of the component within the given pageDiv.
-  // Includes the number of pages.
-  //
-  function measureDimensions(pageDiv) {
-    p.clientDimensions = rawDimensions(pageDiv);
-
-    // Detect single-page components.
-    if (p.clientDimensions.scrollWidth == p.clientDimensions.width * 2) {
-      var doc = pageDiv.m.activeFrame.contentDocument;
-      var elems = doc.body.getElementsByTagName('*');
-      if (!elems || elems.length == 0) {
-        console.warn(
-          "Empty document body for pageDiv["+pageDiv.m.pageIndex+"]: "+id
-        );
-        p.clientDimensions.scrollWidth = p.clientDimensions.width;
-      } else {
-        var elem = elems[elems.length - 1];
-        var lcEnd = elem.offsetTop + elem.offsetHeight;
-        p.clientDimensions.scrollWidth = p.clientDimensions.width *
-          (lcEnd > p.clientDimensions.height ? 2 : 1);
-      }
-    }
-
-    p.clientDimensions.pages = Math.ceil(
-      p.clientDimensions.scrollWidth / p.clientDimensions.width
-    );
-
-    // console.log(
-    //   ""+id+" -> pageDiv["+pageDiv.m.pageIndex+"] -> page count: " +
-    //   p.clientDimensions.pages
-    // );
-
-    return p.clientDimensions;
-  }
-
-
-  // Gets the basic dimensions of the component within the pageDiv, not
-  // including advanced calculations like the number of pages.
-  //
-  function rawDimensions(pageDiv) {
-    var win = pageDiv.m.activeFrame.contentWindow;
-    var doc = win.document;
-    var currStyle = win.getComputedStyle(doc.body, null);
-
-    return {
-      width: pageDiv.m.sheafDiv.clientWidth,
-      height: pageDiv.m.sheafDiv.clientHeight,
-      scrollWidth: scrollerWidth(pageDiv),
-      fontSize: currStyle.getPropertyValue('font-size')
-    }
-  }
-
-
-  function setColumnWidth(pageDiv) {
-    var doc = pageDiv.m.activeFrame.contentDocument;
-    var cw = pageDiv.m.sheafDiv.clientWidth;
-    doc.body.style.columnWidth = cw+"px";
-    doc.body.style.MozColumnWidth = cw+"px";
-    doc.body.style.webkitColumnWidth = cw+"px";
-  }
-
-
   // Iterates over all the chapters that are within this component
   // (according to the array we were provided on initialization) and finds
   // their location (in percentage terms) within the text.
-  //
-  // Location is calculated using scrollIntoView.
   //
   // Stores this percentage with the chapter object in the chapters array.
   //
@@ -439,26 +260,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (p.chapters[0] && typeof p.chapters[0].percent == "number") {
       return;
     }
-    var doc = pageDiv.m.activeFrame.contentDocument;
-    var scroller = scrollerElement(pageDiv);
-    var oldScrollLeft = scroller.scrollLeft;
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.percent = 0;
       if (chp.fragment) {
-        var target = doc.getElementById(chp.fragment);
-        while (target && target.parentNode != doc.body) {
-          target = target.parentNode;
-        }
-        if (target) {
-          target.scrollIntoView();
-          chp.percent = (scroller.scrollLeft / p.clientDimensions.scrollWidth);
-        }
+        chp.percent = pageDiv.m.dimensions.percentageThroughOfId(chp.fragment);
       }
     }
-    scroller.scrollTop = 0;
-    scroller.scrollLeft = oldScrollLeft;
-
     return p.chapters;
   }
 
@@ -471,7 +279,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   //
   function chapterForPage(pageN) {
     var cand = null;
-    var percent = (pageN - 1) / p.clientDimensions.pages;
+    var percent = (pageN - 1) / p.pageLength;
     for (var i = 0; i < p.chapters.length; ++i) {
       if (percent >= p.chapters[i].percent) {
         cand = p.chapters[i];
@@ -494,17 +302,17 @@ Monocle.Component = function (book, id, index, chapters, source) {
     }
     for (var i = 0; i < p.chapters.length; ++i) {
       if (p.chapters[i].fragment == fragment) {
-        return Math.round(p.chapters[i].percent * p.clientDimensions.pages) + 1;
+        return Math.round(p.chapters[i].percent * p.pageLength) + 1;
       }
     }
     return null;
   }
 
 
-  // A shortcut to p.clientDimensions.pages.
+  // A public getter for p.pageLength.
   //
   function lastPageNumber() {
-    return p.clientDimensions ? p.clientDimensions.pages : null;
+    return p.pageLength;
   }
 
 

@@ -26,6 +26,7 @@ Monocle.defer = function (fn, time) {
 //= require "place"
 //= require "component"
 
+Monocle.Dimensions = {}
 Monocle.Controls = {};
 Monocle.Flippers = {};
 Monocle.Panels = {};

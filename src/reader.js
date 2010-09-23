@@ -64,6 +64,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // Prefix for classnames for any created element.
     classPrefix: k.DEFAULT_CLASS_PREFIX
   }
+
   var dom;
 
 
@@ -101,19 +102,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       // Make the reader elements look pretty.
       applyStyles();
 
-      listen(
-        'monocle:componentchange',
-        function (evt) {
-          var doc = evt.m['document'];
-          doc.documentElement.id = options.systemId || "RS:monocle";
-          for (var i = 0; i < p.pageStylesheets.length; ++i) {
-            if (p.pageStylesheets[i]) {
-              addPageStylesheet(doc, i);
-            }
-          }
-          Monocle.Styles.applyRules(doc.body, Monocle.Styles.body);
-        }
-      );
+      listen('monocle:componentchange', persistPageStylesOnComponentChange);
 
       p.flipper.listenForInteraction(options.panels);
 
@@ -151,6 +140,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = cntr.dom.append('div', 'page', i);
       page.m = { reader: API, pageIndex: i, place: null }
+      page.m.dimensions = new Monocle.Dimensions.Columns(page);
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
       // FIXME: clunky
@@ -550,6 +540,20 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  // Called when a page changes its component. Injects our current page
+  // stylesheets into the new component.
+  //
+  function persistPageStylesOnComponentChange(evt) {
+    var doc = evt.m['document'];
+    doc.documentElement.id = options.systemId || "RS:monocle";
+    for (var i = 0; i < p.pageStylesheets.length; ++i) {
+      if (p.pageStylesheets[i]) {
+        addPageStylesheet(doc, i);
+      }
+    }
+  }
+
+
   // Wraps all API-based stylesheet changes (add, update, remove) in a
   // brace of custom events (stylesheetchanging/stylesheetchange), and
   // recalculates component dimensions if specified (default to true).
@@ -636,6 +640,11 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "word-wrap: break-word !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
+  "body {" +
+    "margin: 0 !important;" +
+    "padding: 0 !important;" +
+    "-webkit-text-size-adjust: none;" +
+  "}" +
   "table, img {" +
     "max-width: 100% !important;" +
     "max-height: 90% !important;" +
