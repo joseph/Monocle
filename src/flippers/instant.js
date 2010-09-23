@@ -12,26 +12,8 @@ Monocle.Flippers.Instant = function (reader) {
   }
 
 
-  function page() {
-    return p.reader.dom.find('page');
-  }
-
-
-  function listenForInteraction(panelClass) {
-    if (typeof panelClass != "function") {
-      panelClass = k.DEFAULT_PANELS_CLASS;
-    }
-    p.panels = new panelClass(
-      API,
-      {
-        'end': function (panel) { turn(panel.properties.direction); }
-      }
-    );
-  }
-
-
-  function turn(dir) {
-    moveTo({ page: getPlace().pageNumber() + dir});
+  function addPage(pageDiv) {
+    pageDiv.m.dimensions = new Monocle.Dimensions.Columns(pageDiv);
   }
 
 
@@ -45,17 +27,33 @@ Monocle.Flippers.Instant = function (reader) {
   }
 
 
+  function listenForInteraction(panelClass) {
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+    }
+    p.panels = new panelClass(API, { 'end': turn });
+  }
+
+
+  function page() {
+    return p.reader.dom.find('page');
+  }
+
+
+  function turn(panel) {
+    var dir = panel.properties.direction;
+    moveTo({ page: getPlace().pageNumber() + dir});
+  }
+
+
   function frameToLocus(locus) {
-    var mult = locus.page - 1;
-    var pw = page().m.sheafDiv.clientWidth;
-    var x = 0 - pw * mult;
-    var bdy = page().m.activeFrame.contentDocument.body;
-    Monocle.Styles.affix(bdy, "transform", "translateX("+x+"px)");
+    page().m.dimensions.translateToLocus(locus);
   }
 
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
+  API.addPage = addPage;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;

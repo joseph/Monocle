@@ -84,23 +84,6 @@ Monocle.Styles.component = {
   "user-select": "none"
 }
 
-Monocle.Styles.body = {
-  "margin": "0",
-  "padding": "0",
-  "position": "absolute",
-  "height": "100%",
-  "-webkit-text-size-adjust": "none",
-
-  // FIXME: COLUMN RULES DON"T APPLY TO SOME FLIPPERS?
-  "min-width": "200%",
-  "-webkit-column-gap": "0",
-  "-webkit-column-fill": "auto",
-  "-moz-column-gap": "0",
-  "column-gap": "0",
-  "column-fill": "0"
-}
-
-
 Monocle.Styles.control = {
   "z-index": "100",
   "cursor": "pointer"

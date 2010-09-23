@@ -14,6 +14,16 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
+  function addPage(pageDiv) {
+    pageDiv.m.dimensions = new Monocle.Dimensions.Columns(pageDiv);
+  }
+
+
+  function page() {
+    return p.reader.dom.find('page');
+  }
+
+
   function listenForInteraction(panelClass) {
     if (typeof panelClass != "function") {
       panelClass = k.DEFAULT_PANELS_CLASS;
@@ -28,13 +38,10 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function turn(dir) {
+    if (p.turning) { return; }
     moveTo({ page: getPlace().pageNumber() + dir});
   }
 
-
-  function page() {
-    return p.reader.dom.find('page');
-  }
 
   function getPlace() {
     return page().m.place;
@@ -47,10 +54,9 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function frameToLocus(locus) {
-    var mult = locus.page - 1;
-    var pw = page().m.sheafDiv.clientWidth;
-    var x = 0 - pw * mult;
+    p.turning = true;
 
+    var x = page().m.dimensions.locusToOffset(locus);
     var bdy = page().m.activeFrame.contentDocument.body;
     if (typeof WebKitTransitionEvent != "undefined") {
       bdy.style.webkitTransition = "-webkit-transform " +
@@ -60,6 +66,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
         bdy,
         'webkitTransitionEnd',
         function () {
+          p.turning = false;
           p.reader.dispatchEvent('monocle:turn');
         }
       );
@@ -77,6 +84,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
         ) {
           clearTimeout(bdy.animInterval)
           bdy.style.MozTransform = "translateX(" + finalX + "px)";
+          p.turning = false;
           p.reader.dispatchEvent('monocle:turn');
         } else {
           bdy.style.MozTransform = "translateX(" + destX + "px)";
@@ -91,6 +99,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
+  API.addPage = addPage;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
