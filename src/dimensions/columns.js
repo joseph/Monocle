@@ -174,10 +174,26 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
+  function locusToOffset(locus) {
+    return 0 - (p.measurements.width * (locus.page - 1));
+  }
+
+
+  function translateToLocus(locus) {
+    var offset = locusToOffset(locus);
+    var bdy = p.page.m.activeFrame.contentDocument.body;
+    Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
+    return offset;
+  }
+
+
   API.hasChanged = hasChanged;
   API.measure = measure;
   API.pages = pages;
   API.percentageThroughOfId = percentageThroughOfId;
+
+  API.locusToOffset = locusToOffset;
+  API.translateToLocus = translateToLocus;
 
   initialize();
 

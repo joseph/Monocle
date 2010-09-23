@@ -12,6 +12,11 @@ Monocle.Flippers.Instant = function (reader) {
   }
 
 
+  function addPage(pageDiv) {
+    pageDiv.m.dimensions = new Monocle.Dimensions.Columns(pageDiv);
+  }
+
+
   function page() {
     return p.reader.dom.find('page');
   }
@@ -46,16 +51,13 @@ Monocle.Flippers.Instant = function (reader) {
 
 
   function frameToLocus(locus) {
-    var mult = locus.page - 1;
-    var pw = page().m.sheafDiv.clientWidth;
-    var x = 0 - pw * mult;
-    var bdy = page().m.activeFrame.contentDocument.body;
-    Monocle.Styles.affix(bdy, "transform", "translateX("+x+"px)");
+    page().m.dimensions.translateToLocus(locus);
   }
 
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
+  API.addPage = addPage;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;

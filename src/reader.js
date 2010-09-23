@@ -41,9 +41,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     //   }
     controls: [],
 
-    // The current width of the page.
-    pageWidth: 0,
-
     // The active book.
     book: null,
 
@@ -140,11 +137,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = cntr.dom.append('div', 'page', i);
       page.m = { reader: API, pageIndex: i, place: null }
-      page.m.dimensions = new Monocle.Dimensions.Columns(page);
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
       // FIXME: clunky
       page.m.activeFrame.m = { 'pageDiv': page }
+      p.flipper.addPage(page);
       // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
       Monocle.Events.listenOnIframe(page.m.activeFrame);
     }
@@ -253,16 +250,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       p.boxDimensions.left += o.offsetLeft;
       p.boxDimensions.top += o.offsetTop;
     } while (o = o.offsetParent);
-
-    if (typeof(p.flipper.overrideDimensions) != 'function') {
-      var measuringPage = dom.find('page');
-      if (p.flipper.visiblePages) {
-        measuringPage = p.flipper.visiblePages()[0];
-      }
-      p.pageWidth = measuringPage.offsetWidth;
-    } else {
-      p.flipper.overrideDimensions();
-    }
 
     moveTo(locus);
   }

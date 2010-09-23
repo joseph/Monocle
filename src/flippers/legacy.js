@@ -13,6 +13,11 @@ Monocle.Flippers.Legacy = function (reader) {
   }
 
 
+  function addPage(pageDiv) {
+    pageDiv.m.dimensions = new Monocle.Dimensions.Vert(pageDiv);
+  }
+
+
   function page() {
     return p.reader.dom.find('page');
   }
@@ -26,24 +31,6 @@ Monocle.Flippers.Legacy = function (reader) {
   function moveTo(locus) {
     p.reader.getBook().setOrLoadPageAt(page(), locus, function () {});
     p.reader.dispatchEvent('monocle:turn');
-  }
-
-
-  function overrideDimensions() {
-    var sheaf = p.reader.dom.find('sheaf');
-    var cmpt = p.reader.dom.find('component');
-
-    sheaf.style.overflow = "none";
-    cmpt.dom.setStyles({
-      position: 'relative',
-      width: '100%',
-      minWidth: '0%',
-      overflow: 'none'
-    });
-    cmpt.contentDocument.documentElement.style.overflow = 'hidden';
-
-    // FIXME
-    Monocle.Styles.affix(cmpt.contentDocument.body, 'column-width', 'auto');
   }
 
 
@@ -151,10 +138,10 @@ Monocle.Flippers.Legacy = function (reader) {
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
+  API.addPage = addPage;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
-  API.overrideDimensions = overrideDimensions;
 
   initialize();
 

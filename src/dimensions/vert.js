@@ -2,10 +2,14 @@ Monocle.Dimensions.Vert = function (pageDiv) {
 
   var API = { constructor: Monocle.Dimensions.Vert }
   var k = API.constants = API.constructor;
-  var p = API.properties = {}
+  var p = API.properties = {
+    page: pageDiv,
+    reader: pageDiv.m.reader
+  }
 
 
   function initialize() {
+    p.reader.listen('monocle:componentchange', componentChanged);
   }
 
 
@@ -22,6 +26,16 @@ Monocle.Dimensions.Vert = function (pageDiv) {
 
 
   function percentageThroughOfId(id) {
+  }
+
+
+  function componentChanged(evt) {
+    if (evt.m['page'] != p.page) { return; }
+    var sheaf = p.page.m.sheafDiv;
+    var cmpt = p.page.m.activeFrame;
+    sheaf.dom.setStyles(k.SHEAF_STYLES);
+    cmpt.dom.setStyles(k.COMPONENT_STYLES);
+    cmpt.contentDocument.documentElement.style.overflow = 'hidden';
   }
 
 

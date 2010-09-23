@@ -8,10 +8,7 @@ Monocle.Flippers.Slider = function (reader) {
   var p = API.properties = {
     pageCount: 2,
     activeIndex: 1,
-    divs: {
-      pages: []
-    },
-    turnData: {},
+    turnData: {}
   }
 
 
@@ -21,7 +18,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function addPage(pageDiv) {
-    //p.divs.pages.push(pageDiv);
+    pageDiv.m.dimensions = new Monocle.Dimensions.Columns(pageDiv);
   }
 
 
@@ -107,11 +104,7 @@ Monocle.Flippers.Slider = function (reader) {
       pageDiv,
       locus,
       function (locus) {
-        var mult = locus.page - 1;
-        var pw = pageDiv.m.sheafDiv.clientWidth;
-        var x = 0 - pw * mult;
-        var bdy = pageDiv.m.activeFrame.contentDocument.body;
-        Monocle.Styles.affix(bdy, "transform", "translateX("+x+"px)");
+        pageDiv.m.dimensions.translateToLocus(locus);
         if (callback) { callback(); }
       }
     );
@@ -497,12 +490,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpOut(pageDiv, callback) {
-    setX(
-      pageDiv,
-      0 - p.reader.properties.pageWidth,
-      { duration: 1 },
-      callback
-    );
+    setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: 1 }, callback);
   }
 
 
@@ -522,14 +510,14 @@ Monocle.Flippers.Slider = function (reader) {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(upperPage(), 0 - p.reader.properties.pageWidth, slideOpts, callback);
+    setX(upperPage(), 0 - upperPage().offsetWidth, slideOpts, callback);
   }
 
 
   function slideToCursor(cursorX, callback, duration) {
     setX(
       upperPage(),
-      Math.min(0, cursorX - p.reader.properties.pageWidth),
+      Math.min(0, cursorX - upperPage().offsetWidth),
       { duration: duration || k.durations.FOLLOW_CURSOR },
       callback
     );
@@ -538,6 +526,7 @@ Monocle.Flippers.Slider = function (reader) {
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
+  API.addPage = addPage;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.listenForInteraction = listenForInteraction;
