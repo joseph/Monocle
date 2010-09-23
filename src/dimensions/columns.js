@@ -30,7 +30,22 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function measure() {
     setColumnWidth();
     p.measurements = rawMeasurements();
-    // TODO: detect singe-page components.
+
+    // Detect single-page components.
+    if (p.measurements.scrollWidth == p.measurements.width * 2) {
+      var doc = p.page.m.activeFrame.contentDocument;
+      var elems = doc.body.getElementsByTagName('*');
+      if (!elems || elems.length == 0) {
+        console.warn('Empty document for page['+p.page.properties.pageIndex+']');
+        p.measurements.scrollWidth = p.measurements.width;
+      } else {
+        var elem = elems[elems.length - 1];
+        var lcEnd = elem.offsetTop + elem.offsetHeight;
+        p.measurements.scrollWidth = p.measurements.width *
+          (lcEnd > p.measurements.height ? 2 : 1);
+      }
+    }
+
     p.length = Math.ceil(p.measurements.scrollWidth / p.measurements.width);
     console.log('page['+p.page.m.pageIndex+'] -> '+p.length);
     p.dirty = false;
@@ -50,7 +65,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function percentageThroughOfId(id) {
     var scroller = scrollerElement();
     var oldScrollLeft = scroller.scrollLeft;
-    var doc = page.m.activeFrame.contentDocument;
+    var doc = p.page.m.activeFrame.contentDocument;
     var target = doc.getElementById(id);
     while (target && target.parentNode != doc.body) {
       target = target.parentNode;
