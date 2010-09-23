@@ -17,29 +17,6 @@ Monocle.Flippers.Instant = function (reader) {
   }
 
 
-  function page() {
-    return p.reader.dom.find('page');
-  }
-
-
-  function listenForInteraction(panelClass) {
-    if (typeof panelClass != "function") {
-      panelClass = k.DEFAULT_PANELS_CLASS;
-    }
-    p.panels = new panelClass(
-      API,
-      {
-        'end': function (panel) { turn(panel.properties.direction); }
-      }
-    );
-  }
-
-
-  function turn(dir) {
-    moveTo({ page: getPlace().pageNumber() + dir});
-  }
-
-
   function getPlace() {
     return page().m.place;
   }
@@ -47,6 +24,25 @@ Monocle.Flippers.Instant = function (reader) {
 
   function moveTo(locus) {
     p.reader.getBook().setOrLoadPageAt(page(), locus, frameToLocus);
+  }
+
+
+  function listenForInteraction(panelClass) {
+    if (typeof panelClass != "function") {
+      panelClass = k.DEFAULT_PANELS_CLASS;
+    }
+    p.panels = new panelClass(API, { 'end': turn });
+  }
+
+
+  function page() {
+    return p.reader.dom.find('page');
+  }
+
+
+  function turn(panel) {
+    var dir = panel.properties.direction;
+    moveTo({ page: getPlace().pageNumber() + dir});
   }
 
 

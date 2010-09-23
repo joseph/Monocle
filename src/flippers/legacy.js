@@ -18,19 +18,13 @@ Monocle.Flippers.Legacy = function (reader) {
   }
 
 
-  function page() {
-    return p.reader.dom.find('page');
-  }
-
-
   function getPlace() {
     return page().m.place;
   }
 
 
   function moveTo(locus) {
-    p.reader.getBook().setOrLoadPageAt(page(), locus, function () {});
-    p.reader.dispatchEvent('monocle:turn');
+    p.reader.getBook().setOrLoadPageAt(page(), locus, frameToLocus);
   }
 
 
@@ -41,32 +35,42 @@ Monocle.Flippers.Legacy = function (reader) {
         console.warn("Invalid panel class.")
       }
     }
-    p.panels = new panelClass(
-      API,
-      {
-        'end': function (panel, x) { turn(panel.properties.direction); }
-      }
-    );
+    p.panels = new panelClass(API, { 'end': turn });
   }
 
 
-  function turn(dir) {
+  function page() {
+    return p.reader.dom.find('page');
+  }
+
+
+  function turn(panel) {
+    var dir = panel.properties.direction;
+    var place = getPlace();
+    if (
+      (dir < 0 && place.onFirstPageOfBook()) ||
+      (dir > 0 && place.onLastPageOfBook())
+    ) { return; }
+    moveTo({ page: getPlace().pageNumber() + dir });
+  }
+
+
+  function frameToLocus(locus) {
     var cmpt = p.reader.dom.find('component');
-    var startY = scrollPos(cmpt.contentWindow);
-    showIndicator(
-      cmpt.contentWindow,
-      dir > 0 ? startY + k.TMP : startY
-    );
+    var win = cmpt.contentWindow;
+    var srcY = scrollPos(win);
+    var dims = page().m.dimensions;
+    var pageHeight = dims.properties.pageHeight;
+    var destY = dims.locusToOffset(locus);
+
+    //console.log(srcY + " => " + destY);
+    if (Math.abs(destY - srcY) > pageHeight) {
+      return win.scrollTo(0, destY);
+    }
+
+    showIndicator(win, srcY < destY ? srcY + pageHeight : srcY);
     Monocle.defer(
-      function () {
-        smoothScroll(
-          cmpt.contentWindow,
-          startY,
-          startY + k.TMP * dir,
-          300,
-          hideIndicator
-        );
-      },
+      function () { smoothScroll(win, srcY, destY, 300, scrollingFinished); },
       150
     );
   }
@@ -74,12 +78,17 @@ Monocle.Flippers.Legacy = function (reader) {
 
   function scrollPos(win) {
     // Firefox, Chrome, Opera, Safari
-    if (win.pageYOffset) return win.pageYOffset;
+    if (win.pageYOffset) {
+      return win.pageYOffset;
+    }
     // Internet Explorer 6 - standards mode
-    if (win.document.documentElement && win.document.documentElement.scrollTop)
-        return win.document.documentElement.scrollTop;
+    if (win.document.documentElement && win.document.documentElement.scrollTop) {
+      return win.document.documentElement.scrollTop;
+    }
     // Internet Explorer 6, 7 and 8
-    if (win.document.body.scrollTop) return win.document.body.scrollTop;
+    if (win.document.body.scrollTop) {
+      return win.document.body.scrollTop;
+    }
     return 0;
   }
 
@@ -97,7 +106,7 @@ Monocle.Flippers.Legacy = function (reader) {
       ) {
         clearTimeout(win.smoothScrollInterval);
         win.scrollTo(0, finalY);
-        if (callback) { callback(win); }
+        if (callback) { callback(); }
       } else {
         win.scrollTo(0, destY);
         currY = destY;
@@ -107,32 +116,72 @@ Monocle.Flippers.Legacy = function (reader) {
   }
 
 
+  function scrollingFinished() {
+    hideIndicator(page().m.activeFrame.contentWindow);
+    p.reader.dispatchEvent('monocle:turn');
+  }
+
+
   function showIndicator(win, pos) {
     if (p.hideTO) { clearTimeout(p.hideTO); }
 
-    if (!win.indicator) {
-      var doc = win.document;
-      win.indicator = doc.createElement('div');
-      Monocle.Styles.applyRules(win.indicator, {
-        position: 'absolute',
-        right: 0,
-        'border-top': '2px dashed #F00'
-      });
-      doc.body.appendChild(win.indicator);
+    var doc = win.document;
+    if (!doc.body.indicator) {
+      doc.body.indicator = createIndicator(doc);
+      doc.body.appendChild(doc.body.indicator);
     }
-    win.indicator.style.top = pos+"px";
-    win.indicator.style.width = '100%';
+    doc.body.indicator.line.style.display = "block";
+    doc.body.indicator.style.opacity = 1;
+    positionIndicator(pos);
   }
 
 
   function hideIndicator(win) {
+    var doc = win.document;
     p.hideTO = Monocle.defer(
       function () {
-        win.indicator.style.top = (win.indicator.offsetTop + k.TMP) + "px";
-        win.indicator.style.width = "10px";
+        if (!doc.body.indicator) {
+          doc.body.indicator = createIndicator(doc);
+          doc.body.appendChild(doc.body.indicator);
+        }
+        var dims = page().m.dimensions;
+        positionIndicator(
+          dims.locusToOffset(getPlace().getLocus()) + dims.properties.pageHeight
+        )
+        doc.body.indicator.line.style.display = "none";
+        doc.body.indicator.style.opacity = 0.5;
       },
       600
     );
+  }
+
+
+  function createIndicator(doc) {
+    var iBox = doc.createElement('div');
+    doc.body.appendChild(iBox);
+    Monocle.Styles.applyRules(iBox, k.STYLES.iBox);
+
+    iBox.arrow = doc.createElement('div');
+    iBox.appendChild(iBox.arrow);
+    Monocle.Styles.applyRules(iBox.arrow, k.STYLES.arrow);
+
+    iBox.line = doc.createElement('div');
+    iBox.appendChild(iBox.line);
+    Monocle.Styles.applyRules(iBox.line, k.STYLES.line);
+
+    return iBox;
+  }
+
+
+  function positionIndicator(y) {
+    var p = page();
+    var doc = p.m.activeFrame.contentDocument;
+    var maxHeight = p.m.dimensions.properties.bodyHeight;
+    maxHeight -= doc.body.indicator.offsetHeight;
+    if (y > maxHeight) {
+      y = maxHeight;
+    }
+    doc.body.indicator.style.top = y + "px";
   }
 
 
@@ -148,14 +197,30 @@ Monocle.Flippers.Legacy = function (reader) {
   return API;
 }
 
-Monocle.Flippers.Legacy.TMP = 350;
 Monocle.Flippers.Legacy.FORWARDS = 1;
 Monocle.Flippers.Legacy.BACKWARDS = -1;
 Monocle.Flippers.Legacy.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
-Monocle.Flippers.Legacy.LEGACY_MESSAGE =
-  "Your browser doesn't support Monocle's full feature set. " +
-  'You could try <a href="http://mozilla.com/firefox">Firefox</a>, ' +
-  'Apple\'s <a href="http://apple.com/safari">Safari</a> or ' +
-  'Google\'s <a href="http://google.com/chrome">Chrome</a>.';
+
+Monocle.Flippers.Legacy.STYLES = {
+  iBox: {
+    'position': 'absolute',
+    'right': 0,
+    'left': 0,
+    'height': '10px'
+  },
+  arrow: {
+    'position': 'absolute',
+    'right': 0,
+    'height': '10px',
+    'width': '10px',
+    'background': '#333',
+    'border-radius': '6px'
+  },
+  line: {
+    'width': '100%',
+    'border-top': '2px dotted #333',
+    'margin-top': '5px'
+  }
+}
 
 Monocle.pieceLoaded('flippers/legacy');

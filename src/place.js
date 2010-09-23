@@ -81,6 +81,20 @@ Monocle.Place = function () {
   }
 
 
+  function onFirstPageOfBook() {
+    return p.component.properties.index == 0 && pageNumber() == 1;
+  }
+
+
+  function onLastPageOfBook() {
+    return (
+      p.component.properties.index ==
+        p.component.properties.book.properties.lastCIndex &&
+      pageNumber() == p.component.lastPageNumber()
+    );
+  }
+
+
   API.setPlace = setPlace;
   API.setPercentageThrough = setPercentageThrough;
   API.componentId = componentId;
@@ -91,6 +105,8 @@ Monocle.Place = function () {
   API.chapterTitle = chapterTitle;
   API.chapterSrc = chapterSrc;
   API.getLocus = getLocus;
+  API.onFirstPageOfBook = onFirstPageOfBook;
+  API.onLastPageOfBook = onLastPageOfBook;
 
   return API;
 }

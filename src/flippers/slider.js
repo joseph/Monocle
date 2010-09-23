@@ -128,23 +128,6 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
-  function onFirstPage() {
-    var place = getPlace();
-    return place.properties.component.properties.index == 0 &&
-      place.pageNumber() == 1;
-  }
-
-
-  function onLastPage() {
-    var place = getPlace();
-    var cmpt = place.properties.component;
-    return (
-      cmpt.properties.index == cmpt.properties.book.properties.lastCIndex &&
-      place.pageNumber() == cmpt.lastPageNumber()
-    );
-  }
-
-
   function lift(dir, boxPointX) {
     if (p.turnData.lifting || p.turnData.releasing) { return; }
 
@@ -156,14 +139,14 @@ Monocle.Flippers.Slider = function (reader) {
     p.turnData.lifting = true;
 
     if (dir == k.FORWARDS) {
-      if (onLastPage()) {
+      if (getPlace().onLastPageOfBook()) {
         //console.log("ON LAST PAGE");
         resetTurnData();
         return;
       }
       onGoingForward(boxPointX);
     } else if (dir == k.BACKWARDS) {
-      if (onFirstPage()) {
+      if (getPlace().onFirstPageOfBook()) {
         //console.log("ON FIRST PAGE");
         resetTurnData();
         return;

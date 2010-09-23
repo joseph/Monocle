@@ -33,7 +33,9 @@ Monocle.Panels = {};
 
 //= require "controls/panel"
 //= require "panels/twopane"
+//= require "dimensions/vert"
 //= require "flippers/legacy"
+//= require "dimensions/columns"
 //= require "flippers/slider"
 
 Monocle.pieceLoaded('monocle');
