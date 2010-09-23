@@ -58,6 +58,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // DOM graph of factory-generated objects.
     graph: {},
 
+    // Id applied to the HTML element of each component, can be used to scope
+    // CSS rules.
+    systemId: (options ? options.systemId : null) || k.DEFAULT_SYSTEM_ID,
+
     // Prefix for classnames for any created element.
     classPrefix: k.DEFAULT_CLASS_PREFIX
   }
@@ -532,7 +536,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   //
   function persistPageStylesOnComponentChange(evt) {
     var doc = evt.m['document'];
-    doc.documentElement.id = options.systemId || "RS:monocle";
+    doc.documentElement.id = p.systemId;
     for (var i = 0; i < p.pageStylesheets.length; ++i) {
       if (p.pageStylesheets[i]) {
         addPageStylesheet(doc, i);
@@ -617,6 +621,7 @@ Monocle.Reader.abortMessage = {
   CLASSNAME: "monocleAbortMessage",
   TEXT: "Your browser does not support this technology."
 }
+Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
@@ -626,7 +631,7 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "text-rendering: optimizeSpeed !important;" +
     "word-wrap: break-word !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
-  "}",
+  "}" +
   "body {" +
     "margin: 0 !important;" +
     "padding: 0 !important;" +
