@@ -23,8 +23,8 @@
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/controls/panel.js"></script>
     <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
-    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
 
@@ -124,10 +124,10 @@
           "../../src/styles.js",
           "../../src/controls/panel.js",
           "../../src/panels/twopane.js",
-          "../../src/flippers/slider.js",
-          "../../src/flippers/legacy.js"
+          "../../src/dimensions/columns.js",
+          "../../src/flippers/slider.js"
         ]
-        framer.constants.waitForPiece = 'panels/twopane';
+        framer.constants.waitForPiece = 'flippers/slider';
         return window['reader'+num] = framer.newReader('reader'+num, bd);
       }
 
