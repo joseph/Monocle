@@ -51,6 +51,14 @@ Monocle.Controls.Spinner = function (reader) {
     //console.log('Spinning on ' + (evt ? evt.type : 'unknown'));
     p.spinCount += 1;
     p.reader.showControl(API);
+
+    // If the delay is on a page other than the page we've been assigned to,
+    // don't show the animation.
+    var page = evt && evt.m.page ? evt.m.page : null;
+    for (var i = 0; i < p.divs.length; ++i) {
+      var owner = p.divs[i].parentNode.parentNode;
+      p.divs[i].style.display = (!page || page == owner) ? 'block' : 'none';
+    }
   }
 
 

@@ -73,7 +73,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   //
   function initialize(node, bookData, options, onLoadCallback) {
     var box = typeof(node) == "string" ?  document.getElementById(node) : node;
-    dom = API.dom = new Monocle.Factory(box, 'box', 0, API);
+    dom = API.dom = box.dom = new Monocle.Factory(box, 'box', 0, API);
 
     options = options || {}
 
