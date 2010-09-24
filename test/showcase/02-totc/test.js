@@ -4,83 +4,48 @@
 
   var bookData = {
     getComponents: function () {
-      var componentDiv = document.getElementById('components');
-      var cmpts = [];
-      for (var i = 0; i < componentDiv.childNodes.length; ++i) {
-        var node = componentDiv.childNodes[i];
-        if (node.nodeType == 1 && node.id) {
-          cmpts.push(node.id);
-        }
-      }
-      return cmpts;
+      return [
+        'components/1.html',
+        'components/2.html',
+        'components/3.html'
+      ];
     },
     getContents: function () {
       return [
         {
-          title: "Book the First&mdash;Recalled to Life",
-          src: "part1",
+          title: "The Signal Man",
+          src: "components/1.html"
+        },
+        {
+          title: "The Haunted House",
+          src: "components/2.html",
           children: [
             {
-              title: "I. The Period",
-              src: "part1#part1-I"
+              title: "Chapter I — The Mortals in the House",
+              src: "components/2.html#p2ch1"
             },
             {
-              title: "II. The Mail",
-              src: "part1#part1-II"
-            },
-            {
-              title: "III. The Night Shadows",
-              src: "part1-III"
-            },
-            {
-              title: "IV. The Preparation",
-              src: "part1-IV"
-            },
-            {
-              title: "V. The Wine-shop",
-              src: "part1-V"
-            },
-            {
-              title: "VI. The Shoemaker",
-              src: "part1-VI"
+              title: "Chapter II — The Ghost in Master B.'s Room",
+              src: "components/2.html#p2ch2"
             }
           ]
         },
         {
-          title: "Book the Second&mdash;the Golden Thread",
-          src: "part2",
-          children: [
-            {
-              title: "I. Five Years Later",
-              src: "part2#part2-I"
-            },
-            {
-              title: "II. A Sight",
-              src: "part2-II"
-            },
-            {
-              title: "III. A Disappointment",
-              src: "part2-III"
-            },
-            {
-              title: "IV. Congratulatory",
-              src: "part2-IV"
-            }
-          ]
+          title: "The Trial for Murder",
+          src: "components/3.html"
         }
       ]
     },
     getComponent: function (componentId) {
-      return { nodes: [document.getElementById(componentId).cloneNode(true)] };
+      return { url: componentId }
     },
-    getMetaData: function (key) {
+    getMetaData: function(key) {
       return {
-        title: "A Tale of Two Cities",
+        title: "Three Ghost Stories",
         creator: "Charles Dickens"
       }[key];
     }
   }
-
 
   // Initialize the reader element.
   Monocle.Events.listen(
@@ -93,7 +58,6 @@
       var bkTitle = bookData.getMetaData('title');
       var placeSaver = new Monocle.Controls.PlaceSaver(bkTitle);
       readerOptions.place = placeSaver.savedPlace();
-      //readerOptions.flipper = Monocle.Flippers.Legacy;
       readerOptions.panels = Monocle.Panels.Marginal;
 
       /* Initialize the reader */
