@@ -570,8 +570,15 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   //
   function addPageStylesheet(doc, sheetIndex) {
     var styleRules = p.pageStylesheets[sheetIndex];
+
     if (!styleRules) {
       return;
+    }
+
+    var head = doc.getElementsByTagName('head')[0];
+    if (!head) {
+      head = doc.createElement('head');
+      doc.documentElement.appendChild(head);
     }
 
     if (typeof styleRules.join == "function") {
@@ -587,7 +594,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       styleTag.appendChild(doc.createTextNode(styleRules));
     }
 
-    doc.getElementsByTagName('head')[0].appendChild(styleTag);
+    head.appendChild(styleTag);
 
     return styleTag;
   }

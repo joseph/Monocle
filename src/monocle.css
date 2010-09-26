@@ -44,65 +44,28 @@ div.monelem_overlay {
 
 
 /*===========================================================================
-  FLIPPERS
----------------------------------------------------------------------------*/
-
-/* Legacy */
-
-.monelem_flipper_legacy_message {
-  border: 1px solid #987;
-  background: #FFC;
-  color: #333;
-  font-family: Helvetica; Arial; sans-serif;
-  font-size: 11px;
-  margin-right: 3px;
-  margin-bottom: 3px;
-  padding: 0.5em 1em;
-}
-
-.monelem_flipper_legacy_button {
-  background: #DDD;
-  padding: 6px;
-  border: 1px solid #666;
-  color: #009;
-  font: bold 12px Helvetica; Arial; sans-serif;
-  text-shadow: -1px -1px #EEE;
-  border-radius: 5px;
-  margin-right: 3px;
-  margin-bottom: 3px;
-  margin-top: 3px;
-  cursor: pointer;
-}
-
-
-/*===========================================================================
   PANELS
 ---------------------------------------------------------------------------*/
 
 
 .monelem_panels_imode_panel {
-  width: 33%;
   background: rgba(255,255,255,0.7);
   opacity: 0;
 }
 
 .monelem_panels_imode_backwardsPanel {
-  left: 0;
   -webkit-box-shadow: 1px 1px 3px #777;
   -moz-box-shadow: 1px 1px 3px #777;
   box-shadow: 1px 1px 3px #777;
 }
 
 .monelem_panels_imode_forwardsPanel {
-  right: 0;
   -webkit-box-shadow: -1px 1px 3px #777;
   -moz-box-shadow: -1px 1px 3px #777;
   box-shadow: -1px 1px 3px #777;
 }
 
 .monelem_panels_imode_centralPanel {
-  left: 33%;
-  width: 34%;
 }
 
 .monelem_panels_imode_toggleIcon {
@@ -122,9 +85,7 @@ div.monelem_overlay {
 
 /* Panel */
 
-
-/* Beware: if you modify this class you could significantly change the
- * behaviour of panels. */
+/* If you modify this you could significantly change the way panels work. */
 div.monelem_controls_panel_expanded {
   left: 0 !important;
   width: 100% !important;
@@ -224,8 +185,9 @@ div.monelem_controls_scrubber_needle {
   top: 5px;
   background: #CCC;
   border: 1px solid #999;
-  -webkit-border-radius: 8px;
+  border-radius: 8px;
   -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
 }
 
 div.monelem_controls_scrubber_trail {
@@ -245,13 +207,13 @@ div.monelem_controls_scrubber_bubble {
   bottom: 2.5em;
   background: rgba(0, 0, 0, 0.9);
   color: #CCC;
-  font: bold 12px Lucida Grande, Helvetica, sans-serif;
+  font: bold 12px Lucida Grande, Tahoma, Helvetica, Arial, sans-serif;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
   border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
 }
 
 
