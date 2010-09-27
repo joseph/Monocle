@@ -42,9 +42,13 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       p.measurements.scrollWidth == p.measurements.width * 2
     ) {
       var doc = p.page.m.activeFrame.contentDocument;
-      var lc = doc.body.lastChild;
-      if (!lc) {
-        console.warn('Empty document for page['+p.page.properties.pageIndex+']');
+      var lc;
+      for (var i = doc.body.childNodes.length - 1; i >= 0; --i) {
+        lc = doc.body.childNodes[i];
+        if (lc.getBoundingClientRect) { break; }
+      }
+      if (!lc || !lc.getBoundingClientRect) {
+        console.warn('Empty document for page['+p.page.m.pageIndex+']');
         p.measurements.scrollWidth = p.measurements.width;
       } else if (lc.getBoundingClientRect().bottom > p.measurements.height) {
         p.measurements.scrollWidth = p.measurements.width * 2;
