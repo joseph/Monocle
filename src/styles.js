@@ -25,18 +25,22 @@ Monocle.Styles = {
       return wd ? wd.substring(0,1).toUpperCase()+wd.substring(1,wd.length) : "";
     }
 
-    if (Monocle.Browser.is.Gecko) {
+    target[property] = value;
+    if (Monocle.Browser.is.WebKit) {
+      target['-webkit-'+property] = value;
+    } else {
       var parts = property.split('-');
       for (var i = parts.length; i > 0; --i) {
         parts[i] = capitalize(parts[i]);
       }
       target[parts.join('')] = value;
       parts[0] = capitalize(parts[0]);
-      target['Moz'+parts.join('')] = value;
-    }
-    if (Monocle.Browser.is.WebKit) {
-      target[property] = value;
-      target['-webkit-'+property] = value;
+
+      if (Monocle.Browser.is.Gecko) {
+        target['Moz'+parts.join('')] = value;
+      } else if (Monocle.Browser.is.Opera) {
+        target['O'+parts.join('')] = value;
+      }
     }
   }
 }
