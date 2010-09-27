@@ -31,23 +31,33 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     setColumnWidth();
     p.measurements = rawMeasurements();
 
-    // Detect single-page components.
-    if (p.measurements.scrollWidth == p.measurements.width * 2) {
+    // BROWSERHACK: Detect single-page components in WebKit browsers by checking
+    // whether the last element in the component is beyond the first page.
+    //
+    // This is because (due to the 'width: 200%' rule on the body) a one-page
+    // component will measure as two pages wide in WebKit browsers. For some
+    // reason this doesn't apply to Gecko.
+    if (
+      Monocle.Browser.is.WebKit &&
+      p.measurements.scrollWidth == p.measurements.width * 2
+    ) {
       var doc = p.page.m.activeFrame.contentDocument;
-      var elems = doc.body.getElementsByTagName('*');
-      if (!elems || elems.length == 0) {
+      var lc = doc.body.lastChild;
+      if (!lc) {
         console.warn('Empty document for page['+p.page.properties.pageIndex+']');
         p.measurements.scrollWidth = p.measurements.width;
+      } else if (lc.getBoundingClientRect().bottom > p.measurements.height) {
+        p.measurements.scrollWidth = p.measurements.width * 2;
       } else {
-        var elem = elems[elems.length - 1];
-        var lcEnd = elem.offsetTop + elem.offsetHeight;
-        p.measurements.scrollWidth = p.measurements.width *
-          (lcEnd > p.measurements.height ? 2 : 1);
+        p.measurements.scrollWidth = p.measurements.width;
       }
     }
 
     p.length = Math.ceil(p.measurements.scrollWidth / p.measurements.width);
-    console.log('page['+p.page.m.pageIndex+'] -> '+p.length);
+    console.log(
+      'page['+p.page.m.pageIndex+'] -> '+p.length+
+      ' ('+p.page.m.activeFrame.m.component.properties.id+')'
+    );
     p.dirty = false;
     return p.length;
   }
@@ -81,7 +91,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       scroller.scrollLeft = oldScrollLeft;
     }
 
-    console.log(id + ": " + offset + " of " + p.measurements.scrollWidth);
+    //console.log(id + ": " + offset + " of " + p.measurements.scrollWidth);
     var percent = offset / p.measurements.scrollWidth;
     return percent;
   }
@@ -190,6 +200,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function currBodyStyleValue(property) {
     var win = p.page.m.activeFrame.contentWindow;
     var doc = win.document;
+    if (!doc.body) { return null; }
     var currStyle = win.getComputedStyle(doc.body, null);
     return currStyle.getPropertyValue(property);
   }

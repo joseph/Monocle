@@ -211,7 +211,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
     Monocle.Events.listenOnIframe(frame);
 
     // Announce that the component has changed.
-    var evtData = { 'page': pageDiv, 'document': frame.contentDocument };
+    var evtData = {
+      'page': pageDiv,
+      'document': frame.contentDocument,
+      'component': API
+    };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
     // Correct the body lineHeight to use a number, not a percentage, which
@@ -300,7 +304,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
         return pc2pn(p.chapters[i].percent);
       }
     }
-
     var percent = pageDiv.m.dimensions.percentageThroughOfId(fragment);
     return pc2pn(percent);
   }

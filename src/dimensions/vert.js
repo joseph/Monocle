@@ -56,7 +56,7 @@ Monocle.Dimensions.Vert = function (pageDiv) {
       doc.body.scrollTop = oldScrollTop;
     }
 
-    console.log(id + ": " + offset + " of " + p.bodyHeight);
+    //console.log(id + ": " + offset + " of " + p.bodyHeight);
     var percent = offset / p.bodyHeight;
     return percent;
   }
