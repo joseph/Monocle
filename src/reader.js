@@ -143,6 +143,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       page.m = { reader: API, pageIndex: i, place: null }
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
+      page.m.activeFrame.setAttribute('frameBorder', 0);
+      page.m.activeFrame.setAttribute('scrolling', 'no');
       // FIXME: clunky
       page.m.activeFrame.m = { 'pageDiv': page }
       p.flipper.addPage(page);
@@ -577,6 +579,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     var head = doc.getElementsByTagName('head')[0];
     if (!head) {
+      if (!doc.documentElement) { return; } // FIXME: IE doesn't like docElem.
       head = doc.createElement('head');
       doc.documentElement.appendChild(head);
     }
