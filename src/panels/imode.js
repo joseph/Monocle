@@ -70,8 +70,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
     p.panels.central.contract();
 
-    var page = flipper.visiblePages ?
-      flipper.visiblePages()[0] : p.reader.dom.find('page');
+    var page = p.reader.visiblePages()[0];
     var sheaf = page.m.sheafDiv;
     var bw = sheaf.offsetLeft;
     var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);

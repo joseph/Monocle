@@ -31,11 +31,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     chapters: chapters,
 
     // the frame provided by dataSource.getComponent() for this component
-    source: source,
-
-    // The array of pageDivs that have applied this component. Indexed by
-    // their pageIndex.
-    pageDivs: []
+    source: source
   }
 
 
@@ -47,8 +43,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // callback will be invoked with the pageDiv and this component as arguments.
   //
   function applyTo(pageDiv, callback) {
-    p.pageDivs[pageDiv.m.pageIndex] = pageDiv;
-
     var evtData = { 'page': pageDiv, 'source': p.source };
     pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData);
 
@@ -296,16 +290,19 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // the chapter starts. If the fragment is null or blank, will
   // return the first page of the component.
   //
-  function pageForChapter(fragment) {
+  function pageForChapter(fragment, pageDiv) {
     if (!fragment) {
       return 1;
     }
+    var pc2pn = function (pc) { return Math.floor(pc * p.pageLength) + 1 }
     for (var i = 0; i < p.chapters.length; ++i) {
       if (p.chapters[i].fragment == fragment) {
-        return Math.round(p.chapters[i].percent * p.pageLength) + 1;
+        return pc2pn(p.chapters[i].percent);
       }
     }
-    return null;
+
+    var percent = pageDiv.m.dimensions.percentageThroughOfId(fragment);
+    return pc2pn(percent);
   }
 
 

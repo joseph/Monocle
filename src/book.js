@@ -108,7 +108,7 @@ Monocle.Book = function (dataSource) {
       result.page = pageDiv.m.place.pageNumber();
       result.page += locus.direction;
     } else if (typeof(locus.anchor) == "string") {
-      result.page = component.pageForChapter(locus.anchor);
+      result.page = component.pageForChapter(locus.anchor, pageDiv);
     } else if (typeof(locus.position) == "string") {
       if (locus.position == "start") {
         result.page = 1;

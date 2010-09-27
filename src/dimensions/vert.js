@@ -42,7 +42,23 @@ Monocle.Dimensions.Vert = function (pageDiv) {
 
 
   function percentageThroughOfId(id) {
-    // TODO
+    var doc = p.page.m.activeFrame.contentDocument;
+    var target = doc.getElementById(id);
+    var offset = 0;
+    if (target.getBoundingClientRect) {
+      offset = target.getBoundingClientRect().top;
+      offset -= doc.body.getBoundingClientRect().top;
+    } else {
+      var oldScrollTop = doc.body.scrollTop;
+      target.scrollIntoView();
+      offset = doc.body.scrollTop;
+      doc.body.scrollLeft = 0;
+      doc.body.scrollTop = oldScrollTop;
+    }
+
+    console.log(id + ": " + offset + " of " + p.bodyHeight);
+    var percent = offset / p.bodyHeight;
+    return percent;
   }
 
 

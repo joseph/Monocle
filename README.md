@@ -275,10 +275,6 @@ The flipper interface is as follows.
 Constructor arguments:
 
 * `reader`
-* `setPageFunction` - the 'private' method of the reader that should be invoked
-    whenever a page is being changed. The actual flipper-specific logic to
-    change the page is generally provided in a callback to this invocation.
-    See the existing flippers for examples.
 
 Properties:
 
@@ -287,7 +283,6 @@ Properties:
 Methods:
 
 * `addPage(pageDiv)`
-* `visiblePages()`
 * `getPlace(pageDiv)`
 * `moveTo(locus)`
 * `listenForInteraction()`

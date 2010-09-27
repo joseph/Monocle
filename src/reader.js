@@ -603,6 +603,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  function visiblePages() {
+    return p.flipper.visiblePages ? p.flipper.visiblePages() : [dom.find('page')];
+  }
+
 
   API.getBook = getBook;
   API.getPlace = getPlace;
@@ -618,6 +622,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   API.addPageStyles = addPageStyles;
   API.updatePageStyles = updatePageStyles;
   API.removePageStyles = removePageStyles;
+  API.visiblePages = visiblePages;
 
   initialize(node, bookData, options, onLoadCallback);
 
@@ -638,7 +643,7 @@ Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.TOUCH_DEVICE = (typeof Touch == "object");
 Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html * {" +
-    "text-rendering: optimizeSpeed !important;" +
+    //"text-rendering: optimizeSpeed !important;" +
     "word-wrap: break-word !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}" +

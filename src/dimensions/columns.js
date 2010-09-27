@@ -63,20 +63,26 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
   function percentageThroughOfId(id) {
-    var scroller = scrollerElement();
-    var oldScrollLeft = scroller.scrollLeft;
     var doc = p.page.m.activeFrame.contentDocument;
     var target = doc.getElementById(id);
-    while (target && target.parentNode != doc.body) {
-      target = target.parentNode;
+    if (!target) {
+      return 0;
     }
-    var percent = 0;
-    if (target) {
+    var offset = 0;
+    if (target.getBoundingClientRect) {
+      offset = target.getBoundingClientRect().left;
+      offset -= doc.body.getBoundingClientRect().left;
+    } else {
+      var scroller = scrollerElement();
+      var oldScrollLeft = scroller.scrollLeft;
       target.scrollIntoView();
-      percent = scroller.scrollLeft / p.measurements.scrollWidth;
+      offset = scroller.scrollLeft;
+      scroller.scrollTop = 0;
+      scroller.scrollLeft = oldScrollLeft;
     }
-    scroller.scrollTop = 0;
-    scroller.scrollLeft = oldScrollLeft;
+
+    console.log(id + ": " + offset + " of " + p.measurements.scrollWidth);
+    var percent = offset / p.measurements.scrollWidth;
     return percent;
   }
 
