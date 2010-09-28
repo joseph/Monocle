@@ -127,7 +127,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       frame.onload = null;
       Monocle.defer(callback);
     }
-    frame.src = url;
+    frame.contentWindow.location.replace(url);
   }
 
 
