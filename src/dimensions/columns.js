@@ -58,10 +58,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     }
 
     p.length = Math.ceil(p.measurements.scrollWidth / p.measurements.width);
-    console.log(
-      'page['+p.page.m.pageIndex+'] -> '+p.length+
-      ' ('+p.page.m.activeFrame.m.component.properties.id+')'
-    );
+    // console.log(
+    //   'page['+p.page.m.pageIndex+'] -> '+p.length+
+    //   ' ('+p.page.m.activeFrame.m.component.properties.id+')'
+    // );
     p.dirty = false;
     return p.length;
   }

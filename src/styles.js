@@ -66,7 +66,8 @@ Monocle.Styles.page = {
   "z-index": "1",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
-  "user-select": "none"
+  "user-select": "none",
+  "-webkit-transform": "translate3d(0,0,0)"
 
   /*
   "background": "white",

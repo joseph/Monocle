@@ -173,13 +173,13 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
 
   function deselect() {
-    var cmpt, i = 0;
-    while (cmpt = p.reader.dom.find('component', i)) {
-      var sel = cmpt.contentWindow.getSelection();
-      sel.removeAllRanges();
+    for (var i = 0, cmpt; cmpt = p.reader.dom.find('component', i); ++i) {
+      var sel = cmpt.contentWindow.getSelection() || cmpt.contentDocument.selection;
+      if (sel.collapse) { sel.collapse(); }
+      if (sel.removeAllRanges) { sel.removeAllRanges(); }
+      if (sel.empty) { sel.empty(); }
       cmpt.contentDocument.body.scrollLeft = 0;
       cmpt.contentDocument.body.scrollTop = 0;
-      i += 1;
     }
   }
 

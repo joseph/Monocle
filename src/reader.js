@@ -228,7 +228,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       }
       listen('monocle:componentchange', watcher);
     }
-    p.flipper.moveTo(options.place || { page: 1 });
+    p.flipper.moveTo(place || { page: 1 });
   }
 
 
