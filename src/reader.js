@@ -107,7 +107,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       p.flipper.listenForInteraction(options.panels);
 
       setBook(bk, options.place, function () {
-        console.log('Initialized!');
         p.initialized = true;
         if (onLoadCallback) { onLoadCallback(API); }
         dispatchEvent("monocle:loaded");
@@ -179,7 +178,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     var cb = function (evt) {
       var frame = evt.target || evt.srcElement;
-      //console.log('Initialised frame['+frame.m.pageDiv.m.pageIndex+']');
       Monocle.Events.deafen(frame, 'load', cb);
       if (Monocle.Browser.is.WebKit) {
         frame.contentDocument.documentElement.style.overflow = "hidden";
@@ -248,7 +246,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (!p.initialized) {
       console.warn('Attempt to resize book before initialization.');
     }
-    console.log('resizing');
     if (!dispatchEvent("monocle:resizing", {}, true)) {
       return;
     }
@@ -256,7 +253,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.resizeTimer = setTimeout(
       function () {
         moveTo({ page: pageNumber() });
-        console.log('resized');
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
