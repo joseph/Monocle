@@ -33,6 +33,25 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   var API = { constructor: Monocle.Reader }
   var k = API.constants = API.constructor;
   var p = API.properties = {
+    // Initialization-completed flag.
+    initialized: false,
+
+    // The active book.
+    book: null,
+
+    // DOM graph of factory-generated objects.
+    graph: {},
+
+    // An array of style rules that are automatically applied to every page.
+    pageStylesheets: [],
+
+    // Id applied to the HTML element of each component, can be used to scope
+    // CSS rules.
+    systemId: (options ? options.systemId : null) || k.DEFAULT_SYSTEM_ID,
+
+    // Prefix for classnames for any created element.
+    classPrefix: k.DEFAULT_CLASS_PREFIX,
+
     // Registered control objects (see addControl). Hashes of the form:
     //   {
     //     control: <control instance>,
@@ -41,25 +60,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     //   }
     controls: [],
 
-    // The active book.
-    book: null,
-
     // After the reader has been resized, this resettable timer must expire
     // the place is restored.
-    resizeTimer: null,
-
-    // An array of style rules that are automatically applied to every page.
-    pageStylesheets: [],
-
-    // DOM graph of factory-generated objects.
-    graph: {},
-
-    // Id applied to the HTML element of each component, can be used to scope
-    // CSS rules.
-    systemId: (options ? options.systemId : null) || k.DEFAULT_SYSTEM_ID,
-
-    // Prefix for classnames for any created element.
-    classPrefix: k.DEFAULT_CLASS_PREFIX
+    resizeTimer: null
   }
 
   var dom;
@@ -103,14 +106,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
       p.flipper.listenForInteraction(options.panels);
 
-      // Apply the book, calculating column dimensions & etc.
-      p.book = bk;
-      moveTo(options.place || { page: 1 });
-
-      Monocle.defer(function () {
-        if (onLoadCallback) {
-          onLoadCallback(API);
-        }
+      setBook(bk, options.place, function () {
+        console.log('Initialized!');
+        p.initialized = true;
+        if (onLoadCallback) { onLoadCallback(API); }
         dispatchEvent("monocle:loaded");
       });
     });
@@ -219,6 +218,25 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  // Apply the book, move to a particular place or just the first page, wait
+  // for everything to complete, then fire the callback.
+  //
+  function setBook(bk, place, callback) {
+    p.book = bk;
+    var pageCount = 0;
+    if (typeof callback == 'function') {
+      var watcher = function (evt) {
+        if ((pageCount += 1) == p.flipper.pageCount) {
+          deafen('monocle:componentchange', watcher);
+          callback();
+        }
+      }
+      listen('monocle:componentchange', watcher);
+    }
+    p.flipper.moveTo(options.place || { page: 1 });
+  }
+
+
   function getBook() {
     return p.book;
   }
@@ -227,7 +245,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Attempts to restore the place we were up to in the book before the
   // reader was resized.
   function resized() {
-    //console.log('resizing');
+    if (!p.initialized) {
+      console.warn('Attempt to resize book before initialization.');
+    }
+    console.log('resizing');
     if (!dispatchEvent("monocle:resizing", {}, true)) {
       return;
     }
@@ -235,7 +256,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.resizeTimer = setTimeout(
       function () {
         moveTo({ page: pageNumber() });
-        //console.log('resized');
+        console.log('resized');
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
@@ -249,7 +270,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // flipper thinks is the "active" page.
   //
   function pageNumber(pageDiv) {
-    var place = p.flipper.getPlace(pageDiv);
+    var place = getPlace(pageDiv);
     return place ? (place.pageNumber() || 1) : 1;
   }
 
@@ -261,6 +282,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // flipper thinks is the "active" page.
   //
   function getPlace(pageDiv) {
+    if (!p.initialized) {
+      console.warn('Attempt to access place before initialization.');
+    }
     return p.flipper.getPlace(pageDiv);
   }
 
@@ -269,6 +293,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Monocle.Book#changePage for documentation on the locus argument.
   //
   function moveTo(locus) {
+    if (!p.initialized) {
+      console.warn('Attempt to move place before initialization.');
+    }
     p.flipper.moveTo(locus);
   }
 
