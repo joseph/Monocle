@@ -189,10 +189,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     for (var i = 0; i < pageMax; ++i) {
       var page = dom.find('page', i);
-      page.m.activeFrame.dom.setStyles({
-        visibility: "hidden",
-        position: "absolute"
-      });
+      page.m.activeFrame.style.visibility = "hidden";
       page.m.activeFrame.setAttribute('frameBorder', 0);
       page.m.activeFrame.setAttribute('scrolling', 'no');
       Monocle.Events.listen(page.m.activeFrame, 'load', cb);
