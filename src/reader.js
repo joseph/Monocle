@@ -105,7 +105,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
       // Apply the book, calculating column dimensions & etc.
       p.book = bk;
-      moveTo(options.place)
+      moveTo(options.place || { page: 1 });
 
       Monocle.defer(function () {
         if (onLoadCallback) {
