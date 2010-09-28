@@ -44,12 +44,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // The active book.
     book: null,
 
-    // Properties relating to the input events.
-    interactionData: {},
-
-    // A resettable timer which must expire before dimensions are recalculated
-    // after the reader has been resized.
-    //
+    // After the reader has been resized, this resettable timer must expire
+    // the place is restored.
     resizeTimer: null,
 
     // An array of style rules that are automatically applied to every page.
@@ -109,7 +105,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
       // Apply the book, calculating column dimensions & etc.
       p.book = bk;
-      calcDimensions(options.place)
+      moveTo(options.place)
 
       Monocle.defer(function () {
         if (onLoadCallback) {
@@ -136,6 +132,27 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  function attachFlipper(flipperClass) {
+    // BROWSERHACK: Supported browsers must do CSS columns (at least?).
+    if (!Monocle.Browser.has.columns) {
+      flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
+      if (!flipperClass) {
+        return dom.append(
+          'div',
+          'abortMsg',
+          { 'class': k.abortMessage.CLASSNAME, 'html': k.abortMessage.TEXT }
+        );
+      }
+    } else if (!flipperClass) {
+      flipperClass = Monocle.Flippers[k.FLIPPER_DEFAULT_CLASS];
+      if (!flipperClass) {
+        throw("No flipper class");
+      }
+    }
+    p.flipper = new flipperClass(API, null, p.readerOptions);
+  }
+
+
   function createReaderElements() {
     var cntr = dom.append('div', 'container');
     for (var i = 0; i < p.flipper.pageCount; ++i) {
@@ -143,7 +160,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       page.m = { reader: API, pageIndex: i, place: null }
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
-      // FIXME: clunky
       page.m.activeFrame.m = { 'pageDiv': page }
       p.flipper.addPage(page);
       // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
@@ -161,6 +177,19 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     var pageMax = p.flipper.pageCount;
     var pageCount = 0;
+
+    var cb = function (evt) {
+      var frame = evt.target || evt.srcElement;
+      //console.log('Initialised frame['+frame.m.pageDiv.m.pageIndex+']');
+      Monocle.Events.deafen(frame, 'load', cb);
+      if (Monocle.Browser.is.WebKit) {
+        frame.contentDocument.documentElement.style.overflow = "hidden";
+      }
+      if ((pageCount += 1) == pageMax) {
+        Monocle.defer(callback);
+      }
+    }
+
     for (var i = 0; i < pageMax; ++i) {
       var page = dom.find('page', i);
       page.m.activeFrame.dom.setStyles({
@@ -169,41 +198,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       });
       page.m.activeFrame.setAttribute('frameBorder', 0);
       page.m.activeFrame.setAttribute('scrolling', 'no');
-      var cb = function (evt) {
-        var frame = evt.target || evt.srcElement;
-        Monocle.Events.deafen(frame, 'load', cb);
-        if (Monocle.Browser.is.WebKit) {
-          frame.contentDocument.documentElement.style.overflow = "hidden";
-        }
-        if ((pageCount +=1) == pageMax) {
-          callback();
-        }
-      }
       Monocle.Events.listen(page.m.activeFrame, 'load', cb);
       page.m.activeFrame.src = url;
     }
-  }
-
-
-  function attachFlipper(flipperClass) {
-    // BROWSERHACK: Supported browsers must do CSS columns (at least?).
-    if (!Monocle.Browser.has.columns) {
-      flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
-      if (!flipperClass) {
-        return dom.append(
-          'div',
-          'abortMsg',
-          { 'class': k.abortMessage.CLASSNAME, 'html': k.abortMessage.TEXT }
-        );
-        return;
-      }
-    } else if (!flipperClass) {
-      flipperClass = Monocle.Flippers[k.FLIPPER_DEFAULT_CLASS];
-      if (!flipperClass) {
-        throw("No flipper class");
-      }
-    }
-    p.flipper = new flipperClass(API, null, p.readerOptions);
   }
 
 
@@ -227,39 +224,22 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  // Attempts to restore the place we were up to in the book before the
+  // reader was resized.
   function resized() {
+    //console.log('resizing');
     if (!dispatchEvent("monocle:resizing", {}, true)) {
       return;
     }
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
       function () {
-        calcDimensions();
+        moveTo({ page: pageNumber() });
+        //console.log('resized');
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
     );
-  }
-
-
-  // Note: locus argument is OPTIONAL. Defaults to "current page".
-  //
-  function calcDimensions(locus) {
-    locus = locus || { page: pageNumber() };
-    var box = dom.find('box');
-    p.boxDimensions = {
-      left: 0,
-      top: 0,
-      width: box.offsetWidth,
-      height: box.offsetHeight
-    }
-    var o = box;
-    do {
-      p.boxDimensions.left += o.offsetLeft;
-      p.boxDimensions.top += o.offsetTop;
-    } while (o = o.offsetParent);
-
-    moveTo(locus);
   }
 
 
@@ -476,12 +456,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   /* PAGE STYLESHEETS */
 
   // API for adding a new stylesheet to all components. styleRules should be
-  // a string of CSS rules. recalcDimensions defaults to true.
+  // a string of CSS rules. restorePlace defaults to true.
   //
   // Returns a sheet index value that can be used with updatePageStyles
   // and removePageStyles.
   //
-  function addPageStyles(styleRules, recalcDimensions) {
+  function addPageStyles(styleRules, restorePlace) {
     return changingStylesheet(function () {
       p.pageStylesheets.push(styleRules);
       var sheetIndex = p.pageStylesheets.length - 1;
@@ -491,14 +471,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         addPageStylesheet(doc, sheetIndex);
       }
       return sheetIndex;
-    }, recalcDimensions);
+    }, restorePlace);
   }
 
 
   // API for updating the styleRules in an existing page stylesheet across
   // all components. Takes a sheet index value obtained via addPageStyles.
   //
-  function updatePageStyles(sheetIndex, styleRules, recalcDimensions) {
+  function updatePageStyles(sheetIndex, styleRules, restorePlace) {
     return changingStylesheet(function () {
       p.pageStylesheets[sheetIndex] = styleRules;
       if (typeof styleRules.join == "function") {
@@ -516,14 +496,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
           );
         }
       }
-    }, recalcDimensions);
+    }, restorePlace);
   }
 
 
   // API for removing a page stylesheet from all components. Takes a sheet
   // index value obtained via addPageStyles.
   //
-  function removePageStyles(sheetIndex, recalcDimensions) {
+  function removePageStyles(sheetIndex, restorePlace) {
     return changingStylesheet(function () {
       p.pageStylesheets[sheetIndex] = null;
       for (var i = 0; i < p.flipper.pageCount; ++i) {
@@ -531,7 +511,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         styleTag.parentNode.removeChild(styleTag);
       }
-    }, recalcDimensions);
+    }, restorePlace);
   }
 
 
@@ -553,14 +533,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // brace of custom events (stylesheetchanging/stylesheetchange), and
   // recalculates component dimensions if specified (default to true).
   //
-  function changingStylesheet(callback, recalcDimensions) {
-    recalcDimensions = (recalcDimensions === false) ? false : true;
-    if (recalcDimensions) {
+  function changingStylesheet(callback, restorePlace) {
+    restorePlace = (restorePlace === false) ? false : true;
+    if (restorePlace) {
       dispatchEvent("monocle:stylesheetchanging", {});
     }
     var result = callback();
-    if (recalcDimensions) {
-      calcDimensions();
+    if (restorePlace) {
+      moveTo({ page: pageNumber() });
       Monocle.defer(
         function () { dispatchEvent("monocle:stylesheetchange", {}); }
       );
@@ -642,10 +622,9 @@ Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
-Monocle.Reader.TOUCH_DEVICE = (typeof Touch == "object");
 Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html * {" +
-    //"text-rendering: optimizeSpeed !important;" +
+    "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}" +
