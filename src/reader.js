@@ -427,16 +427,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       overlay.style.display = "block";
     }
     if (controlData.controlType == "popover") {
-      overlay.listeners = Monocle.Events.listenForContact(
+      overlay.listeners = Monocle.Events.listenForTap(
         overlay,
-        {
-          start: function (evt) {
-            obj = evt.target || window.event.srcElement;
-            do {
-              if (obj == controlData.elements[0]) { return true; }
-            } while (obj && (obj = obj.parentNode));
-            hideControl(ctrl);
-          }
+        function (evt) {
+          obj = evt.target || window.event.srcElement;
+          do {
+            if (obj == controlData.elements[0]) { return true; }
+          } while (obj && (obj = obj.parentNode));
+          hideControl(ctrl);
         }
       );
     }

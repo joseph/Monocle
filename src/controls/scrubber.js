@@ -71,7 +71,8 @@ Monocle.Controls.Scrubber = function (reader) {
     var cntrListeners, bodyListeners;
 
     var moveEvt = function (evt, x) {
-      x = x || evt.m.offsetX;
+      evt.preventDefault();
+      x = x || evt.m.registrantX;
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
       var book = p.reader.getBook();

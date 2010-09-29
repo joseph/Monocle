@@ -53,11 +53,29 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
       pageY: ci.pageY
     };
 
+    var target = evt.target || window.srcElement;
+    while (target.nodeType != 1 && target.parentNode) {
+      target = target.parentNode;
+    }
+    var offset = offsetFor(evt, target);
+    evt.m.offsetX = offset[0];
+    evt.m.offsetY = offset[1];
+
+    if (evt.currentTarget) {
+      offset = offsetFor(evt, evt.currentTarget);
+      evt.m.registrantX = offset[0];
+      evt.m.registrantY = offset[1];
+    }
+
+    return evt;
+  }
+
+
+  var offsetFor = function (evt, elem) {
     var r;
-    if (evt.currentTarget.getBoundingClientRect) {
-      r = evt.currentTarget.getBoundingClientRect();
+    if (elem.getBoundingClientRect) {
+      r = elem.getBoundingClientRect();
     } else {
-      var elem = evt.currentTarget;
       r = { left: elem.offsetLeft, top: elem.offsetTop }
       while (elem = elem.parentNode) {
         if (elem.offsetLeft || elem.offsetTop) {
@@ -66,11 +84,9 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
         }
       }
     }
-    evt.m.offsetX = evt.m.pageX - r.left;
-    evt.m.offsetY = evt.m.pageY - r.top;
-
-    return evt;
+    return [evt.m.pageX - r.left, evt.m.pageY - r.top];
   }
+
 
   var capture = (options && options.useCapture) || false;
 
@@ -120,6 +136,11 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     if (fns.end) {
       listeners.end = function (evt) {
         fns.end(cursorInfo(evt, evt.changedTouches[0]));
+        // BROWSERHACK:
+        // If there is something listening for contact end events, we always
+        // prevent the default, because TouchMonitor can't do it (since it
+        // fires it on a delay: ugh). Would be nice to remove this line and
+        // standardise things.
         evt.preventDefault();
       }
     }
@@ -158,6 +179,67 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
   }
 }
 
+
+// Number of pixels tap can move while still being a tap.
+Monocle.Events.TAP_SENSITIVITY = 10;
+
+// Looks for start/end events on an element without significant move events in
+// between. Fires on the end event.
+//
+// Also sets up a dummy click event on K3, so that the elem becomes a
+// cursor target.
+//
+// Returns a listeners object that you should pass to deafenForTap if you
+// need to.
+Monocle.Events.listenForTap = function (elem, fn) {
+  var startPos;
+
+  // On Kindle, register a noop function with click to make the elem a
+  // cursor target.
+  if (Monocle.Browser.on.Kindle3) {
+    Monocle.Events.listen(elem, 'click', function () {});
+  }
+
+  var annulIfMovedTooFar = function (evt) {
+    if (!startPos) { return; }
+    var diff = [
+      Math.abs(evt.m.offsetX - startPos[0]),
+      Math.abs(evt.m.offsetY - startPos[1])
+    ];
+    if (diff[0] + diff[1] > Monocle.Events.TAP_SENSITIVITY) {
+      startPos = null;
+    } else {
+      evt.preventDefault();
+    }
+  }
+
+  return Monocle.Events.listenForContact(
+    elem,
+    {
+      start: function (evt) {
+        startPos = [evt.m.offsetX, evt.m.offsetY];
+        evt.preventDefault();
+      },
+      move: annulIfMovedTooFar,
+      end: function (evt) {
+        annulIfMovedTooFar(evt);
+        if (startPos) {
+          evt.m.startOffset = startPos;
+          fn(evt);
+        }
+      },
+      cancel: function (evt) {
+        startPos = null;
+      }
+    },
+    {
+      useCapture: false
+    }
+  );
+}
+
+
+Monocle.Events.deafenForTap = Monocle.Events.deafenForContact;
 
 
 // BROWSERHACK: iOS touch events on iframes are busted. The TouchMonitor,
@@ -231,9 +313,7 @@ Monocle.Events.TouchMonitor = function () {
 
     var target = element;
     var touch = evt.touches[0] || evt.changedTouches[0];
-    if (edata.frame) {
-      target = document.elementFromPoint(touch.screenX, touch.screenY);
-    }
+    target = document.elementFromPoint(touch.screenX, touch.screenY);
 
     if (target) {
       translateTouchEvent(element, target, evt, edata);

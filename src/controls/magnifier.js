@@ -21,7 +21,7 @@ Monocle.Controls.Magnifier = function (reader) {
     btn.smallA = btn.dom.append('span', 'controls_magnifier_a', { text: 'A' });
     btn.largeA = btn.dom.append('span', 'controls_magnifier_A', { text: 'A' });
     p.buttons.push(btn);
-    Monocle.Events.listenForContact(btn, { start: toggleMagnification });
+    Monocle.Events.listenForTap(btn, toggleMagnification);
     return btn;
   }
 

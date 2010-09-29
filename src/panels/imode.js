@@ -44,7 +44,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     p.toggleIcon = {
       createControlElements: function (cntr) {
         var div = cntr.dom.make('div', 'panels_imode_toggleIcon');
-        Monocle.Events.listenForContact(div, { start: modeOff });
+        Monocle.Events.listenForTap(div, modeOff);
         return div;
       }
     }
