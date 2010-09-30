@@ -175,7 +175,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
   function deselect() {
     for (var i = 0, cmpt; cmpt = p.reader.dom.find('component', i); ++i) {
       var sel = cmpt.contentWindow.getSelection() || cmpt.contentDocument.selection;
-      if (sel.collapse) { sel.collapse(); }
+      if (sel.collapse) { sel.collapse(true); }
       if (sel.removeAllRanges) { sel.removeAllRanges(); }
       if (sel.empty) { sel.empty(); }
       cmpt.contentDocument.body.scrollLeft = 0;
