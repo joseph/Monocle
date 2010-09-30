@@ -505,6 +505,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       for (var i = 0; i < p.flipper.pageCount; ++i) {
         var doc = dom.find('component', i).contentDocument;
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
+        if (!styleTag) {
+          console.warn('No such stylesheet: ' + sheetIndex);
+        }
         if (styleTag.styleSheet) {
           styleTag.styleSheet.cssText = styleRules;
         } else {

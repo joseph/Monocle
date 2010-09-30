@@ -181,7 +181,7 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 
 
 // Number of pixels tap can move while still being a tap.
-Monocle.Events.TAP_SENSITIVITY = 10;
+Monocle.Events.TAP_SENSITIVITY = 20;
 
 // Looks for start/end events on an element without significant move events in
 // between. Fires on the end event.
@@ -203,8 +203,8 @@ Monocle.Events.listenForTap = function (elem, fn) {
   var annulIfMovedTooFar = function (evt) {
     if (!startPos) { return; }
     var diff = [
-      Math.abs(evt.m.offsetX - startPos[0]),
-      Math.abs(evt.m.offsetY - startPos[1])
+      Math.abs(evt.m.pageX - startPos[0]),
+      Math.abs(evt.m.pageY - startPos[1])
     ];
     if (diff[0] + diff[1] > Monocle.Events.TAP_SENSITIVITY) {
       startPos = null;
@@ -217,7 +217,7 @@ Monocle.Events.listenForTap = function (elem, fn) {
     elem,
     {
       start: function (evt) {
-        startPos = [evt.m.offsetX, evt.m.offsetY];
+        startPos = [evt.m.pageX, evt.m.pageY];
         evt.preventDefault();
       },
       move: annulIfMovedTooFar,
