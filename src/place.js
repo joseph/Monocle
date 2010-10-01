@@ -81,6 +81,16 @@ Monocle.Place = function () {
   }
 
 
+  // Returns the position (between 0 and 1) of this place in the entire book.
+  function percentageOfBook() {
+    componentIds = p.component.properties.book.properties.componentIds;
+    componentSize = 1.0 / componentIds.length;
+    var pc = componentIds.indexOf(componentId()) * componentSize;
+    pc += componentSize * p.percent;
+    return pc;
+  }
+
+
   function onFirstPageOfBook() {
     return p.component.properties.index == 0 && pageNumber() == 1;
   }
@@ -105,6 +115,7 @@ Monocle.Place = function () {
   API.chapterTitle = chapterTitle;
   API.chapterSrc = chapterSrc;
   API.getLocus = getLocus;
+  API.percentageOfBook = percentageOfBook;
   API.onFirstPageOfBook = onFirstPageOfBook;
   API.onLastPageOfBook = onLastPageOfBook;
 
