@@ -365,19 +365,19 @@ Monocle.Flippers.Slider = function (reader) {
           Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
         ) {
           clearTimeout(elem.setXTransitionInterval)
-          elem.style.MozTransform = "translateX(" + finalX + "px)";
+          Monocle.Styles.setX(elem, finalX);
           if (elem.setXTCB) {
             elem.setXTCB();
           }
         } else {
-          elem.style.MozTransform = "translateX(" + destX + "px)";
+          Monocle.Styles.setX(elem, destX);
           currX = destX;
         }
       }
 
       elem.setXTransitionInterval = setInterval(stepFn, frameRate);
     } else {
-      elem.style.MozTransform = "translateX("+x+")";
+      Monocle.Styles.setX(elem, x);
     }
 
     if (elem.setXTCB) {

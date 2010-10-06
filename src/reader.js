@@ -296,7 +296,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       dispatchEvent('monocle:jumping', { locus: locus });
       fn = function () {
         dispatchEvent('monocle:jump', { locus: locus });
-        callback();
+        if (callback) { callback(); }
       }
     }
     p.flipper.moveTo(locus, fn);

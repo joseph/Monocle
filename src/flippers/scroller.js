@@ -87,11 +87,11 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
           Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
         ) {
           clearTimeout(bdy.animInterval)
-          bdy.style.MozTransform = "translateX(" + finalX + "px)";
+          Monocle.Styles.setX(bdy, finalX);
           p.turning = false;
           p.reader.dispatchEvent('monocle:turn');
         } else {
-          bdy.style.MozTransform = "translateX(" + destX + "px)";
+          Monocle.Styles.setX(bdy, destX);
           currX = destX;
         }
         p.currX = destX;

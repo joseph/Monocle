@@ -42,6 +42,22 @@ Monocle.Styles = {
         target['O'+parts.join('')] = value;
       }
     }
+  },
+
+  setX: function (elem, x) {
+    var s = elem.style;
+    if (typeof x == "number") { x += "px"; }
+    s.webkitTransform = "translate3d("+x+", 0, 0)";
+    s.MozTransform = s.OTransform = s.transform = "translateX("+x+")";
+    return x;
+  },
+
+  setY: function (elem, y) {
+    var s = elem.style;
+    if (typeof y == "number") { y += "px"; }
+    s.webkitTransform = "translate3d(0, "+y+", 0)";
+    s.MozTransform = s.OTransform = s.transform = "translateY("+y+")";
+    return y;
   }
 }
 
