@@ -48,8 +48,12 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   }
 
 
-  function moveTo(locus) {
-    p.reader.getBook().setOrLoadPageAt(page(), locus, frameToLocus);
+  function moveTo(locus, callback) {
+    var fn = frameToLocus;
+    if (typeof callback == "function") {
+      fn = function () { frameToLocus(); callback(); }
+    }
+    p.reader.getBook().setOrLoadPageAt(page(), locus, fn);
   }
 
 

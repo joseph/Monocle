@@ -55,10 +55,7 @@ Monocle.Styles.container = {
   "top": "0",
   "left": "0",
   "bottom": "0",
-  "right": "0",
-  "-webkit-user-select": "none",
-  "-moz-user-select": "none",
-  "user-select": "none"
+  "right": "0"
 }
 
 Monocle.Styles.page = {
@@ -80,10 +77,7 @@ Monocle.Styles.page = {
 
 Monocle.Styles.sheaf = {
   "position": "absolute",
-  "overflow": "hidden", // Required by MobileSafari to constrain inner iFrame.
-  "-webkit-user-select": "none",
-  "-moz-user-select": "none",
-  "user-select": "none"
+  "overflow": "hidden" // Required by MobileSafari to constrain inner iFrame.
 
   /*
   "top": "0",

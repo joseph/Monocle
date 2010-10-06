@@ -249,7 +249,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
       function () {
-        moveTo({ page: pageNumber() });
+        p.flipper.moveTo({ page: pageNumber() });
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
@@ -285,11 +285,21 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Moves the current page as specified by the locus. See
   // Monocle.Book#changePage for documentation on the locus argument.
   //
-  function moveTo(locus) {
+  // The callback argument is optional.
+  //
+  function moveTo(locus, callback) {
     if (!p.initialized) {
       console.warn('Attempt to move place before initialization.');
     }
-    p.flipper.moveTo(locus);
+    var fn = callback;
+    if (!locus.direction) {
+      dispatchEvent('monocle:jumping', { locus: locus });
+      fn = function () {
+        dispatchEvent('monocle:jump', { locus: locus });
+        callback();
+      }
+    }
+    p.flipper.moveTo(locus, fn);
   }
 
 
@@ -561,7 +571,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     var result = callback();
     if (restorePlace) {
-      moveTo({ page: pageNumber() });
+      p.flipper.moveTo({ page: pageNumber() });
       Monocle.defer(
         function () { dispatchEvent("monocle:stylesheetchange", {}); }
       );
