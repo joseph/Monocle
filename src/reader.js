@@ -437,14 +437,19 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       overlay.style.display = "block";
     }
     if (controlData.controlType == "popover") {
-      overlay.listeners = Monocle.Events.listenForTap(
+      overlay.listeners = Monocle.Events.listenForContact(
         overlay,
-        function (evt) {
-          obj = evt.target || window.event.srcElement;
-          do {
-            if (obj == controlData.elements[0]) { return true; }
-          } while (obj && (obj = obj.parentNode));
-          hideControl(ctrl);
+        {
+          start: function (evt) {
+            obj = evt.target || window.event.srcElement;
+            do {
+              if (obj == controlData.elements[0]) { return true; }
+            } while (obj && (obj = obj.parentNode));
+            hideControl(ctrl);
+          },
+          move: function (evt) {
+            evt.preventDefault();
+          }
         }
       );
     }
@@ -478,7 +483,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function deafen(evtType, fn) {
     Monocle.Events.deafen(dom.find('box'), evtType, fn);
   }
-
 
 
   /* PAGE STYLESHEETS */
@@ -517,6 +521,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         if (!styleTag) {
           console.warn('No such stylesheet: ' + sheetIndex);
+          return;
         }
         if (styleTag.styleSheet) {
           styleTag.styleSheet.cssText = styleRules;

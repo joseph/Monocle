@@ -57,10 +57,15 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     while (target.nodeType != 1 && target.parentNode) {
       target = target.parentNode;
     }
+
+    // The position of contact from the top left of the element
+    // on which the event fired.
     var offset = offsetFor(evt, target);
     evt.m.offsetX = offset[0];
     evt.m.offsetY = offset[1];
 
+    // The position of contact from the top left of the element
+    // on which the event is registered.
     if (evt.currentTarget) {
       offset = offsetFor(evt, evt.currentTarget);
       evt.m.registrantX = offset[0];
@@ -74,7 +79,9 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
   var offsetFor = function (evt, elem) {
     var r;
     if (elem.getBoundingClientRect) {
-      r = elem.getBoundingClientRect();
+      var er = elem.getBoundingClientRect();
+      var dr = document.body.getBoundingClientRect();
+      r = { left: er.left - dr.left, top: er.top - dr.top };
     } else {
       r = { left: elem.offsetLeft, top: elem.offsetTop }
       while (elem = elem.parentNode) {
@@ -180,9 +187,6 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 }
 
 
-// Number of pixels tap can move while still being a tap.
-Monocle.Events.TAP_SENSITIVITY = 20;
-
 // Looks for start/end events on an element without significant move events in
 // between. Fires on the end event.
 //
@@ -200,13 +204,15 @@ Monocle.Events.listenForTap = function (elem, fn) {
     Monocle.Events.listen(elem, 'click', function () {});
   }
 
-  var annulIfMovedTooFar = function (evt) {
-    if (!startPos) { return; }
-    var diff = [
-      Math.abs(evt.m.pageX - startPos[0]),
-      Math.abs(evt.m.pageY - startPos[1])
-    ];
-    if (diff[0] + diff[1] > Monocle.Events.TAP_SENSITIVITY) {
+  var annulIfOutOfBounds = function (evt) {
+    // We don't have to track this nonsense for mouse events.
+    if (evt.type.match(/^mouse/)) {
+      return;
+    }
+    if (
+      evt.m.registrantX < 0 || evt.m.registrantX > elem.offsetWidth ||
+      evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
+    ) {
       startPos = null;
     } else {
       evt.preventDefault();
@@ -220,9 +226,9 @@ Monocle.Events.listenForTap = function (elem, fn) {
         startPos = [evt.m.pageX, evt.m.pageY];
         evt.preventDefault();
       },
-      move: annulIfMovedTooFar,
+      move: annulIfOutOfBounds,
       end: function (evt) {
-        annulIfMovedTooFar(evt);
+        annulIfOutOfBounds(evt);
         if (startPos) {
           evt.m.startOffset = startPos;
           fn(evt);
