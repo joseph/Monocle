@@ -57,7 +57,7 @@ Monocle.Controls.Scrubber = function (reader) {
     var cntr = p.reader.dom.find(k.CLS.container);
     x = Math.min(cntr.offsetWidth - node.offsetWidth, x);
     x = Math.max(x, 0);
-    Monocle.Styles.affix(node, 'transform', 'translateX('+x+'px)');
+    Monocle.Styles.setX(node, x);
   }
 
 
@@ -72,7 +72,7 @@ Monocle.Controls.Scrubber = function (reader) {
 
     var moveEvt = function (evt, x) {
       evt.preventDefault();
-      x = x || evt.m.registrantX;
+      x = (typeof x == "number") ? x : evt.m.registrantX;
       var place = pixelToPlace(x, cntr);
       setX(needle, x - needle.offsetWidth / 2);
       var book = p.reader.getBook();

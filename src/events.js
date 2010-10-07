@@ -209,6 +209,10 @@ Monocle.Events.listenForTap = function (elem, fn) {
     if (evt.type.match(/^mouse/)) {
       return;
     }
+    // Doesn't work on iOS 3.1 for some reason, so ignore for that version.
+    if (Monocle.Browser.is.MobileSafari && Monocle.Browser.iOSVersion < "3.2") {
+      return;
+    }
     if (
       evt.m.registrantX < 0 || evt.m.registrantX > elem.offsetWidth ||
       evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
