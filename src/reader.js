@@ -306,7 +306,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Moves to the relevant element in the relevant component.
   //
   function skipToChapter(src) {
-    moveTo(p.book.locusOfChapter(src));
+    var locus = p.book.locusOfChapter(src);
+    if (locus) {
+      moveTo(locus);
+      return true;
+    } else {
+      dispatchEvent("monocle:notfound", { href: src });
+      return false;
+    }
   }
 
 

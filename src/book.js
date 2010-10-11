@@ -344,7 +344,7 @@ Monocle.Book = function (dataSource) {
   function locusOfChapter(src) {
     var matcher = new RegExp('^(.+?)(#(.*))?$');
     var matches = src.match(matcher);
-    if (!matches) {
+    if (!matches || p.componentIds.indexOf(matches[1]) == -1) {
       return null;
     }
     var locus = { componentId: matches[1] }
