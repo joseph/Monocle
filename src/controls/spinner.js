@@ -27,8 +27,8 @@ Monocle.Controls.Spinner = function (reader) {
     p.reader.listen('monocle:componentchange', spun);
     p.reader.listen('monocle:resizing', resizeSpin);
     p.reader.listen('monocle:resize', resizeSpun);
-    p.reader.listen('monocle:stylesheetchanging', spin);
-    p.reader.listen('monocle:stylesheetchange', spun);
+    //p.reader.listen('monocle:stylesheetchanging', spin);
+    //p.reader.listen('monocle:stylesheetchange', spun);
   }
 
 
