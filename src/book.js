@@ -344,12 +344,23 @@ Monocle.Book = function (dataSource) {
   function locusOfChapter(src) {
     var matcher = new RegExp('^(.+?)(#(.*))?$');
     var matches = src.match(matcher);
-    if (!matches || p.componentIds.indexOf(matches[1]) == -1) {
-      return null;
-    }
-    var locus = { componentId: matches[1] }
+    if (!matches) { return null; }
+    var cmptId = componentIdMatching(matches[1]);
+    if (!cmptId) { return null; }
+    var locus = { componentId: cmptId }
     matches[3] ? locus.anchor = matches[3] : locus.position = "start";
     return locus;
+  }
+
+
+  function componentIdMatching(str) {
+    for (var i = 0; i < p.componentIds.length; ++i) {
+      if (str.indexOf(p.componentIds[i]) > -1) {
+        //console.log(p.componentIds[i]+" matches "+str);
+        return p.componentIds[i];
+      }
+    }
+    return null;
   }
 
 
