@@ -45,7 +45,7 @@ Monocle.Browser.has = {
   transform3d: Monocle.Browser.is.WebKit, // FIXME!
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion &&
-    Monocle.Browser.iOSVersion < "4.2",
+    Monocle.Browser.iOSVersion < "4.3",
   selectThruBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion &&
     Monocle.Browser.iOSVersion < "4.2",
