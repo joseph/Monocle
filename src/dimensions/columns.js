@@ -38,7 +38,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     // component will measure as two pages wide in WebKit browsers. For some
     // reason this doesn't apply to Gecko.
     if (
-      Monocle.Browser.is.WebKit &&
+      Monocle.Browser.has.iframeDoubleWidthBug &&
       p.measurements.scrollWidth == p.measurements.width * 2
     ) {
       var doc = p.page.m.activeFrame.contentDocument;
@@ -143,16 +143,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   //   This means that it's the parent div that must be scrolled -- the sheaf.
   //
   function scrollerElement() {
-    var bdy = p.page.m.activeFrame.contentDocument.body;
-
-    if (Monocle.Browser.has.iframeWidthBug) {
-      var oldSL = bdy.scrollLeft;
-      var sl = bdy.scrollLeft = bdy.scrollWidth;
-      var bodyScroller = (bdy.scrollLeft != 0);
-      bdy.scrollLeft = oldSL;
-      return bodyScroller ? bdy : p.page.m.sheafDiv;
+    if (Monocle.Browser.has.mustScrollSheaf) {
+      return p.page.m.sheafDiv;
     } else {
-      return bdy;
+      return p.page.m.activeFrame.contentDocument.body;
     }
   }
 
@@ -177,13 +171,13 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   //
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
-    if (Monocle.Browser.has.iframeWidthBug) {
+    if (Monocle.Browser.has.iframeDoubleWidthBug) {
       if (Monocle.Browser.iOSVersion < "4.1") {
         var hbw = bdy.scrollWidth / 2;
         var sew = scrollerElement().scrollWidth;
         return Math.max(sew, hbw);
       } else {
-        bdy.scrollWidth; // Throw one away. WTF!
+        bdy.scrollWidth; // Throw one away. Nuts.
         var hbw = bdy.scrollWidth / 2;
         //console.log(p.id + ": " + hbw + "px");
         return hbw;
@@ -240,11 +234,16 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 Monocle.Dimensions.Columns.BODY_STYLES = {
   "position": "absolute",
   "height": "100%",
-  "min-width": "200%",
   "-webkit-column-gap": "0",
   "-webkit-column-fill": "auto",
   "-moz-column-gap": "0",
   "-moz-column-fill": "auto",
   "column-gap": "0",
   "column-fill": "auto"
+}
+
+if (Monocle.Browser.has.iframeDoubleWidthBug) {
+  Monocle.Dimensions.Columns.BODY_STYLES["min-width"] = "200%";
+} else {
+  Monocle.Dimensions.Columns.BODY_STYLES["width"] = "100%";
 }

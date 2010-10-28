@@ -42,18 +42,17 @@ Monocle.Browser.has = {
     }
   })(),
   columns: Monocle.Browser.is.WebKit || Monocle.Browser.is.Gecko, // FIXME!
-  transform3d: Monocle.Browser.is.WebKit, // FIXME!
+  transform3d: Monocle.Browser.on.iPhone || Monocle.Browser.on.iPad, // FIXME!
   iframeTouchBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion &&
-    Monocle.Browser.iOSVersion < "4.3",
+    Monocle.Browser.iOSVersion < "4.2",
   selectThruBug: Monocle.Browser.is.MobileSafari &&
     Monocle.Browser.iOSVersion &&
     Monocle.Browser.iOSVersion < "4.2",
-  iframeWidthBug: Monocle.Browser.on.iPhone ||
-    Monocle.Browser.on.iPad,
+  mustScrollSheaf: Monocle.Browser.is.MobileSafari,
+  iframeDoubleWidthBug: Monocle.Browser.is.MobileSafari,
   floatColumnBug: Monocle.Browser.is.WebKit
 }
-
 
 if (typeof(MONOCLE_NO_COMPAT) == 'undefined') {
 

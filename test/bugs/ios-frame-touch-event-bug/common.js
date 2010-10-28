@@ -34,7 +34,7 @@ function touchEvt(evt) {
 
 
 function registerElem(elem, klass) {
-  if (typeof Touch == "object") {
+  if (isTouch()) {
     elem.addEventListener('touchstart', touchEvt, false);
     elem.addEventListener('touchmove', touchEvt, false);
     elem.addEventListener('touchend', touchEvt, false);
@@ -52,4 +52,14 @@ function registerElem(elem, klass) {
 function evtSection() {
   window.newEvtSection = true;
   console.log('new evt section');
+}
+
+
+function isTouch() {
+  try {
+    document.createEvent("TouchEvent");
+    return true;
+  } catch (e) {
+    return false;
+  }
 }

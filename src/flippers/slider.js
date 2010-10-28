@@ -346,7 +346,11 @@ Monocle.Flippers.Slider = function (reader) {
         transition = 'none';
       }
       elem.style.webkitTransition = transition;
-      elem.style.webkitTransform = "translate3d("+x+",0,0)";
+      if (Monocle.Browser.has.transform3d) {
+        elem.style.webkitTransform = "translate3d("+x+",0,0)";
+      } else {
+        elem.style.webkitTransform = "translateX("+x+")";
+      }
 
     // BROWSERHACK: NON-WEBKIT (no transitions)
     } else if (duration > 0) {

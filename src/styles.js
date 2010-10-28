@@ -47,7 +47,11 @@ Monocle.Styles = {
   setX: function (elem, x) {
     var s = elem.style;
     if (typeof x == "number") { x += "px"; }
-    s.webkitTransform = "translate3d("+x+", 0, 0)";
+    if (Monocle.Browser.has.transform3d) {
+      s.webkitTransform = "translate3d("+x+", 0, 0)";
+    } else {
+      s.webkitTransform = "translateX("+x+")";
+    }
     s.MozTransform = s.OTransform = s.transform = "translateX("+x+")";
     return x;
   },
@@ -55,7 +59,11 @@ Monocle.Styles = {
   setY: function (elem, y) {
     var s = elem.style;
     if (typeof y == "number") { y += "px"; }
-    s.webkitTransform = "translate3d(0, "+y+", 0)";
+    if (Monocle.Browser.has.transform3d) {
+      s.webkitTransform = "translate3d(0, "+y+", 0)";
+    } else {
+      s.webkitTransform = "translateY("+y+")";
+    }
     s.MozTransform = s.OTransform = s.transform = "translateY("+y+")";
     return y;
   }
