@@ -20,28 +20,7 @@ Monocle.Styles = {
   //
   affix: function (elem, property, value) {
     var target = elem.style ? elem.style : elem;
-
-    var capitalize = function (wd) {
-      return wd ? wd.substring(0,1).toUpperCase()+wd.substring(1,wd.length) : "";
-    }
-
-    target[property] = value;
-    if (Monocle.Browser.is.WebKit) {
-      target['-webkit-'+property] = value;
-    } else {
-      var parts = property.split('-');
-      for (var i = parts.length; i > 0; --i) {
-        parts[i] = capitalize(parts[i]);
-      }
-      target[parts.join('')] = value;
-      parts[0] = capitalize(parts[0]);
-
-      if (Monocle.Browser.is.Gecko) {
-        target['Moz'+parts.join('')] = value;
-      } else if (Monocle.Browser.is.Opera) {
-        target['O'+parts.join('')] = value;
-      }
-    }
+    target[Monocle.Browser.CSSProps.toDOMProp(property)] = value;
   },
 
   setX: function (elem, x) {

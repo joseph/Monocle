@@ -478,7 +478,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var evt = document.createEvent("Events");
     evt.initEvent(evtType, false, cancelable || false);
     evt.m = data;
-    return dom.find('box').dispatchEvent(evt);
+    try {
+      return dom.find('box').dispatchEvent(evt);
+    } catch(e) {
+      console.warn("Failed to dispatch event: " + evtType);
+      return false;
+    }
   }
 
 
