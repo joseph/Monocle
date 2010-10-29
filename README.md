@@ -11,6 +11,18 @@ Contributions welcome - fork the repository on
 [GitHub](http://github.com/joseph/monocle).
 
 
+## Staying up to date
+
+Monocle tries to keep the master branch on Github fairly stable. This means
+it tracks a long way behind the bleeding edge — currently the master is
+1.0, from March 2010.
+
+If you want to work with the edge version of Monocle (and I'd encourage this
+for any new projects), check out the 'componentry' branch:
+
+   http://github.com/joseph/monocle/tree/componentry
+
+
 ## Getting started
 
 Here's the simplest thing that could possibly work.
