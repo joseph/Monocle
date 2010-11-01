@@ -34,7 +34,6 @@ itself. In theory there's no limit on the size of the contents of that div.
 A more advanced scenario involves feeding Monocle a "book data object", from
 which it can lazily load the contents of the book as the user requests it.
 
-
 ### Specification of the book data object
 
 The book data object should provide certain required methods.
@@ -369,3 +368,47 @@ The class idiom looks like this:
 
 This allows a quite concise, clear coding style. There's a trade-off against
 class inheritance, but JS offers other ways to share logic between classes.
+
+
+## Browser support
+
+At this time, Monocle aims for full support of all browsers with a
+W3C-compliant CSS column module implementation. That is only Gecko and WebKit
+at this point. Legacy support is provided for some other browsers, including
+recent versions of Opera and Internet Explorer. Please encourage your
+browser-maker to work on implementing these standards in particular:
+
+* CSS Multi-Column Layout
+* W3C DOM Level 2 Event Model
+* CSS 2D Transforms (better: 3D Transforms, even better: hardware acceleration)
+
+Monocle has a particular focus on mobile devices. Monocle either supports or
+is trying to support:
+
+* iOS 3.1+
+* Android 2.0+
+* Blackberry 6
+* Kindle 3
+
+All these mobile platforms implement columned iframes differently, so support
+may be patchy in places, but we're working on it. Patches that improve or
+broaden Monocle's browser support are very welcome (but please provide tests).
+
+Inventive Labs would like to thank Ebooq for providing a device to assist with
+Android testing.
+
+
+## Future directions
+
+Monocle has a small set of big goals:
+
+* Faster, more responsive page flipping
+* Wider browser support (and better tests, automated as far as possible)
+* Tracking spec developments in EPUB and Zhook, supporting where appropriate
+
+We'd also like to provide more implementation showcases in the tests, and
+offer developer documentation in wiki form. Monocle wants to get leaner; we
+expect the controls to move out into an extension library.
+
+If you can help out with any of these things, fork away (or contact 'joseph'
+on GitHub).
