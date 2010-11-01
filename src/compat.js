@@ -19,6 +19,7 @@ Monocle.Browser.on = {
   iPad: navigator.userAgent.indexOf("iPad") != -1,
   BlackBerry: navigator.userAgent.indexOf("BlackBerry") != -1,
   Android: navigator.userAgent.indexOf('Android') != -1,
+  MacOSX: navigator.userAgent.indexOf('Mac OS X') != -1,
   Kindle3: navigator.userAgent.match(/Kindle\/3/)
   // TODO: Mac, Windows, etc
 }
@@ -202,6 +203,15 @@ Monocle.Browser.has.floatColumnBug = Monocle.Browser.is.WebKit;
 // a problem.
 //
 Monocle.Browser.has.relativeIframeWidthBug = Monocle.Browser.on.Android;
+
+
+// Some combination of Webkit and OSX 10.6 cause a flicker during slider
+// "jumps" (ie, when the page instantly moves to a different translate position).
+//
+// Workaround involves giving these jumps a tiny (but not zero) duration.
+//
+Monocle.Browser.has.jumpFlickerBug =
+  Monocle.Browser.on.MacOSX && Monocle.Browser.is.WebKit;
 
 
 // A little console stub if not initialized in a console-equipped browser.

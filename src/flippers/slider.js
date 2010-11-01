@@ -405,7 +405,7 @@ Monocle.Flippers.Slider = function (reader) {
   // This is a replacement setX with better cross-browser support.
   // Two problems keep it from going in:
   //
-  // * It removes the simulated transition support required for Moz less that 4.
+  // * It removes the simulated transition support required for Moz less than 4.
   // * getX is still not cross-browser, so it sometimes fails to detect when
   //   a transition has already occurred. Resulting in freezes.
   /*
@@ -473,13 +473,14 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    // Duration should be 0, but is set to 1 to address a 10.6 Safari bug.
-    setX(pageDiv, 0, { duration: 1 }, callback);
+    var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
+    setX(pageDiv, 0, { duration: dur }, callback);
   }
 
 
   function jumpOut(pageDiv, callback) {
-    setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: 1 }, callback);
+    var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
+    setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: dur }, callback);
   }
 
 
