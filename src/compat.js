@@ -157,11 +157,51 @@ Monocle.Browser.has.transform3d = Monocle.Browser.CSSProps.isSupported([
   'OPerspective',
   'msPerspective'
 ]) && Monocle.Browser.CSSProps.supportsMediaQueryProperty('transform-3d');
+
+// iOS (at least up to version 4.1) makes a complete hash of touch events
+// when an iframe is overlapped by other elements. It's a dog's breakfast.
+// See test/bugs/ios-frame-touch-bug for details.
+//
 Monocle.Browser.has.iframeTouchBug = Monocle.Browser.iOSVersionBelow("4.2");
+
+// In early versions of iOS (up to 4.1), MobileSafari would send text-select
+// activity to the first iframe, even if that iframe is overlapped by a "higher"
+// iframe.
+//
 Monocle.Browser.has.selectThruBug = Monocle.Browser.iOSVersionBelow("4.2");
+
+// In MobileSafari browsers, iframes are rendered at the width and height of
+// their content, rather than having scrollbars. So in that case, it's the
+// containing element (the "sheaf") that must be scrolled, not the iframe body.
+//
+// Relatedly, these browsers tend to need a min-width set on the body of the
+// iframe that is 200% -- this ensures that the body will have columns. But when
+// this min-width is set, it becomes much more difficult to detect 1 page
+// components (since they will appear to be 2 pages wide). A different
+// algorithm is implemented for this case.
+//
 Monocle.Browser.has.mustScrollSheaf = Monocle.Browser.is.MobileSafari;
 Monocle.Browser.has.iframeDoubleWidthBug = Monocle.Browser.has.mustScrollSheaf;
+
+// Webkit-based browsers put floated elements in the wrong spot when columns are
+// used -- they appear way down where they would be if there were no columns.
+// Presumably the float positions are calculated before the columns. A bug has
+// been lodged.
+//
+// FIXME: Hooray, this is fixed in the latest Webkit nightlies. How to detect?
+//
 Monocle.Browser.has.floatColumnBug = Monocle.Browser.is.WebKit;
+
+// On Android browsers, if the component iframe has a relative width (ie, 100%),
+// the width of the entire browser will keep expanding and expanding to fit the
+// width of the body of the iframe (which, with columns, is massive). So, 100% is
+// treated as "of the body content" rather than "of the parent dimensions". In
+// this scenario, we need to give the component iframe a fixed width in pixels.
+//
+// In iOS, the frame is clipped by overflow:hidden, so this doesn't seem to be
+// a problem.
+//
+Monocle.Browser.has.relativeIframeWidthBug = Monocle.Browser.on.Android;
 
 
 // A little console stub if not initialized in a console-equipped browser.

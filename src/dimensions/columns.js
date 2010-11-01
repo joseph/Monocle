@@ -172,14 +172,15 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
     if (Monocle.Browser.has.iframeDoubleWidthBug) {
-      if (Monocle.Browser.iOSVersion < "4.1") {
+      if (Monocle.Browser.on.Android) {
+        return bdy.scrollWidth * 1.5; // I actually have no idea why 1.5.
+      } else if (Monocle.Browser.iOSVersion < "4.1") {
         var hbw = bdy.scrollWidth / 2;
         var sew = scrollerElement().scrollWidth;
         return Math.max(sew, hbw);
       } else {
         bdy.scrollWidth; // Throw one away. Nuts.
         var hbw = bdy.scrollWidth / 2;
-        //console.log(p.id + ": " + hbw + "px");
         return hbw;
       }
     } else if (Monocle.Browser.is.Gecko) {

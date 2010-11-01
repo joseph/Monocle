@@ -208,8 +208,26 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       cmpt.dom.setStyles(Monocle.Styles.component);
       Monocle.Styles.applyRules(cmpt.contentDocument.body, Monocle.Styles.body);
     }
+    lockFrameWidths();
     dom.find('overlay').dom.setStyles(Monocle.Styles.overlay);
     dispatchEvent('monocle:styles');
+  }
+
+
+  function lockingFrameWidths() {
+    if (!Monocle.Browser.has.relativeIframeWidthBug) { return; }
+    for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
+      cmpt.style.display = "none";
+    }
+  }
+
+
+  function lockFrameWidths() {
+    if (!Monocle.Browser.has.relativeIframeWidthBug) { return; }
+    for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
+      cmpt.style.width = cmpt.parentNode.offsetWidth+"px";
+      cmpt.style.display = "block";
+    }
   }
 
 
@@ -243,12 +261,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (!p.initialized) {
       console.warn('Attempt to resize book before initialization.');
     }
+    lockingFrameWidths();
     if (!dispatchEvent("monocle:resizing", {}, true)) {
       return;
     }
     clearTimeout(p.resizeTimer);
     p.resizeTimer = setTimeout(
       function () {
+        lockFrameWidths();
         p.flipper.moveTo({ page: pageNumber() });
         dispatchEvent("monocle:resize");
       },
