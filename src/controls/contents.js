@@ -46,7 +46,7 @@ Monocle.Controls.Contents = function (reader) {
       p.reader.hideControl(API);
     }
 
-    Monocle.Events.listen(li, 'click', invoked);
+    Monocle.Events.listenForTap(li, invoked);
 
     if (chp.children) {
       for (var i = 0; i < chp.children.length; ++i) {
