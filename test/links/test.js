@@ -34,7 +34,7 @@
   // Initialize the reader element.
   var rdrOptions = {
     panels: Monocle.Panels.IMode,
-    flipper: Monocle.Flippers.Slider
+    flipper: Monocle.Flippers.Instant
   }
   Monocle.Events.listen(
     window,
