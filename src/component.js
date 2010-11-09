@@ -123,6 +123,14 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Loads the URL into the given frame, invokes callback once loaded.
   //
   function loadFrameFromURL(url, frame, callback) {
+    // If it's a relative path, we need to make it absolute, using the
+    // reader's location (not the active component's location).
+    if (!url.match(/^\//)) {
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      url = link.href;
+      delete(link);
+    }
     frame.onload = function () {
       frame.onload = null;
       Monocle.defer(callback);

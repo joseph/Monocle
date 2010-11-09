@@ -354,13 +354,7 @@ Monocle.Book = function (dataSource) {
 
 
   function componentIdMatching(str) {
-    for (var i = 0; i < p.componentIds.length; ++i) {
-      if (str.indexOf(p.componentIds[i]) > -1) {
-        //console.log(p.componentIds[i]+" matches "+str);
-        return p.componentIds[i];
-      }
-    }
-    return null;
+    return p.componentIds.indexOf(str) >= 0 ? str : null;
   }
 
 

@@ -25,7 +25,7 @@ Monocle.Flippers.Instant = function (reader) {
   function moveTo(locus, callback) {
     var fn = frameToLocus;
     if (typeof callback == "function") {
-      fn = function () { frameToLocus(); callback(); }
+      fn = function (locus) { frameToLocus(locus); callback(locus); }
     }
     p.reader.getBook().setOrLoadPageAt(page(), locus, fn);
   }
