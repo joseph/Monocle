@@ -30,11 +30,17 @@ div.monelem_sheaf {
   left: 1em;
   bottom: 1em;
   right: 1em;
+
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 1em;
+	line-height: 1.4em;
+	color: #333;
 }
 
 
 /* The iframe within the page that loads the content of the book. */
 div.monelem_component {
+	
 }
 
 
