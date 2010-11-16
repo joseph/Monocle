@@ -158,6 +158,7 @@ Monocle.Browser.has.transform3d = Monocle.Browser.CSSProps.isSupported([
   'OPerspective',
   'msPerspective'
 ]) && Monocle.Browser.CSSProps.supportsMediaQueryProperty('transform-3d');
+Monocle.Browser.has.embedded = (top != self);
 
 // iOS (at least up to version 4.1) makes a complete hash of touch events
 // when an iframe is overlapped by other elements. It's a dog's breakfast.

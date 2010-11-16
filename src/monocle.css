@@ -223,6 +223,19 @@ div.monelem_controls_scrubber_bubble {
 }
 
 
+/*===========================================================================
+  Flippers
+---------------------------------------------------------------------------*/
+
+div.monelem_flippers_slider_wait {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
 
 
 /*===========================================================================
@@ -238,4 +251,8 @@ div.monelem_controls_spinner_anim {
 
 div.monelem_panels_imode_toggleIcon {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAaCAYAAABPY4eKAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1%2B%2FAAAABV0RVh0Q3JlYXRpb24gVGltZQAzMC82LzEwBMfmVwAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNXG14zYAAANYSURBVEiJtdZbiNVVFMfxj8cx85JkIGlqSESgOGA9WIQgGmTRUyRaYFJDnUWYGV2eyiCpkIbEKJI1UqYvUkmFDxFBgpghonajSDCM7hcxLSnt4ulh%2F2c4HufMTOH8Xs75%2F%2Ffa67v3%2Bu%2B91hphGJWZNUzCXJyKiHd6xxqNhhGDTB6NOViAyzARY3EaP%2BNL7MCBiPi9Ze4leBlTsR9jcCnuiYgDbeGZeV4F7EINe7EP3%2BJ49W4GrsZ8NPAGXouIk5k5F93YFhHPVT5H4kbcjaX1ev3kWfDMPB9P4ko8ERE7BopONWcOVmMc1uBRrG8Oc5Ptq1hdr9cPdrQMTMUWfBQRCweD9ioiPsQtmbkeu7G8P3ClsZSI98EzcxqeUsLXM1RwZs7ErRiJKXgQN2Tmzoj4qsV2Hn7BYcq369UaHIqI5yPizyGCx2MPfsRVOBoR6%2FA%2BNmXmqCbbm%2FAiMiJO9cEzcwEuwLODwMZk5oXVLYA6PouIF%2FC6cvBgI37D0mreStyJroh4r9df785XYGtEHG8Hfnjb1w08Xu2qq3regtOZuaka2whV5NZieWY%2BhkV4ICJ2N%2FusZeYMJQm8NdCuuxdPH4HENGzsXjx9REQcqRxvR2dEfNBrHxF7lHywGPXW7085cEvwZkScHAheaRz%2BwngcqyAnlEPan%2Fbh5oj4rr%2FBDlyOXUMA%2Fx%2F9oFytM5SZs3t6epbWlOtxeJjg%2BzEmMye3vF%2BCYx2YhdFnTTs3OoQT2JqZ3TiC2zETyzrwrnIwhkMTqwVsxW24GLsiYmWj0dCBo2gNy7nSRfgpIjZjM6WU1ut1lHt%2BGLOHCd6J79sN1pSkMSUzJwwD%2FBoD5I9aRHyiFIVFQ3D2j1KR%2Fh7MMDPnY1JE7GwLr3434N5BnI3GFRiFzuai0Ub34aWBDGr0pcKPM%2FPpqovpT11KoVinNAvXt1lkLTNXKFesXU1HUz3HI0plWqW0QGcoIjYoERpMy7AS17b2da06o43KzLF4RanRzwwx3%2FfOHYW7lL5ubUR83p9do9Ho%2B99fDzcZDynfdxPejog%2FBoCOxHW4AxOwKiK%2BaGc%2FILzJ6ULcXznciwM4qFSzCUob3Km0UCeU3W5v5%2B8%2FwZsWMQvzlN1Nq8C%2F4ht8qkRm72B%2B%2BoP%2FC0sEOftJmUbfAAAAAElFTkSuQmCC);
+}
+
+div.monelem_flippers_slider_wait {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABeElEQVR42rXUv0sCYRzHcaEyiCiJBmkIHCJH4ejXEIJDSKtLIjQ0REscSFE0JRQUFZEgLUE%2FKCmiX0NkLWIuDUFDEDRWBM35B1zvLzwnx9llmj3wwuf7fR4%2BfO84dBmGUVM1D%2Fx2aZrWjQmsYR1zCKPecseHJPLYRGdJoDTVYQYbmEIUM6r3hjGE8Ilx%2BBFHWgKtYb04gQ6Pw%2BQBXOERfbZBrouBFE14x5DUDmGzuMGL%2Bl1BgzpbkloCpajDIXQ5%2FCGwAB0FVWcQQRp78JiBPty5yiz17nYQVnUE91iEW3pm4DQSrgqXTIQPaFJbA5cRkUYVoa8YVfsojmRzjliVgVnkcYAcAtJc%2BEPgBQYxjFbzkUeQtFwyUqmU4bS3fXuXaJQgYQZ6cQp%2FhdMlMG8NQ%2FFwEvsVhPXgFl6nwGZsYwttZcKCeEBI6tLA0sd4Qgwtlr4bslZxhqD0nQLtof3YxTOyOEZO7eNol3u%2FDrRN1YUBdDhc%2B%2F9%2F7C%2F2YLggaYNChgAAAABJRU5ErkJggg%3D%3D);
 }

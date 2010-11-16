@@ -102,6 +102,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function setPage(pageDiv, locus, callback) {
+    ensureWaitControl();
     p.reader.getBook().setOrLoadPageAt(
       pageDiv,
       locus,
@@ -183,6 +184,7 @@ Monocle.Flippers.Slider = function (reader) {
     checkPoint(boxPointX);
 
     p.turnData.releasing = true;
+    showWaitControl(lowerPage());
 
     if (dir == k.FORWARDS) {
       if (
@@ -227,14 +229,18 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function onGoingBackward(x) {
-    var lp = lowerPage();
+    var lp = lowerPage(), up = upperPage();
+    showWaitControl(up);
     jumpOut(lp, // move lower page off-screen
       function () {
         flipPages(); // flip lower to upper
         setPage( // set upper page to previous
           lp,
           getPlace(lowerPage()).getLocus({ direction: k.BACKWARDS }),
-          function () { lifted(x); }
+          function () {
+            lifted(x);
+            hideWaitControl(up);
+          }
         );
       }
     );
@@ -242,8 +248,10 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function afterGoingForward() {
-    var up = upperPage();
+    var up = upperPage(), lp = lowerPage();
     if (p.interactive) {
+      showWaitControl(up);
+      showWaitControl(lp);
       setPage( // set upper (off screen) to current
         up,
         getPlace().getLocus({ direction: k.FORWARDS }),
@@ -254,6 +262,7 @@ Monocle.Flippers.Slider = function (reader) {
         }
       );
     } else {
+      showWaitControl(lp);
       flipPages();
       jumpIn(up, function () { prepareNextPage(announceTurn); });
     }
@@ -313,6 +322,8 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function announceTurn() {
+    hideWaitControl(upperPage());
+    hideWaitControl(lowerPage());
     p.reader.dispatchEvent('monocle:turn');
     resetTurnData();
   }
@@ -513,6 +524,28 @@ Monocle.Flippers.Slider = function (reader) {
     );
   }
 
+
+  function ensureWaitControl() {
+    if (p.waitControl) { return; }
+    p.waitControl = {
+      createControlElements: function (holder) {
+        return holder.dom.make('div', 'flippers_slider_wait');
+      }
+    }
+    p.reader.addControl(p.waitControl, 'page');
+  }
+
+
+  function showWaitControl(page) {
+    var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
+    ctrl.style.opacity = 0.5;
+  }
+
+
+  function hideWaitControl(page) {
+    var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
+    ctrl.style.opacity = 0;
+  }
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
   API.pageCount = p.pageCount;
