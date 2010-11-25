@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Columns test</title>
+
+    <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
+    <style type="text/css">
+      #reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+      }
+      #out {
+        white-space: pre;
+        font: 10pt Courier, monospace;
+        margin-top: 2em;
+      }
+    </style>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/factory.js"></script>
+    <script type="text/javascript" src="../../src/events.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
+    <script type="text/javascript" src="../../src/framer.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+
+
+    <script>
+      var bd = {
+        getComponents: function () { return ['pt1.html', 'pt2.html']; },
+        getComponent: function (cmptId) { return { url: cmptId } },
+        getContents: function () { return []; },
+        getMetaData: function (key) { return null; }
+      }
+
+      Monocle.Events.listen(
+        window,
+        'load',
+        function () {
+          Monocle.Events.listen(
+            document.getElementById('reader'),
+            'monocle:componentchange',
+            componentChanged
+          );
+          window.reader = Monocle.Reader('reader', bd);
+        }
+      );
+
+      function componentChanged(evt) {
+        var doc = evt.m.document;
+        var pI = evt.m.page.m.pageIndex;
+        prects(doc, "Page "+pI+" on componentchange");
+        Monocle.defer(function () { prects(doc, "Page "+pI+" on defer") });
+      }
+
+      function prects(doc, msg) {
+        var out = document.getElementById('out');
+        out.innerHTML += "<strong>"+msg+"</strong><br />";
+        for (var i = 0; i < doc.body.childNodes.length; ++i) {
+          var child = doc.body.childNodes[i];
+          if (!child.getBoundingClientRect) {
+            continue;
+          }
+          out.innerHTML += child.tagName+"#"+child.id+": ";
+          var bcr = child.getBoundingClientRect();
+          out.innerHTML += "t: "+bcr.top+", r: "+bcr.right+
+            ", b:"+bcr.bottom+", l: "+bcr.left+"<br />";
+        }
+        out.innerHTML += "<hr />";
+      }
+    </script>
+  </head>
+  <body>
+
+    <div id="reader"></div>
+
+    <div id="out"></div>
+
+  </body>
+</html>
