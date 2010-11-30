@@ -96,7 +96,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     createReaderElements();
 
     // Clamp page frames to a set of styles that reduce Monocle breakage.
-    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
+    var defRules = k.DEFAULT_STYLE_RULES;
+    if (options.stylesheet) { defRules += options.stylesheet; }
+    p.defaultStyles = addPageStyles(defRules, false);
 
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
@@ -701,8 +703,10 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "padding: 0 !important;" +
     "-webkit-text-size-adjust: none;" +
   "}" +
-  "table, img {" +
+  "body * {" +
     "max-width: 100% !important;" +
+  "}" +
+  "img, video, object {" +
     "max-height: 90% !important;" +
   "}"
 ]
