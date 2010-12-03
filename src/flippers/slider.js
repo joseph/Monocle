@@ -538,13 +538,13 @@ Monocle.Flippers.Slider = function (reader) {
 
   function showWaitControl(page) {
     var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
-    ctrl.style.opacity = 0.5;
+    ctrl.style.visibility = "visible";
   }
 
 
   function hideWaitControl(page) {
     var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
-    ctrl.style.opacity = 0;
+    ctrl.style.visibility = "hidden";
   }
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.

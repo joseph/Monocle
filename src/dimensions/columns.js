@@ -50,10 +50,19 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       if (!lc || !lc.getBoundingClientRect) {
         console.warn('Empty document for page['+p.page.m.pageIndex+']');
         p.measurements.scrollWidth = p.measurements.width;
-      } else if (lc.getBoundingClientRect().bottom > p.measurements.height) {
-        p.measurements.scrollWidth = p.measurements.width * 2;
       } else {
-        p.measurements.scrollWidth = p.measurements.width;
+        // NB: right is generally wider than width if the column styles have
+        // had a chance to apply to the component. Otherwise bottom will
+        // be greater than height. See tests/columns.
+        var bcr = lc.getBoundingClientRect();
+        if (
+          bcr.right > p.measurements.width ||
+          bcr.bottom > p.measurements.height
+        ) {
+          p.measurements.scrollWidth = p.measurements.width * 2;
+        } else {
+          p.measurements.scrollWidth = p.measurements.width;
+        }
       }
     }
 
