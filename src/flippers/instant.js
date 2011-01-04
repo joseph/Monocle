@@ -52,6 +52,7 @@ Monocle.Flippers.Instant = function (reader) {
 
   function frameToLocus(locus) {
     page().m.dimensions.translateToLocus(locus);
+    Monocle.defer(function () { p.reader.dispatchEvent('monocle:turn'); });
   }
 
 

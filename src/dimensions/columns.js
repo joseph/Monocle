@@ -181,7 +181,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
     if (Monocle.Browser.has.iframeDoubleWidthBug) {
-      if (Monocle.Browser.on.Android) {
+      if (Monocle.Browser.on.Kindle3) {
+        return scrollerElement().scrollWidth;
+      } else if (Monocle.Browser.on.Android) {
         return bdy.scrollWidth * 1.5; // I actually have no idea why 1.5.
       } else if (Monocle.Browser.iOSVersion < "4.1") {
         var hbw = bdy.scrollWidth / 2;
