@@ -184,7 +184,13 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       if (Monocle.Browser.on.Kindle3) {
         return scrollerElement().scrollWidth;
       } else if (Monocle.Browser.on.Android) {
-        return bdy.scrollWidth * 1.5; // I actually have no idea why 1.5.
+        // FIXME: On Android, bdy.scrollWidth reports the wrong value if the
+        // browser's Text Size setting is anything other than "Normal".
+        // Seems like an Android bug to me.
+        //
+        // If you could detect the text size, you could compensate for it. Eg,
+        // a Text Size of "Large" -> multipy bdy.scrollWidth by 1.5.
+        return bdy.scrollWidth;
       } else if (Monocle.Browser.iOSVersion < "4.1") {
         var hbw = bdy.scrollWidth / 2;
         var sew = scrollerElement().scrollWidth;
