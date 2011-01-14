@@ -45,6 +45,7 @@ Monocle.Book = function (dataSource) {
   //  - position: string, one of "start" or "end", moves to corresponding point
   //      in the given component
   //  - anchor: an element id within the component
+  //  - xpath: an xpath within the component
   //
   // The locus object can also specify a componentId. If it is not provided
   // (or it is invalid), we default to the currently active component, and
@@ -109,6 +110,8 @@ Monocle.Book = function (dataSource) {
       result.page += locus.direction;
     } else if (typeof(locus.anchor) == "string") {
       result.page = component.pageForChapter(locus.anchor, pageDiv);
+    } else if (typeof(locus.xpath) == "string") {
+      result.page = component.pageForXPath(locus.xpath, pageDiv);
     } else if (typeof(locus.position) == "string") {
       if (locus.position == "start") {
         result.page = 1;

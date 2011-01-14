@@ -85,12 +85,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  function percentageThroughOfId(id) {
-    var doc = p.page.m.activeFrame.contentDocument;
-    var target = doc.getElementById(id);
+  function percentageThroughOfNode(target) {
     if (!target) {
       return 0;
     }
+    var doc = p.page.m.activeFrame.contentDocument;
     var offset = 0;
     if (target.getBoundingClientRect) {
       offset = target.getBoundingClientRect().left;
@@ -238,7 +237,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   API.hasChanged = hasChanged;
   API.measure = measure;
   API.pages = pages;
-  API.percentageThroughOfId = percentageThroughOfId;
+  API.percentageThroughOfNode = percentageThroughOfNode;
 
   API.locusToOffset = locusToOffset;
   API.translateToLocus = translateToLocus;
