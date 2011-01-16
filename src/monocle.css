@@ -217,6 +217,24 @@ div.monelem_controls_scrubber_bubble {
 }
 
 
+/* Stencil */
+div.monelem_controls_stencil_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+
+div.monelem_controls_stencil_cutout {
+  position: absolute;
+  outline: 1px dotted #F0F;
+  background: rgba(255,0,255,0.3);
+}
+
+
+
 /*===========================================================================
   Flippers
 ---------------------------------------------------------------------------*/

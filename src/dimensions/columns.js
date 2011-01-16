@@ -21,8 +21,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       (!p.measurements) ||
       (p.measurements.width != newMeasurements.width) ||
       (p.measurements.height != newMeasurements.height) ||
-      (p.measurements.scrollWidth != newMeasurements.scrollWidth) ||
-      (p.measurements.fontSize != newMeasurements.fontSize)
+      (p.measurements.scrollWidth != newMeasurements.scrollWidth)
     );
   }
 
@@ -138,8 +137,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     return {
       width: sheaf.clientWidth,
       height: sheaf.clientHeight,
-      scrollWidth: scrollerWidth(),
-      fontSize: currBodyStyleValue('font-size')
+      scrollWidth: scrollerWidth()
     }
   }
 
