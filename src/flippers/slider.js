@@ -92,10 +92,10 @@ Monocle.Flippers.Slider = function (reader) {
 
   function moveTo(locus, callback) {
     var fn = function () {
-      prepareNextPage(announceTurn);
-      if (typeof callback == "function") {
-        callback();
-      }
+      prepareNextPage(function () {
+        if (typeof callback == "function") { callback(); }
+        announceTurn();
+      });
     }
     setPage(upperPage(), locus, fn);
   }
