@@ -230,8 +230,6 @@ div.monelem_controls_stencil_container {
 a.monelem_controls_stencil_cutout {
   display: block;
   position: absolute;
-  outline: 1px dotted #F0F;
-  background: rgba(255,0,255,0.3);
 }
 
 
