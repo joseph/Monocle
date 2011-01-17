@@ -31,12 +31,9 @@ Monocle.Controls.Stencil = function (reader) {
   function shift(evt) {
     var pageDiv = p.reader.visiblePages()[0];
     var cmptId = pageComponentId(pageDiv);
-    if (cmptId != p.activeComponent) {
+    //if (cmptId != p.activeComponent) {
       update(pageDiv);
-    }
-    var place = p.reader.getPlace();
-    var dims = pageDiv.m.dimensions.properties.measurements;
-    Monocle.Styles.setX(p.container, (place.pageNumber() - 1) * dims.width * -1);
+    //}
   }
 
 
@@ -47,12 +44,14 @@ Monocle.Controls.Stencil = function (reader) {
     p.activeComponent = cmptId;
     var doc = pageDiv.m.activeFrame.contentDocument;
     var rects = p.components[cmptId];
+    var i;
     if (!rects) {
       var rects = p.components[cmptId] = [];
       var iElems = doc.getElementsByTagName('A');
-      for (var i = 0; i < iElems.length; ++i) {
+      for (i = 0; i < iElems.length; ++i) {
         var r = iElems[i].getClientRects();
         for (var j = 0; j < r.length; j++) {
+          r[j].href = iElems[i].getAttribute('href');
           rects.push(r[j]);
         }
       }
@@ -60,22 +59,39 @@ Monocle.Controls.Stencil = function (reader) {
 
     if (!rects.length) { return; }
 
-    // Update location of rects - creating as required.
+    var place = p.reader.getPlace();
+    var pages = place.pageNumber() - 1;
+    var w = pageDiv.m.dimensions.properties.measurements.width;
+    var l = w * pages;
+    var visRects = [];
     for (i = 0; i < rects.length; ++i) {
-      if (!p.cutouts[i]) {
-        p.cutouts[i] = p.container.dom.append('div', k.CLS.cutout);
+      if (rectVisible(rects[i], l, l+w)) {
+        visRects.push(rects[i]);
       }
-      var place = p.reader.getPlace();
-      var pages = place.pageNumber() - 1;
-      var l = rects[i].left;
-      var t = rects[i].top;
-      p.cutouts[i].dom.setStyles({
+    }
+
+    // Update location of visible rectangles - creating as required.
+    for (i = 0; i < visRects.length; ++i) {
+      if (!p.cutouts[i]) {
+        p.cutouts[i] = p.container.dom.append('a', k.CLS.cutout);
+        p.cutouts[i].setAttribute('target', '_blank');
+      }
+      var link = p.cutouts[i];
+      link.dom.setStyles({
         display: 'block',
-        left: l+"px",
-        top: t+"px",
-        width: rects[i].width+"px",
-        height: rects[i].height+"px"
+        left: (visRects[i].left - l)+"px",
+        top: visRects[i].top+"px",
+        width: visRects[i].width+"px",
+        height: visRects[i].height+"px"
       });
+      Monocle.Events.deafen(link, 'click', cutoutClick);
+      var href = link.href = visRects[i].href;
+      if (!k.REGEXES.protocolAndHost.test(href)) {
+        if (k.REGEXES.onlyAnchorInHref.test(href)) {
+          link.href = place.componentId() + href;
+        }
+        Monocle.Events.listen(link, 'click', cutoutClick);
+      }
     }
 
     // Hide remaining rects.
@@ -88,6 +104,24 @@ Monocle.Controls.Stencil = function (reader) {
 
   function pageComponentId(pageDiv) {
     return pageDiv.m.activeFrame.m.component.properties.id;
+  }
+
+
+  function rectVisible(rect, left, right) {
+    return rect.left >= left && rect.left < right;
+  }
+
+
+  function cutoutClick(evt) {
+    var link = evt.currentTarget;
+    var cmptId = hrefToCmptId(link.href);
+    p.reader.skipToChapter(cmptId);
+    evt.preventDefault();
+  }
+
+
+  function hrefToCmptId(href) {
+    return href.replace(k.REGEXES.protocolAndHost, '').replace(/^\//, '');
   }
 
 
@@ -104,6 +138,12 @@ Monocle.Controls.Stencil = function (reader) {
 Monocle.Controls.Stencil.CLS = {
   container: 'controls_stencil_container',
   cutout: 'controls_stencil_cutout'
+}
+
+
+Monocle.Controls.Stencil.REGEXES = {
+  protocolAndHost: /^[^\/]*:\/\/[^\/]+/,
+  onlyAnchorInHref: /^#(.*)$/
 }
 
 Monocle.pieceLoaded('controls/stencil');
