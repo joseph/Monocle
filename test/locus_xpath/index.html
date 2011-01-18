@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Locus with XPath test</title>
+    <title>Columns test</title>
 
     <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
     <style type="text/css">
@@ -14,11 +14,6 @@
         border: 1px solid #000;
         background-color: #CCC;
         overflow: hidden;
-      }
-      #out {
-        white-space: pre;
-        font: 10pt Courier, monospace;
-        margin-top: 2em;
       }
     </style>
 
@@ -49,48 +44,34 @@
         getMetaData: function (key) { return null; }
       }
 
+      function goToXPath(cmptId, xpath) {
+        window.reader.moveTo({ componentId: cmptId, xpath: xpath });
+      }
+
       Monocle.Events.listen(
         window,
         'load',
         function () {
-          Monocle.Events.listen(
-            document.getElementById('reader'),
-            'monocle:componentchange',
-            componentChanged
-          );
           window.reader = Monocle.Reader('reader', bd);
         }
       );
-
-      function componentChanged(evt) {
-        var doc = evt.m.document;
-        var pI = evt.m.page.m.pageIndex;
-        prects(doc, "Page "+pI+" on componentchange");
-        Monocle.defer(function () { prects(doc, "Page "+pI+" on defer") });
-      }
-
-      function prects(doc, msg) {
-        var out = document.getElementById('out');
-        out.innerHTML += "<strong>"+msg+"</strong><br />";
-        for (var i = 0; i < doc.body.childNodes.length; ++i) {
-          var child = doc.body.childNodes[i];
-          if (!child.getBoundingClientRect) {
-            continue;
-          }
-          out.innerHTML += child.tagName+"#"+child.id+": ";
-          var bcr = child.getBoundingClientRect();
-          out.innerHTML += "t: "+bcr.top+", r: "+bcr.right+
-            ", b:"+bcr.bottom+", l: "+bcr.left+"<br />";
-        }
-        out.innerHTML += "<hr />";
-      }
     </script>
   </head>
   <body>
 
     <div id="reader"></div>
 
-    <div id="out"></div>
+    <ul>
+      <li>
+        <a href="javascript:goToXPath('pt1.html', '//p[2]');">Second paragraph of Part I</a>
+      </li>
+      <li>
+        <a href="javascript:goToXPath('pt2.html', '//p[6]');">Sixth paragraph of Part II</a>
+      </li>
+      <li>
+        <a href="javascript:goToXPath('pt2.html', '//*[contains(text(), \'gremlins\')]');">First occurrence of 'gremlins' in Part II</a>
+      </li>
+    </ul>
 
   </body>
 </html>

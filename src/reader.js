@@ -697,15 +697,15 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
-  "}" +
+  "}",
   "body {" +
     "margin: 0 !important;" +
     "padding: 0 !important;" +
     "-webkit-text-size-adjust: none;" +
-  "}" +
+  "}",
   "body * {" +
     "max-width: 100% !important;" +
-  "}" +
+  "}",
   "img, video, object {" +
     "max-height: 90% !important;" +
   "}"

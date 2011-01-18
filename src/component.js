@@ -266,11 +266,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (p.chapters[0] && typeof p.chapters[0].percent == "number") {
       return;
     }
+    var doc = pageDiv.m.activeFrame.contentDocument;
     for (var i = 0; i < p.chapters.length; ++i) {
       var chp = p.chapters[i];
       chp.percent = 0;
       if (chp.fragment) {
-        chp.percent = pageDiv.m.dimensions.percentageThroughOfId(chp.fragment);
+        var node = doc.getElementById(chp.fragment);
+        chp.percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
       }
     }
     return p.chapters;
@@ -306,14 +308,34 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (!fragment) {
       return 1;
     }
-    var pc2pn = function (pc) { return Math.floor(pc * p.pageLength) + 1 }
     for (var i = 0; i < p.chapters.length; ++i) {
       if (p.chapters[i].fragment == fragment) {
-        return pc2pn(p.chapters[i].percent);
+        return percentToPageNumber(p.chapters[i].percent);
       }
     }
-    var percent = pageDiv.m.dimensions.percentageThroughOfId(fragment);
-    return pc2pn(percent);
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var node = doc.getElementById(fragment);
+    var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+    return percentToPageNumber(percent);
+  }
+
+
+  function pageForXPath(xpath, pageDiv) {
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var node = doc.evaluate(
+      xpath,
+      doc,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    ).singleNodeValue;
+    var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+    return percentToPageNumber(percent);
+  }
+
+
+  function percentToPageNumber(pc) {
+    return Math.floor(pc * p.pageLength) + 1;
   }
 
 
@@ -328,6 +350,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
+  API.pageForXPath = pageForXPath;
   API.lastPageNumber = lastPageNumber;
 
   return API;

@@ -21,8 +21,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       (!p.measurements) ||
       (p.measurements.width != newMeasurements.width) ||
       (p.measurements.height != newMeasurements.height) ||
-      (p.measurements.scrollWidth != newMeasurements.scrollWidth) ||
-      (p.measurements.fontSize != newMeasurements.fontSize)
+      (p.measurements.scrollWidth != newMeasurements.scrollWidth)
     );
   }
 
@@ -85,12 +84,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  function percentageThroughOfId(id) {
-    var doc = p.page.m.activeFrame.contentDocument;
-    var target = doc.getElementById(id);
+  function percentageThroughOfNode(target) {
     if (!target) {
       return 0;
     }
+    var doc = p.page.m.activeFrame.contentDocument;
     var offset = 0;
     if (target.getBoundingClientRect) {
       offset = target.getBoundingClientRect().left;
@@ -138,8 +136,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     return {
       width: sheaf.clientWidth,
       height: sheaf.clientHeight,
-      scrollWidth: scrollerWidth(),
-      fontSize: currBodyStyleValue('font-size')
+      scrollWidth: scrollerWidth()
     }
   }
 
@@ -181,8 +178,16 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
     if (Monocle.Browser.has.iframeDoubleWidthBug) {
-      if (Monocle.Browser.on.Android) {
-        return bdy.scrollWidth * 1.5; // I actually have no idea why 1.5.
+      if (Monocle.Browser.on.Kindle3) {
+        return scrollerElement().scrollWidth;
+      } else if (Monocle.Browser.on.Android) {
+        // FIXME: On Android, bdy.scrollWidth reports the wrong value if the
+        // browser's Text Size setting is anything other than "Normal".
+        // Seems like an Android bug to me.
+        //
+        // If you could detect the text size, you could compensate for it. Eg,
+        // a Text Size of "Large" -> multipy bdy.scrollWidth by 1.5.
+        return bdy.scrollWidth;
       } else if (Monocle.Browser.iOSVersion < "4.1") {
         var hbw = bdy.scrollWidth / 2;
         var sew = scrollerElement().scrollWidth;
@@ -230,7 +235,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   API.hasChanged = hasChanged;
   API.measure = measure;
   API.pages = pages;
-  API.percentageThroughOfId = percentageThroughOfId;
+  API.percentageThroughOfNode = percentageThroughOfNode;
 
   API.locusToOffset = locusToOffset;
   API.translateToLocus = translateToLocus;

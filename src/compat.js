@@ -183,7 +183,8 @@ Monocle.Browser.has.selectThruBug = Monocle.Browser.iOSVersionBelow("4.2");
 // algorithm is implemented for this case.
 //
 Monocle.Browser.has.mustScrollSheaf = Monocle.Browser.is.MobileSafari;
-Monocle.Browser.has.iframeDoubleWidthBug = Monocle.Browser.has.mustScrollSheaf;
+Monocle.Browser.has.iframeDoubleWidthBug =
+  Monocle.Browser.has.mustScrollSheaf || Monocle.Browser.on.Kindle3;
 
 // Webkit-based browsers put floated elements in the wrong spot when columns are
 // used -- they appear way down where they would be if there were no columns.

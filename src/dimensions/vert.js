@@ -41,9 +41,11 @@ Monocle.Dimensions.Vert = function (pageDiv) {
   }
 
 
-  function percentageThroughOfId(id) {
+  function percentageThroughOfNode(target) {
+    if (!target) {
+      return 0;
+    }
     var doc = p.page.m.activeFrame.contentDocument;
-    var target = doc.getElementById(id);
     var offset = 0;
     if (target.getBoundingClientRect) {
       offset = target.getBoundingClientRect().top;
@@ -83,7 +85,7 @@ Monocle.Dimensions.Vert = function (pageDiv) {
   API.hasChanged = hasChanged;
   API.measure = measure;
   API.pages = pages;
-  API.percentageThroughOfId = percentageThroughOfId;
+  API.percentageThroughOfNode = percentageThroughOfNode;
   API.locusToOffset = locusToOffset;
 
   initialize();

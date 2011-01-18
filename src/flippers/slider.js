@@ -92,10 +92,10 @@ Monocle.Flippers.Slider = function (reader) {
 
   function moveTo(locus, callback) {
     var fn = function () {
-      prepareNextPage(announceTurn);
-      if (typeof callback == "function") {
-        callback();
-      }
+      prepareNextPage(function () {
+        if (typeof callback == "function") { callback(); }
+        announceTurn();
+      });
     }
     setPage(upperPage(), locus, fn);
   }
@@ -322,14 +322,14 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function announceTurn() {
-    hideWaitControl(upperPage());
-    hideWaitControl(lowerPage());
     p.reader.dispatchEvent('monocle:turn');
     resetTurnData();
   }
 
 
   function resetTurnData() {
+    hideWaitControl(upperPage());
+    hideWaitControl(lowerPage());
     p.turnData = {};
   }
 
@@ -485,13 +485,17 @@ Monocle.Flippers.Slider = function (reader) {
 
   function jumpIn(pageDiv, callback) {
     var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
-    setX(pageDiv, 0, { duration: dur }, callback);
+    Monocle.defer(function () {
+      setX(pageDiv, 0, { duration: dur }, callback);
+    });
   }
 
 
   function jumpOut(pageDiv, callback) {
     var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
-    setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: dur }, callback);
+    Monocle.defer(function () {
+      setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: dur }, callback);
+    });
   }
 
 
@@ -502,7 +506,9 @@ Monocle.Flippers.Slider = function (reader) {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(upperPage(), 0, slideOpts, callback);
+    Monocle.defer(function () {
+      setX(upperPage(), 0, slideOpts, callback);
+    });
   }
 
 
@@ -511,7 +517,9 @@ Monocle.Flippers.Slider = function (reader) {
       duration: k.durations.SLIDE,
       timing: 'ease-in'
     };
-    setX(upperPage(), 0 - upperPage().offsetWidth, slideOpts, callback);
+    Monocle.defer(function () {
+      setX(upperPage(), 0 - upperPage().offsetWidth, slideOpts, callback);
+    });
   }
 
 
