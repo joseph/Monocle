@@ -232,6 +232,9 @@ a.monelem_controls_stencil_cutout {
   position: absolute;
 }
 
+div.monelem_controls_stencil_highlighted a {
+  background: rgba(0,0,255,0.15);
+}
 
 
 /*===========================================================================

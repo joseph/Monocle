@@ -45,10 +45,12 @@
         window.reader = Monocle.Reader('reader', null, {}, function (rdr) {
           var stencil = new Monocle.Controls.Stencil(rdr);
           rdr.addControl(stencil);
+          // This line is useful mostly for testing:
+          // it highlights the stencil's link cutouts.
+          stencil.toggleHighlights();
         });
       });
     </script>
-
   </head>
 
   <body>

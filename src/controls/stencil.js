@@ -14,28 +14,34 @@ Monocle.Controls.Stencil = function (reader) {
   function createControlElements(holder) {
     p.container = holder.dom.make('div', k.CLS.container);
     p.reader.listen('monocle:turn', draw);
+    p.reader.listen('monocle:componentchange', update);
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
+    p.baseURL = getBaseURL();
     return p.container;
   }
 
-
+  // Resets any pre-calculated rectangles for the active component,
+  // recalculates them, and forces cutouts to be "drawn" (moved into the new
+  // rectangular locations).
+  //
   function update() {
     var pageDiv = p.reader.visiblePages()[0];
     var cmptId = pageComponentId(pageDiv);
-    p.components[cmptId] = null; // Reset pre-calculated rectangles.
-    getRects(pageDiv);
+    p.components[cmptId] = null;
+    calculateRectangles(pageDiv);
     draw();
   }
 
 
-  // After a page turn, aligns cutouts to pages. If component changed or
-  // resized, calls update.
+  // Aligns the stencil container to the shape of the page, then moves the
+  // cutout links to sit above any currently visible rectangles.
+  //
   function draw() {
     var pageDiv = p.reader.visiblePages()[0];
     var cmptId = pageComponentId(pageDiv);
     if (cmptId != p.activeComponent) {
-      getRects(pageDiv);
+      calculateRectangles(pageDiv);
     }
 
     // Position the container.
@@ -45,7 +51,7 @@ Monocle.Controls.Stencil = function (reader) {
     var placed = 0;
     var rects = p.components[cmptId];
     if (rects && rects.length) {
-      placed = layoutRects(pageDiv, rects);
+      placed = layoutRectangles(pageDiv, rects);
     }
 
     // Hide remaining rects.
@@ -56,7 +62,10 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
-  function getRects(pageDiv) {
+  // Iterate over all the <a> elements in the active component, and
+  // create an array of rectangular points corresponding to their positions.
+  //
+  function calculateRectangles(pageDiv) {
     var cmptId = pageComponentId(pageDiv);
     p.activeComponent = cmptId;
     var doc = pageDiv.m.activeFrame.contentDocument;
@@ -69,13 +78,13 @@ Monocle.Controls.Stencil = function (reader) {
 
     var iElems = doc.getElementsByTagName('a');
     for (var i = 0; i < iElems.length; ++i) {
-      var href = iElems[i].getAttribute('href');
-      if (href) {
+      if (iElems[i].href) {
+        var href = deconstructHref(iElems[i].href);
         if (!iElems[i].processed) {
           fixLink(iElems[i], href);
         }
 
-        if (calcRects) {
+        if (calcRects && iElems[i].getClientRects) {
           var r = iElems[i].getClientRects();
           for (var j = 0; j < r.length; j++) {
             p.components[cmptId].push({
@@ -94,6 +103,8 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
+  // Find the offset position in pixels from the left of the current page.
+  //
   function getOffset(pageDiv) {
     var place = p.reader.getPlace();
     var pages = place.pageNumber() - 1;
@@ -103,9 +114,9 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
-  // Creates the necessary cutouts for the active component on the given page,
-  // or updates them if they already exist.
-  function layoutRects(pageDiv, rects) {
+  // Update location of visible rectangles - creating as required.
+  //
+  function layoutRectangles(pageDiv, rects) {
     var offset = getOffset(pageDiv);
     var visRects = [];
     for (var i = 0; i < rects.length; ++i) {
@@ -114,7 +125,6 @@ Monocle.Controls.Stencil = function (reader) {
       }
     }
 
-    // Update location of visible rectangles - creating as required.
     for (i = 0; i < visRects.length; ++i) {
       if (!p.cutouts[i]) {
         p.cutouts[i] = createCutout();
@@ -134,18 +144,15 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
-  function fixLink(link, href) {
-    Monocle.Events.deafen(link, 'click', cutoutClick);
-    link.href = href;
+  // Set the link (either the original <a> tag or a cutout) to listen for
+  // clicks and go to the corresponding component (or open the external URL
+  // in a new window).
+  //
+  function fixLink(link, hrefObject) {
     link.setAttribute('target', '_blank');
-    if (!k.REGEXES.protocolAndHost.test(href)) {
-      if (k.REGEXES.onlyAnchorInHref.test(href)) {
-        var pageDiv = p.reader.visiblePages()[0];
-        var cmptId = pageComponentId(pageDiv);
-        link.href = cmptId + href;
-      }
-      Monocle.Events.listen(link, 'click', cutoutClick);
-    }
+    link.deconstructedHref = hrefObject;
+    if (link.processed) { return; }
+    Monocle.Events.listen(link, 'click', cutoutClick);
     link.processed = true;
   }
 
@@ -156,11 +163,17 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
+  // Returns the active component id for the given page, or the current
+  // page if no argument passed in.
+  //
   function pageComponentId(pageDiv) {
+    pageDiv = pageDiv || p.reader.visiblePages()[0];
     return pageDiv.m.activeFrame.m.component.properties.id;
   }
 
 
+  // Positions the stencil container over the active frame.
+  //
   function alignToComponent(pageDiv) {
     cmpt = pageDiv.m.activeFrame.parentNode;
     p.container.dom.setStyles({
@@ -180,22 +193,85 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
-  function cutoutClick(evt) {
-    var link = evt.currentTarget;
-    var cmptId = hrefToCmptId(link.href);
-    p.reader.skipToChapter(cmptId);
-    evt.preventDefault();
+  // Make the active cutouts visible (by giving them a class -- override style
+  // in monocle.css).
+  //
+  function toggleHighlights() {
+    var cls = k.CLS.highlights
+    if (p.container.dom.hasClass(cls)) {
+      p.container.dom.removeClass(cls);
+    } else {
+      p.container.dom.addClass(cls);
+    }
   }
 
 
-  function hrefToCmptId(href) {
-    return href.replace(k.REGEXES.protocolAndHost, '').replace(/^\//, '');
+  // Returns an object with either:
+  //
+  // - an 'external' property -- an absolute URL with a protocol,
+  // host & etc, which should be treated as an external resource (eg,
+  // open in new window)
+  //
+  //   OR
+  //
+  // - a 'componentId' property -- a relative URL with no forward slash,
+  // which must be treated as a componentId; and
+  // - a 'hash' property -- which may be an anchor in the form "#foo", or
+  // may be blank.
+  //
+  // Expects an absolute URL to be passed in. A weird but useful property
+  // of <a> tags is that while link.getAttribute('href') will return the
+  // actual string value of the attribute (eg, 'foo.html'), link.href will
+  // return the absolute URL (eg, 'http://example.com/monocles/foo.html').
+  //
+  function deconstructHref(url) {
+    var result = {};
+    var re = new RegExp("^"+p.baseURL+"([^#]*)(#.*)?$");
+    var match = url.match(re);
+    if (match) {
+      result.componentId = match[1] || pageComponentId();
+      result.hash = match[2] || '';
+    } else {
+      result.external = url;
+    }
+    return result;
+  }
+
+
+  // Returns the base URL for the reader's host page, which can be used
+  // to deconstruct the hrefs of individual links within components.
+  //
+  function getBaseURL() {
+    var a = document.createElement('a');
+    a.setAttribute('href', 'x');
+    return a.href.replace(/x$/,'')
+  }
+
+
+  // Invoked when a cutout is clicked -- opens external URL in new window,
+  // or moves to an internal component.
+  //
+  function cutoutClick(evt) {
+    var link = evt.currentTarget;
+    var href = link.deconstructedHref;
+    if (!href) {
+      return;
+    }
+    if (href.external) {
+      link.href = href.external;
+      return;
+    }
+    var cmptId = href.componentId + href.hash;
+    //console.log("Skipping to: "+cmptId);
+    p.reader.skipToChapter(cmptId);
+    evt.preventDefault();
   }
 
 
   API.createControlElements = createControlElements;
   API.draw = draw;
   API.update = update;
+  API.toggleHighlights = toggleHighlights;
 
   return API;
 }
@@ -203,13 +279,9 @@ Monocle.Controls.Stencil = function (reader) {
 
 Monocle.Controls.Stencil.CLS = {
   container: 'controls_stencil_container',
-  cutout: 'controls_stencil_cutout'
+  cutout: 'controls_stencil_cutout',
+  highlights: 'controls_stencil_highlighted'
 }
 
-
-Monocle.Controls.Stencil.REGEXES = {
-  protocolAndHost: /^[^\/]*:\/\/[^\/]+/,
-  onlyAnchorInHref: /^#(.*)$/
-}
 
 Monocle.pieceLoaded('controls/stencil');
