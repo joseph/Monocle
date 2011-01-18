@@ -72,6 +72,15 @@ Monocle.Book = function (dataSource) {
       locus.load = true;
       locus.componentId = p.componentIds[0];
       return locus;
+    } else if (cIndex < 0 && currComponent.properties.id != locus.componentId) {
+      // Invalid component, say not found.
+      if (locus.componentId) {
+        pageDiv.m.reader.dispatchEvent(
+          "monocle:notfound",
+          { href: locus.componentId }
+        );
+      }
+      return null;
     } else if (cIndex < 0) {
       // No specified (or invalid) component, use current component.
       component = currComponent;
@@ -167,7 +176,7 @@ Monocle.Book = function (dataSource) {
   //
   function setPageAt(pageDiv, locus) {
     locus = pageNumberAt(pageDiv, locus);
-    if (!locus.load) {
+    if (locus && !locus.load) {
       var component = p.components[p.componentIds.indexOf(locus.componentId)];
       pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
       pageDiv.m.place.setPlace(component, locus.page);
@@ -211,6 +220,10 @@ Monocle.Book = function (dataSource) {
       locus = pageNumberAt(pageDiv, locus);
     }
 
+    if (!locus) {
+      return;
+    }
+
     if (!locus.load) {
       callback(locus);
       return;
@@ -218,7 +231,9 @@ Monocle.Book = function (dataSource) {
 
     var findPageNumber = function () {
       locus = setPageAt(pageDiv, locus);
-      if (locus.load) {
+      if (!locus) {
+        return;
+      } else if (locus.load) {
         loadPageAt(pageDiv, locus, callback, progressCallback)
       } else {
         callback(locus);
@@ -246,10 +261,12 @@ Monocle.Book = function (dataSource) {
   // If your flipper doesn't care whether a component needs to be
   // loaded before the page can be set, you can use this shortcut.
   //
-  function setOrLoadPageAt(pageDiv, locus, callback, progressCallback) {
+  function setOrLoadPageAt(pageDiv, locus, callback, onProgress, onFail) {
     locus = setPageAt(pageDiv, locus);
-    if (locus.load) {
-      loadPageAt(pageDiv, locus, callback, progressCallback);
+    if (!locus) {
+      if (onFail) { onFail(); }
+    } else if (locus.load) {
+      loadPageAt(pageDiv, locus, callback, onProgress);
     } else {
       callback(locus);
     }
