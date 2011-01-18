@@ -72,14 +72,16 @@ Monocle.Book = function (dataSource) {
       locus.load = true;
       locus.componentId = p.componentIds[0];
       return locus;
-    } else if (cIndex < 0 && currComponent.properties.id != locus.componentId) {
+    } else if (
+      cIndex < 0 &&
+      locus.componentId &&
+      currComponent.properties.id != locus.componentId
+    ) {
       // Invalid component, say not found.
-      if (locus.componentId) {
-        pageDiv.m.reader.dispatchEvent(
-          "monocle:notfound",
-          { href: locus.componentId }
-        );
-      }
+      pageDiv.m.reader.dispatchEvent(
+        "monocle:notfound",
+        { href: locus.componentId }
+      );
       return null;
     } else if (cIndex < 0) {
       // No specified (or invalid) component, use current component.

@@ -11,15 +11,20 @@ Monocle.Controls.Stencil = function (reader) {
   }
 
 
+  // Create the stencil container and listen for draw/update events.
+  //
   function createControlElements(holder) {
     p.container = holder.dom.make('div', k.CLS.container);
     p.reader.listen('monocle:turn', draw);
-    p.reader.listen('monocle:componentchange', update);
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
+    p.reader.listen('monocle:componentchange', function (evt) {
+      if (evt.m.page == p.reader.visiblePages()[0]) { Monocle.defer(update); }
+    });
     p.baseURL = getBaseURL();
     return p.container;
   }
+
 
   // Resets any pre-calculated rectangles for the active component,
   // recalculates them, and forces cutouts to be "drawn" (moved into the new
