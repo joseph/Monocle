@@ -696,6 +696,7 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html * {" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
+    "overflow: visible !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
   "body {" +
