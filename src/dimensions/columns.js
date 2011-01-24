@@ -197,7 +197,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
         var hbw = bdy.scrollWidth / 2;
         return hbw;
       }
-    } else if (Monocle.Browser.is.Gecko) {
+    } else if (k.SETX && Monocle.Browser.is.Gecko) {
       var lc = bdy.lastChild;
       while (lc && lc.nodeType != 1) {
         lc = lc.previousSibling;
@@ -226,8 +226,13 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
-    var bdy = p.page.m.activeFrame.contentDocument.body;
-    Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
+    if (k.SETX) {
+      var bdy = p.page.m.activeFrame.contentDocument.body;
+      Monocle.Styles.affix(bdy, "transform", "translateX("+(offset+3)+"px)");
+    } else {
+      var scrElem = scrollerElement();
+      scrElem.scrollLeft = 0 - offset;
+    }
     return offset;
   }
 
@@ -256,6 +261,8 @@ Monocle.Dimensions.Columns.BODY_STYLES = {
   "column-gap": "0",
   "column-fill": "auto"
 }
+
+Monocle.Dimensions.Columns.SETX = true; // Set to false for scrollLeft.
 
 if (Monocle.Browser.has.iframeDoubleWidthBug) {
   Monocle.Dimensions.Columns.BODY_STYLES["min-width"] = "200%";
