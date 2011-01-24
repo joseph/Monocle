@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Webkit fails to render outside document boundaries</title>
+    <style>
+      #frame {
+        width: 200px;
+        height: 300px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <p>
+      This iframe has a width of 200px. It contains a document body with
+      a column-width of 200px, that is translateX'ed -200px. So it should
+      be showing the second column, but it is blank in latest Webkit nightlies.
+    </p>
+
+    <p>
+      Try changing the translateX to -199px: the second column is suddenly
+      visible.
+    </p>
+
+    <iframe id="frame" src="inner.html"></iframe>
+
+  </body>
+</html>
