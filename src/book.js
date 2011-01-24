@@ -146,6 +146,7 @@ Monocle.Book = function (dataSource) {
       if (cIndex == 0) {
         // On first page of book.
         result.page = 1;
+        result.boundarystart = true;
       } else {
         // Moving backwards from current component.
         result.load = true;
@@ -157,6 +158,7 @@ Monocle.Book = function (dataSource) {
       if (cIndex == p.lastCIndex) {
         // On last page of book.
         result.page = lastPageNum['new'];
+        result.boundaryend = true;
       } else {
         // Moving forwards from current component.
         result.load = true;
@@ -179,17 +181,23 @@ Monocle.Book = function (dataSource) {
   function setPageAt(pageDiv, locus) {
     locus = pageNumberAt(pageDiv, locus);
     if (locus && !locus.load) {
-      var component = p.components[p.componentIds.indexOf(locus.componentId)];
-      pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
-      pageDiv.m.place.setPlace(component, locus.page);
+      if (locus.boundarystart) {
+        pageDiv.m.reader.dispatchEvent('monocle:boundarystart', { locus: locus });
+      } else if (locus.boundaryend) {
+        pageDiv.m.reader.dispatchEvent('monocle:boundaryend', { locus: locus });
+      } else {
+        var component = p.components[p.componentIds.indexOf(locus.componentId)];
+        pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
+        pageDiv.m.place.setPlace(component, locus.page);
 
-      var evtData = {
-        page: pageDiv,
-        locus: locus,
-        pageNumber: pageDiv.m.place.pageNumber(),
-        componentId: locus.componentId
+        var evtData = {
+          page: pageDiv,
+          locus: locus,
+          pageNumber: pageDiv.m.place.pageNumber(),
+          componentId: locus.componentId
+        }
+        pageDiv.m.reader.dispatchEvent("monocle:pagechange", evtData);
       }
-      pageDiv.m.reader.dispatchEvent("monocle:pagechange", evtData);
     }
     return locus;
   }
