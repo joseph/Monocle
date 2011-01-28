@@ -228,7 +228,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var offset = locusToOffset(locus);
     if (k.SETX) {
       var bdy = p.page.m.activeFrame.contentDocument.body;
-      Monocle.Styles.affix(bdy, "transform", "translateX("+(offset+3)+"px)");
+      Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
     } else {
       var scrElem = scrollerElement();
       scrElem.scrollLeft = 0 - offset;
