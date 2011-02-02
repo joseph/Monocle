@@ -82,6 +82,11 @@
         }
       }
 
+      var fn = function (rdr) {
+        rdr.listen('monocle:boundarystart', function () { console.log('start!') });
+        rdr.listen('monocle:boundaryend', function () { console.log('end!') });
+      }
+
       // Initialize the reader element.
       Monocle.Events.listen(
         window,
@@ -90,22 +95,26 @@
           window.reader1 = Monocle.Reader(
             'instant',
             bookData,
-            { flipper: Monocle.Flippers.Instant }
+            { flipper: Monocle.Flippers.Instant },
+            fn
           );
           window.reader2 = Monocle.Reader(
             'scroller',
             bookData,
-            { flipper: Monocle.Flippers.Scroller }
+            { flipper: Monocle.Flippers.Scroller },
+            fn
           );
           window.reader3 = Monocle.Reader(
             'slider',
             bookData,
-            { flipper: Monocle.Flippers.Slider }
+            { flipper: Monocle.Flippers.Slider },
+            fn
           );
           window.reader4 = Monocle.Reader(
             'legacy',
             bookData,
-            { flipper: Monocle.Flippers.Legacy }
+            { flipper: Monocle.Flippers.Legacy },
+            fn
           );
         }
       );

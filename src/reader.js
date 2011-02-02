@@ -455,7 +455,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       console.warn("No data for control: " + ctrl);
       return;
     }
-    if (controlData.hidden == false) {
+    if (showingControl(ctrl)) {
       return;
     }
     for (var i = 0; i < controlData.elements.length; ++i) {
@@ -487,6 +487,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       ctrl.properties.hidden = false;
     }
     dispatchEvent('controlshow', ctrl, false);
+  }
+
+
+  function showingControl(ctrl) {
+    var controlData = dataForControl(ctrl);
+    return controlData.hidden == false;
   }
 
 
@@ -668,6 +674,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   API.addControl = addControl;
   API.hideControl = hideControl;
   API.showControl = showControl;
+  API.showingControl = showingControl;
   API.dispatchEvent = dispatchEvent;
   API.listen = listen;
   API.deafen = deafen;
@@ -694,8 +701,10 @@ Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html * {" +
+    "-webkit-font-smoothing: subpixel-antialiased;" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
+    "overflow: visible !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
   "body {" +

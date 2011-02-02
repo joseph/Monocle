@@ -143,14 +143,14 @@ Monocle.Flippers.Slider = function (reader) {
 
     if (dir == k.FORWARDS) {
       if (getPlace().onLastPageOfBook()) {
-        //console.log("ON LAST PAGE");
+        p.reader.dispatchEvent('monocle:boundaryend');
         resetTurnData();
         return;
       }
       onGoingForward(boxPointX);
     } else if (dir == k.BACKWARDS) {
       if (getPlace().onFirstPageOfBook()) {
-        //console.log("ON FIRST PAGE");
+        p.reader.dispatchEvent('monocle:boundarystart');
         resetTurnData();
         return;
       }
