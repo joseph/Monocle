@@ -318,7 +318,29 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
     return percentToPageNumber(percent);
   }
-
+  
+  function pageForClientRect(nodeObj, pageDiv) {
+    if (!nodeObj) {
+      return 1;
+    }
+    var doc = pageDiv.m.activeFrame.contentDocument;
+	node = nodeObj.getNode(nodeObj.node, doc);
+	if(!node){
+		return 1;
+	}
+	if(node.getBoundingClientRect) { // it's not a text node
+		var perc = pageDiv.m.dimensions.percentageThroughOfNode(node);
+		console.log(node);
+		return percentToPageNumber(perc);
+	}
+	// has to be a textnode, let's create a range
+	var offset = parseInt(nodeObj.offset || 0);
+	var range = doc.createRange();
+	range.setStart(node, offset);
+	range.setEnd(node, offset + 1);
+    var percent = pageDiv.m.dimensions.percentageThroughOfNode(range);
+    return percentToPageNumber(percent);
+  }
 
   function pageForXPath(xpath, pageDiv) {
     var doc = pageDiv.m.activeFrame.contentDocument;
@@ -332,7 +354,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
     return percentToPageNumber(percent);
   }
-
 
   function percentToPageNumber(pc) {
     return Math.floor(pc * p.pageLength) + 1;
@@ -350,6 +371,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
+  API.pageForClientRect = pageForClientRect;
   API.pageForXPath = pageForXPath;
   API.lastPageNumber = lastPageNumber;
 
