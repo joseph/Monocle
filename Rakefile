@@ -6,8 +6,8 @@ task :dist do
   end
 
   sec = Sprockets::Secretary.new(
-    :load_path => "src",
-    :source_files => "src/monocle.js"
+    :load_path => ["src"],
+    :source_files => ["src/monocle.js"]
   )
   out = sec.concatenation
 
