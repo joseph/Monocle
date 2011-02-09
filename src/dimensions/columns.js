@@ -168,12 +168,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   //  2) The sheafDiv scrollWidth is sometimes only 2x page width, despite
   //    body being much bigger.
   //
-  // In Gecko browsers, translating X on the document body causes the
-  // scrollWidth of the body to change. (I think this is a bug.) Hence, we
-  // have to find the last element in the body, and get the 'right' value from
-  // its bounding rect.
-  //
-  // In other browsers, we can just use the scrollWidth of the scrollerElement.
+  // In other browsers, the only consistent way to measure the width of the
+  // body is by comparing the first element's left to the last element's right.
+  // (There are bizarre differences between Gecko, recent Webkit (~534) and
+  // older Webkit.)
   //
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
@@ -197,15 +195,19 @@ Monocle.Dimensions.Columns = function (pageDiv) {
         var hbw = bdy.scrollWidth / 2;
         return hbw;
       }
-    } else if (k.SETX && Monocle.Browser.is.Gecko) {
+    } else if (bdy.getBoundingClientRect) {
+      var fc = bdy.firstChild;
+      while (fc && fc.nodeType != 1) { fc = fc.nextSibling; }
       var lc = bdy.lastChild;
-      while (lc && lc.nodeType != 1) {
-        lc = lc.previousSibling;
-      }
-      if (lc && lc.getBoundingClientRect) {
-        return lc.getBoundingClientRect().right;
+      while (lc && lc.nodeType != 1) { lc = lc.previousSibling; }
+      if (fc && lc) {
+        var fcr = fc.getBoundingClientRect(), lcr = lc.getBoundingClientRect();
+        var w = Math.abs(fcr.left) + Math.abs(lcr.right);
+        return w;
       }
     }
+
+    // Fall back to scrollWidth.
     return scrollerElement().scrollWidth;
   }
 
