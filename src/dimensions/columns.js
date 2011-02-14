@@ -196,15 +196,16 @@ Monocle.Dimensions.Columns = function (pageDiv) {
         return hbw;
       }
     } else if (bdy.getBoundingClientRect) {
-      var fc = bdy.firstChild;
-      while (fc && fc.nodeType != 1) { fc = fc.nextSibling; }
-      var lc = bdy.lastChild;
-      while (lc && lc.nodeType != 1) { lc = lc.previousSibling; }
-      if (fc && lc) {
-        var fcr = fc.getBoundingClientRect(), lcr = lc.getBoundingClientRect();
-        var w = Math.abs(fcr.left) + Math.abs(lcr.right);
-        return w;
+      // FIXME: this is quite inefficient.
+      var elems = bdy.getElementsByTagName('*');
+      var bdyRect = bdy.getBoundingClientRect();
+      var l = bdyRect.left, r = bdyRect.right;
+      for (var i = elems.length - 1; i >= 0; --i) {
+        var rect = elems[i].getBoundingClientRect();
+        l = Math.min(l, rect.left);
+        r = Math.max(r, rect.right);
       }
+      return Math.abs(l) + Math.abs(r);
     }
 
     // Fall back to scrollWidth.
