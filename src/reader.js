@@ -184,6 +184,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       if (Monocle.Browser.is.WebKit) {
         frame.contentDocument.documentElement.style.overflow = "hidden";
       }
+      dispatchEvent('monocle:frameprimed', { frame: frame, pageIndex: pageCount });
       if ((pageCount += 1) == pageMax) {
         Monocle.defer(callback);
       }
@@ -241,6 +242,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var pageCount = 0;
     if (typeof callback == 'function') {
       var watcher = function (evt) {
+        dispatchEvent('monocle:firstcomponentchange', evt.m);
         if ((pageCount += 1) == p.flipper.pageCount) {
           deafen('monocle:componentchange', watcher);
           callback();
