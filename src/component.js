@@ -330,7 +330,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
 	}
 	if(node.getBoundingClientRect) { // it's not a text node
 		var perc = pageDiv.m.dimensions.percentageThroughOfNode(node);
-		console.log(node);
 		return percentToPageNumber(perc);
 	}
 	// has to be a textnode, let's create a range
