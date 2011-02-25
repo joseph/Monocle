@@ -229,6 +229,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
+    p.page.m.offset = 0 - offset;
     if (k.SETX) {
       var bdy = p.page.m.activeFrame.contentDocument.body;
       Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");

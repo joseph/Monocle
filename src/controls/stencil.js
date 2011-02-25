@@ -47,8 +47,8 @@ Monocle.Controls.Stencil = function (reader) {
   function draw() {
     var pageDiv = p.reader.visiblePages()[0];
     var cmptId = pageComponentId(pageDiv);
-    if (cmptId != p.activeComponent) {
-      calculateRectangles(pageDiv);
+    if (!p.components[cmptId]) {
+      return;
     }
 
     // Position the container.
@@ -79,6 +79,10 @@ Monocle.Controls.Stencil = function (reader) {
     p.activeComponent = cmptId;
     var doc = pageDiv.m.activeFrame.contentDocument;
     var offset = getOffset(pageDiv);
+    // BROWSER HACK: Gecko doesn't subtract translations from GBCR values.
+    if (Monocle.Browser.is.Gecko) {
+      offset.l = 0;
+    }
     var calcRects = false;
     if (!p.components[cmptId]) {
       p.components[cmptId] = []
@@ -115,11 +119,10 @@ Monocle.Controls.Stencil = function (reader) {
   // Find the offset position in pixels from the left of the current page.
   //
   function getOffset(pageDiv) {
-    var place = p.reader.getPlace();
-    var pages = place.pageNumber() - 1;
-    var result = { w: pageDiv.m.dimensions.properties.measurements.width }
-    result.l = result.w * pages;
-    return result;
+    return {
+      l: pageDiv.m.offset || 0,
+      w: pageDiv.m.dimensions.properties.measurements.width
+    };
   }
 
 
