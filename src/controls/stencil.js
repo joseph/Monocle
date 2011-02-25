@@ -19,7 +19,7 @@ Monocle.Controls.Stencil = function (reader) {
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
     p.reader.listen('monocle:componentchange', function (evt) {
-      if (evt.m.page == p.reader.visiblePages()[0]) { Monocle.defer(update); }
+      Monocle.defer(update);
     });
     p.reader.listen('monocle:interactive:on', disable);
     p.reader.listen('monocle:interactive:off', enable);
@@ -93,14 +93,12 @@ Monocle.Controls.Stencil = function (reader) {
     for (var i = 0; i < iElems.length; ++i) {
       if (iElems[i].href) {
         var href = deconstructHref(iElems[i].href);
-        if (!iElems[i].processed) {
-          fixLink(iElems[i], href);
-        }
 
         if (calcRects && iElems[i].getClientRects) {
           var r = iElems[i].getClientRects();
           for (var j = 0; j < r.length; j++) {
             p.components[cmptId].push({
+              link: iElems[i],
               href: href,
               left: Math.ceil(r[j].left + offset.l),
               top: Math.ceil(r[j].top),
@@ -149,6 +147,7 @@ Monocle.Controls.Stencil = function (reader) {
         width: visRects[i].width+"px",
         height: visRects[i].height+"px"
       });
+      link.relatedLink = visRects[i].link;
       fixLink(link, visRects[i].href);
     }
 
@@ -264,21 +263,48 @@ Monocle.Controls.Stencil = function (reader) {
   // or moves to an internal component.
   //
   function cutoutClick(evt) {
-    if (p.disabled) {
-      return;
-    }
     var link = evt.currentTarget;
-    var href = link.deconstructedHref;
-    if (!href) {
-      return;
+    olink = link.relatedLink;
+    var clickHandler = function (e) {
+      if (e.defaultPrevented) { // NB: unfortunately not supported in Gecko.
+        return;
+      }
+      var href = link.deconstructedHref;
+      if (!href) {
+        return;
+      }
+      if (href.external) {
+        link.href = href.external;
+        return;
+      }
+      var cmptId = href.componentId + href.hash;
+      p.reader.skipToChapter(cmptId);
+      e.preventDefault();
     }
-    if (href.external) {
-      link.href = href.external;
-      return;
+    Monocle.Events.listen(olink, 'click', clickHandler);
+    var mimicEvt = document.createEvent('MouseEvents');
+    mimicEvt.initMouseEvent(
+      'click',
+      true,
+      true,
+      document.defaultView,
+      evt.detail,
+      evt.screenX,
+      evt.screenY,
+      evt.screenX,
+      evt.screenY,
+      evt.ctrlKey,
+      evt.altKey,
+      evt.shiftKey,
+      evt.metaKey,
+      evt.which,
+      null
+    );
+    try {
+      olink.dispatchEvent(mimicEvt);
+    } finally {
+      Monocle.Events.deafen(olink, 'click', clickHandler);
     }
-    var cmptId = href.componentId + href.hash;
-    p.reader.skipToChapter(cmptId);
-    evt.preventDefault();
   }
 
 
