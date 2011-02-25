@@ -61,6 +61,7 @@ Monocle.Flippers.Slider = function (reader) {
   // A panel can call this with true/false to indicate that the user needs
   // to be able to select or otherwise interact with text.
   function interactiveMode(bState) {
+    p.reader.dispatchEvent('monocle:interactive:'+(bState ? 'on' : 'off'));
     if (!Monocle.Browser.has.selectThruBug) {
       return;
     }

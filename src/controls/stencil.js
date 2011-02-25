@@ -21,6 +21,8 @@ Monocle.Controls.Stencil = function (reader) {
     p.reader.listen('monocle:componentchange', function (evt) {
       if (evt.m.page == p.reader.visiblePages()[0]) { Monocle.defer(update); }
     });
+    p.reader.listen('monocle:interactive:on', disable);
+    p.reader.listen('monocle:interactive:off', enable);
     p.baseURL = getBaseURL();
     return p.container;
   }
@@ -54,9 +56,11 @@ Monocle.Controls.Stencil = function (reader) {
 
     // Layout the cutouts.
     var placed = 0;
-    var rects = p.components[cmptId];
-    if (rects && rects.length) {
-      placed = layoutRectangles(pageDiv, rects);
+    if (!p.disabled) {
+      var rects = p.components[cmptId];
+      if (rects && rects.length) {
+        placed = layoutRectangles(pageDiv, rects);
+      }
     }
 
     // Hide remaining rects.
@@ -257,6 +261,9 @@ Monocle.Controls.Stencil = function (reader) {
   // or moves to an internal component.
   //
   function cutoutClick(evt) {
+    if (p.disabled) {
+      return;
+    }
     var link = evt.currentTarget;
     var href = link.deconstructedHref;
     if (!href) {
@@ -267,9 +274,20 @@ Monocle.Controls.Stencil = function (reader) {
       return;
     }
     var cmptId = href.componentId + href.hash;
-    //console.log("Skipping to: "+cmptId);
     p.reader.skipToChapter(cmptId);
     evt.preventDefault();
+  }
+
+
+  function disable() {
+    p.disabled = true;
+    draw();
+  }
+
+
+  function enable() {
+    p.disabled = false;
+    draw();
   }
 
 
