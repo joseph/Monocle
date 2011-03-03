@@ -79,7 +79,7 @@ Monocle.Controls.Stencil = function (reader) {
     p.activeComponent = cmptId;
     var doc = pageDiv.m.activeFrame.contentDocument;
     var offset = getOffset(pageDiv);
-    // BROWSER HACK: Gecko doesn't subtract translations from GBCR values.
+    // BROWSERHACK: Gecko doesn't subtract translations from GBCR values.
     if (Monocle.Browser.is.Gecko) {
       offset.l = 0;
     }
@@ -93,6 +93,7 @@ Monocle.Controls.Stencil = function (reader) {
     for (var i = 0; i < iElems.length; ++i) {
       if (iElems[i].href) {
         var href = deconstructHref(iElems[i].href);
+        fixLink(iElems[i], href, clickHandler);
 
         if (calcRects && iElems[i].getClientRects) {
           var r = iElems[i].getClientRects();
@@ -148,7 +149,7 @@ Monocle.Controls.Stencil = function (reader) {
         height: visRects[i].height+"px"
       });
       link.relatedLink = visRects[i].link;
-      fixLink(link, visRects[i].href);
+      fixLink(link, visRects[i].href, cutoutClick);
     }
 
     return i;
@@ -159,12 +160,21 @@ Monocle.Controls.Stencil = function (reader) {
   // clicks and go to the corresponding component (or open the external URL
   // in a new window).
   //
-  function fixLink(link, hrefObject) {
+  // NB: if the original link already has a click handler on it (eg, if the
+  // content is scripted), that click handler can:
+  //
+  // * stopPropagation if it is defined first
+  // * run Monocle.Events.deafen(link, 'click', link.stencilClickHandler)
+  //
+  // in order to prevent the default stencil click behaviour when in
+  // interactive mode.
+  //
+  function fixLink(link, hrefObject, handler) {
     link.setAttribute('target', '_blank');
     link.deconstructedHref = hrefObject;
-    if (link.processed) { return; }
-    Monocle.Events.listen(link, 'click', cutoutClick);
-    link.processed = true;
+    if (link.stencilClickHandler) { return; }
+    link.stencilClickHandler = handler;
+    Monocle.Events.listen(link, 'click', link.stencilClickHandler);
   }
 
 
@@ -265,22 +275,6 @@ Monocle.Controls.Stencil = function (reader) {
   function cutoutClick(evt) {
     var link = evt.currentTarget;
     olink = link.relatedLink;
-    var clickHandler = function (e) {
-      if (e.defaultPrevented) { // NB: unfortunately not supported in Gecko.
-        return;
-      }
-      var href = link.deconstructedHref;
-      if (!href) {
-        return;
-      }
-      if (href.external) {
-        link.href = href.external;
-        return;
-      }
-      var cmptId = href.componentId + href.hash;
-      p.reader.skipToChapter(cmptId);
-      e.preventDefault();
-    }
     Monocle.Events.listen(olink, 'click', clickHandler);
     var mimicEvt = document.createEvent('MouseEvents');
     mimicEvt.initMouseEvent(
@@ -305,6 +299,25 @@ Monocle.Controls.Stencil = function (reader) {
     } finally {
       Monocle.Events.deafen(olink, 'click', clickHandler);
     }
+  }
+
+
+  function clickHandler(evt) {
+    if (evt.defaultPrevented) { // NB: unfortunately not supported in Gecko.
+      return;
+    }
+    var link = evt.currentTarget;
+    var href = link.deconstructedHref;
+    if (!href) {
+      return;
+    }
+    if (href.external) {
+      link.href = href.external;
+      return;
+    }
+    var cmptId = href.componentId + href.hash;
+    p.reader.skipToChapter(cmptId);
+    evt.preventDefault();
   }
 
 
