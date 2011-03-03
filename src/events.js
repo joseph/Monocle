@@ -1,6 +1,28 @@
 Monocle.Events = {}
 
 
+// Fire a custom event on a given target element. The attached data object will
+// be available to all listeners at evt.m.
+//
+// Internet Explorer does not permit custom events; we'll wait for a
+// version of IE that supports the W3C model.
+//
+Monocle.Events.dispatch = function (elem, evtType, data, cancelable) {
+  if (!document.createEvent) {
+    return true;
+  }
+  var evt = document.createEvent("Events");
+  evt.initEvent(evtType, false, cancelable || false);
+  evt.m = data;
+  try {
+    return elem.dispatchEvent(evt);
+  } catch(e) {
+    console.warn("Failed to dispatch event: "+evtType);
+    return false;
+  }
+}
+
+
 // Register a function to be invoked when an event fires.
 //
 Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
@@ -53,7 +75,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
       pageY: ci.pageY
     };
 
-    var target = evt.target || window.srcElement;
+    var target = evt.target || evt.srcElement;
     while (target.nodeType != 1 && target.parentNode) {
       target = target.parentNode;
     }

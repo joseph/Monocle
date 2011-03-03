@@ -498,22 +498,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
-  // Internet Explorer does not permit custom events; we'll wait for a
-  // version of IE that supports the W3C model.
-  //
   function dispatchEvent(evtType, data, cancelable) {
-    if (!document.createEvent) {
-      return true;
-    }
-    var evt = document.createEvent("Events");
-    evt.initEvent(evtType, false, cancelable || false);
-    evt.m = data;
-    try {
-      return dom.find('box').dispatchEvent(evt);
-    } catch(e) {
-      console.warn("Failed to dispatch event: " + evtType);
-      return false;
-    }
+    return Monocle.Events.dispatch(dom.find('box'), evtType, data, cancelable);
   }
 
 
