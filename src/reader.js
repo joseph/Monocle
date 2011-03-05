@@ -688,22 +688,22 @@ Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.DEFAULT_STYLE_RULES = [
-  "html * {" +
+  "html#RS\\:monocle * {" +
     "-webkit-font-smoothing: subpixel-antialiased;" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     "overflow: visible !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
-  "body {" +
+  "html#RS\\:monocle body {" +
     "margin: 0 !important;" +
     "padding: 0 !important;" +
     "-webkit-text-size-adjust: none;" +
   "}",
-  "body * {" +
+  "html#RS\\:monocle body * {" +
     "max-width: 100% !important;" +
   "}",
-  "img, video, object {" +
+  "html#RS\\:monocle img, video, object {" +
     "max-height: 90% !important;" +
   "}"
 ]
