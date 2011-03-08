@@ -27,6 +27,8 @@ Monocle.Controls.Spinner = function (reader) {
     p.reader.listen('monocle:componentchange', spun);
     p.reader.listen('monocle:resizing', resizeSpin);
     p.reader.listen('monocle:resize', resizeSpun);
+    p.reader.listen('monocle:jumping', spin);
+    p.reader.listen('monocle:jump', spun);
     //p.reader.listen('monocle:stylesheetchanging', spin);
     //p.reader.listen('monocle:stylesheetchange', spun);
   }
@@ -53,11 +55,16 @@ Monocle.Controls.Spinner = function (reader) {
     p.reader.showControl(API);
 
     // If the delay is on a page other than the page we've been assigned to,
-    // don't show the animation.
+    // don't show the animation. p.global ensures that if an event affects
+    // all pages, the animation is always shown, even if other events in this
+    // spin cycle are page-specific.
     var page = evt && evt.m.page ? evt.m.page : null;
+    if (!page) {
+      p.global = true;
+    }
     for (var i = 0; i < p.divs.length; ++i) {
       var owner = p.divs[i].parentNode.parentNode;
-      p.divs[i].style.display = (!page || page == owner) ? 'block' : 'none';
+      p.divs[i].style.display = (p.global || page == owner) ? 'block' : 'none';
     }
   }
 
@@ -66,6 +73,8 @@ Monocle.Controls.Spinner = function (reader) {
     //console.log('Spun on ' + (evt ? evt.type : 'unknown'));
     p.spinCount -= 1;
     if (p.spinCount > 0) { return; }
+    p.spinCount = 0;
+    p.global = false;
     p.reader.hideControl(API);
   }
 
