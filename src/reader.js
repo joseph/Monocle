@@ -708,5 +708,11 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "}"
 ]
 
+if (Monocle.Browser.has.columnOverflowPaintBug) {
+  Monocle.Reader.DEFAULT_STYLE_RULES.push(
+    "::-webkit-scrollbar { width: 0; height: 0; }"
+  )
+}
+
 
 Monocle.pieceLoaded('reader');

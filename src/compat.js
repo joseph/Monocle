@@ -216,6 +216,25 @@ Monocle.Browser.has.jumpFlickerBug =
   Monocle.Browser.on.MacOSX && Monocle.Browser.is.WebKit;
 
 
+// Chrome versions 10 and 11 (beta) have a bug whereby the content of a
+// block with columns is not painted at all when the block is scrolled. The
+// effect is that every page after the first page in a component is blank.
+//
+// More information:
+//
+//    test/bugs/column-overflow-paint-bug
+//
+//    https://bugs.webkit.org/show_bug.cgi?id=52987
+//
+//    https://github.com/joseph/monocle/issues#issue/25
+//
+// Thanks to madfarmer on Github for identifying a workaround.
+//
+Monocle.Browser.has.columnOverflowPaintBug = Monocle.Browser.is.WebKit &&
+  !Monocle.Browser.is.MobileSafari &&
+  navigator.userAgent.indexOf("AppleWebKit/534") > 0;
+
+
 // A little console stub if not initialized in a console-equipped browser.
 if (typeof window.console == "undefined") {
   window.console = {
