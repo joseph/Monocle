@@ -15,6 +15,7 @@ Monocle.Factory = function (element, label, index, reader) {
   // the slot is not free, throws an error.
   //
   function initialize() {
+    if (!p.label) { return; }
     // Append the element to the reader's graph of DOM elements.
     var node = p.reader.properties.graph;
     node[p.label] = node[p.label] || [];
