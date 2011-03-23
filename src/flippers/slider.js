@@ -19,6 +19,10 @@ Monocle.Flippers.Slider = function (reader) {
 
   function addPage(pageDiv) {
     pageDiv.m.dimensions = new Monocle.Dimensions.Columns(pageDiv);
+
+    // BROWSERHACK: Firefox 4 is prone to beachballing on the first page turn
+    // unless a zeroed translateX has been applied to the page div.
+    Monocle.Styles.setX(pageDiv, "0px");
   }
 
 
@@ -380,7 +384,7 @@ Monocle.Flippers.Slider = function (reader) {
           (new Date()).getTime() - stamp > duration ||
           Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
         ) {
-          clearTimeout(elem.setXTransitionInterval)
+          clearTimeout(elem.setXTransitionInterval);
           Monocle.Styles.setX(elem, finalX);
           if (elem.setXTCB) {
             elem.setXTCB();
