@@ -472,7 +472,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         overlay,
         {
           start: function (evt) {
-            obj = evt.target || window.event.srcElement;
+            var obj = evt.target || window.event.srcElement;
             do {
               if (obj == controlData.elements[0]) { return true; }
             } while (obj && (obj = obj.parentNode));
@@ -703,8 +703,8 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html#RS\\:monocle body * {" +
     "max-width: 100% !important;" +
   "}",
-  "html#RS\\:monocle img, video, object {" +
-    "max-height: 90% !important;" +
+  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object {" +
+    "max-height: 100% !important;" +
   "}"
 ]
 
