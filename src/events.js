@@ -212,18 +212,27 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 // Looks for start/end events on an element without significant move events in
 // between. Fires on the end event.
 //
-// Also sets up a dummy click event on K3, so that the elem becomes a
+// Also sets up a dummy click event on Kindle3, so that the elem becomes a
 // cursor target.
+//
+// If the optional activeClass string is provided, and if the element was
+// created by a Monocle.Factory, then the activeClass will be applied to the
+// element while it is being tapped.
 //
 // Returns a listeners object that you should pass to deafenForTap if you
 // need to.
-Monocle.Events.listenForTap = function (elem, fn) {
+Monocle.Events.listenForTap = function (elem, fn, activeClass) {
   var startPos;
 
   // On Kindle, register a noop function with click to make the elem a
   // cursor target.
   if (Monocle.Browser.on.Kindle3) {
     Monocle.Events.listen(elem, 'click', function () {});
+  }
+
+  var annul = function () {
+    startPos = null;
+    if (activeClass && elem.dom) { elem.dom.removeClass(activeClass); }
   }
 
   var annulIfOutOfBounds = function (evt) {
@@ -239,7 +248,7 @@ Monocle.Events.listenForTap = function (elem, fn) {
       evt.m.registrantX < 0 || evt.m.registrantX > elem.offsetWidth ||
       evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
     ) {
-      startPos = null;
+      annul();
     } else {
       evt.preventDefault();
     }
@@ -251,6 +260,7 @@ Monocle.Events.listenForTap = function (elem, fn) {
       start: function (evt) {
         startPos = [evt.m.pageX, evt.m.pageY];
         evt.preventDefault();
+        if (activeClass && elem.dom) { elem.dom.addClass(activeClass); }
       },
       move: annulIfOutOfBounds,
       end: function (evt) {
@@ -259,10 +269,9 @@ Monocle.Events.listenForTap = function (elem, fn) {
           evt.m.startOffset = startPos;
           fn(evt);
         }
+        annul();
       },
-      cancel: function (evt) {
-        startPos = null;
-      }
+      cancel: annul
     },
     {
       useCapture: false
