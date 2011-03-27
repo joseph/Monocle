@@ -344,7 +344,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Valid types:
   //  - standard (an overlay above the pages)
   //  - page (within the page)
-  //  - modal (overlay where click-away does nothing)
+  //  - modal (overlay where click-away does nothing, for a single control)
+  //  - hud (overlay that multiple controls can share)
   //  - popover (overlay where click-away removes the ctrl elements)
   //  - invisible
   //
@@ -382,7 +383,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         page.appendChild(runner);
         ctrlData.elements.push(runner);
       }
-    } else if (cType == "modal" || cType == "popover") {
+    } else if (cType == "modal" || cType == "popover" || cType == "hud") {
       ctrlElem = ctrl.createControlElements(overlay);
       overlay.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
@@ -455,18 +456,27 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var controlData = dataForControl(ctrl);
     if (!controlData) {
       console.warn("No data for control: " + ctrl);
-      return;
+      return false;
     }
+
     if (showingControl(ctrl)) {
-      return;
+      return false;
     }
+
+    var overlay = dom.find('overlay');
+    if (controlData.usesOverlay && controlData.controlType != "hud") {
+      for (var i = 0, ii = p.controls.length; i < ii; ++i) {
+        if (p.controls[i].usesOverlay && !p.controls[i].hidden) {
+          return false;
+        }
+      }
+      overlay.style.display = "block";
+    }
+
     for (var i = 0; i < controlData.elements.length; ++i) {
       controlData.elements[i].style.display = "block";
     }
-    var overlay = dom.find('overlay');
-    if (controlData.usesOverlay) {
-      overlay.style.display = "block";
-    }
+
     if (controlData.controlType == "popover") {
       overlay.listeners = Monocle.Events.listenForContact(
         overlay,
@@ -489,6 +499,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       ctrl.properties.hidden = false;
     }
     dispatchEvent('controlshow', ctrl, false);
+    return true;
   }
 
 
