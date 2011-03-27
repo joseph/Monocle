@@ -148,14 +148,26 @@ Monocle.Flippers.Slider = function (reader) {
 
     if (dir == k.FORWARDS) {
       if (getPlace().onLastPageOfBook()) {
-        p.reader.dispatchEvent('monocle:boundaryend');
+        p.reader.dispatchEvent(
+          'monocle:boundaryend',
+          {
+            locus: getPlace().getLocus({ direction : dir }),
+            page: upperPage()
+          }
+        );
         resetTurnData();
         return;
       }
       onGoingForward(boxPointX);
     } else if (dir == k.BACKWARDS) {
       if (getPlace().onFirstPageOfBook()) {
-        p.reader.dispatchEvent('monocle:boundarystart');
+        p.reader.dispatchEvent(
+          'monocle:boundarystart',
+          {
+            locus: getPlace().getLocus({ direction : dir }),
+            page: upperPage()
+          }
+        );
         resetTurnData();
         return;
       }
