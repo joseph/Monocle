@@ -111,21 +111,31 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function componentChanged(evt) {
     if (evt.m['page'] != p.page) { return; }
     var doc = evt.m['document'];
-    Monocle.Styles.applyRules(doc.body, k.BODY_STYLES);
+    if (Monocle.Browser.has.columnOverflowPaintBug) {
+      var div = doc.createElement('div');
+      Monocle.Styles.applyRules(div, k.BODY_STYLES);
+      div.style.cssText += "overflow: scroll !important;";
+      while (doc.body.childNodes.length) {
+        div.appendChild(doc.body.firstChild);
+      }
+      doc.body.appendChild(div);
+    } else {
+      Monocle.Styles.applyRules(doc.body, k.BODY_STYLES);
 
-    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
-    if (Monocle.Browser.is.WebKit) {
-      doc.documentElement.style.overflow = 'hidden';
+      // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
+      if (Monocle.Browser.is.WebKit) {
+        doc.documentElement.style.overflow = 'hidden';
+      }
     }
+
     p.dirty = true;
   }
 
 
   function setColumnWidth() {
     var cw = p.page.m.sheafDiv.clientWidth;
-    var doc = p.page.m.activeFrame.contentDocument;
     if (currBodyStyleValue('column-width') != cw+"px") {
-      Monocle.Styles.affix(doc.body, 'column-width', cw+"px");
+      Monocle.Styles.affix(columnedElement(), 'column-width', cw+"px");
       p.dirty = true;
     }
   }
@@ -152,8 +162,15 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     if (Monocle.Browser.has.mustScrollSheaf) {
       return p.page.m.sheafDiv;
     } else {
-      return p.page.m.activeFrame.contentDocument.body;
+      return columnedElement();
     }
+  }
+
+
+  // Returns the element to which columns CSS should be applied.
+  function columnedElement() {
+    var elem = p.page.m.activeFrame.contentDocument.body;
+    return Monocle.Browser.has.columnOverflowPaintBug ? elem.firstChild : elem;
   }
 
 
@@ -229,7 +246,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
-    if (k.SETX) {
+    p.page.m.offset = 0 - offset;
+    if (k.SETX && !Monocle.Browser.has.columnOverflowPaintBug) {
       var bdy = p.page.m.activeFrame.contentDocument.body;
       Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
     } else {

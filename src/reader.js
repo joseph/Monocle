@@ -344,7 +344,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Valid types:
   //  - standard (an overlay above the pages)
   //  - page (within the page)
-  //  - modal (overlay where click-away does nothing)
+  //  - modal (overlay where click-away does nothing, for a single control)
+  //  - hud (overlay that multiple controls can share)
   //  - popover (overlay where click-away removes the ctrl elements)
   //  - invisible
   //
@@ -382,7 +383,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         page.appendChild(runner);
         ctrlData.elements.push(runner);
       }
-    } else if (cType == "modal" || cType == "popover") {
+    } else if (cType == "modal" || cType == "popover" || cType == "hud") {
       ctrlElem = ctrl.createControlElements(overlay);
       overlay.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
@@ -455,24 +456,33 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var controlData = dataForControl(ctrl);
     if (!controlData) {
       console.warn("No data for control: " + ctrl);
-      return;
+      return false;
     }
+
     if (showingControl(ctrl)) {
-      return;
+      return false;
     }
+
+    var overlay = dom.find('overlay');
+    if (controlData.usesOverlay && controlData.controlType != "hud") {
+      for (var i = 0, ii = p.controls.length; i < ii; ++i) {
+        if (p.controls[i].usesOverlay && !p.controls[i].hidden) {
+          return false;
+        }
+      }
+      overlay.style.display = "block";
+    }
+
     for (var i = 0; i < controlData.elements.length; ++i) {
       controlData.elements[i].style.display = "block";
     }
-    var overlay = dom.find('overlay');
-    if (controlData.usesOverlay) {
-      overlay.style.display = "block";
-    }
+
     if (controlData.controlType == "popover") {
       overlay.listeners = Monocle.Events.listenForContact(
         overlay,
         {
           start: function (evt) {
-            obj = evt.target || window.event.srcElement;
+            var obj = evt.target || window.event.srcElement;
             do {
               if (obj == controlData.elements[0]) { return true; }
             } while (obj && (obj = obj.parentNode));
@@ -489,6 +499,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       ctrl.properties.hidden = false;
     }
     dispatchEvent('controlshow', ctrl, false);
+    return true;
   }
 
 
@@ -498,22 +509,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
-  // Internet Explorer does not permit custom events; we'll wait for a
-  // version of IE that supports the W3C model.
-  //
   function dispatchEvent(evtType, data, cancelable) {
-    if (!document.createEvent) {
-      return true;
-    }
-    var evt = document.createEvent("Events");
-    evt.initEvent(evtType, false, cancelable || false);
-    evt.m = data;
-    try {
-      return dom.find('box').dispatchEvent(evt);
-    } catch(e) {
-      console.warn("Failed to dispatch event: " + evtType);
-      return false;
-    }
+    return Monocle.Events.dispatch(dom.find('box'), evtType, data, cancelable);
   }
 
 
@@ -702,25 +699,31 @@ Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
 Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.DEFAULT_STYLE_RULES = [
-  "html * {" +
+  "html#RS\\:monocle * {" +
     "-webkit-font-smoothing: subpixel-antialiased;" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     "overflow: visible !important;" +
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
-  "body {" +
+  "html#RS\\:monocle body {" +
     "margin: 0 !important;" +
     "padding: 0 !important;" +
     "-webkit-text-size-adjust: none;" +
   "}",
-  "body * {" +
+  "html#RS\\:monocle body * {" +
     "max-width: 100% !important;" +
   "}",
-  "img, video, object {" +
-    "max-height: 90% !important;" +
+  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object {" +
+    "max-height: 95% !important;" +
   "}"
 ]
+
+if (Monocle.Browser.has.columnOverflowPaintBug) {
+  Monocle.Reader.DEFAULT_STYLE_RULES.push(
+    "::-webkit-scrollbar { width: 0; height: 0; }"
+  )
+}
 
 
 Monocle.pieceLoaded('reader');

@@ -183,10 +183,11 @@ Monocle.Book = function (dataSource) {
   function setPageAt(pageDiv, locus) {
     locus = pageNumberAt(pageDiv, locus);
     if (locus && !locus.load) {
+      var evtData = { locus: locus, page: pageDiv }
       if (locus.boundarystart) {
-        pageDiv.m.reader.dispatchEvent('monocle:boundarystart', { locus: locus });
+        pageDiv.m.reader.dispatchEvent('monocle:boundarystart', evtData);
       } else if (locus.boundaryend) {
-        pageDiv.m.reader.dispatchEvent('monocle:boundaryend', { locus: locus });
+        pageDiv.m.reader.dispatchEvent('monocle:boundaryend', evtData);
       } else {
         var component = p.components[p.componentIds.indexOf(locus.componentId)];
         pageDiv.m.place = pageDiv.m.place || new Monocle.Place();
