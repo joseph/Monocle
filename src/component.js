@@ -228,12 +228,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     // Correct the body lineHeight to use a number, not a percentage, which
     // causes the text to jump upwards.
-    var doc = frame.contentDocument;
+    /*var doc = frame.contentDocument;
     var win = doc.defaultView;
     var currStyle = win.getComputedStyle(doc.body, null);
     var lh = parseFloat(currStyle.getPropertyValue('line-height'));
     var fs = parseFloat(currStyle.getPropertyValue('font-size'));
-    doc.body.style.lineHeight = lh / fs;
+    doc.body.style.lineHeight = lh / fs;*/
 
     p.pageLength = pageDiv.m.dimensions.measure();
     frame.style.visibility = "visible";
