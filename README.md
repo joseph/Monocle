@@ -428,6 +428,8 @@ on GitHub).
 
 ### History
 
+2.0.0 - Complete rewrite to sandbox content in iframes (the Componentry branch).
+
 1.0.1 - Scrolling flipper, more tests, work on sandboxing in iframe (Framer).
 
 1.0.0 - Initial release
