@@ -369,3 +369,11 @@ The class idiom looks like this:
 
 This allows a quite concise, clear coding style. However, it does make class
 inheritance somewhat limited. Let's see how it goes.
+
+
+
+### History
+
+1.0.1 - Scrolling flipper, more tests, work on sandboxing in iframe (Framer).
+
+1.0.0 - Initial release
