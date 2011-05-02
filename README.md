@@ -424,3 +424,10 @@ expect the controls to move out into an extension library.
 
 If you can help out with any of these things, fork away (or contact 'joseph'
 on GitHub).
+
+
+### History
+
+1.0.1 - Scrolling flipper, more tests, work on sandboxing in iframe (Framer).
+
+1.0.0 - Initial release
