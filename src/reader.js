@@ -96,9 +96,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     createReaderElements();
 
     // Clamp page frames to a set of styles that reduce Monocle breakage.
-    var defRules = k.DEFAULT_STYLE_RULES;
-    if (options.stylesheet) { defRules += options.stylesheet; }
-    p.defaultStyles = addPageStyles(defRules, false);
+    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
+    if (options.stylesheet) {
+      p.initialStyles = addPageStyles(options.stylesheet, false);
+    }
 
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
