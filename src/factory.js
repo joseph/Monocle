@@ -73,7 +73,11 @@ Monocle.Factory = function (element, label, index, reader) {
   //
   function make(tagName, oLabel, index_or_options, or_options) {
     var oIndex, options;
-    if (arguments.length == 2) {
+    if (arguments.length == 1) {
+      oLabel = null,
+      oIndex = 0;
+      options = {};
+    } else if (arguments.length == 2) {
       oIndex = 0;
       options = {};
     } else if (arguments.length == 4) {
