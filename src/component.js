@@ -322,14 +322,17 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   function pageForXPath(xpath, pageDiv) {
     var doc = pageDiv.m.activeFrame.contentDocument;
-    var node = doc.evaluate(
-      xpath,
-      doc,
-      null,
-      XPathResult.FIRST_ORDERED_NODE_TYPE,
-      null
-    ).singleNodeValue;
-    var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+    var percent = 0;
+    if (typeof doc.evaluate == "function") {
+      var node = doc.evaluate(
+        xpath,
+        doc,
+        null,
+        9,
+        null
+      ).singleNodeValue;
+      var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+    }
     return percentToPageNumber(percent);
   }
 
