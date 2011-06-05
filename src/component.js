@@ -79,6 +79,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
     if (p.source.html || (typeof p.source == "string")) {   // HTML
       return loadFrameFromHTML(p.source.html || p.source, frame, callback);
+    } else if (p.source.javascript) {                       // JAVASCRIPT
+      //console.log("Loading as javascript: "+p.source.javascript);
+      return loadFrameFromJavaScript(p.source.javascript, frame, callback);
     } else if (p.source.url) {                              // URL
       return loadFrameFromURL(p.source.url, frame, callback);
     } else if (p.source.nodes) {                            // NODES
@@ -91,6 +94,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   // LOAD STRATEGY: HTML
   // Loads a HTML string into the given frame, invokes the callback once loaded.
+  //
+  // Cleans the string so it can be used in a JavaScript statement. This is
+  // slow, so if the string is already clean, skip this and use
+  // loadFrameFromJavaScript directly.
   //
   function loadFrameFromHTML(src, frame, callback) {
     // Compress whitespace.
@@ -109,8 +116,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
       src = src.replace(new RegExp(doctypeFragment, 'm'), '');
     }
 
-    src = "javascript: '" + src + "';";
+    loadFrameFromJavaScript(src, frame, callback);
+  }
 
+
+  // LOAD STRATEGY: JAVASCRIPT
+  // Like the HTML strategy, but assumes that the src string is already clean.
+  //
+  function loadFrameFromJavaScript(src, frame, callback) {
+    src = "javascript:'"+src+"';";
     frame.onload = function () {
       frame.onload = null;
       Monocle.defer(callback);
