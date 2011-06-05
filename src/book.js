@@ -304,7 +304,20 @@ Monocle.Book = function (dataSource) {
       var evtData = { 'page': pageDiv, 'component': cmptId, 'index': index };
       pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
     }
+    var failedToLoadComponent = function () {
+      console.warn("Failed to load component: "+cmptId);
+      pageDiv.m.reader.dispatchEvent('monocle:componentfailed', evtData);
+      try {
+        var currCmpt = pageDiv.m.activeFrame.m.component;
+        evtData.cmptId = currCmpt.properties.id;
+        callback(currCmpt);
+      } catch (e) {
+        console.warn("Failed to fall back to previous component.");
+      }
+    }
+
     var fn = function (cmptSource) {
+      if (cmptSource === false) { return failedToLoadComponent(); }
       if (pageDiv) {
         evtData['source'] = cmptSource;
         pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
@@ -322,6 +335,8 @@ Monocle.Book = function (dataSource) {
     var cmptSource = p.dataSource.getComponent(cmptId, fn);
     if (cmptSource && !p.components[index]) {
       fn(cmptSource);
+    } else if (cmptSource === false) {
+      return failedToLoadComponent();
     }
   }
 
