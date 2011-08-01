@@ -101,7 +101,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   //
   function loadFrameFromHTML(src, frame, callback) {
     // Compress whitespace.
-    src = src.replace(/\s+/g, ' ');
+    str = str.replace(/\n/g, '\\n').replace(/\r/, '\\r');
 
     // Escape single-quotes.
     src = src.replace(/\'/g, '\\\'');
