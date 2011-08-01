@@ -151,10 +151,24 @@ Monocle.Place.FromPageNumber = function (component, pageNumber) {
   return place;
 }
 
+
 Monocle.Place.FromPercentageThrough = function (component, percent) {
   var place = new Monocle.Place();
   place.setPercentageThrough(component, percent);
   return place;
+}
+
+
+// We can't create a place from a percentage of the book, because the
+// component may not have been loaded yet. But we can get a locus.
+//
+Monocle.Place.percentOfBookToLocus = function (reader, percent) {
+  var componentIds = reader.getBook().properties.componentIds;
+  var componentSize = 1.0 / componentIds.length;
+  return {
+    componentId: componentIds[Math.floor(percent / componentSize)],
+    percent: (percent % componentSize) / componentSize
+  }
 }
 
 Monocle.pieceLoaded('place');
