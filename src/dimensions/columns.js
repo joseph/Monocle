@@ -111,21 +111,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function componentChanged(evt) {
     if (evt.m['page'] != p.page) { return; }
     var doc = evt.m['document'];
-    if (Monocle.Browser.has.columnOverflowPaintBug) {
-      var div = doc.createElement('div');
-      Monocle.Styles.applyRules(div, k.BODY_STYLES);
-      div.style.cssText += "overflow: scroll !important;";
-      while (doc.body.childNodes.length) {
-        div.appendChild(doc.body.firstChild);
-      }
-      doc.body.appendChild(div);
-    } else {
-      Monocle.Styles.applyRules(doc.body, k.BODY_STYLES);
+    Monocle.Styles.applyRules(doc.body, k.BODY_STYLES);
 
-      // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
-      if (Monocle.Browser.is.WebKit) {
-        doc.documentElement.style.overflow = 'hidden';
-      }
+    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
+    if (Monocle.Browser.is.WebKit) {
+      doc.documentElement.style.overflow = 'hidden';
     }
 
     p.dirty = true;
@@ -169,8 +159,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   // Returns the element to which columns CSS should be applied.
   function columnedElement() {
-    var elem = p.page.m.activeFrame.contentDocument.body;
-    return Monocle.Browser.has.columnOverflowPaintBug ? elem.firstChild : elem;
+    return p.page.m.activeFrame.contentDocument.body;
   }
 
 
@@ -247,7 +236,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
     p.page.m.offset = 0 - offset;
-    if (k.SETX && !Monocle.Browser.has.columnOverflowPaintBug) {
+    if (k.SETX) {
       var bdy = p.page.m.activeFrame.contentDocument.body;
       Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
     } else {
