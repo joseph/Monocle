@@ -308,7 +308,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   // Moves the current page as specified by the locus. See
-  // Monocle.Book#changePage for documentation on the locus argument.
+  // Monocle.Book#pageNumberAt for documentation on the locus argument.
   //
   // The callback argument is optional.
   //
@@ -717,6 +717,7 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "}",
   "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object {" +
     "max-height: 95% !important;" +
+    "height: auto !important;" +
   "}"
 ]
 
