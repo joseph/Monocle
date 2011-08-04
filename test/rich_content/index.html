@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Rich Content test - Monocle</title>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/events.js"></script>
+    <script type="text/javascript" src="../../src/factory.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/vert.js"></script>
+    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
+
+    <style type="text/css">
+      #reader {
+        width: 300px;
+        height: 420px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+      }
+      p {
+        max-width: 25em;
+      }
+    </style>
+
+    <script type="text/javascript">
+      // Initialize the reader element.
+      Monocle.Events.listen(
+        window,
+        'load',
+        function () { window.reader = Monocle.Reader('reader'); }
+      );
+    </script>
+
+  </head>
+
+  <body>
+    <h1>Rich Content</h1>
+    <p>Q. What happens when we paginate more complex data?</p>
+
+    <h2>Tables</h2>
+    <div id="reader">
+      <style>
+        html#RS\:monocle div.scrollerFrame {
+          width: 100%;
+          height: 100%;
+          overflow: auto !important;
+        }
+      </style>
+
+      <p>Lorem ipsum introduction.</p>
+      <img src="horse.jpg" />
+      <!--div class="scrollerFrame"-->
+        <table>
+          <tr>
+            <th>Table heading 1</th>
+            <th>Table heading 2</th>
+            <th>Table heading 3</th>
+            <th>Table heading 4</th>
+            <th>Table heading 5</th>
+            <th>Table heading 6</th>
+            <th>Table heading 7</th>
+            <th>Table heading 8</th>
+          </tr>
+          <tr>
+            <td>Table row 1 cell 1</td>
+            <td>Table row 1 cell 2</td>
+            <td>Table row 1 cell 3</td>
+            <td>Table row 1 cell 4</td>
+            <td>Table row 1 cell 5</td>
+            <td>Table row 1 cell 6</td>
+            <td>Table row 1 cell 7</td>
+            <td>Table row 1 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 2 cell 1</td>
+            <td>Table row 2 cell 2</td>
+            <td>Table row 2 cell 3</td>
+            <td>Table row 2 cell 4</td>
+            <td>Table row 2 cell 5</td>
+            <td>Table row 2 cell 6</td>
+            <td>Table row 2 cell 7</td>
+            <td>Table row 2 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 3 cell 1</td>
+            <td>Table row 3 cell 2</td>
+            <td>Table row 3 cell 3</td>
+            <td>Table row 3 cell 4</td>
+            <td>Table row 3 cell 5</td>
+            <td>Table row 3 cell 6</td>
+            <td>Table row 3 cell 7</td>
+            <td>Table row 3 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 4 cell 1</td>
+            <td>Table row 4 cell 2</td>
+            <td>Table row 4 cell 3</td>
+            <td>Table row 4 cell 4</td>
+            <td>Table row 4 cell 5</td>
+            <td>Table row 4 cell 6</td>
+            <td>Table row 4 cell 7</td>
+            <td>Table row 4 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 5 cell 1</td>
+            <td>Table row 5 cell 2</td>
+            <td>Table row 5 cell 3</td>
+            <td>Table row 5 cell 4</td>
+            <td>Table row 5 cell 5</td>
+            <td>Table row 5 cell 6</td>
+            <td>Table row 5 cell 7</td>
+            <td>Table row 5 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 6 cell 1</td>
+            <td>Table row 6 cell 2</td>
+            <td>Table row 6 cell 3</td>
+            <td>Table row 6 cell 4</td>
+            <td>Table row 6 cell 5</td>
+            <td>Table row 6 cell 6</td>
+            <td>Table row 6 cell 7</td>
+            <td>Table row 6 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 7 cell 1</td>
+            <td>Table row 7 cell 2</td>
+            <td>Table row 7 cell 3</td>
+            <td>Table row 7 cell 4</td>
+            <td>Table row 7 cell 5</td>
+            <td>Table row 7 cell 6</td>
+            <td>Table row 7 cell 7</td>
+            <td>Table row 7 cell 8</td>
+          </tr>
+          <tr>
+            <td>Table row 8 cell 1</td>
+            <td>Table row 8 cell 2</td>
+            <td>Table row 8 cell 3</td>
+            <td>Table row 8 cell 4</td>
+            <td>Table row 8 cell 5</td>
+            <td>Table row 8 cell 6</td>
+            <td>Table row 8 cell 7</td>
+            <td>Table row 8 cell 8</td>
+          </tr>
+        </table>
+      <!--/div-->
+      <p>Lorem ipsum duo.</p>
+      <img src="horse.jpg" />
+      <p>Lorem ipsum tre.</p>
+    </div>
+
+    <p>
+      A. Not surprisingly, the CSS-column-based approach to
+      pagination struggles with non-linear flows in most browsers.
+    </p>
+    <p>
+      One approach to this is to handle tables differently -- for eg,
+      by replacing them in the flow with a button that opens the table
+      in a pannable div/iframe floating over the top of the page. Or even
+      re-embedding them in the page within a pannable frame (for the simplest
+      example, uncomment the scrollerFrame div in the source of this page).
+    </p>
+    <p>
+      Monocle dispatches a <code>monocle:componentchange</code> event to
+      give your upper logic layers a chance to modify the DOM of components
+      before pagination is calculated.
+    </p>
+    <p>
+      This problem isn't specific to Monocle - it's endemic to complex
+      layouts when you have wildly variable page dimensions and pagination
+      approaches that assume linear content flows.
+    </p>
+  </body>
+</html>
