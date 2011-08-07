@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Columns test</title>
+    <title>Locus with XPath test</title>
 
     <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
     <style type="text/css">
       #reader {
         position: relative;
@@ -57,10 +57,18 @@
       );
     </script>
   </head>
-  <body>
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
 
-    <div id="reader"></div>
+    <h1>Locus with XPath test</h1>
+    <p>
+      You can tell Monocle to go to specific content using an XPath.
+      This might be useful for implementing search or annotations.
+    </p>
 
+    <p>
+      Go to:
+    </p>
     <ul>
       <li>
         <a href="javascript:goToXPath('pt1.html', '//p[2]');">Second paragraph of Part I</a>
@@ -72,6 +80,8 @@
         <a href="javascript:goToXPath('pt2.html', '//*[contains(text(), \'gremlins\')]');">First occurrence of 'gremlins' in Part II</a>
       </li>
     </ul>
+
+    <div id="reader"></div>
 
   </body>
 </html>

@@ -10,23 +10,24 @@
     <title>Default stylesheet test</title>
 
     <!-- MONOCLE CORE -->
-    <script type="text/javascript" src="../../../src/monocle.js"></script>
-    <script type="text/javascript" src="../../../src/compat.js"></script>
-    <script type="text/javascript" src="../../../src/events.js"></script>
-    <script type="text/javascript" src="../../../src/factory.js"></script>
-    <script type="text/javascript" src="../../../src/styles.js"></script>
-    <script type="text/javascript" src="../../../src/reader.js"></script>
-    <script type="text/javascript" src="../../../src/book.js"></script>
-    <script type="text/javascript" src="../../../src/component.js"></script>
-    <script type="text/javascript" src="../../../src/place.js"></script>
+    <script type="text/javascript" src="../../src/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat.js"></script>
+    <script type="text/javascript" src="../../src/events.js"></script>
+    <script type="text/javascript" src="../../src/factory.js"></script>
+    <script type="text/javascript" src="../../src/styles.js"></script>
+    <script type="text/javascript" src="../../src/reader.js"></script>
+    <script type="text/javascript" src="../../src/book.js"></script>
+    <script type="text/javascript" src="../../src/component.js"></script>
+    <script type="text/javascript" src="../../src/place.js"></script>
 
     <!-- MONOCLE FLIPPERS -->
-    <script type="text/javascript" src="../../../src/controls/panel.js"></script>
-    <script type="text/javascript" src="../../../src/panels/twopane.js"></script>
-    <script type="text/javascript" src="../../../src/dimensions/columns.js"></script>
-    <script type="text/javascript" src="../../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="../../../src/monocle.css" />
+    <link rel="stylesheet" type="text/css" href="../../src/monocle.css" />
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
 
     <style type="text/css">
       #reader {
@@ -51,9 +52,14 @@
 
   </head>
 
-  <body>
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
     <h1>Default stylesheet</h1>
-    <p>Adds a stylsheet rule for green body text upon initialisation.</p>
+    <p>
+      Demonstrates how to apply a stylesheet to each component on load in
+      the Monocle Reader's initialisation options. In this case, it turns the
+      component's body text <span style="color: #090;">green</span>.
+    </p>
 
     <div id="reader">
       <p>

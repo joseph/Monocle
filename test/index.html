@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Guide to Monocle tests</title>
+
+    <link href="tests.css" rel="stylesheet" />
+
+  </head>
+
+  <body class="narrow">
+    <h1>Guide to Monocle tests</h1>
+
+    <p>
+      Monocle has three kinds of tests:
+    </p>
+    <ol>
+      <li>
+        <strong>Examples</strong> show you how to implement a Monocle
+        Reader.
+      </li>
+      <li>
+        <strong>Feature tests</strong> exercise the various aspects of
+        Monocle, including the way book content is loaded, the way content is
+        paginated, the way pages are animated, etc.
+      </li>
+      <li>
+        <strong>Bug tests</strong> typically highlight rendering or logic
+        problems in browsers, and in some cases test Monocle's workarounds.
+      </li>
+    </ol>
+
+    <h2>Examples</h2>
+    <ul>
+      <li>
+        <a href="showcase/01-velveteen/index.html">Showcase: Velveteen Rabbit</a>
+        &mdash; The simplest possible reader.
+      </li>
+      <li>
+        <a href="showcase/02-dickens/index.html">Showcase: Charles Dickens</a>
+        &mdash; A visually appealing, full-featured reader.
+      </li>
+      <li>
+        <a href="dogfood/index.html">Dogfood</a>
+        &mdash; Tests the example code from Monocle's README.
+      </li>
+    </ul>
+
+    <h2>Feature tests</h2>
+    <ul>
+      <li>
+        <a href="bookdata/index.html">Book data</a>
+        &mdash; Loading different kinds of HTML content.
+      </li>
+      <li>
+        <a href="componentry/index.html">Componentry</a>
+        &mdash; Various strategies for loading content into components.
+      </li>
+      <li>
+        <a href="controls/index.html">Controls</a>
+        &mdash; Simple tests for Monocle's stock controls.
+      </li>
+      <li>
+        <a href="flippers/index.html">Flippers</a>
+        &mdash; Ways that Monocle can animate page-turns.
+      </li>
+      <li>
+        <a href="locus_xpath/index.html">Locus with XPath</a>
+        &mdash; Tell Monocle to go to a particular location in the content.
+      </li>
+      <li>
+        <a href="panels/index.html">Panels</a>
+        &mdash; Ways that you can interact with Monocle pages.
+      </li>
+      <li>
+        <a href="stencil/index.html">Stencil</a>
+        &mdash; A Monocle feature that makes links clickable through panels.
+      </li>
+      <li>
+        <a href="stylesheet/index.html">Stylesheet</a>
+        &mdash; Set a default stylesheet for all components when creating
+        the Reader.
+      </li>
+    </ul>
+
+
+    <h2>Bug tests</h2>
+    <ul>
+      <li>
+        <a href="rich_content/index.html">Rich content</a>
+        &mdash; Shows the problems browsers have paginating rich content
+        like tables, and suggests solutions.
+      </li>
+      <li>
+        <a href="embedded/index.html">Embedded Reader</a>
+        &mdash; Some old mobile browsers struggle with iframes inside iframes.
+      </li>
+      <li>
+        <a href="bugs/">Client-specific bug index</a>
+        &mdash; A repository of other bugs that afflict only specific clients.
+      </li>
+    </ul>
+
+  </body>
+
+</html>

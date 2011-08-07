@@ -11,6 +11,14 @@ Contributions welcome - fork the repository on
 [GitHub](http://github.com/joseph/monocle).
 
 
+
+## Try some examples
+
+The best way to gain a quick understanding of Monocle is to open `index.html`
+in the `test` directory. This gives you an overview of the main example tests and
+feature tests.
+
+
 ## Getting started
 
 Here's the simplest thing that could possibly work.
@@ -33,6 +41,7 @@ itself. In theory there's no limit on the size of the contents of that div.
 
 A more advanced scenario involves feeding Monocle a "book data object", from
 which it can lazily load the contents of the book as the user requests it.
+
 
 ### Specification of the book data object
 

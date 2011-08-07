@@ -1,13 +1,33 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <title>Embed test</title>
+    <title>Embedded Reader test</title>
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
     <style>
-      body {
-        margin: 8em;
+      iframe {
+        border: 1px solid #F0F;
       }
     </style>
   </head>
-  <body>
-    <iframe src="embed.html" width="300" height="400" scrolling="no" frameborder="0" style="border: 1px solid #000;"></iframe>
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Embedded Reader test</h1>
+    <p>
+      Tests that the Monocle Reader functions properly when embedded in an
+      iframe. Essentially this nests iframes, since components are loaded into
+      iframes within the Monocle Reader.
+    </p>
+    <p>
+      This should be a straightforward test, but some older mobile browsers
+      have difficulty with touch coordinates and deep nesting &mdash; this
+      lets us check for that.
+    </p>
+    <iframe
+      src="embed.html"
+      width="300"
+      height="400"
+      scrolling="no"
+      frameborder="0"
+    ></iframe>
   </body>
 </html>
