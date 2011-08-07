@@ -279,3 +279,5 @@ if (Monocle.Browser.has.iframeDoubleWidthBug) {
 } else {
   Monocle.Dimensions.Columns.BODY_STYLES["width"] = "100%";
 }
+
+Monocle.pieceLoaded("dimensions/columns");

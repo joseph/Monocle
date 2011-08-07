@@ -18,7 +18,6 @@
     <script type="text/javascript" src="../../src/book.js"></script>
     <script type="text/javascript" src="../../src/component.js"></script>
     <script type="text/javascript" src="../../src/place.js"></script>
-    <script type="text/javascript" src="../../src/framer.js"></script>
 
     <!-- MONOCLE FLIPPERS -->
     <script type="text/javascript" src="../../src/controls/panel.js"></script>
@@ -88,27 +87,6 @@
         return window['reader'+num] = Monocle.Reader('reader'+num, bd);
       }
 
-      function framedReader(num, cmpt) {
-        var bd = new bookData({components: [cmpt]});
-        var framer = Monocle.Framer();
-        framer.constants.scripts = [
-          "../../src/monocle.js",
-          "../../src/compat.js",
-          "../../src/events.js",
-          "../../src/factory.js",
-          "../../src/reader.js",
-          "../../src/book.js",
-          "../../src/component.js",
-          "../../src/place.js",
-          "../../src/styles.js",
-          "../../src/controls/panel.js",
-          "../../src/panels/twopane.js",
-          "../../src/dimensions/columns.js",
-          "../../src/flippers/slider.js"
-        ]
-        framer.constants.waitForPiece = 'flippers/slider';
-        return window['reader'+num] = framer.newReader('reader'+num, bd);
-      }
 
       // Initialize the reader element.
       Monocle.Events.listen(
@@ -121,7 +99,7 @@
           inlineReader(4, ['04-short-1page','04-short-2page','04-short-3page']);
           inlineReader(5, '05-short-document-with-image');
           inlineReader(6, '06-document-with-stylesheet');
-          framedReader(7, '07-contains-javascript');
+          inlineReader(7, '07-contains-javascript');
         }
       );
     </script>
