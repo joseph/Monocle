@@ -1,4 +1,5 @@
 Monocle.Styles = {
+
   // Takes a hash or string of CSS property assignments and applies them
   // to the element.
   //
@@ -14,14 +15,19 @@ Monocle.Styles = {
     return elem.style.cssText;
   },
 
+
   // Generates cross-browser properties for a given property.
   // ie, affix(<elem>, 'transition', 'linear 100ms') would apply that value
   // to webkitTransition for WebKit browsers, and to MozTransition for Gecko.
   //
   affix: function (elem, property, value) {
     var target = elem.style ? elem.style : elem;
-    target[Monocle.Browser.CSSProps.toDOMProp(property)] = value;
+    var props = Monocle.Browser.CSSProps.toDOMProps(property);
+    for (var i = 0, ii = props.length; i < ii; ++i) {
+      target[props[i]] = value;
+    }
   },
+
 
   setX: function (elem, x) {
     var s = elem.style;
@@ -35,6 +41,7 @@ Monocle.Styles = {
     return x;
   },
 
+
   setY: function (elem, y) {
     var s = elem.style;
     if (typeof y == "number") { y += "px"; }
@@ -46,6 +53,7 @@ Monocle.Styles = {
     s.MozTransform = s.OTransform = s.transform = "translateY("+y+")";
     return y;
   }
+
 }
 
 

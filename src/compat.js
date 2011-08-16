@@ -63,42 +63,22 @@ Monocle.Browser.CSSProps.capStr = function (wd) {
 // If no second argument, then an array of all known prefixes is returned,
 // in the order of Monocle.Browser.CSSProps.domprefixes (see above).
 //
-Monocle.Browser.CSSProps.toDOMProps = function (prop, prefix) {
+Monocle.Browser.CSSProps.toDOMProps = function (prop) {
   var parts = prop.split('-');
   for (var i = parts.length; i > 0; --i) {
     parts[i] = Monocle.Browser.CSSProps.capStr(parts[i]);
   }
 
-  if (typeof(prefix) != 'undefined' && prefix != null) {
-    if (prefix) {
+  var props = [parts.join('')];
+  var eng = Monocle.Browser.CSSProps.engines.indexOf(Monocle.Browser.engine);
+  if (eng) {
+    var pf = Monocle.Browser.CSSProps.domprefixes[eng];
+    if (pf) {
       parts[0] = Monocle.Browser.CSSProps.capStr(parts[0]);
-      return prefix+parts.join('');
-    } else {
-      return parts.join('');
+      props.push(pf+parts.join(''));
     }
   }
-
-  var props = [parts.join('')];
-  parts[0] = Monocle.Browser.CSSProps.capStr(parts[0]);
-  for (i = 0; i < Monocle.Browser.CSSProps.prefixes.length; ++i) {
-    var pf = Monocle.Browser.CSSProps.domprefixes[i];
-    if (!pf) { continue; }
-    props.push(pf+parts.join(''));
-  }
   return props;
-}
-
-
-// Returns the appropriate DOM version of the CSS property for the
-// current browser.
-//
-Monocle.Browser.CSSProps.toDOMProp = function (prop) {
-  return Monocle.Browser.CSSProps.toDOMProps(
-    prop,
-    Monocle.Browser.CSSProps.domprefixes[
-      Monocle.Browser.CSSProps.engines.indexOf(Monocle.Browser.engine)
-    ]
-  );
 }
 
 

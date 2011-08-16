@@ -268,6 +268,8 @@ Monocle.Dimensions.Columns.BODY_STYLES = {
   "-webkit-column-fill": "auto",
   "-moz-column-gap": "0",
   "-moz-column-fill": "auto",
+  "-o-column-gap": "0",
+  "-o-column-fill": "auto",
   "column-gap": "0",
   "column-fill": "auto"
 }
