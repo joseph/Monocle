@@ -382,9 +382,9 @@ class inheritance, but JS offers other ways to share logic between classes.
 ## Browser support
 
 At this time, Monocle aims for full support of all browsers with a
-W3C-compliant CSS column module implementation. That is only Gecko and WebKit
-at this point. Legacy support is provided for some other browsers, including
-recent versions of Opera and Internet Explorer. Please encourage your
+W3C-compliant CSS column module implementation. That is Gecko, WebKit and
+Opera at this point. Legacy support is provided for some other browsers,
+including recent versions of Internet Explorer. Please encourage your
 browser-maker to work on implementing these standards in particular:
 
 * CSS Multi-Column Layout
