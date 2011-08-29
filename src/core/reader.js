@@ -176,8 +176,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       page.m.activeFrame.setAttribute('frameBorder', 0);
       page.m.activeFrame.setAttribute('scrolling', 'no');
       p.flipper.addPage(page);
-      // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
-      Monocle.Events.listenOnIframe(page.m.activeFrame);
     }
     dom.append('div', 'overlay');
     dispatchEvent("monocle:loading");
