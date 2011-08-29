@@ -236,14 +236,23 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
     p.page.m.offset = 0 - offset;
+    translateToOffset(offset);
+    return offset;
+  }
+
+
+  function translateToOffset(offset) {
     if (k.SETX) {
       var bdy = p.page.m.activeFrame.contentDocument.body;
-      Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
+      if (Monocle.Browser.iOSVersion >= 5) {
+        bdy.style.cssText += "-webkit-transform: translate3d("+offset+"px,0,0)";
+      } else {
+        Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
+      }
     } else {
       var scrElem = scrollerElement();
       scrElem.scrollLeft = 0 - offset;
     }
-    return offset;
   }
 
 
