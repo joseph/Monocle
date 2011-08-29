@@ -1,3 +1,6 @@
+// This was once used by the legacy flipper, before the legacy flipper was
+// removed. It could serve as the basis for a scrolling flipper or something.
+//
 Monocle.Dimensions.Vert = function (pageDiv) {
 
   var API = { constructor: Monocle.Dimensions.Vert }
