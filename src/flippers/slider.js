@@ -67,24 +67,6 @@ Monocle.Flippers.Slider = function (reader) {
   // to be able to select or otherwise interact with text.
   function interactiveMode(bState) {
     p.reader.dispatchEvent('monocle:interactive:'+(bState ? 'on' : 'off'));
-    if (!Monocle.Browser.env.selectIgnoresZOrder) { return; }
-    if (p.interactive = bState) {
-      if (p.activeIndex != 0) {
-        var place = getPlace();
-        if (place) {
-          setPage(
-            p.reader.dom.find('page', 0),
-            place.getLocus(),
-            function () {
-              flipPages();
-              prepareNextPage();
-            }
-          );
-        } else {
-          flipPages();
-        }
-      }
-    }
   }
 
 
