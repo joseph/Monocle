@@ -185,7 +185,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       if (Monocle.Browser.is.WebKit) {
         frame.contentDocument.documentElement.style.overflow = "hidden";
       }
-      dispatchEvent('monocle:frameprimed', { frame: frame, pageIndex: pageCount });
+      dispatchEvent(
+        'monocle:frameprimed',
+        { frame: frame, pageIndex: pageCount }
+      );
       if ((pageCount += 1) == pageMax) {
         Monocle.defer(callback);
       }
@@ -262,6 +265,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   // Attempts to restore the place we were up to in the book before the
   // reader was resized.
+  //
   function resized() {
     if (!p.initialized) {
       console.warn('Attempt to resize book before initialization.');
@@ -274,11 +278,21 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.resizeTimer = setTimeout(
       function () {
         lockFrameWidths();
-        p.flipper.moveTo({ page: pageNumber() });
+        recalculateDimensions();
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
     );
+  }
+
+
+
+  function recalculateDimensions(andRestorePlace) {
+    if (!p.book) { return; }
+    p.book.properties.componentSizes = [];
+    if (andRestorePlace !== false) {
+      p.flipper.moveTo({ page: pageNumber() });
+    }
   }
 
 
@@ -616,10 +630,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     var result = callback();
     if (restorePlace) {
-      p.flipper.moveTo({ page: pageNumber() });
+      recalculateDimensions(true);
       Monocle.defer(
         function () { dispatchEvent("monocle:stylesheetchange", {}); }
       );
+    } else {
+      recalculateDimensions(false);
     }
     return result;
   }

@@ -4,8 +4,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   var k = API.constants = API.constructor;
   var p = API.properties = {
     page: pageDiv,
-    reader: pageDiv.m.reader,
-    dirty: true
+    reader: pageDiv.m.reader
   }
 
 
@@ -15,14 +14,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
   function hasChanged() {
-    if (p.dirty) { return true; }
-    var newMeasurements = rawMeasurements();
-    return (
-      (!p.measurements) ||
-      (p.measurements.width != newMeasurements.width) ||
-      (p.measurements.height != newMeasurements.height) ||
-      (p.measurements.scrollWidth != newMeasurements.scrollWidth)
-    );
+    return p.page.m.activeFrame.m.component.getSize() ? false : true;
   }
 
 
@@ -66,17 +58,18 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     }
 
     p.length = Math.ceil(p.measurements.scrollWidth / p.measurements.width);
-    // console.log(
-    //   'page['+p.page.m.pageIndex+'] -> '+p.length+
-    //   ' ('+p.page.m.activeFrame.m.component.properties.id+')'
-    // );
-    p.dirty = false;
+
+    console.log(
+      'page['+p.page.m.pageIndex+'] -> '+p.length+
+      ' ('+p.page.m.activeFrame.m.component.properties.id+')'
+    );
+
     return p.length;
   }
 
 
   function pages() {
-    if (p.dirty) {
+    if (hasChanged()) {
       console.warn('Accessing pages() when dimensions are dirty.')
       return 0;
     }
@@ -117,8 +110,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     if (Monocle.Browser.is.WebKit) {
       doc.documentElement.style.overflow = 'hidden';
     }
-
-    p.dirty = true;
   }
 
 
@@ -126,7 +117,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var cw = p.page.m.sheafDiv.clientWidth;
     if (currBodyStyleValue('column-width') != cw+"px") {
       Monocle.Styles.affix(columnedElement(), 'column-width', cw+"px");
-      p.dirty = true;
     }
   }
 
@@ -181,41 +171,57 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   //
   function scrollerWidth() {
     var bdy = p.page.m.activeFrame.contentDocument.body;
-    if (Monocle.Browser.has.iframeDoubleWidthBug) {
-      if (Monocle.Browser.on.Kindle3) {
-        return scrollerElement().scrollWidth;
-      } else if (Monocle.Browser.on.Android) {
-        // FIXME: On Android, bdy.scrollWidth reports the wrong value if the
-        // browser's Text Size setting is anything other than "Normal".
-        // Seems like an Android bug to me.
-        //
-        // If you could detect the text size, you could compensate for it. Eg,
-        // a Text Size of "Large" -> multipy bdy.scrollWidth by 1.5.
-        return bdy.scrollWidth;
-      } else if (Monocle.Browser.iOSVersion < "4.1") {
-        var hbw = bdy.scrollWidth / 2;
-        var sew = scrollerElement().scrollWidth;
-        return Math.max(sew, hbw);
-      } else {
-        bdy.scrollWidth; // Throw one away. Nuts.
-        var hbw = bdy.scrollWidth / 2;
-        return hbw;
-      }
-    } else if (bdy.getBoundingClientRect) {
-      // FIXME: this is quite inefficient.
-      var elems = bdy.getElementsByTagName('*');
-      var bdyRect = bdy.getBoundingClientRect();
-      var l = bdyRect.left, r = bdyRect.right;
-      for (var i = elems.length - 1; i >= 0; --i) {
-        var rect = elems[i].getBoundingClientRect();
-        l = Math.min(l, rect.left);
-        r = Math.max(r, rect.right);
-      }
-      return Math.abs(l) + Math.abs(r);
-    }
+    var cmpt = p.page.m.activeFrame.m.component;
+    var sw = cmpt.getSize();
+    if (!sw) {
+      translateToOffset(0);
 
-    // Fall back to scrollWidth.
-    return scrollerElement().scrollWidth;
+      // Note that we access the body scrollwidth before the scrollerElement's
+      // scrollWidth -- this precalculation should ensure a correct result in
+      // some browsers (notably iOS) due to a minor bug.
+      //
+      var bw = bdy.scrollWidth;
+      sw = scrollerElement().scrollWidth;
+      console.log(p.page.m.pageIndex + " (body) : " + bw);
+      console.log(p.page.m.pageIndex + " (scrollerElem) : " + sw);
+      cmpt.setSize(sw);
+
+      translateToOffset(0 - p.page.m.offset);
+    }
+    return sw;
+
+    // if (Monocle.Browser.has.iframeDoubleWidthBug) {
+    //   if (false && Monocle.Browser.on.Kindle3) {
+    //     return scrollerElement().scrollWidth;
+    //   } else if (false && Monocle.Browser.on.Android) {
+    //     // FIXME: On Android, bdy.scrollWidth reports the wrong value if the
+    //     // browser's Text Size setting is anything other than "Normal".
+    //     // Seems like an Android bug to me.
+    //     //
+    //     // If you could detect the text size, you could compensate for it. Eg,
+    //     // a Text Size of "Large" -> multipy bdy.scrollWidth by 1.5.
+    //     return bdy.scrollWidth;
+    //   } else if (true) {//Monocle.Browser.iOSVersion < "4.1") {
+    //     var hbw = bdy.scrollWidth / 2;
+    //     var sew = scrollerElement().scrollWidth;
+    //     return Math.max(sew, hbw);
+    //   } else {
+    //     bdy.scrollWidth; // Throw one away. Nuts.
+    //     var hbw = bdy.scrollWidth / 2;
+    //     return hbw;
+    //   }
+    // } else if (bdy.getBoundingClientRect) {
+    //   // FIXME: this is quite inefficient.
+    //   var elems = bdy.getElementsByTagName('*');
+    //   var bdyRect = bdy.getBoundingClientRect();
+    //   var l = bdyRect.left, r = bdyRect.right;
+    //   for (var i = elems.length - 1; i >= 0; --i) {
+    //     var rect = elems[i].getBoundingClientRect();
+    //     l = Math.min(l, rect.left);
+    //     r = Math.max(r, rect.right);
+    //   }
+    //   return Math.abs(l) + Math.abs(r);
+    // }
   }
 
 

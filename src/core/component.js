@@ -363,12 +363,24 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  function setSize(n) {
+    p.book.properties.componentSizes[p.index] = n;
+  }
+
+
+  function getSize() {
+    return p.book.properties.componentSizes[p.index];
+  }
+
+
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.pageForXPath = pageForXPath;
   API.lastPageNumber = lastPageNumber;
+  API.setSize = setSize;
+  API.getSize = getSize;
 
   return API;
 }

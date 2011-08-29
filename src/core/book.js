@@ -17,6 +17,7 @@ Monocle.Book = function (dataSource) {
   var p = API.properties = {
     dataSource: dataSource,
     components: [],
+    componentSizes: [],
     chapters: {} // flat arrays of chapters per component
   }
 
