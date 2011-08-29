@@ -30,8 +30,6 @@
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
     <script type="text/javascript" src="../../src/flippers/scroller.js"></script>
     <script type="text/javascript" src="../../src/flippers/instant.js"></script>
-    <script type="text/javascript" src="../../src/dimensions/vert.js"></script>
-    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
     <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
     <link rel="stylesheet" type="text/css" href="../tests.css" />
@@ -108,11 +106,6 @@
             bookData,
             { flipper: Monocle.Flippers.Slider }
           );
-          window.reader4 = Monocle.Reader(
-            'legacy',
-            bookData,
-            { flipper: Monocle.Flippers.Legacy }
-          );
         }
       );
     </script>
@@ -143,15 +136,6 @@
       <p>
         Pages slide out of view to left (forwards) and
         into view from left (back).
-      </p>
-    </div>
-
-    <div class="readerInfo">
-      <h2>Legacy</h2>
-      <div class="reader" id="legacy"></div>
-      <p>
-        Text is displayed as a single vertical column, with a scrollbar.
-        This is for browsers that do not support the CSS3 Multi-column module.
       </p>
     </div>
 

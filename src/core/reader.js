@@ -153,16 +153,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function attachFlipper(flipperClass) {
     if (!flipperClass) {
-      if (!Monocle.Browser.env.supportsColumns) {
-        flipperClass = Monocle.Flippers.Legacy;
-      } else if (Monocle.Browser.on.Kindle3) {
+      if (Monocle.Browser.on.Kindle3) {
         flipperClass = Monocle.Flippers.Instant;
+      } else {
+        flipperClass = Monocle.Flippers.Slider;
       }
-
-      flipperClass = flipperClass || Monocle.Flippers.Slider;
     }
-
-    if (!flipperClass) { throw("Flipper not found."); }
 
     p.flipper = new flipperClass(API, null, p.readerOptions);
   }
