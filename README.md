@@ -14,7 +14,7 @@ Contributions welcome - fork the repository on
 ## Getting Monocle
 
 You can download a unified, redistributable version of Monocle 
-[from Github](https://github.com/joseph/Monocle/archives/master).
+[from Github](https://github.com/joseph/Monocle/downloads).
 
 The scripts and stylesheets are separated into:
 
@@ -25,7 +25,7 @@ It's recommended that you develop against the unminified files, to make
 debugging easier. In production, use the minified files.
 
 
-## Getting started
+## Integrating Monocle
 
 Here's the simplest thing that could possibly work.
 
@@ -56,14 +56,15 @@ A more advanced scenario involves feeding Monocle a "book data object", from
 which it can lazily load the contents of the book as the user requests it.
 
 
-## Try some examples
+## Exploring Monocle
 
-The best way to gain a quick understanding of Monocle is to clone this 
-repository, and open `index.html` in the `test` directory. This gives you 
-an overview of the main example tests and feature tests.
+If you want to explore all of Monocle's features, clone this repository and
+open `test/index.html` in your browser. This will guide you through Monocle's
+tests, which incidentally demonstrate all the major features. View source or
+browse the test directory in your text editor for implementation details.
 
 
-## The book data object
+## Connecting Monocle to your book content
 
 For a non-trivial Monocle implementation, your task is to connect the 
 Monocle Reader to your book's HTML content and structure. You create 
@@ -119,7 +120,7 @@ If you can help out with any of these things, fork away (or contact 'joseph'
 on GitHub).
 
 
-### History
+## History
 
 2.1.0 - Source file reorganisation, Sprockets 2, distributables, wiki.
 
