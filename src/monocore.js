@@ -1,0 +1,17 @@
+//= require "core/monocle"
+//= require "core/compat"
+//= require "core/factory"
+//= require "core/events"
+//= require "core/styles"
+//= require "core/reader"
+//= require "core/book"
+//= require "core/place"
+//= require "core/component"
+//= require "controls/panel"
+//= require "panels/twopane"
+//= require "dimensions/vert"
+//= require "flippers/legacy"
+//= require "dimensions/columns"
+//= require "flippers/slider"
+
+Monocle.pieceLoaded('monocore');
