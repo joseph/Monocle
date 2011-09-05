@@ -43,8 +43,12 @@ class MonocleDistributor
       build(:minify => minified)
       distribute("README.md", IO.read("README.md"))
       manifest = ["scripts/", "styles/", "README.md"]
-      pkg_path = File.expand_path("dist/monocle-#{pkg_type}#{release_name}.zip")
-      `cd #{dist_dir} && zip -r #{pkg_path} #{manifest.join(' ')}`
+      pkg_path = "dist/monocle-#{pkg_type}#{release_name}.zip"
+      cmd = [
+        "cd #{dist_dir} && ",
+        "zip -r #{File.expand_path(pkg_path)} #{manifest.join(' ')}"
+      ]
+      `#{cmd.join}`
       puts "Package: #{pkg_path}"
       FileUtils.rm_rf("dist/pkg")
       acc << pkg_path
@@ -102,6 +106,9 @@ class MonocleDistributor
 
 
     def upload_packages(pkgs)
+      if dep('highline', :else => "no HighLine, no prompts")
+        return  unless HighLine.new.agree("Upload these packages to Github?")
+      end
       pkgs.reverse.each { |pkg_path|
         min = pkg_path.index('minified') ? 'minified ' : ''
         upload(pkg_path, "Monocle #{min}script @ #{release_name}")
@@ -122,7 +129,7 @@ class MonocleDistributor
         :description => desc
       }
       url = gh.replace(opts)
-      puts("Wrote: #{file} -> #{CGI.unescape(url)}")
+      puts("Uploaded: #{file} -> #{CGI.unescape(url)}")
     end
 
 
