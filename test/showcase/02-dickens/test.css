@@ -232,6 +232,11 @@ div.monelem_controls_contents_chapter {
   border-bottom: 2px groove #FFF6E9;
 }
 
+li.monelem_controls_contents_chapter_active {
+  text-shadow: -1px -1px #876;
+  background: #BA9;
+}
+
 
 /* Overriding the scrubber display */
 div.monelem_controls_scrubber_container {

@@ -6,7 +6,6 @@
 ---------------------------------------------------------------------------*/
 
 /* Contents */
-
 div.monelem_controls_contents_container {
   position: absolute;
   width: 75%;
@@ -15,8 +14,9 @@ div.monelem_controls_contents_container {
   top: 12.5%;
   background: #EEE;
   border: 2px solid #F7F7F7;
-  overflow-y: auto;
   border-radius: 9px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   -moz-border-radius: 9px;
   -webkit-border-radius: 9px;
   box-shadow: 1px 2px 6px rgba(0,0,0,0.5);
@@ -38,6 +38,10 @@ li.monelem_controls_contents_chapter {
   cursor: pointer;
 }
 
+li.monelem_controls_contents_chapter_active {
+  background: #999;
+  color: white;
+}
 
 /* Magnifier */
 

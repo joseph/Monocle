@@ -493,19 +493,18 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
 
     if (controlData.controlType == "popover") {
+      var onControl = function (evt) {
+        var obj = evt.target;
+        do {
+          if (obj == controlData.elements[0]) { return true; }
+        } while (obj && (obj = obj.parentNode));
+        return false;
+      }
       overlay.listeners = Monocle.Events.listenForContact(
         overlay,
         {
-          start: function (evt) {
-            var obj = evt.target || window.event.srcElement;
-            do {
-              if (obj == controlData.elements[0]) { return true; }
-            } while (obj && (obj = obj.parentNode));
-            hideControl(ctrl);
-          },
-          move: function (evt) {
-            evt.preventDefault();
-          }
+          start: function (evt) { if (!onControl(evt)) { hideControl(ctrl); } },
+          move: function (evt) { if (!onControl(evt)) { evt.preventDefault(); } }
         }
       );
     }

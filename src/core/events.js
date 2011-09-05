@@ -249,8 +249,6 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
       evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
     ) {
       annul();
-    } else {
-      evt.preventDefault();
     }
   }
 
@@ -259,7 +257,6 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
     {
       start: function (evt) {
         startPos = [evt.m.pageX, evt.m.pageY];
-        evt.preventDefault();
         if (activeClass && elem.dom) { elem.dom.addClass(activeClass); }
       },
       move: annulIfOutOfBounds,
