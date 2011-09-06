@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=540" />
+
+    <title>The Monocle Challenge</title>
+
+    <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
+    <style>
+      body {
+        width: 500px;
+        margin: 20px auto 100px;
+      }
+      .problemBox {
+        margin: 0 auto;
+      }
+      .problemBox iframe {
+        border: none;
+        background: #EEE;
+      }
+      textarea {
+        width: 100%;
+        display: block;
+      }
+    </style>
+
+    <!-- THESE STYLES ARE PERTINENT AND YOU MAY CHANGE THEM -->
+    <style>
+      .problemBox {
+        width: 300px;
+        height: 300px;
+
+        /*
+          This is considered necessary in iOS5 to constrain the iframe.
+          See the component-scrollbars test for more info.
+        */
+        overflow: hidden;
+      }
+      .problemBox iframe {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <script src="scratch.js"></script>
+  </head>
+
+  <body>
+
+    <p>
+      This is the biggest unresolved problem in
+      <a href="http://github.com/joseph/Monocle">Monocle</a>.
+    </p>
+
+    <p>
+      Here is a 300x300 <code>div</code>, containing an
+      <code>iframe</code> with arbitrary HTML content. The body of
+      the <code>iframe</code> has a height of 300px and a
+      <code>column-width</code> of 300px.
+    </p>
+
+    <div class="problemBox">
+      <iframe id="problem1" src="problem1.html" scrolling="no"></iframe>
+    </div>
+
+
+    <h1>
+      Q: How wide is the content of the <code>iframe</code>?
+    </h1>
+
+    <h2>
+      Rules
+    </h2>
+
+    <ol>
+      <li>
+        No scrollbars may be visible within the <code>div</code>.
+      </li>
+      <li>
+        You may change the DOM or any CSS in the parent document.
+      </li>
+      <li>
+        You may change the CSS of the <code>body</code> of the
+        <code>iframe</code>. You may not change the DOM of the
+        <code>iframe</code>, nor any CSS other than the
+        <code>body</code>.
+      </li>
+      <li>
+        Your solution must work and be correct in the latest
+        Gecko/WebKit/Opera, Android 2.2+ and iOS 4.2+. It doesn't
+        need to be <em>the same</em>, just <em>correct</em>.
+      </li>
+    </ol>
+
+    <h2>
+      Extra credit
+    </h2>
+
+    <p>
+      This problem is identical, except that the <code>body</code>
+      of the <code>iframe</code> has a <code>transform</code> applied:
+      <code>translateX(-600px)</code>. The content of the iframe is
+      always &gt; 600px. How wide is it?
+    </p>
+
+    <div class="problemBox">
+      <iframe id="problem2" src="problem2.html" scrolling="no"></iframe>
+    </div>
+
+    <p>
+      This problem is also identical, and may be trivial if your solution
+      is awesome. The content of the iframe &lt;= 300px. Does your solution
+      give you 300px?
+    </p>
+
+    <div class="problemBox">
+      <iframe id="problem3" src="problem3.html" scrolling="no"></iframe>
+    </div>
+
+
+    <h2>
+      Scratch
+    </h2>
+
+    <p>
+      In this box, you can evaluate arbitrary JavaScript.
+      Four variables are already populated: <code>_div</code>,
+      <code>_frame</code>, <code>_window</code>, and <code>_body</code>.
+      The return value of your code will appear below, for each problem.
+    </p>
+
+    <form id="scratch">
+      <textarea id="scratchText">_body.scrollWidth;</textarea>
+      <input type="submit" value="Evaluate" />
+      <pre><code id="scratchResult"></code></pre>
+    </form>
+
+
+    <h2>Curious?</h2>
+    <p>
+      Monocle's current solution, which <em>sometimes</em> fails the
+      Problem 2 test in iOS 5, is <a href="https://github.com/joseph/Monocle/blob/master/src/dimensions/columns.js#L166-219">here</a>.
+    </p>
+
+  </body>
+</html>

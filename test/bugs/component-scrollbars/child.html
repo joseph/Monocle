@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Child</title>
+
+    <style>
+      body {
+        /* We can eliminate margin and padding from the body. */
+        margin: 0;
+        padding: 0;
+
+        /* Body dimensions. */
+        height: 300px;
+
+        /*
+          This declaration is very controversial. Something has to force
+          the content to be a multiple of 300px. Another way to do this
+          (for some browsers?) is with min-width: 200%.
+        */
+        width: 300px;
+
+        /*
+          Absolute positioning forces the body to have the pixel dimensions
+          we specified. You might have a better way.
+        */
+        position: absolute;
+
+        /* Columns. */
+        -webkit-column-width: 300px;
+        -moz-column-width: 300px;
+        -o-column-width: 300px;
+        column-width: 300px;
+        -webkit-column-gap: 0;
+        -moz-column-gap: 0;
+        -o-column-gap: 0;
+        column-gap: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <p>
+      Pellentesque habitant morbi tristique senectus et netus et malesuada
+      fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies
+      eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.
+      Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+    </p>
+
+    <p>
+      Pellentesque habitant morbi tristique senectus et netus et malesuada
+      fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies
+      eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.
+      Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
+    </p>
+
+    <p>
+      Pellentesque habitant morbi tristique senectus et netus et malesuada
+      fames ac turpis egestas.
+    </p>
+
+    <ul>
+      <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+      <li>Aliquam tincidunt mauris eu risus.</li>
+      <li>Vestibulum auctor dapibus neque.</li>
+    </ul>
+
+    <h2>Header Level 2</h2>
+
+    <ol>
+       <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+       <li>Aliquam tincidunt mauris eu risus.</li>
+    </ol>
+
+    <blockquote>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Vivamus magna. Cras in mi at felis aliquet congue. Ut a est eget ligula
+        molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis
+        mollis, tellus est malesuada tellus, at luctus turpis elit sit amet quam.
+        Vivamus pretium ornare est.
+      </p>
+    </blockquote>
+
+    <h3>Header Level 3</h3>
+
+    <ul>
+       <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+       <li>Aliquam tincidunt mauris eu risus.</li>
+    </ul>
+
+    <pre><code>
+    #header h1 a {
+      display: block;
+      width: 300px;
+      height: 80px;
+    }
+    </code></pre>
+  </body>
+</html>

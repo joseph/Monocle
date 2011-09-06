@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=540" />
+
+    <title>
+      Q: What is the best way to disable scrollbars in the iframe?
+    </title>
+
+    <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
+    <style>
+      body {
+        width: 500px;
+        margin: 20px auto 100px;
+      }
+      .problemBox {
+        margin: 0 auto;
+      }
+      .problemBox iframe {
+        border: none;
+        background: #EEE;
+      }
+      textarea {
+        width: 100%;
+        display: block;
+      }
+    </style>
+
+    <!-- THESE STYLES ARE PERTINENT AND YOU MAY CHANGE THEM -->
+    <style>
+      .problemBox {
+        width: 300px;
+        height: 300px;
+      }
+      .problemBox iframe {
+        width: 100%;
+        height: 100%;
+      }
+
+
+      #problem1 {
+      }
+
+      #problem2 {
+        overflow: hidden;
+      }
+
+      #problem3 iframe {
+        overflow: hidden;
+      }
+
+      #problem4 {
+      }
+
+      #result {
+        overflow: hidden;
+      }
+    </style>
+
+    <script>
+      function onFrames(fn) {
+        try {
+          var iframes = document.getElementsByTagName('iframe');
+          for (var i = 0, ii = frames.length; i < ii; ++i) {
+            fn(iframes[i]);
+          }
+        } catch(e) {
+          alert(e);
+        }
+      }
+
+
+      function scrollBody(fr) {
+        fr.contentDocument.body.scrollLeft = 50;
+      }
+
+
+      function scrollWindow(fr) {
+        fr.contentWindow.scrollTo(100, 0);
+      }
+
+
+      function scrollFrame(fr) {
+        fr.scrollLeft = 150;
+      }
+
+
+      function scrollParent(fr) {
+        fr.parentNode.scrollLeft = 200;
+      }
+
+
+      function translateFrame(fr) {
+        var s = fr.contentDocument.body.style
+        s.webkitTransform = "translateX(-250px)";
+        s.MozTransform = "translateX(-250px)";
+        s.OTransform = "translateX(-250px)";
+        s.transform = "translateX(-250px)";
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <h1>
+      Q: What is the best way to disable scrollbars in the iframe?
+    </h1>
+
+    <h2>A1: the "scrolling=no" attribute</h2>
+    <div class="problemBox" id="problem1">
+      <iframe src="child.html" scrolling="no"></iframe>
+    </div>
+
+    <h2>A2: "overflow: hidden" on the containing div</h2>
+    <div class="problemBox" id="problem2">
+      <iframe src="child.html"></iframe>
+    </div>
+
+    <h2>A3: "overflow: hidden" on the iframe</h2>
+    <div class="problemBox" id="problem3">
+      <iframe src="child.html"></iframe>
+    </div>
+
+    <h2>A4: "overflow: hidden" on the body of the child</h2>
+    <div class="problemBox" id="problem4">
+      <iframe src="child-oh.html"></iframe>
+    </div>
+
+
+    <h2>Scrolling tests</h2>
+    <ul>
+      <li>
+        <a href="javascript:onFrames(scrollBody)">Scroll frame bodies</a>
+      </li>
+      <li>
+        <a href="javascript:onFrames(scrollWindow)">Scroll frame windows</a>
+      </li>
+      <li>
+        <a href="javascript:onFrames(scrollFrame)">Scroll iframe elements</a>
+      </li>
+      <li>
+        <a href="javascript:onFrames(scrollParent)">Scroll iframe parents</a>
+      </li>
+      <li>
+        <a href="javascript:onFrames(translateFrame)">Translate frame bodies</a>
+      </li>
+    </ul>
+
+
+    <h2>Notes</h2>
+    <ul>
+      <li>
+        Initially the iframe has the correct dimensions (300x300) in all
+        browsers, except A1 in iOS5, where it is the width of the content.
+      </li>
+      <li>
+        After "Translate", in any iOS &gt;= 4.2, A1, A3 and A4 are
+        expanded to the width of the content (this is pretty weird).
+      </li>
+
+      <li>
+        <b>A1</b>: Works in all browsers except iOS.
+      </li>
+
+      <li>
+        <b>A2</b>: Unsurprisingly, does not prevent scrollbars in any
+        browser. Does not prevent scrolling in Android. BUT: it is the only
+        thing that always enforces iframe dimensions on iOS.
+      </li>
+
+      <li>
+        <b>A3</b>: Hides scrollbars in Gecko. Not in Opera or WebKit, and
+        does not prevent scrolling in Android. Not a good solution.
+      </li>
+
+      <li>
+        <b>A4</b>: Hides scrollbars in all browsers
+        (except iOS after translate). In Gecko after translate, no
+        subsequent columns are visible &mdash; overflow <i>hides</i> the
+        second and subsequent columns.
+      </li>
+
+      <li>
+        <b>Translate</b> is the only thing that works identically in
+        all browsers, for all iframes. Except Gecko/A4 (see previous note).
+      </li>
+
+      <li>
+        <b>Scroll frame bodies</b> has no effect in Gecko, Opera or Android.
+        Works for all iframes in WebKit. Works for A3 and A4 in iOS5, works
+        for all iframes in iOS4.
+      </li>
+
+      <li>
+        <b>Scroll frame windows</b> works in Gecko except Gecko/A4.
+        Works for all iframes in WebKit, Opera, iOS4, and iOS5 except
+        A1 and A2. Does not work at all in Android, weirdly.
+      </li>
+
+      <li>
+        <b>Scroll iframe elements</b> and <b>Scroll iframe parents</b>
+        do nothing in any browser.
+      </li>
+    </ul>
+
+    <h2>Result</h2>
+
+    <p>
+      For all browsers, we will use A1. For iOS, we will additionally apply
+      A2 (to constrain the iframe).
+    </p>
+
+    <p>
+      Movement should be done by <b>translating</b>.
+    </p>
+
+    <p>
+      <b>Scrolling the frame window</b> (frame.contentWindow) &mdash;
+      this works in iOS5 as well for R. It works everywhere except Android,
+      which sadly rules it out.
+    </p>
+
+    <h2>R: "overflow: hidden" on container + "scrolling=no" on iframe</h2>
+    <div class="problemBox" id="result">
+      <iframe src="child.html" scrolling="no"></iframe>
+    </div>
+
+  </body>
+
+</html>
