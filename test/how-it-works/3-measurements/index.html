@@ -5,7 +5,7 @@
 
     <meta name="viewport" content="width=540" />
 
-    <title>The Monocle Challenge</title>
+    <title>Measuring iframe content width</title>
 
     <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
     <style>
@@ -44,6 +44,23 @@
       }
     </style>
     <script src="scratch.js"></script>
+
+    <script>
+      window.addEventListener(
+        "load",
+        function () {
+          var prob2 = document.getElementById('problem2');
+          var bdy = prob2.contentDocument.body;
+          var s = bdy.style;
+          s.transform = "translateX(-600px)";
+          s.webkitTransform = "translate3d(-600px, 0, 0)";
+          s.MozTransform = s.transform;
+          s.OTransform = s.transform;
+        },
+        false
+      );
+    </script>
+    <script src="../column-force.js"></script>
   </head>
 
   <body>
@@ -61,7 +78,7 @@
     </p>
 
     <div class="problemBox">
-      <iframe id="problem1" src="problem1.html" scrolling="no"></iframe>
+      <iframe id="problem1" src="child-long.html" scrolling="no"></iframe>
     </div>
 
 
@@ -105,17 +122,16 @@
     </p>
 
     <div class="problemBox">
-      <iframe id="problem2" src="problem2.html" scrolling="no"></iframe>
+      <iframe id="problem2" src="child-long.html" scrolling="no"></iframe>
     </div>
 
     <p>
-      This problem is also identical, and may be trivial if your solution
-      is awesome. The content of the iframe &lt;= 300px. Does your solution
-      give you 300px?
+      This should be trivial. The content of the iframe &lt;= 300px.
+      Does your solution give you 300px?
     </p>
 
     <div class="problemBox">
-      <iframe id="problem3" src="problem3.html" scrolling="no"></iframe>
+      <iframe id="problem3" src="child-short.html" scrolling="no"></iframe>
     </div>
 
 

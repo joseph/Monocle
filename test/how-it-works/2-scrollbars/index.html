@@ -7,9 +7,7 @@
 
     <meta name="viewport" content="width=540" />
 
-    <title>
-      Q: What is the best way to disable scrollbars in the iframe?
-    </title>
+    <title>Disabling iframe scrollbars</title>
 
     <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
     <style>
@@ -101,7 +99,18 @@
         s.OTransform = "translateX(-250px)";
         s.transform = "translateX(-250px)";
       }
+
+
+      window.addEventListener(
+        "load",
+        function () {
+          var fr = document.getElementById('problem4Frame');
+          fr.contentDocument.body.style.overflow = "hidden";
+        },
+        false
+      );
     </script>
+    <script src="../column-force.js"></script>
   </head>
 
   <body>
@@ -127,7 +136,7 @@
 
     <h2>A4: "overflow: hidden" on the body of the child</h2>
     <div class="problemBox" id="problem4">
-      <iframe src="child-oh.html"></iframe>
+      <iframe src="child.html" id="problem4Frame"></iframe>
     </div>
 
 

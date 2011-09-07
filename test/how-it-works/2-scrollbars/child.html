@@ -2,41 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Problem 1</title>
+    <title>Problem</title>
 
-    <style>
-      body {
-        /* We can eliminate margin and padding from the body. */
-        margin: 0;
-        padding: 0;
-
-        /* Body dimensions. */
-        height: 300px;
-
-        /*
-          This declaration is very controversial. Something has to force
-          the content to be a multiple of 300px. Another way to do this
-          (for some browsers?) is with min-width: 200%.
-        */
-        width: 300px;
-
-        /*
-          Absolute positioning forces the body to have the pixel dimensions
-          we specified. You might have a better way.
-        */
-        position: absolute;
-
-        /* Columns. */
-        -webkit-column-width: 300px;
-        -moz-column-width: 300px;
-        -o-column-width: 300px;
-        column-width: 300px;
-        -webkit-column-gap: 0;
-        -moz-column-gap: 0;
-        -o-column-gap: 0;
-        column-gap: 0;
-      }
-    </style>
+    <link rel="stylesheet" href="../columned.css" />
   </head>
 
   <body>

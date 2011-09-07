@@ -17,8 +17,8 @@ function onEvaluate(evt) {
 
 function scratchSetup() {
   var form = document.getElementById("scratch");
-  form.onsubmit = onEvaluate;
+  form.addEventListener("submit", onEvaluate, false);
 }
 
 
-window.onload = scratchSetup;
+window.addEventListener("load", scratchSetup, false);

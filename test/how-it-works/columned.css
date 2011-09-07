@@ -1,0 +1,49 @@
+/*
+  This is the canonical stylesheet for turning a HTML document into
+  300px-wide columns. It demonstrates the changes that Monocle makes
+  to a component after loading it in the iframe, in order to achieve
+  pagination.
+*/
+
+body {
+  /*
+   We can eliminate margin and padding from the body.
+   This should ensure that the content is an exact multiple
+   of the column-width.
+  */
+  margin: 0;
+  padding: 0;
+
+  /*
+    Absolute positioning forces the body to have the exact
+    pixel dimensions we specify.
+  */
+  position: absolute;
+
+  /*
+    Set the height to occupy the full vertical area of the iframe.
+  */
+  height: 100%;
+
+  /*
+    Some browsers need this to force columns: Opera.
+  */
+  width: 100%;
+
+  /*
+    Columns.
+  */
+  -webkit-column-width: 300px;
+  -moz-column-width: 300px;
+  -o-column-width: 300px;
+  column-width: 300px;
+  -webkit-column-gap: 0;
+  -moz-column-gap: 0;
+  -o-column-gap: 0;
+  column-gap: 0;
+}
+
+
+body.column-force {
+  min-width: 200%;
+}
