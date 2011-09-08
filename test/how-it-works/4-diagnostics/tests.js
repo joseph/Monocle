@@ -169,7 +169,7 @@ function bodyDimensions(fr) {
     width: doc.documentElement.scrollWidth,
     height: doc.documentElement.scrollHeight
   }
-  if (result.height == 0) {
+  if (result.width <= fr.parentNode.offsetWidth) {
     result.width = doc.body.scrollWidth;
     result.height = doc.body.scrollHeight;
   }

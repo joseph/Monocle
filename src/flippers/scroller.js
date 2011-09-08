@@ -65,7 +65,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
     if (typeof WebKitTransitionEvent != "undefined") {
       bdy.style.webkitTransition = "-webkit-transform " +
         p.duration + "ms ease-out 0ms";
-      bdy.style.webkitTransform = "translateX("+x+"px)";
+      bdy.style.webkitTransform = "translateX(-"+x+"px)";
       Monocle.Events.listen(
         bdy,
         'webkitTransitionEnd',
@@ -75,7 +75,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
         }
       );
     } else {
-      var finalX = x;
+      var finalX = 0 - x;
       var stamp = (new Date()).getTime();
       var frameRate = 40;
       var currX = p.currX || 0;

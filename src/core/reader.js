@@ -182,9 +182,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var cb = function (evt) {
       var frame = evt.target || evt.srcElement;
       Monocle.Events.deafen(frame, 'load', cb);
-      if (Monocle.Browser.is.WebKit) {
-        frame.contentDocument.documentElement.style.overflow = "hidden";
-      }
       dispatchEvent(
         'monocle:frameprimed',
         { frame: frame, pageIndex: pageCount }
@@ -723,8 +720,6 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
   "html#RS\\:monocle body {" +
-    "margin: 0 !important;" +
-    "padding: 0 !important;" +
     "-webkit-text-size-adjust: none;" +
   "}",
   "html#RS\\:monocle body * {" +

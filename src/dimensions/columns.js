@@ -4,7 +4,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   var k = API.constants = API.constructor;
   var p = API.properties = {
     page: pageDiv,
-    reader: pageDiv.m.reader
+    reader: pageDiv.m.reader,
+    length: 0
   }
 
 
@@ -19,45 +20,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
   function measure() {
-    setColumnWidth();
-    p.measurements = rawMeasurements();
-
-    // BROWSERHACK: Detect single-page components in WebKit browsers by checking
-    // whether the last element in the component is beyond the first page.
-    //
-    // This is because (due to the 'width: 200%' rule on the body) a one-page
-    // component will measure as two pages wide in WebKit browsers. For some
-    // reason this doesn't apply to Gecko.
-    if (
-      Monocle.Browser.has.iframeDoubleWidthBug &&
-      p.measurements.scrollWidth == p.measurements.width * 2
-    ) {
-      var doc = p.page.m.activeFrame.contentDocument;
-      var lc;
-      for (var i = doc.body.childNodes.length - 1; i >= 0; --i) {
-        lc = doc.body.childNodes[i];
-        if (lc.getBoundingClientRect) { break; }
-      }
-      if (!lc || !lc.getBoundingClientRect) {
-        console.warn('Empty document for page['+p.page.m.pageIndex+']');
-        p.measurements.scrollWidth = p.measurements.width;
-      } else {
-        // NB: right is generally wider than width if the column styles have
-        // had a chance to apply to the component. Otherwise bottom will
-        // be greater than height. See tests/columns.
-        var bcr = lc.getBoundingClientRect();
-        if (
-          bcr.right > p.measurements.width ||
-          bcr.bottom > p.measurements.height
-        ) {
-          p.measurements.scrollWidth = p.measurements.width * 2;
-        } else {
-          p.measurements.scrollWidth = p.measurements.width;
-        }
-      }
-    }
-
-    p.length = Math.ceil(p.measurements.scrollWidth / p.measurements.width);
+    p.length = Math.ceil(columnedDimensions().width / pageDimensions().width);
 
     console.log(
       'page['+p.page.m.pageIndex+'] -> '+p.length+
@@ -77,188 +40,103 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
+  // FIXME: I guess we've busted this.
+  //
   function percentageThroughOfNode(target) {
-    if (!target) {
-      return 0;
-    }
-    var doc = p.page.m.activeFrame.contentDocument;
-    var offset = 0;
-    if (target.getBoundingClientRect) {
-      offset = target.getBoundingClientRect().left;
-      offset -= doc.body.getBoundingClientRect().left;
-    } else {
-      var scroller = scrollerElement();
-      var oldScrollLeft = scroller.scrollLeft;
-      target.scrollIntoView();
-      offset = scroller.scrollLeft;
-      scroller.scrollTop = 0;
-      scroller.scrollLeft = oldScrollLeft;
-    }
+    // if (!target) {
+    //   return 0;
+    // }
+    // var doc = p.page.m.activeFrame.contentDocument;
+    // var offset = 0;
+    // if (target.getBoundingClientRect) {
+    //   offset = target.getBoundingClientRect().left;
+    //   offset -= doc.body.getBoundingClientRect().left;
+    // } else {
+    //   var scroller = columnedElement();
+    //   var oldScrollLeft = scroller.scrollLeft;
+    //   target.scrollIntoView();
+    //   offset = scroller.scrollLeft;
+    //   scroller.scrollTop = 0;
+    //   scroller.scrollLeft = oldScrollLeft;
+    // }
+    //
+    // var percent = offset / columnedDimensions().width;
+    // return percent;
 
-    //console.log(id + ": " + offset + " of " + p.measurements.scrollWidth);
-    var percent = offset / p.measurements.scrollWidth;
-    return percent;
+    return 0;
   }
 
 
   function componentChanged(evt) {
     if (evt.m['page'] != p.page) { return; }
-    var doc = evt.m['document'];
-    Monocle.Styles.applyRules(doc.body, k.BODY_STYLES);
-
-    // BROWSERHACK: WEBKIT bug - iframe needs scrollbars explicitly disabled.
-    if (Monocle.Browser.is.WebKit) {
-      doc.documentElement.style.overflow = 'hidden';
-    }
+    setColumnWidth();
   }
 
 
   function setColumnWidth() {
-    var cw = p.page.m.sheafDiv.clientWidth;
-    if (currBodyStyleValue('column-width') != cw+"px") {
-      Monocle.Styles.affix(columnedElement(), 'column-width', cw+"px");
-    }
-  }
+    var pdims = pageDimensions();
+    var ce = columnedElement();
 
+    ce.style.cssText = Monocle.Styles.applyRules(null, k.STYLE["columned"]);
 
-  function rawMeasurements() {
-    var sheaf = p.page.m.sheafDiv;
-    return {
-      width: sheaf.clientWidth,
-      height: sheaf.clientHeight,
-      scrollWidth: scrollerWidth()
-    }
-  }
+    Monocle.Styles.affix(ce, 'column-width', pdims.width+'px');
 
-
-  // Returns the element that is offset to the left in order to display
-  // a particular page.
-  //
-  // This is a BROWSERHACK:
-  //   iOS devices don't allow scrollbars on the frame itself.
-  //   This means that it's the parent div that must be scrolled -- the sheaf.
-  //
-  function scrollerElement() {
-    if (Monocle.Browser.has.mustScrollSheaf) {
-      return p.page.m.sheafDiv;
-    } else {
-      return columnedElement();
+    if (ce.scrollHeight > pdims.height) {
+      console.warn("Forcing columns...");
+      Monocle.Styles.applyRules(ce, k.STYLE["column-force"]);
     }
   }
 
 
   // Returns the element to which columns CSS should be applied.
+  //
   function columnedElement() {
     return p.page.m.activeFrame.contentDocument.body;
   }
 
 
-  // Returns the width of the offsettable area of the scroller element. By
-  // definition, the number of pages is always this number divided by the
-  // width of a single page (eg, the client area of the scroller element).
+  // Returns the dimensions of the offsettable area of the columned element. By
+  // definition, the number of pages is always the width of this divided by the
+  // width of a single page (eg, the client area of the columned element).
   //
-  // BROWSERHACK:
-  //
-  // iOS 4+ devices sometimes report incorrect scrollWidths.
-  //  1) The body scrollWidth is now always 2x what it really is.
-  //  2) The sheafDiv scrollWidth is sometimes only 2x page width, despite
-  //    body being much bigger.
-  //
-  // In other browsers, the only consistent way to measure the width of the
-  // body is by comparing the first element's left to the last element's right.
-  // (There are bizarre differences between Gecko, recent Webkit (~534) and
-  // older Webkit.)
-  //
-  function scrollerWidth() {
-    var bdy = p.page.m.activeFrame.contentDocument.body;
+  function columnedDimensions() {
+    var elem = columnedElement();
     var cmpt = p.page.m.activeFrame.m.component;
-    var sw = cmpt.getSize();
-    if (!sw) {
-      translateToOffset(0);
-
-      // Note that we access the body scrollwidth before the scrollerElement's
-      // scrollWidth -- this precalculation should ensure a correct result in
-      // some browsers (notably iOS) due to a minor bug.
-      //
-      var bw = bdy.scrollWidth;
-      sw = scrollerElement().scrollWidth;
-      console.log(p.page.m.pageIndex + " (body) : " + bw);
-      console.log(p.page.m.pageIndex + " (scrollerElem) : " + sw);
-      cmpt.setSize(sw);
-
-      translateToOffset(0 - p.page.m.offset);
+    var de = p.page.m.activeFrame.contentDocument.documentElement;
+    var size = cmpt.getSize();
+    if (!size) {
+      size = { width: de.scrollWidth, height: de.scrollHeight }
+      if (size.width <= pageDimensions().width) {
+        size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      }
+      //console.log("width: "+size.width+", height: "+size.height);
+      cmpt.setSize(size);
     }
-    return sw;
-
-    // if (Monocle.Browser.has.iframeDoubleWidthBug) {
-    //   if (false && Monocle.Browser.on.Kindle3) {
-    //     return scrollerElement().scrollWidth;
-    //   } else if (false && Monocle.Browser.on.Android) {
-    //     // FIXME: On Android, bdy.scrollWidth reports the wrong value if the
-    //     // browser's Text Size setting is anything other than "Normal".
-    //     // Seems like an Android bug to me.
-    //     //
-    //     // If you could detect the text size, you could compensate for it. Eg,
-    //     // a Text Size of "Large" -> multipy bdy.scrollWidth by 1.5.
-    //     return bdy.scrollWidth;
-    //   } else if (true) {//Monocle.Browser.iOSVersion < "4.1") {
-    //     var hbw = bdy.scrollWidth / 2;
-    //     var sew = scrollerElement().scrollWidth;
-    //     return Math.max(sew, hbw);
-    //   } else {
-    //     bdy.scrollWidth; // Throw one away. Nuts.
-    //     var hbw = bdy.scrollWidth / 2;
-    //     return hbw;
-    //   }
-    // } else if (bdy.getBoundingClientRect) {
-    //   // FIXME: this is quite inefficient.
-    //   var elems = bdy.getElementsByTagName('*');
-    //   var bdyRect = bdy.getBoundingClientRect();
-    //   var l = bdyRect.left, r = bdyRect.right;
-    //   for (var i = elems.length - 1; i >= 0; --i) {
-    //     var rect = elems[i].getBoundingClientRect();
-    //     l = Math.min(l, rect.left);
-    //     r = Math.max(r, rect.right);
-    //   }
-    //   return Math.abs(l) + Math.abs(r);
-    // }
+    return size;
   }
 
 
-  function currBodyStyleValue(property) {
-    var win = p.page.m.activeFrame.contentWindow;
-    var doc = win.document;
-    if (!doc.body) { return null; }
-    var currStyle = win.getComputedStyle(doc.body, null);
-    return currStyle.getPropertyValue(property);
+  function pageDimensions() {
+    var elem = p.page.m.sheafDiv;
+    return { width: elem.clientWidth, height: elem.clientHeight }
   }
 
 
   function locusToOffset(locus) {
-    return 0 - (p.measurements.width * (locus.page - 1));
+    return pageDimensions().width * (locus.page - 1);
   }
 
 
   function translateToLocus(locus) {
     var offset = locusToOffset(locus);
-    p.page.m.offset = 0 - offset;
-    translateToOffset(offset);
-    return offset;
-  }
-
-
-  function translateToOffset(offset) {
-    if (k.SETX) {
-      var bdy = p.page.m.activeFrame.contentDocument.body;
-      if (Monocle.Browser.iOSVersion >= 5) {
-        bdy.style.cssText += "-webkit-transform: translate3d("+offset+"px,0,0)";
-      } else {
-        Monocle.Styles.affix(bdy, "transform", "translateX("+offset+"px)");
-      }
+    p.page.m.offset = offset;
+    var ce = columnedElement();
+    if (Monocle.Browser.iOSVersion >= 5) {
+      ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
     } else {
-      var scrElem = scrollerElement();
-      scrElem.scrollLeft = 0 - offset;
+      Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
     }
+    return offset;
   }
 
 
@@ -276,25 +154,23 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 }
 
 
-Monocle.Dimensions.Columns.BODY_STYLES = {
-  "position": "absolute",
-  "height": "100%",
-  "-webkit-column-gap": "0",
-  "-webkit-column-fill": "auto",
-  "-moz-column-gap": "0",
-  "-moz-column-fill": "auto",
-  "-o-column-gap": "0",
-  "-o-column-fill": "auto",
-  "column-gap": "0",
-  "column-fill": "auto"
+Monocle.Dimensions.Columns.STYLE = {
+  "columned": {
+    "margin": "0",
+    "padding": "0",
+    "height": "100%",
+    "width": "100%",
+    "position": "absolute",
+    "-webkit-column-gap": "0",
+    "-moz-column-gap": "0",
+    "-o-column-gap": "0",
+    "column-gap": "0"
+  },
+  "column-force": {
+    "min-width": "200%",
+    "overflow": "hidden"
+  }
 }
 
-Monocle.Dimensions.Columns.SETX = true; // Set to false for scrollLeft.
-
-if (Monocle.Browser.has.iframeDoubleWidthBug) {
-  Monocle.Dimensions.Columns.BODY_STYLES["min-width"] = "200%";
-} else {
-  Monocle.Dimensions.Columns.BODY_STYLES["width"] = "100%";
-}
 
 Monocle.pieceLoaded("dimensions/columns");

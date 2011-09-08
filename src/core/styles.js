@@ -3,6 +3,9 @@ Monocle.Styles = {
   // Takes a hash or string of CSS property assignments and applies them
   // to the element.
   //
+  // If elem is null, simply returns the CSS string. Otherwise, applies the rules
+  // and returns the elem's cssText.
+  //
   applyRules: function (elem, rules) {
     if (typeof rules != 'string') {
       var parts = [];
@@ -11,8 +14,12 @@ Monocle.Styles = {
       }
       rules = parts.join(" ");
     }
-    elem.style.cssText += ';'+rules;
-    return elem.style.cssText;
+    if (elem) {
+      elem.style.cssText += ';'+rules;
+      return elem.style.cssText;
+    } else {
+      return rules;
+    }
   },
 
 
@@ -88,7 +95,7 @@ Monocle.Styles.page = {
 
 Monocle.Styles.sheaf = {
   "position": "absolute",
-  "overflow": "hidden" // Required by MobileSafari to constrain inner iFrame.
+  "overflow": "hidden"
 
   /*
   "top": "0",
@@ -99,11 +106,9 @@ Monocle.Styles.sheaf = {
 }
 
 Monocle.Styles.component = {
-  "display": "block",
   "width": "100%",
   "height": "100%",
   "border": "none",
-  "overflow": "hidden",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
   "user-select": "none"
