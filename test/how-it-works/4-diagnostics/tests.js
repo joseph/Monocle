@@ -34,7 +34,7 @@ var tests = [
 
   ["columnsRequireMinWidth", function (cb) {
     loadTestFrame(function (fr) {
-      bdy = fr.contentDocument.body;
+      var bdy = fr.contentDocument.body;
       if (!bdy.className) {
         cb("MinWidth not required", "green");
       } else if (bdy.className == "column-force") {
@@ -103,7 +103,7 @@ function runNextTest() {
     var box = document.getElementById("problemBox");
     if (box) { box.parentNode.removeChild(box); }
     runNextTest();
-  })
+  });
 }
 
 
@@ -114,18 +114,15 @@ function loadTestFrame(cb, src) {
   document.body.appendChild(box);
   box.id = "problemBox";
 
-  var expectedHeight = box.offsetHeight;
-
-  //src = "child.html";
   if (typeof src == "undefined") { src = 4; }
 
   if (typeof src == "number") {
     var pgs = [];
     for (var i = 1, ii = src; i <= ii; ++i) {
-      pgs.push('<p>You are on page '+i+ ' of this book.</p>');
+      pgs.push('<p>You are on page '+i+' of this book.</p>');
     }
     src = "javascript:'<!DOCTYPE html><html>"+
-      '<head><style>body{margin:0;padding:0;position:absolute;height:100%;width:100%;-webkit-column-width:300px;-webkit-column-gap:0;-moz-column-width:300px;-moz-column-gap:0;-o-column-width:300px;-o-column-gap:0;column-width:300px;column-gap:0;}body.column-force{min-width:200%;overflow: hidden;}p{line-height:240px;text-align: center;}</style></head>'+
+      '<head><style>p{line-height:240px;text-align:center;}</style></head>'+
       '<body>'+pgs.join("")+'</body>'+
       "</html>'";
   }
@@ -134,18 +131,33 @@ function loadTestFrame(cb, src) {
   box.appendChild(fr);
   fr.setAttribute("scrolling", "no");
   fr.onload = function () {
+    if (!fr.contentDocument || !fr.contentDocument.body) { return; }
     var bdy = fr.contentDocument.body;
-    if (bodyDimensions(fr).height > expectedHeight) {
-      bdy.setAttribute('class', 'column-force');
-      setTimeout(function () {
-        if (bodyDimensions(fr).height > expectedHeight) {
-          bdy.className = "column-failed "+bodyDimensions(fr).height;
-        }
-        cb(fr);
-      }, 0);
-    } else {
-      cb(fr);
+    bdy.style.cssText = ([
+      "margin:0",
+      "padding:0",
+      "position:absolute",
+      "height:100%",
+      "width:100%",
+      "-webkit-column-width:300px",
+      "-webkit-column-gap:0",
+      "-moz-column-width:300px",
+      "-moz-column-gap:0",
+      "-o-column-width:300px",
+      "-o-column-gap:0",
+      "column-width:300px",
+      "column-gap:0"
+    ].join(";"));
+    if (bodyDimensions(fr).height > box.offsetHeight) {
+      bdy.style.cssText += ["min-width:200%", "overflow:hidden"].join(";");
+      if (bodyDimensions(fr).height <= box.offsetHeight) {
+        bdy.className = "column-force";
+      } else {
+        bdy.className = "column-failed "+bodyDimensions(fr).height;
+        console.log("failed");
+      }
     }
+    cb(fr);
   }
   fr.src = src;
 }
