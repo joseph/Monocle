@@ -9,6 +9,7 @@ function onEvaluate(evt) {
     var _frame = document.getElementById("problem"+i);
     var _div = _frame.parentNode;
     var _window = _frame.contentWindow;
+    var _documentElement = _frame.contentDocument.documentElement;
     var _body = _frame.contentDocument.body;
     out.innerHTML += "Problem "+i+": "+eval(script)+"<br />";
   }

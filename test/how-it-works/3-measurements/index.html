@@ -8,23 +8,7 @@
     <title>Measuring iframe content width</title>
 
     <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
-    <style>
-      body {
-        width: 500px;
-        margin: 20px auto 100px;
-      }
-      .problemBox {
-        margin: 0 auto;
-      }
-      .problemBox iframe {
-        border: none;
-        background: #EEE;
-      }
-      textarea {
-        width: 100%;
-        display: block;
-      }
-    </style>
+    <link rel="stylesheet" href="../common.css" />
 
     <!-- THESE STYLES ARE PERTINENT AND YOU MAY CHANGE THEM -->
     <style>
@@ -141,23 +125,17 @@
 
     <p>
       In this box, you can evaluate arbitrary JavaScript.
-      Four variables are already populated: <code>_div</code>,
-      <code>_frame</code>, <code>_window</code>, and <code>_body</code>.
-      The return value of your code will appear below, for each problem.
+      Several variables are already populated: <code>_div</code>,
+      <code>_frame</code>, <code>_window</code>, _documentElement and
+      <code>_body</code>. The return value of your code will appear below,
+      for each problem.
     </p>
 
     <form id="scratch">
-      <textarea id="scratchText">_body.scrollWidth;</textarea>
+      <textarea id="scratchText">if (_documentElement.scrollHeight == 0) { _body.scrollWidth; } else { _documentElement.scrollWidth; }</textarea>
       <input type="submit" value="Evaluate" />
       <pre><code id="scratchResult"></code></pre>
     </form>
-
-
-    <h2>Curious?</h2>
-    <p>
-      Monocle's current solution, which <em>sometimes</em> fails the
-      Problem 2 test in iOS 5, is <a href="https://github.com/joseph/Monocle/blob/master/src/dimensions/columns.js#L166-219">here</a>.
-    </p>
 
   </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Problem</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        -webkit-column-width: 300px;
+        -moz-column-width: 300px;
+        -o-column-width: 300px;
+        column-width: 300px;
+        -webkit-column-gap: 0;
+        -moz-column-gap: 0;
+        -o-column-gap: 0;
+        column-gap: 0;
+      }
+
+      /* Force columns in everything except old WebKit.*/
+      body {
+        /*
+          Forces columns in everything except old WebKit.
+          Causes documentElement.scrollHeight = 0 in new WebKit.
+        */
+        position: absolute;
+
+        /*
+          Forces columns in Opera (with pos:abs). Doesn't seem to
+          do any harm in other browsers.
+        */
+        width: 100%;
+      }
+
+
+      /* Force columns in old WebKit. */
+      body.old {
+        /*
+          Forces columns in old WebKit (Kindle/iOS3).
+
+          Causes body.scrollWidth to always be at least 2x frame width.
+
+          In Opera, can shorten first column to populate second
+          sometimes. Will also do this in WebKit unless absolute-positioned.
+          Therefore, do not use except for old WebKit.
+        */
+        min-width: 200%;
+
+        /*
+          Also required in some circumstances by old Webkit to force columns.
+
+          Has the handy effect of un-doubling the body.scrollWidth in old
+          WebKit (down to a minimum of two pages).
+
+          Breaks Gecko, which won't display anything when translated
+          past the overflow. Therefore, do not use except for old WebKit.
+        */
+        overflow: hidden;
+      }
+
+      /* Simple test for translating 2 pages to the right. */
+      body.trans {
+        -webkit-transform: translateX(-600px);
+        -moz-transform: translateX(-600px);
+        -o-transform: translateX(-600px);
+        transform: translateX(-600px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="font-size: 50px; line-height: 66px;">
+      This text should appear in the
+      first column.
+
+      <br />
+
+      This text should appear in the
+      second column.
+
+      <br />
+
+      This text should appear in the
+      third column.
+    </div>
+  </body>
+</html>

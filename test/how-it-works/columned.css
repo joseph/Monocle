@@ -46,4 +46,5 @@ body {
 
 body.column-force {
   min-width: 200%;
+  overflow: hidden;
 }

@@ -1,0 +1,16 @@
+body {
+  width: 500px;
+  margin: 20px auto 100px;
+}
+.problemBox {
+  margin: 0 auto;
+}
+.problemBox iframe {
+  border: none;
+  background: #EEE;
+}
+
+textarea {
+  width: 100%;
+  display: block;
+}
