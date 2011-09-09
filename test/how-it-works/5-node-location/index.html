@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=540" />
+
+    <title>Finding the location of a node within content</title>
+
+    <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
+    <link rel="stylesheet" href="../common.css" />
+
+    <!-- THESE STYLES ARE PERTINENT AND YOU MAY CHANGE THEM -->
+    <style>
+      .problemBox {
+        width: 300px;
+        height: 300px;
+        overflow: hidden;
+      }
+      .problemBox iframe {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <script>
+      function findBeacons() {
+        var gbcr = typeof document.body.getBoundingClientRect == "function";
+        var out = [];
+
+        var fr = document.getElementById("problem");
+        var doc = fr.contentDocument;
+        var beacons = doc.getElementsByTagName("span");
+
+        var offset, pg;
+        for (var i = 0, ii = beacons.length; i < ii; ++i) {
+          var beacon = beacons[i];
+          /* GBCR TECHNIQUE */
+          if (gbcr) {
+            var transX = transX || doc.body.getBoundingClientRect().left;
+            offset = beacon.getBoundingClientRect().left;
+            pg = Math.ceil((offset - transX) / fr.offsetWidth);
+            out.push("Beacon "+i+" [GBCR]: Page "+pg);
+          }
+
+          /* SIV TECHNIQUE */
+          doc.body.id = ""; // Remove the translation.
+          var scroller = fr.contentWindow;
+          var svScrollX = scroller.scrollX; // Store current scrollX.
+
+          beacon.scrollIntoView();
+          offset = scroller.scrollX;
+          pg = Math.ceil(offset / fr.offsetWidth) + 1;
+          out.push("Beacon "+i+" [SIV]: Page "+pg);
+
+          scroller.scrollTo(svScrollX, 0); // Restore scrollX.
+          doc.body.id = "trans"; // Restore the translation.
+        }
+
+        document.getElementById("results").innerHTML = out.join("\n");
+      }
+
+      window.addEventListener("load", findBeacons, false);
+    </script>
+    <script src="../column-force.js"></script>
+  </head>
+
+  <body>
+
+    <p>
+      Here is some content that has been columnised and translated 600px (or
+      two "pages"). Via various methods, on what pages are the three
+      "beacon" elements?
+    </p>
+
+    <div class="problemBox">
+      <iframe id="problem" src="child.html"></iframe>
+    </div>
+
+    <pre><code id="results"></code></pre>
+
+    <p>
+      The expected results are <b>1, 2 and 5</b>.
+    </p>
+
+    <p>
+      GBCR: GetBoundingClientRect &mdash; A pretty efficient calculation
+      based on block dimensions and offsets. Not supported in older browsers.
+    </p>
+
+    <p>
+      SIV: ScrollIntoView &mdash; A slower and less accurate calculation
+      that works by natively "scrolling the element into view", checking
+      the scroll offset, then scrolling back to the previous offset.
+      Browsers sometimes calculate "in view" differently, leading to
+      infrequent off-by-one errors. Also, it has to remove transforms before
+      calculating scroll offset, and replace them afterward.
+    </p>
+
+
+    <h2>What's on the page?</h2>
+
+
+  </body>
+</html>

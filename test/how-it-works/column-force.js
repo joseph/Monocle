@@ -1,11 +1,12 @@
 function detectForceColumnsWithMinWidth() {
-  var kindle = navigator.userAgent.indexOf("Kindle/3");
-  var iOS3 = navigator.userAgent.indexOf("iPhone OS 3");
-  if (kindle < 0 && iOS3 < 0) { return; }
-  console.warn("Column force on all iframes...");
   var frames = document.getElementsByTagName('iframe');
   for (var i = 0, ii = frames.length; i < ii; ++i) {
-    frames[i].contentDocument.body.className = "column-force";
+    var pn = frames[i].parentNode;
+    var bd = frames[i].contentDocument.body;
+    if (bd.scrollHeight > pn.offsetHeight) {
+      console.warn("Column force on iframe ["+i+"]");
+      bd.className = "column-force";
+    }
   }
 }
 

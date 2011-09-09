@@ -132,7 +132,13 @@
     </p>
 
     <form id="scratch">
-      <textarea id="scratchText">if (_documentElement.scrollHeight == 0) { _body.scrollWidth; } else { _documentElement.scrollWidth; }</textarea>
+      <textarea id="scratchText" rows="5">
+if (_documentElement.scrollWidth &lt;= _frame.offsetWidth) {
+  _body.scrollWidth;
+} else {
+  _documentElement.scrollWidth;
+}
+      </textarea>
       <input type="submit" value="Evaluate" />
       <pre><code id="scratchResult"></code></pre>
     </form>
