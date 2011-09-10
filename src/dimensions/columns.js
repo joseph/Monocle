@@ -53,7 +53,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       ];
       //while (s != s.parent) { scrollers.push([s, s.scrollX]); s = s.parent; }
 
-      if (Monocle.Browser.has.mustScrollSheaf) {
+      if (Monocle.Browser.env.sheafIsScroller) {
         var scroller = p.page.m.sheafDiv;
         var x = scroller.scrollLeft;
         target.scrollIntoView();
@@ -129,16 +129,20 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var de = p.page.m.activeFrame.contentDocument.documentElement;
     var size = cmpt.getSize();
     if (!size) {
-      if (Monocle.Browser.env.iframeWidthFromBody) {
-        size = { width: elem.scrollWidth, height: elem.scrollHeight }
-      } else {
-        size = { width: de.scrollWidth, height: de.scrollHeight }
-      }
-
-      // size = { width: de.scrollWidth, height: de.scrollHeight }
-      // if (size.width <= pageDimensions().width) {
+      // FIXME: this env precalculation doesn't work properly in Gecko & iOS3.
+      //
+      // if (Monocle.Browser.env.iframeWidthFromBody) {
       //   size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      // } else {
+      //   size = { width: de.scrollWidth, height: de.scrollHeight }
       // }
+      //
+      size = { width: de.scrollWidth, height: de.scrollHeight }
+      if (size.width <= pageDimensions().width) {
+        size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      }
+      //
+      // END FIXME
 
       if (Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
         //console.log(size.width + " -> " + (size.width + p.page.m.offset));

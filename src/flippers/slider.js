@@ -66,9 +66,7 @@ Monocle.Flippers.Slider = function (reader) {
   // to be able to select or otherwise interact with text.
   function interactiveMode(bState) {
     p.reader.dispatchEvent('monocle:interactive:'+(bState ? 'on' : 'off'));
-    if (!Monocle.Browser.has.selectThruBug) {
-      return;
-    }
+    if (!Monocle.Browser.env.selectIgnoresZOrder) { return; }
     if (p.interactive = bState) {
       if (p.activeIndex != 0) {
         var place = getPlace();
@@ -374,7 +372,7 @@ Monocle.Flippers.Slider = function (reader) {
         transition = 'none';
       }
       elem.style.webkitTransition = transition;
-      if (Monocle.Browser.has.transform3d) {
+      if (Monocle.Browser.env.supportsTransform3d) {
         elem.style.webkitTransform = "translate3d("+x+",0,0)";
       } else {
         elem.style.webkitTransform = "translateX("+x+")";
@@ -441,7 +439,7 @@ Monocle.Flippers.Slider = function (reader) {
     var duration, transition;
 
     // NB: if the browser lacks transition support, moves immediately to x.
-    if (!Monocle.Browser.has.transitions) {
+    if (!Monocle.Browser.env.supportsTransitions) {
       duration = 0;
     } else if (!options.duration) {
       duration = 0;
@@ -471,7 +469,7 @@ Monocle.Flippers.Slider = function (reader) {
 
     // Set the styles
     elem.dom.setBetaStyle('transition', transition);
-    if (Monocle.Browser.has.transform3d) {
+    if (Monocle.Browser.env.supportsTransform3d) {
       elem.dom.setBetaStyle('transform', 'translate3d('+x+',0,0)');
     } else {
       elem.dom.setBetaStyle('transform', 'translateX('+x+')');
@@ -501,7 +499,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
+    var dur = Monocle.Browser.env.flickersOnJump ? 1 : 0;
     Monocle.defer(function () {
       setX(pageDiv, 0, { duration: dur }, callback);
     });
@@ -509,7 +507,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpOut(pageDiv, callback) {
-    var dur = Monocle.Browser.has.jumpFlickerBug ? 1 : 0;
+    var dur = Monocle.Browser.env.flickersOnJump ? 1 : 0;
     Monocle.defer(function () {
       setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: dur }, callback);
     });

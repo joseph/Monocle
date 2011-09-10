@@ -115,7 +115,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
 
   var capture = (options && options.useCapture) || false;
 
-  if (!Monocle.Browser.has.touch) {
+  if (!Monocle.Browser.env.touch) {
     if (fns.start) {
       listeners.mousedown = function (evt) {
         if (evt.button != 0) { return; }
@@ -175,7 +175,7 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
       }
     }
 
-    if (Monocle.Browser.has.iframeTouchBug) {
+    if (Monocle.Browser.env.brokenIframeTouchModel) {
       Monocle.Events.tMonitor = Monocle.Events.tMonitor ||
         new Monocle.Events.TouchMonitor();
       Monocle.Events.tMonitor.listen(elem, listeners, options);
@@ -195,8 +195,8 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
 //
 Monocle.Events.deafenForContact = function (elem, listeners) {
   var prefix = "";
-  if (Monocle.Browser.has.touch) {
-    prefix = Monocle.Browser.has.iframeTouchBug ? "contact" : "touch";
+  if (Monocle.Browser.env.touch) {
+    prefix = Monocle.Browser.env.brokenIframeTouchModel ? "contact" : "touch";
   }
 
   for (evtType in listeners) {
@@ -556,7 +556,7 @@ Monocle.Events.TouchMonitor = function () {
 
 
 Monocle.Events.listenOnIframe = function (frame) {
-  if (!Monocle.Browser.has.iframeTouchBug) {
+  if (!Monocle.Browser.env.brokenIframeTouchModel) {
     return;
   }
   Monocle.Events.tMonitor = Monocle.Events.tMonitor ||

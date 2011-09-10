@@ -30,16 +30,14 @@ Monocle.Styles = {
   affix: function (elem, property, value) {
     var target = elem.style ? elem.style : elem;
     var props = Monocle.Browser.css.toDOMProps(property);
-    for (var i = 0, ii = props.length; i < ii; ++i) {
-      target[props[i]] = value;
-    }
+    while (props.length) { target[props.shift()] = value; }
   },
 
 
   setX: function (elem, x) {
     var s = elem.style;
     if (typeof x == "number") { x += "px"; }
-    if (Monocle.Browser.has.transform3d) {
+    if (Monocle.Browser.env.supportsTransform3d) {
       s.webkitTransform = "translate3d("+x+", 0, 0)";
     } else {
       s.webkitTransform = "translateX("+x+")";
@@ -52,7 +50,7 @@ Monocle.Styles = {
   setY: function (elem, y) {
     var s = elem.style;
     if (typeof y == "number") { y += "px"; }
-    if (Monocle.Browser.has.transform3d) {
+    if (Monocle.Browser.env.supportsTransform3d) {
       s.webkitTransform = "translate3d(0, "+y+", 0)";
     } else {
       s.webkitTransform = "translateY("+y+")";

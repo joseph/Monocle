@@ -1,19 +1,28 @@
-Monocle.Browser = { engine: 'W3C' }
+Monocle.Browser = {}
 
 // Detect the browser engine and set boolean flags for reference.
 //
 Monocle.Browser.is = {
-  IE: (!!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1)) &&
-    (Monocle.Browser.engine = "IE"),
-  Opera: navigator.userAgent.indexOf('Opera') > -1 &&
-    (Monocle.Browser.engine = "Opera"),
-  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1 &&
-    (Monocle.Browser.engine = "WebKit"),
+  IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
+  Opera: navigator.userAgent.indexOf('Opera') > -1,
+  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
   Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
-    navigator.userAgent.indexOf('KHTML') === -1 &&
-    (Monocle.Browser.engine = "Gecko"),
+    navigator.userAgent.indexOf('KHTML') === -1,
   MobileSafari: !!navigator.userAgent.match(/AppleWebKit.*Mobile/)
 } // ... with thanks to PrototypeJS.
+
+
+if (Monocle.Browser.is.IE) {
+  Monocle.Browser.engine = "IE";
+} else if (Monocle.Browser.is.Opera) {
+  Monocle.Browser.engine = "Opera";
+} else if (Monocle.Browser.is.WebKit) {
+  Monocle.Browser.engine = "WebKit";
+} else if (Monocle.Browser.is.Gecko) {
+  Monocle.Browser.engine = "Gecko";
+} else {
+  Monocle.Browser.engine = "W3C";
+}
 
 
 // Detect the client platform (typically device/operating system).
@@ -62,7 +71,8 @@ Monocle.Browser.css = new Monocle.CSS();
 //
 Monocle.Browser.survey = function (callback) {
   if (!Monocle.Browser.env) {
-    Monocle.Browser.env = new Monocle.Env(callback);
+    Monocle.Browser.env = new Monocle.Env();
+    Monocle.Browser.env.survey(callback);
   } else if (typeof callback == "function") {
     callback();
   }

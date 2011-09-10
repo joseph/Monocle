@@ -6,14 +6,7 @@ Monocle.CSS = function () {
     guineapig: document.createElement('div')
   }
 
-  // If second argument is not null, returns just a single string representing
-  // the JavaScript version of the CSS property (eg, 'WebkitBackgroundSize'
-  // from 'background-size'). Note that this means you can pass an empty string
-  // to get the W3C DOM version of the property (ie, 'backgroundSize').
-  //
-  // If no second argument, then an array of all known prefixes is returned,
-  // in the order of k.domprefixes.
-  //
+
   function toDOMProps(prop) {
     var parts = prop.split('-');
     for (var i = parts.length; i > 0; --i) {

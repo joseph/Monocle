@@ -142,7 +142,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function attachFlipper(flipperClass) {
     // BROWSERHACK: Supported browsers must do CSS columns (at least?).
-    if (!Monocle.Browser.has.columns) {
+    if (!Monocle.Browser.env.supportsColumns) {
       flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
       if (!flipperClass) {
         return dom.append(
@@ -226,7 +226,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function lockingFrameWidths() {
-    if (!Monocle.Browser.has.relativeIframeWidthBug) { return; }
+    if (!Monocle.Browser.env.relativeIframeExpands) { return; }
     for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
       cmpt.style.display = "none";
     }
@@ -234,7 +234,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function lockFrameWidths() {
-    if (!Monocle.Browser.has.relativeIframeWidthBug) { return; }
+    if (!Monocle.Browser.env.relativeIframeExpands) { return; }
     for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
       cmpt.style.width = cmpt.parentNode.offsetWidth+"px";
       cmpt.style.display = "block";
@@ -724,7 +724,8 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     "overflow: visible !important;" +
-    //(Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
+    // FIXME - RE-ENABLE
+    //(Monocle.Browser.env.floatsIgnoreColumns ? "float: none !important;" : "")+
   "}",
   "html#RS\\:monocle body {" +
     "-webkit-text-size-adjust: none;" +
