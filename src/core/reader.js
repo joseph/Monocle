@@ -68,13 +68,20 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   var dom;
 
 
+  // Inspects the browser environment and kicks off preparing the container.
+  //
+  function initialize() {
+    options = options || {}
+
+    Monocle.Browser.survey(prepareBox);
+  }
+
+
   // Sets up the container and internal elements.
   //
-  function initialize(node, bookData, options, onLoadCallback) {
+  function prepareBox() {
     var box = typeof(node) == "string" ?  document.getElementById(node) : node;
     dom = API.dom = box.dom = new Monocle.Factory(box, 'box', 0, API);
-
-    options = options || {}
 
     dispatchEvent("monocle:initializing");
 
@@ -695,7 +702,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   API.removePageStyles = removePageStyles;
   API.visiblePages = visiblePages;
 
-  initialize(node, bookData, options, onLoadCallback);
+  initialize();
 
   return API;
 }
@@ -717,7 +724,7 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     "overflow: visible !important;" +
-    (Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
+    //(Monocle.Browser.has.floatColumnBug ? "float: none !important;" : "") +
   "}",
   "html#RS\\:monocle body {" +
     "-webkit-text-size-adjust: none;" +
@@ -731,4 +738,4 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "}"
 ]
 
-Monocle.pieceLoaded('reader');
+Monocle.pieceLoaded('core/reader');

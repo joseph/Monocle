@@ -29,7 +29,7 @@ Monocle.Styles = {
   //
   affix: function (elem, property, value) {
     var target = elem.style ? elem.style : elem;
-    var props = Monocle.Browser.CSSProps.toDOMProps(property);
+    var props = Monocle.Browser.css.toDOMProps(property);
     for (var i = 0, ii = props.length; i < ii; ++i) {
       target[props[i]] = value;
     }
@@ -129,4 +129,4 @@ Monocle.Styles.overlay = {
 
 
 
-Monocle.pieceLoaded('styles');
+Monocle.pieceLoaded('core/styles');

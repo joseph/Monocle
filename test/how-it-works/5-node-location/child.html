@@ -6,11 +6,11 @@
 
     <link rel="stylesheet" href="../columned.css" />
     <style>
-      body#trans {
+      #trans {
+        transform: translateX(-600px);
         -webkit-transform: translate3d(-600px, 0, 0);
         -moz-transform: translateX(-600px);
         -o-transform: translateX(-600px);
-        transform: translateX(-600px);
       }
 
       .beacon {
@@ -25,21 +25,26 @@
         -moz-box-shadow: 0px 0px 10px #FFB;
         box-shadow: 0px 0px 10px #FFB;
       }
+
+      .break {
+        display: block;
+        padding-bottom: 220px;
+      }
     </style>
   </head>
 
   <body id="trans">
-    <div style="font-size: 50px; line-height: 66px;">
+    <div style="font: 24px serif;">
       This text should <span class="beacon">appear</span> in the first column.
-      <br />
+      <div class="break"></div>
       This <span class="beacon">text</span> should appear in the second column.
-      <br />
+      <div class="break"></div>
       This text should appear in the third column.
-      <br />
+      <div class="break"></div>
       This text should appear in the fourth column.
-      <br />
+      <div class="break"></div>
     </div>
-    <div style="font-size: 25px; line-height: 80px; text-align: center;">
+    <div style="font: 15px serif; text-align: center;">
       The <span class="beacon">final</span> text appears in column five.<br />
     </div>
   </body>

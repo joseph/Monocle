@@ -443,4 +443,4 @@ Monocle.Book.fromNodes = function (nodes) {
   return new Monocle.Book(bookData);
 }
 
-Monocle.pieceLoaded('book');
+Monocle.pieceLoaded('core/book');

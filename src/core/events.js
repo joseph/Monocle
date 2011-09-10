@@ -26,11 +26,7 @@ Monocle.Events.dispatch = function (elem, evtType, data, cancelable) {
 // Register a function to be invoked when an event fires.
 //
 Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
-  if (elem.addEventListener) {
-    return elem.addEventListener(evtType, fn, useCapture || false);
-  } else if (elem.attachEvent) {
-    return elem.attachEvent('on'+evtType, fn);
-  }
+  return elem.addEventListener(evtType, fn, useCapture || false);
 }
 
 
@@ -568,4 +564,4 @@ Monocle.Events.listenOnIframe = function (frame) {
   Monocle.Events.tMonitor.listenOnIframe(frame);
 }
 
-Monocle.pieceLoaded('events');
+Monocle.pieceLoaded('core/events');

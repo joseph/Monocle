@@ -32,35 +32,63 @@
         var doc = fr.contentDocument;
         var beacons = doc.getElementsByTagName("span");
 
-        var offset, pg;
+        var offset, pg, mthd;
+        var pgWidth = fr.parentNode.offsetWidth;
         for (var i = 0, ii = beacons.length; i < ii; ++i) {
           var beacon = beacons[i];
-          /* GBCR TECHNIQUE */
           if (gbcr) {
-            var transX = transX || doc.body.getBoundingClientRect().left;
+            mthd = "GBCR";
+
             offset = beacon.getBoundingClientRect().left;
-            pg = Math.ceil((offset - transX) / fr.offsetWidth);
-            out.push("Beacon "+i+" [GBCR]: Page "+pg);
+
+            // Add back the translation on the body (typically negative).
+            offset -= doc.body.getBoundingClientRect().left;
+
+          } else {
+            mthd = "SIV";
+            doc.body.id = ""; // Remove the translation.
+            offset = scrollOffset(beacon, fr);
+            doc.body.id = "trans"; // Restore the translation.
           }
+          // We know at least 1px will be vis, and we don't want 0.
+          offset += 1;
 
-          /* SIV TECHNIQUE */
-          doc.body.id = ""; // Remove the translation.
-          var scroller = fr.contentWindow;
-          var svScrollX = scroller.scrollX; // Store current scrollX.
+          // Page is the offset divided by the page size.
+          pg = Math.ceil(offset / pgWidth);
 
-          beacon.scrollIntoView();
-          offset = scroller.scrollX;
-          pg = Math.ceil(offset / fr.offsetWidth) + 1;
-          out.push("Beacon "+i+" [SIV]: Page "+pg);
-
-          scroller.scrollTo(svScrollX, 0); // Restore scrollX.
-          doc.body.id = "trans"; // Restore the translation.
+          out.push("Beacon "+i+" ["+mthd+"]: Page "+pg);
+          out.push(offset);
         }
 
         document.getElementById("results").innerHTML = out.join("\n");
       }
 
-      window.addEventListener("load", findBeacons, false);
+
+      function scrollOffset(elem, fr) {
+        var offset = 0, scroller, x;
+        if (navigator.userAgent.indexOf("iPhone OS 3") >= 0) {
+          scroller = fr.parentNode;
+          x = scroller.scrollLeft;
+          elem.scrollIntoView();
+          offset = scroller.scrollLeft;
+          scroller.scrollLeft = x;
+          scroller.scrollTop = 0;
+        } else {
+          scroller = fr.contentWindow;
+          x = scroller.scrollX;
+          elem.scrollIntoView();
+          offset = scroller.scrollX;
+          scroller.scrollTo(x, 0);
+        }
+        return offset;
+      }
+
+      window.addEventListener(
+        "load",
+        // The zero-second delay is for iOS3.
+        function () { setTimeout(findBeacons, 0); },
+        false
+      );
     </script>
     <script src="../column-force.js"></script>
   </head>

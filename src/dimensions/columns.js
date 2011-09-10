@@ -40,30 +40,50 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  // FIXME: I guess we've busted this.
-  //
   function percentageThroughOfNode(target) {
-    // if (!target) {
-    //   return 0;
-    // }
-    // var doc = p.page.m.activeFrame.contentDocument;
-    // var offset = 0;
-    // if (target.getBoundingClientRect) {
-    //   offset = target.getBoundingClientRect().left;
-    //   offset -= doc.body.getBoundingClientRect().left;
-    // } else {
-    //   var scroller = columnedElement();
-    //   var oldScrollLeft = scroller.scrollLeft;
-    //   target.scrollIntoView();
-    //   offset = scroller.scrollLeft;
-    //   scroller.scrollTop = 0;
-    //   scroller.scrollLeft = oldScrollLeft;
-    // }
-    //
-    // var percent = offset / columnedDimensions().width;
-    // return percent;
+    if (!target) { return 0; }
+    var doc = p.page.m.activeFrame.contentDocument;
+    var offset = 0;
+    if (Monocle.Browser.env.findNodesByScrolling) {
+      // TODO: remove translation
+      var win = s = p.page.m.activeFrame.contentWindow;
+      var scrollers = [
+        [win, win.scrollX, win.scrollY],
+        [window, window.scrollX, window.scrollY]
+      ];
+      //while (s != s.parent) { scrollers.push([s, s.scrollX]); s = s.parent; }
 
-    return 0;
+      if (Monocle.Browser.has.mustScrollSheaf) {
+        var scroller = p.page.m.sheafDiv;
+        var x = scroller.scrollLeft;
+        target.scrollIntoView();
+        offset = scroller.scrollLeft;
+      } else {
+        var scroller = win;
+        var x = scroller.scrollX;
+        target.scrollIntoView();
+        offset = scroller.scrollX;
+      }
+
+      while (s = scrollers.shift()) {
+        s[0].scrollTo(s[1], s[2]);
+      }
+      // TODO: replace translation
+    } else {
+      offset = target.getBoundingClientRect().left;
+      offset -= doc.body.getBoundingClientRect().left;
+    }
+
+    // We know at least 1px will be visible, and offset should not be 0.
+    offset += 1;
+
+    // Percent is the offset divided by the total width of the component.
+    var percent = offset / columnedDimensions().width;
+
+    // Page number would be offset divided by the width of a single page.
+    // var pageNum = Math.ceil(offset / pageDimensions().width);
+
+    return percent;
   }
 
 
@@ -77,13 +97,17 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var pdims = pageDimensions();
     var ce = columnedElement();
 
+    // FIXME: Apply as a single string. Dynamically generate gap rule.
     ce.style.cssText = Monocle.Styles.applyRules(null, k.STYLE["columned"]);
-
     Monocle.Styles.affix(ce, 'column-width', pdims.width+'px');
 
-    if (ce.scrollHeight > pdims.height) {
-      console.warn("Forcing columns...");
-      Monocle.Styles.applyRules(ce, k.STYLE["column-force"]);
+    if (Monocle.Browser.env.forceColumns) {
+      Monocle.defer(function () {
+        if (ce.scrollHeight > pdims.height) {
+          console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
+          Monocle.Styles.applyRules(ce, k.STYLE["column-force"]);
+        }
+      });
     }
   }
 
@@ -105,11 +129,21 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var de = p.page.m.activeFrame.contentDocument.documentElement;
     var size = cmpt.getSize();
     if (!size) {
-      size = { width: de.scrollWidth, height: de.scrollHeight }
-      if (size.width <= pageDimensions().width) {
+      if (Monocle.Browser.env.iframeWidthFromBody) {
         size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      } else {
+        size = { width: de.scrollWidth, height: de.scrollHeight }
       }
-      //console.log("width: "+size.width+", height: "+size.height);
+
+      // size = { width: de.scrollWidth, height: de.scrollHeight }
+      // if (size.width <= pageDimensions().width) {
+      //   size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      // }
+
+      if (Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
+        //console.log(size.width + " -> " + (size.width + p.page.m.offset));
+        size.width += p.page.m.offset;
+      }
       cmpt.setSize(size);
     }
     return size;
@@ -131,7 +165,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var offset = locusToOffset(locus);
     p.page.m.offset = offset;
     var ce = columnedElement();
-    if (Monocle.Browser.iOSVersion >= 5) {
+    //if (Monocle.Browser.iOSVersion >= 5) {
+    if (Monocle.Browser.env.translateIframeIn3d) {
       ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
     } else {
       Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");

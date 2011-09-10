@@ -20,3 +20,6 @@ Monocle.Dimensions = {}
 Monocle.Controls = {};
 Monocle.Flippers = {};
 Monocle.Panels = {};
+
+
+Monocle.pieceLoaded("core/monocle");

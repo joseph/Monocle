@@ -49,8 +49,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
     return loadFrame(
       pageDiv,
       function () {
-        setupFrame(pageDiv, pageDiv.m.activeFrame);
-        callback(pageDiv, API);
+        setupFrame(
+          pageDiv,
+          pageDiv.m.activeFrame,
+          function () { callback(pageDiv, API) }
+        );
       }
     );
   }
@@ -227,7 +230,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Once a frame is loaded with this component, call this method to style
   // and measure its contents.
   //
-  function setupFrame(pageDiv, frame) {
+  function setupFrame(pageDiv, frame, callback) {
     // BROWSERHACK: iOS touch events on iframes are busted. See comments in
     // events.js for an explanation of this hack.
     Monocle.Events.listenOnIframe(frame);
@@ -240,20 +243,17 @@ Monocle.Component = function (book, id, index, chapters, source) {
     };
     pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
-    // Correct the body lineHeight to use a number, not a percentage, which
-    // causes the text to jump upwards.
-    // var doc = frame.contentDocument;
-    // var win = doc.defaultView;
-    // var currStyle = win.getComputedStyle(doc.body, null);
-    // var lh = parseFloat(currStyle.getPropertyValue('line-height'));
-    // var fs = parseFloat(currStyle.getPropertyValue('font-size'));
-    // doc.body.style.lineHeight = lh / fs;
+    // We defer the measurement to allow any style changes from the event
+    // to take effect.
+    Monocle.defer(function () {
+      p.pageLength = pageDiv.m.dimensions.measure();
+      frame.style.visibility = "visible";
 
-    p.pageLength = pageDiv.m.dimensions.measure();
-    frame.style.visibility = "visible";
+      // Find the place of any chapters in the component.
+      locateChapters(pageDiv);
 
-    // Find the place of any chapters in the component.
-    locateChapters(pageDiv);
+      callback();
+    });
   }
 
 
@@ -337,7 +337,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function pageForXPath(xpath, pageDiv) {
     var doc = pageDiv.m.activeFrame.contentDocument;
     var percent = 0;
-    if (typeof doc.evaluate == "function") {
+    if (Monocle.Browser.env.supportsXPath) {
       var node = doc.evaluate(
         xpath,
         doc,
@@ -346,6 +346,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
         null
       ).singleNodeValue;
       var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+    } else {
+      console.warn("XPath not supported in this client.");
     }
     return percentToPageNumber(percent);
   }
@@ -385,4 +387,4 @@ Monocle.Component = function (book, id, index, chapters, source) {
   return API;
 }
 
-Monocle.pieceLoaded('component');
+Monocle.pieceLoaded('core/component');
