@@ -112,7 +112,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       // Make the reader elements look pretty.
       applyStyles();
 
-      listen('monocle:componentchange', persistPageStylesOnComponentChange);
+      listen('monocle:componentmodify', persistPageStylesOnComponentChange);
 
       p.flipper.listenForInteraction(options.panels);
 
@@ -183,7 +183,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function primeFrames(url, callback) {
     url = url || "about:blank";
 
-    var pageMax = p.flipper.pageCount;
     var pageCount = 0;
 
     var cb = function (evt) {
@@ -193,31 +192,29 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         'monocle:frameprimed',
         { frame: frame, pageIndex: pageCount }
       );
-      if ((pageCount += 1) == pageMax) {
+      if ((pageCount += 1) == p.flipper.pageCount) {
         Monocle.defer(callback);
       }
     }
 
-    for (var i = 0; i < pageMax; ++i) {
-      var page = dom.find('page', i);
+    forEachPage(function (page) {
       page.m.activeFrame.style.visibility = "hidden";
       page.m.activeFrame.setAttribute('frameBorder', 0);
       page.m.activeFrame.setAttribute('scrolling', 'no');
       Monocle.Events.listen(page.m.activeFrame, 'load', cb);
       page.m.activeFrame.src = url;
-    }
+    });
   }
 
 
   function applyStyles() {
     dom.find('container').dom.setStyles(Monocle.Styles.container);
-    for (var i = 0; i < p.flipper.pageCount; ++i) {
-      var page = dom.find('page', i);
+    forEachPage(function (page, i) {
       page.dom.setStyles(Monocle.Styles.page);
       dom.find('sheaf', i).dom.setStyles(Monocle.Styles.sheaf);
       var cmpt = dom.find('component', i)
       cmpt.dom.setStyles(Monocle.Styles.component);
-    }
+    });
     lockFrameWidths();
     dom.find('overlay').dom.setStyles(Monocle.Styles.overlay);
     dispatchEvent('monocle:styles');
@@ -281,7 +278,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.resizeTimer = setTimeout(
       function () {
         lockFrameWidths();
-        recalculateDimensions();
+        recalculateDimensions(true);
         dispatchEvent("monocle:resize");
       },
       k.durations.RESIZE_DELAY
@@ -292,9 +289,24 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function recalculateDimensions(andRestorePlace) {
     if (!p.book) { return; }
-    p.book.properties.componentSizes = [];
+    dispatchEvent("monocle:resizing", {});
+
+    var place, locus;
     if (andRestorePlace !== false) {
-      p.flipper.moveTo({ page: pageNumber() });
+      var place = getPlace();
+      var locus = { percent: place ? place.percentageThrough() : 0 };
+    }
+
+    // Better to use an event? Or chaining consecutively?
+    forEachPage(function (pageDiv) {
+      pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
+    });
+
+    if (locus) {
+      Monocle.defer(function () {
+        p.flipper.moveTo(locus);
+        dispatchEvent("monocle:resize");
+      });
     }
   }
 
@@ -395,12 +407,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       cntr.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
     } else if (cType == "page") {
-      for (var i = 0; i < p.flipper.pageCount; ++i) {
-        var page = dom.find('page', i);
+      forEachPage(function (page, i) {
         var runner = ctrl.createControlElements(page);
         page.appendChild(runner);
         ctrlData.elements.push(runner);
-      }
+      });
     } else if (cType == "modal" || cType == "popover" || cType == "hud") {
       ctrlElem = ctrl.createControlElements(overlay);
       overlay.appendChild(ctrlElem);
@@ -681,6 +692,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function visiblePages() {
     return p.flipper.visiblePages ? p.flipper.visiblePages() : [dom.find('page')];
+  }
+
+
+  function forEachPage(callback) {
+    for (var i = 0, ii = p.flipper.pageCount; i < ii; ++i) {
+      var page = dom.find('page', i);
+      callback(page, i);
+    }
   }
 
 

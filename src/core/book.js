@@ -17,7 +17,6 @@ Monocle.Book = function (dataSource) {
   var p = API.properties = {
     dataSource: dataSource,
     components: [],
-    componentSizes: [],
     chapters: {} // flat arrays of chapters per component
   }
 
@@ -100,16 +99,14 @@ Monocle.Book = function (dataSource) {
     // If we're here, then the locus is based on the current component.
     var result = { load: false, componentId: locus.componentId, page: 1 }
 
-    // Get the current last page, update the component, get new last page.
-    var lastPageNum = { 'old': component.lastPageNumber() }
-    var changedDims = component.updateDimensions(pageDiv);
-    lastPageNum['new'] = component.lastPageNumber();
+    // Get the current last page.
+    lastPageNum = component.lastPageNumber();
 
     // Deduce the page number for the given locus.
     if (typeof(locus.page) == "number") {
       result.page = locus.page;
     } else if (typeof(locus.pagesBack) == "number") {
-      result.page = lastPageNum['new'] + locus.pagesBack;
+      result.page = lastPageNum + locus.pagesBack;
     } else if (typeof(locus.percent) == "number") {
       var place = new Monocle.Place();
       place.setPlace(component, 1);
@@ -134,15 +131,6 @@ Monocle.Book = function (dataSource) {
       console.warn("Unrecognised locus: " + locus);
     }
 
-    // If the dimensions of the pageDiv have changed, we should multiply the
-    // page num against the difference between the old number of pages in the
-    // component and the new number of pages in the component.
-    if (changedDims && lastPageNum['old']) {
-      result.page = Math.round(
-        lastPageNum['new'] * (result.page / lastPageNum['old'])
-      );
-    }
-
     if (result.page < 1) {
       if (cIndex == 0) {
         // On first page of book.
@@ -155,16 +143,16 @@ Monocle.Book = function (dataSource) {
         result.pagesBack = result.page;
         result.page = null;
       }
-    } else if (result.page > lastPageNum['new']) {
+    } else if (result.page > lastPageNum) {
       if (cIndex == p.lastCIndex) {
         // On last page of book.
-        result.page = lastPageNum['new'];
+        result.page = lastPageNum;
         result.boundaryend = true;
       } else {
         // Moving forwards from current component.
         result.load = true;
         result.componentId = p.componentIds[cIndex + 1];
-        result.page -= lastPageNum['new'];
+        result.page -= lastPageNum;
       }
     }
 

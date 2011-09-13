@@ -1,3 +1,5 @@
+Monocle.DEBUG = true;
+
 (function () {
 
   Monocle.Styles.container.right = "24px";

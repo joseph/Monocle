@@ -236,22 +236,20 @@ Monocle.Component = function (book, id, index, chapters, source) {
     //
     Monocle.Events.listenOnIframe(frame);
 
-    // Announce that the component has changed.
-    var evtData = {
-      'page': pageDiv,
-      'document': frame.contentDocument,
-      'component': API
-    };
-    pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
+    var doc = frame.contentDocument;
+    var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
 
-    // We defer the measurement to allow any style changes from the event
-    // to take effect.
-    Monocle.defer(function () {
-      p.pageLength = pageDiv.m.dimensions.measure();
+    // Announce that the component is loaded.
+    pageDiv.m.reader.dispatchEvent('monocle:componentmodify', evtData);
+
+    updateDimensions(pageDiv, function () {
       frame.style.visibility = "visible";
 
       // Find the place of any chapters in the component.
       locateChapters(pageDiv);
+
+      // Announce that the component has changed.
+      pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
       callback();
     });
@@ -261,13 +259,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Checks whether the pageDiv dimensions have changed. If they have,
   // remeasures dimensions and returns true. Otherwise returns false.
   //
-  function updateDimensions(pageDiv) {
-    if (pageDiv.m.dimensions.hasChanged()) {
-      p.pageLength = pageDiv.m.dimensions.measure();
-      return true;
-    } else {
-      return false;
-    }
+  function updateDimensions(pageDiv, callback) {
+    pageDiv.m.dimensions.update(function (pageLength) {
+      p.pageLength = pageLength;
+      if (typeof callback == "function") { callback() };
+    });
   }
 
 
@@ -366,24 +362,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
-  function setSize(n) {
-    p.book.properties.componentSizes[p.index] = n;
-  }
-
-
-  function getSize() {
-    return p.book.properties.componentSizes[p.index];
-  }
-
-
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.pageForXPath = pageForXPath;
   API.lastPageNumber = lastPageNumber;
-  API.setSize = setSize;
-  API.getSize = getSize;
 
   return API;
 }

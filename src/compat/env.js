@@ -317,7 +317,7 @@ Monocle.Env = function () {
     // In iOS, the frame is clipped by overflow:hidden, so this doesn't seem to
     // be a problem.
     //
-    // TODO: Can anyone think of a way to detect this?
+    // TODO: Is there a way to detect this?
     //
     ["relativeIframeExpands", function () {
       result(navigator.userAgent.indexOf("Android 2") >= 0);

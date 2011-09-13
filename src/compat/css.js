@@ -7,6 +7,58 @@ Monocle.CSS = function () {
   }
 
 
+  // Returns engine-specific properties,
+  //
+  // eg:
+  //
+  //  toCSSProps('transform')
+  //
+  // ... in WebKit, this will return:
+  //
+  //  ['transform', '-webkit-transform']
+  //
+  function toCSSProps(prop) {
+    var props = [prop];
+    var eng = k.engines.indexOf(Monocle.Browser.engine);
+    if (eng) {
+      var pf = k.prefixes[eng];
+      if (pf) {
+        props.push(pf+prop);
+      }
+    }
+    return props;
+  }
+
+
+  // Returns an engine-specific CSS string.
+  //
+  // eg:
+  //
+  //   toCSSDeclaration('column-width', '300px')
+  //
+  // ... in Mozilla, this will return:
+  //
+  //   "column-width: 300px; -moz-column-width: 300px;"
+  //
+  function toCSSDeclaration(prop, val) {
+    var props = toCSSProps(prop);
+    for (var i = 0, ii = props.length; i < ii; ++i) {
+      props[i] += ": "+val+";";
+    }
+    return props.join("");
+  }
+
+
+  // Returns an array of DOM properties specific to this engine.
+  //
+  // eg:
+  //
+  //   toDOMProps('column-width')
+  //
+  // ... in Opera, this will return:
+  //
+  //   [columnWidth, OColumnWidth]
+  //
   function toDOMProps(prop) {
     var parts = prop.split('-');
     for (var i = parts.length; i > 0; --i) {
@@ -26,6 +78,9 @@ Monocle.CSS = function () {
   }
 
 
+  // Is this exact property (or any in this array of properties) supported
+  // by this engine?
+  //
   function supportsProperty(props) {
     for (var i in props) {
       if (p.guineapig.style[props[i]] !== undefined) { return true; }
@@ -35,6 +90,8 @@ Monocle.CSS = function () {
 
 
 
+  // Is this property (or a prefixed variant) supported by this engine?
+  //
   function supportsPropertyWithAnyPrefix(prop) {
     return supportsProperty(toDOMProps(prop));
   }
@@ -69,6 +126,8 @@ Monocle.CSS = function () {
   }
 
 
+  API.toCSSProps = toCSSProps;
+  API.toCSSDeclaration = toCSSDeclaration;
   API.toDOMProps = toDOMProps;
   API.supportsProperty = supportsProperty;
   API.supportsPropertyWithAnyPrefix = supportsPropertyWithAnyPrefix;

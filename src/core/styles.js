@@ -1,12 +1,7 @@
 Monocle.Styles = {
 
-  // Takes a hash or string of CSS property assignments and applies them
-  // to the element.
-  //
-  // If elem is null, simply returns the CSS string. Otherwise, applies the rules
-  // and returns the elem's cssText.
-  //
-  applyRules: function (elem, rules) {
+  // Takes a hash and returns a string.
+  rulesToString: function (rules) {
     if (typeof rules != 'string') {
       var parts = [];
       for (var declaration in rules) {
@@ -14,12 +9,17 @@ Monocle.Styles = {
       }
       rules = parts.join(" ");
     }
-    if (elem) {
-      elem.style.cssText += ';'+rules;
-      return elem.style.cssText;
-    } else {
-      return rules;
-    }
+    return rules;
+  },
+
+
+  // Takes a hash or string of CSS property assignments and applies them
+  // to the element.
+  //
+  applyRules: function (elem, rules) {
+    rules = Monocle.Styles.rulesToString(rules);
+    elem.style.cssText += ';'+rules;
+    return elem.style.cssText;
   },
 
 

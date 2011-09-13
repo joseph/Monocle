@@ -5,38 +5,121 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   var p = API.properties = {
     page: pageDiv,
     reader: pageDiv.m.reader,
-    length: 0
+    length: 0,
+    width: 0
   }
 
 
-  function initialize() {
-    p.reader.listen('monocle:componentchange', componentChanged);
+  function update(callback) {
+    setColumnWidth();
+    Monocle.defer(function () {
+      p.length = columnCount();
+      if (Monocle.DEBUG) {
+        console.log(
+          'page['+p.page.m.pageIndex+'] -> '+p.length+
+          ' ('+p.page.m.activeFrame.m.component.properties.id+')'
+        );
+      }
+      callback(p.length);
+    });
   }
 
 
-  function hasChanged() {
-    return p.page.m.activeFrame.m.component.getSize() ? false : true;
-  }
+  function setColumnWidth() {
+    var pdims = pageDimensions();
+    var ce = columnedElement();
 
+    p.width = pdims.width;
 
-  function measure() {
-    p.length = Math.ceil(columnedDimensions().width / pageDimensions().width);
+    var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
+    rules += Monocle.Browser.css.toCSSDeclaration('column-width', p.width+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', 0);
+    rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
 
-    console.log(
-      'page['+p.page.m.pageIndex+'] -> '+p.length+
-      ' ('+p.page.m.activeFrame.m.component.properties.id+')'
-    );
-
-    return p.length;
-  }
-
-
-  function pages() {
-    if (hasChanged()) {
-      console.warn('Accessing pages() when dimensions are dirty.')
-      return 0;
+    if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
+      console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
+      rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
     }
-    return p.length;
+
+    if (ce.style.cssText != rules) {
+      console.log(
+        "Changing CSS for page ["+p.page.m.pageIndex+"]: "+
+        (new Date()).getTime()
+      );
+
+      // Update offset because we're translating to zero.
+      p.page.m.offset = 0;
+
+      // Apply body style changes.
+      ce.style.cssText = rules;
+    }
+  }
+
+
+  // Returns the element to which columns CSS should be applied.
+  //
+  function columnedElement() {
+    return p.page.m.activeFrame.contentDocument.body;
+  }
+
+
+  // Returns the dimensions of the offsettable area of the columned element. By
+  // definition, the number of pages is always the width of this divided by the
+  // width of a single page (eg, the client area of the columned element).
+  //
+  function columnedDimensions() {
+    console.log(
+      "columnedDimensions for page ["+p.page.m.pageIndex+"]: "+
+      (new Date()).getTime()
+    );
+    var cmpt = p.page.m.activeFrame.m.component;
+    var bd = columnedElement();
+    var de = p.page.m.activeFrame.contentDocument.documentElement;
+    size = { width: bd.scrollWidth, height: bd.scrollHeight }
+    console.compatDir(size);
+    if (size.width < de.scrollWidth) {
+      size = { width: de.scrollWidth, height: de.scrollHeight }
+      console.compatDir(size);
+    }
+
+    if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
+      size.width += p.page.m.offset;
+    }
+    return size;
+  }
+
+
+  function pageDimensions() {
+    var elem = p.page.m.sheafDiv;
+    return { width: elem.clientWidth, height: elem.clientHeight }
+  }
+
+
+  function columnCount() {
+    return Math.ceil(columnedDimensions().width / pageDimensions().width)
+  }
+
+
+  function locusToOffset(locus) {
+    return pageDimensions().width * (locus.page - 1);
+  }
+
+
+  function translateToLocus(locus) {
+    var offset = locusToOffset(locus);
+    p.page.m.offset = offset;
+    translateToOffset(offset);
+    return offset;
+  }
+
+
+  function translateToOffset(offset) {
+    var ce = columnedElement();
+    if (Monocle.Browser.env.translateIframeIn3d) {
+      ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
+    } else {
+      Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
+    }
   }
 
 
@@ -45,7 +128,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var doc = p.page.m.activeFrame.contentDocument;
     var offset = 0;
     if (Monocle.Browser.env.findNodesByScrolling) {
-      // TODO: remove translation
+      // First, remove translation...
+      translateToOffset(0);
+
+      // Store scroll offsets for all windows.
       var win = s = p.page.m.activeFrame.contentWindow;
       var scrollers = [
         [win, win.scrollX, win.scrollY],
@@ -65,10 +151,13 @@ Monocle.Dimensions.Columns = function (pageDiv) {
         offset = scroller.scrollX;
       }
 
+      // Restore scroll offsets for all windows.
       while (s = scrollers.shift()) {
         s[0].scrollTo(s[1], s[2]);
       }
-      // TODO: replace translation
+
+      // ... finally, replace translation.
+      translateToOffset(p.page.m.offset);
     } else {
       offset = target.getBoundingClientRect().left;
       offset -= doc.body.getBoundingClientRect().left;
@@ -87,97 +176,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  function componentChanged(evt) {
-    if (evt.m['page'] != p.page) { return; }
-    setColumnWidth();
-  }
-
-
-  function setColumnWidth() {
-    var pdims = pageDimensions();
-    var ce = columnedElement();
-
-    // FIXME: Apply as a single string. Dynamically generate gap rule.
-    ce.style.cssText = Monocle.Styles.applyRules(null, k.STYLE["columned"]);
-    Monocle.Styles.affix(ce, 'column-width', pdims.width+'px');
-
-    if (Monocle.Browser.env.forceColumns) {
-      Monocle.defer(function () {
-        if (ce.scrollHeight > pdims.height) {
-          console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
-          Monocle.Styles.applyRules(ce, k.STYLE["column-force"]);
-        }
-      });
-    }
-  }
-
-
-  // Returns the element to which columns CSS should be applied.
-  //
-  function columnedElement() {
-    return p.page.m.activeFrame.contentDocument.body;
-  }
-
-
-  // Returns the dimensions of the offsettable area of the columned element. By
-  // definition, the number of pages is always the width of this divided by the
-  // width of a single page (eg, the client area of the columned element).
-  //
-  function columnedDimensions() {
-    var cmpt = p.page.m.activeFrame.m.component;
-    var bd = columnedElement();
-    var de = p.page.m.activeFrame.contentDocument.documentElement;
-    var size = cmpt.getSize();
-    if (!size) {
-      size = { width: bd.scrollWidth, height: bd.scrollHeight }
-      if (size.width < de.scrollWidth) {
-        size = { width: de.scrollWidth, height: de.scrollHeight }
-      }
-
-      if (Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
-        //console.log(size.width + " -> " + (size.width + p.page.m.offset));
-        size.width += p.page.m.offset;
-      }
-      cmpt.setSize(size);
-    }
-    return size;
-  }
-
-
-  function pageDimensions() {
-    var elem = p.page.m.sheafDiv;
-    return { width: elem.clientWidth, height: elem.clientHeight }
-  }
-
-
-  function locusToOffset(locus) {
-    return pageDimensions().width * (locus.page - 1);
-  }
-
-
-  function translateToLocus(locus) {
-    var offset = locusToOffset(locus);
-    p.page.m.offset = offset;
-    var ce = columnedElement();
-    //if (Monocle.Browser.iOSVersion >= 5) {
-    if (Monocle.Browser.env.translateIframeIn3d) {
-      ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
-    } else {
-      Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
-    }
-    return offset;
-  }
-
-
-  API.hasChanged = hasChanged;
-  API.measure = measure;
-  API.pages = pages;
+  API.update = update;
   API.percentageThroughOfNode = percentageThroughOfNode;
 
   API.locusToOffset = locusToOffset;
   API.translateToLocus = translateToLocus;
-
-  initialize();
 
   return API;
 }
@@ -189,11 +192,7 @@ Monocle.Dimensions.Columns.STYLE = {
     "padding": "0",
     "height": "100%",
     "width": "100%",
-    "position": "absolute",
-    "-webkit-column-gap": "0",
-    "-moz-column-gap": "0",
-    "-o-column-gap": "0",
-    "column-gap": "0"
+    "position": "absolute"
   },
   "column-force": {
     "min-width": "200%",

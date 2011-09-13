@@ -26,11 +26,6 @@ Monocle.Dimensions.Vert = function (pageDiv) {
   }
 
 
-  function pages() {
-    return p.length;
-  }
-
-
   function getBodyHeight() {
     return p.page.m.activeFrame.contentDocument.body.scrollHeight;
   }
@@ -84,7 +79,6 @@ Monocle.Dimensions.Vert = function (pageDiv) {
 
   API.hasChanged = hasChanged;
   API.measure = measure;
-  API.pages = pages;
   API.percentageThroughOfNode = percentageThroughOfNode;
   API.locusToOffset = locusToOffset;
 

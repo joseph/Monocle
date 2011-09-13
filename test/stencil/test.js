@@ -1,3 +1,5 @@
+Monocle.DEBUG = true;
+
 (function () {
   var bookData = {
     getComponents: function () {

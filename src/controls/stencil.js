@@ -120,7 +120,7 @@ Monocle.Controls.Stencil = function (reader) {
   function getOffset(pageDiv) {
     return {
       l: pageDiv.m.offset || 0,
-      w: pageDiv.m.dimensions.properties.measurements.width
+      w: pageDiv.m.dimensions.properties.width
     };
   }
 
