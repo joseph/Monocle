@@ -52,7 +52,7 @@ if (Monocle.Browser.is.MobileSafari) {
   })();
 }
 Monocle.Browser.iOSVersionBelow = function (strOrNum) {
-  return Monocle.Browser.iOSVersion && Monocle.Browser.iOSVersion < strOrNum;
+  return !!Monocle.Browser.iOSVersion && Monocle.Browser.iOSVersion < strOrNum;
 }
 
 

@@ -16,5 +16,7 @@
 //= require "flippers/legacy"
 //= require "dimensions/columns"
 //= require "flippers/slider"
+//= require "flippers/scroller"
+//= require "flippers/instant"
 
 Monocle.pieceLoaded('monocore');

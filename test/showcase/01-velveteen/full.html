@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Velveteen Rabbit - Monocle</title>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../../src/core/monocle.js"></script>
+    <script type="text/javascript" src="../../../src/compat/env.js"></script>
+    <script type="text/javascript" src="../../../src/compat/css.js"></script>
+    <script type="text/javascript" src="../../../src/compat/stubs.js"></script>
+    <script type="text/javascript" src="../../../src/compat/browser.js"></script>
+    <script type="text/javascript" src="../../../src/core/events.js"></script>
+    <script type="text/javascript" src="../../../src/core/factory.js"></script>
+    <script type="text/javascript" src="../../../src/core/styles.js"></script>
+    <script type="text/javascript" src="../../../src/core/reader.js"></script>
+    <script type="text/javascript" src="../../../src/core/book.js"></script>
+    <script type="text/javascript" src="../../../src/core/component.js"></script>
+    <script type="text/javascript" src="../../../src/core/place.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../../src/dimensions/vert.js"></script>
+    <script type="text/javascript" src="../../../src/flippers/legacy.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../../styles/monocore.css" />
+    <link rel="stylesheet" type="text/css" href="../../tests.css" />
+
+    <style type="text/css">
+      #rabbit {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+
+    <script type="text/javascript">
+      // Initialize the reader element.
+      Monocle.Events.listen(
+        window,
+        'load',
+        function () {
+          window.reader = Monocle.Reader('rabbit');
+          Monocle.Events.listen(
+            window,
+            'resize',
+            function () { window.reader.resized() }
+          );
+        }
+      );
+    </script>
+
+  </head>
+
+  <body>
+
+    <div id="rabbit">
+
+      <style>
+        p {
+          line-height: 130%;
+        }
+        img {
+          max-width: 98%;
+          max-height: 98%;
+          -webkit-column-break-before: always;
+        }
+        .dedication {
+          text-align: center;
+          font-style: italic;
+          margin: 16em 0 10em;
+        }
+        .center {
+          text-align: center;
+        }
+        h1, h2, h3 {
+          text-align: center;
+        }
+        h1 small {
+          font-size: 85%;
+          font-variant: small-caps;
+        }
+        h2 {
+          margin-bottom: 3em;
+          font-weight: normal;
+        }
+        h2 small {
+          font-size: 85%;
+          font-style: italic;
+        }
+      </style>
+
+
+      <img src="images/cover.jpg" alt="The Velveteen Rabbit, by Margery Williams" />
+
+      <h1>
+        <small>The</small><br />Velveteen Rabbit
+      </h1>
+
+      <h2>
+        <small>or</small><br />How Toys Become Real
+      </h2>
+
+      <h3>
+        <i>by Margery Williams</i><br />
+        <small>Illustrations by William Nicholson</small>
+      </h3>
+
+      <p class="dedication">
+        To Francesco Bianco<br />
+        from<br />
+        The Velveteen Rabbit
+      </p>
+
+
+      <p>
+      THERE was once a velveteen rabbit, and in the beginning he was really splendid.  He was fat and bunchy, as a rabbit should be; his coat was spotted brown and white, he had real thread whiskers, and his ears were lined with pink sateen.  On Christmas morning, when he sat wedged in the top of the Boy&#8217;s stocking, with a sprig of holly between his paws, the effect was charming.
+      </p>
+      <p>
+      There were other things in the stocking, nuts and oranges and a toy engine, and chocolate almonds and a clockwork mouse, but the Rabbit was quite the best of all.  For at least two hours the Boy loved him, and then Aunts and Uncles came to dinner, and there was a great rustling of tissue paper and unwrapping of parcels, and in the excitement of looking at all the new presents the Velveteen Rabbit was forgotten.
+      </p>
+
+      <p class="center">
+        <img alt="christmas" src="images/christmas.jpg" /><br />
+        <i>Christmas</i>
+      </p>
+
+
+      <p>
+      For a long time he lived in the toy cupboard or on the nursery floor, and no one thought very much about him.  He was naturally shy, and being only made of velveteen, some of the more expensive toys quite snubbed him.  The mechanical toys were very superior, and looked down upon every one else; they were full of modern ideas, and pretended they were real.  The model boat, who had lived through two seasons and lost most of his paint, caught the tone from them and never missed an opportunity of referring to his rigging in technical terms.  The Rabbit could not claim to be a model of anything, for he didn&#8217;t know that real rabbits existed; he thought they were all stuffed with sawdust like himself, and he understood that sawdust was quite out-of-date and should never be mentioned in modern circles.  Even Timothy, the jointed wooden lion, who was made by the disabled soldiers, and should have had broader views, put on airs and pretended he was connected with Government.  Between them all the poor little Rabbit was made to feel himself very insignificant and commonplace, and the only person who was kind to him at all was the Skin Horse.
+      </p>
+      <p>
+      The Skin Horse had lived longer in the nursery than any of the others.  He was so old that his brown coat was bald in patches and showed the seams underneath, and most of the hairs in his tail had been pulled out to string bead necklaces.  He was wise, for he had seen a long succession of mechanical toys arrive to boast and swagger, and by-and-by break their mainsprings and pass away, and he knew that they were only toys, and would never turn into anything else.  For nursery magic is very strange and wonderful, and only those playthings that are old and wise and experienced like the Skin Horse understand all about it.
+      </p>
+      <p>
+      &#8220;What is <em>Real</em>?&#8221; asked the Rabbit one day, when they were lying side by side near the nursery fender, before Nana came to tidy the room.  &#8220;Does it mean having things that buzz inside you and a stick-out handle?&#8221;
+      </p>
+      <p>
+      &#8220;Real isn&#8217;t how you are made,&#8221; said the Skin Horse.  &#8220;It&#8217;s a thing that happens to you.  When a child loves you for a long, long time, not just to play with, but <em>really</em> loves you, then you become Real.&#8221;
+      </p>
+      <p>
+      &#8220;Does it hurt?&#8221; asked the Rabbit.
+      </p>
+      <p>
+      &#8220;Sometimes,&#8221; said the Skin Horse, for he was always truthful.  &#8220;When you are Real you don&#8217;t mind being hurt.&#8221;
+      </p>
+      <p>
+      &#8220;Does it happen all at once, like being wound up,&#8221; he asked, &#8220;or bit by bit?&#8221;
+      </p>
+      <p>
+      &#8220;It doesn&#8217;t happen all at once,&#8221; said the Skin Horse.  &#8220;You become.  It takes a long time.  That&#8217;s why it doesn&#8217;t happen often to people who break easily, or have sharp edges, or who have to be carefully kept.  Generally, by the time you are Real, most of your hair has been loved off, and your eyes drop out and you get loose in the joints and very shabby.  But these things don&#8217;t matter at all, because once you are Real you can&#8217;t be ugly, except to people who don&#8217;t understand.&#8221;
+      </p>
+      <p>
+      &#8220;I suppose <i>you</i> are real?&#8221; said the Rabbit.  And then he wished he had not said it, for he thought the Skin Horse might be sensitive.  But the Skin Horse only smiled.
+      </p>
+
+      <p>
+      &#8220;The Boy&#8217;s Uncle made me Real,&#8221; he said.  &#8220;That was a great many years ago; but once you are Real you can&#8217;t become unreal again.  It lasts for always.&#8221;
+      </p>
+      <p>
+      The Rabbit sighed.  He thought it would be a long time before this magic called Real happened to him.  He longed to become Real, to know what it felt like; and yet the idea of growing shabby and losing his eyes and whiskers was rather sad.  He wished that he could become it without these uncomfortable things happening to him.
+      </p>
+      <p>
+      There was a person called Nana who ruled the nursery.  Sometimes she took no notice of the playthings lying about, and sometimes, for no reason whatever, she went swooping about like a great wind and hustled them away in cupboards.  She called this &#8220;tidying up,&#8221; and the playthings all hated it, especially the tin ones.  The Rabbit didn&#8217;t mind it so much, for wherever he was thrown he came down soft.
+      </p>
+      <p>
+      One evening, when the Boy was going to bed, he couldn&#8217;t find the china dog that always slept with him.  Nana was in a hurry, and it was too much trouble to hunt for china dogs at bedtime, so she simply looked about her, and seeing that the toy cupboard door stood open, she made a swoop.
+      </p>
+      <p>
+      &#8220;Here,&#8221; she said, &#8220;take your old Bunny!  He&#8217;ll do to sleep with you!&#8221;   And she dragged the Rabbit out by one ear, and put him into the Boy&#8217;s arms.
+      </p>
+      <p>
+      That night, and for many nights after, the Velveteen Rabbit slept in the Boy&#8217;s bed.  At first he found it rather uncomfortable, for the Boy hugged him very tight, and sometimes he rolled over on him, and sometimes he pushed him so far under the pillow that the Rabbit could scarcely breathe.  And he missed, too, those long moonlight hours in the nursery, when all the house was silent, and his talks with the Skin Horse.  But very soon he grew to like it, for the Boy used to talk to him, and made nice tunnels for him under the bedclothes that he said were like the burrows the real rabbits lived in.  And they had splendid games together, in whispers, when Nana had gone away to her supper and left the night-light burning on the mantelpiece.  And when the Boy dropped off to sleep, the Rabbit would snuggle down close under his little warm chin and dream, with the Boy&#8217;s hands clasped close round him all night long.
+      </p>
+      <p>
+      And so time went on, and the little Rabbit was very happy–so happy that he never noticed how his beautiful velveteen fur was getting shabbier and shabbier, and his tail becoming unsewn, and all the pink rubbed off his nose where the Boy had kissed him.
+      </p>
+      <p>
+      Spring came, and they had long days in the garden, for wherever the Boy went the Rabbit went too.  He had rides in the wheelbarrow, and picnics on the grass, and lovely fairy huts built for him under the raspberry canes behind the flower border.  And once, when the Boy was called away suddenly to go out to tea, the Rabbit was left out on the lawn until long after dusk, and Nana had to come and look for him with the candle because the Boy couldn&#8217;t go to sleep unless he was there.  He was wet through with the dew and quite earthy from diving into the burrows the Boy had made for him in the flower bed, and Nana grumbled as she rubbed him off with a corner of her apron.
+      </p>
+
+      <p class="center">
+        <img alt="spring" src="images/spring.jpg" /><br />
+        <i>Spring Time</i>
+      </p>
+
+      <p>
+      &#8220;You must have your old Bunny!&#8221; she said.  &#8220;Fancy all that fuss for a toy!&#8221;
+      </p>
+      <p>
+      The Boy sat up in bed and stretched out his hands.
+      </p>
+      <p>
+      &#8220;Give me my Bunny!&#8221; he said.  &#8220;You mustn&#8217;t say that.  He isn&#8217;t a toy.  He&#8217;s <em>real</em>!&#8221;
+      </p>
+      <p>
+      When the little Rabbit heard that he was happy, for he knew that what the Skin Horse had said was true at last.  The nursery magic had happened to him, and he was a toy no longer.  He was Real.  The Boy himself had said it.
+      </p>
+      <p>
+      That night he was almost too happy to sleep, and so much love stirred in his little sawdust heart that it almost burst.  And into his boot-button eyes, that had long ago lost their polish, there came a look of wisdom and beauty, so that even Nana noticed it next morning when she picked him up, and said, &#8220;I declare if that old Bunny hasn&#8217;t got quite a knowing expression!&#8221;
+      </p>
+
+      <p class="center">&asymp;</p>
+
+      <p>
+      That was a wonderful Summer!
+      </p>
+      <p>
+      Near the house where they lived there was a wood, and in the long June evenings the Boy liked to go there after tea to play.  He took the Velveteen Rabbit with him, and before he wandered off to pick flowers, or play at brigands among the trees, he always made the Rabbit a little nest somewhere among the bracken, where he would be quite cosy, for he was a kind-hearted little boy and he liked Bunny to be comfortable.  One evening, while the Rabbit was lying there alone, watching the ants that ran to and fro between his velvet paws in the grass, he saw two strange beings creep out of the tall bracken near him.
+      </p>
+      <p>
+      They were rabbits like himself, but quite furry and brand-new.  They must have been very well made, for their seams didn&#8217;t show at all, and they changed shape in a queer way when they moved; one minute they were long and thin and the next minute fat and bunchy, instead of always staying the same like he did.  Their feet padded softly on the ground, and they crept quite close to him, twitching their noses, while the Rabbit stared hard to see which side the clockwork stuck out, for he knew that people who jump generally have something to wind them up.  But he couldn&#8217;t see it.  They were evidently a new kind of rabbit altogether.
+      </p>
+
+      <p>
+      They stared at him, and the little Rabbit stared back.  And all the time their noses twitched.
+      </p>
+      <p>
+      &#8220;Why don&#8217;t you get up and play with us?&#8221; one of them asked.
+      </p>
+      <p>
+      &#8220;I don&#8217;t feel like it,&#8221; said the Rabbit, for he didn&#8217;t want to explain that he had no clockwork.
+      </p>
+      <p>
+      &#8220;Ho!&#8221; said the furry rabbit.  &#8220;It&#8217;s as easy as anything,&#8221; And he gave a big hop sideways and stood on his hind legs.
+      </p>
+      <p>
+      &#8220;I don&#8217;t believe you can!&#8221; he said.
+      </p>
+      <p>
+      &#8220;I can!&#8221; said the little Rabbit.  &#8220;I can jump higher than anything!&#8221; He meant when the Boy threw him, but of course he didn&#8217;t want to say so.
+      </p>
+      <p>
+      &#8220;Can you hop on your hind legs?&#8221; asked the furry rabbit.
+      </p>
+      <p>
+      That was a dreadful question, for the Velveteen Rabbit had no hind legs at all!  The back of him was made all in one piece, like a pincushion.  He sat still in the bracken, and hoped that the other rabbits wouldn&#8217;t notice.
+      </p>
+      <p>
+      &#8220;I don&#8217;t want to!&#8221; he said again.
+      </p>
+      <p>
+      But the wild rabbits have very sharp eyes.  And this one stretched out his neck and looked.
+      </p>
+      <p>
+      &#8220;He hasn&#8217;t got any hind legs!&#8221; he called out.  &#8220;Fancy a rabbit without any hind legs!&#8221; And he began to laugh.
+      </p>
+      <p>
+      &#8220;I have!&#8221; cried the little Rabbit.  &#8220;I have got hind legs!  I am sitting on them!&#8221;
+      </p>
+      <p>
+      &#8220;Then stretch them out and show me, like this!&#8221; said the wild rabbit.  And he began to whirl round and dance, till the little Rabbit got quite dizzy.
+      </p>
+      <p>
+      &#8220;I don&#8217;t like dancing,&#8221; he said.  &#8220;I&#8217;d rather sit still!&#8221;
+      </p>
+      <p>
+      But all the while he was longing to dance, for a funny new tickly feeling ran through him, and he felt he would give anything in the world to be able to jump about like these rabbits did.
+      </p>
+      <p>
+      The strange rabbit stopped dancing, and came quite close.  He came so close this time that his long whiskers brushed the Velveteen Rabbit&#8217;s ear, and then he wrinkled his nose suddenly and flattened his ears and jumped backwards.
+      </p>
+
+      <p>
+      &#8220;He doesn&#8217;t smell right!&#8221; he exclaimed.  &#8220;He isn&#8217;t a rabbit at all!  He isn&#8217;t real!&#8221;
+      </p>
+      <p>
+      &#8220;I <i>am</i> Real!&#8221; said the little Rabbit.  &#8220;I am Real!  The Boy said so!&#8221;   And he nearly began to cry.
+      </p>
+      <p>
+      Just then there was a sound of footsteps, and the Boy ran past near them, and with a stamp of feet and a flash of white tails the two strange rabbits disappeared.
+      </p>
+      <p>
+      &#8220;Come back and play with me!&#8221; called the little Rabbit.  &#8220;Oh, do come back!   I <i>know</i> I am Real!&#8221;
+      </p>
+      <p>
+      But there was no answer, only the little ants ran to and fro, and the bracken swayed gently where the two strangers had passed.  The Velveteen Rabbit was all alone.
+      </p>
+      <p>
+      &#8220;Oh, dear!&#8221; he thought.  &#8220;Why did they run away like that?  Why couldn&#8217;t they stop and talk to me?&#8221;
+      </p>
+      <p>
+      For a long time he lay very still, watching the bracken, and hoping that they would come back.  But they never returned, and presently the sun sank lower and the little white moths fluttered out, and the Boy came and carried him home.
+      </p>
+
+      <p class="center"> &asymp; </p>
+
+      <p>
+      Weeks passed, and the little Rabbit grew very old and shabby, but the Boy loved him just as much.  He loved him so hard that he loved all his whiskers off, and the pink lining to his ears turned grey, and his brown spots faded.  He even began to lose his shape, and he scarcely looked like a rabbit any more, except to the Boy.  To him he was always beautiful, and that was all that the little Rabbit cared about.  He didn&#8217;t mind how he looked to other people, because the nursery magic had made him Real, and when you are Real shabbiness doesn&#8217;t matter.
+      </p>
+      <p>
+      And then, one day, the Boy was ill.
+      </p>
+      <p>
+      His face grew very flushed, and he talked in his sleep, and his little body was so hot that it burned the Rabbit when he held him close. Strange people came and went in the nursery, and a light burned all night and through it all the little Velveteen Rabbit lay there, hidden from sight under the bedclothes, and he never stirred, for he was afraid that if they found him some one might take him away, and he knew that the Boy needed him.
+      </p>
+      <p>
+      It was a long weary time, for the Boy was too ill to play, and the little Rabbit found it rather dull with nothing to do all day long.  But he snuggled down patiently, and looked forward to the time when the Boy should be well again, and they would go out in the garden amongst the flowers and the butterflies and play splendid games in the raspberry thicket like they used to.  All sorts of delightful things he planned, and while the Boy lay half asleep he crept up close to the pillow and whispered them in his ear.  And presently the fever turned, and the Boy got better.  He was able to sit up in bed and look at picture-books, while the little Rabbit cuddled close at his side.  And one day, they let him get up and dress.
+      </p>
+      <p>
+      It was a bright, sunny morning, and the windows stood wide open.  They had carried the Boy out on to the balcony, wrapped in a shawl, and the little Rabbit lay tangled up among the bedclothes, thinking.
+      </p>
+      <p>
+      The Boy was going to the seaside to-morrow.  Everything was arranged, and now it only remained to carry out the doctor&#8217;s orders.  They talked about it all, while the little Rabbit lay under the bedclothes, with just his head peeping out, and listened.  The room was to be disinfected, and all the books and toys that the Boy had played with in bed must be burnt.
+      </p>
+      <p>
+      &#8220;Hurrah!&#8221; thought the little Rabbit.  &#8220;To-morrow we shall go to the seaside!&#8221;  For the boy had often talked of the seaside, and he wanted very much to see the big waves coming in, and the tiny crabs, and the sand castles.
+      </p>
+      <p>
+      Just then Nana caught sight of him.
+      </p>
+      <p>
+      &#8220;How about his old Bunny?&#8221; she asked.
+      </p>
+      <p>
+      &#8221;<i>That?</i>&#8221; said the doctor.  &#8220;Why, it&#8217;s a mass of scarlet fever germs!–Burn it at once.  What?  Nonsense!  Get him a new one.  He mustn&#8217;t have that any more!&#8221;
+      </p>
+
+      <p class="center">
+        <img alt="anxious" src="images/anxious.jpg" /><br />
+        <i>Anxious Times</i>
+      </p>
+
+      <p>
+      And so the little Rabbit was put into a sack with the old picture-books and a lot of rubbish, and carried out to the end of the garden behind the fowl-house.  That was a fine place to make a bonfire, only the gardener was too busy just then to attend to it.  He had the potatoes to dig and the green peas to gather, but next morning he promised to come quite early and burn the whole lot.
+      </p>
+      <p>
+      That night the Boy slept in a different bedroom, and he had a new bunny to sleep with him.  It was a splendid bunny, all white plush with real glass eyes, but the Boy was too excited to care very much about it.  For to-morrow he was going to the seaside, and that in itself was such a wonderful thing that he could think of nothing else.
+      </p>
+      <p>
+      And while the Boy was asleep, dreaming of the seaside, the little Rabbit lay among the old picture-books in the corner behind the fowl-house, and he felt very lonely.  The sack had been left untied, and so by wriggling a bit he was able to get his head through the opening and look out.  He was shivering a little, for he had always been used to sleeping in a proper bed, and by this time his coat had worn so thin and threadbare from hugging that it was no longer any protection to him.  Near by he could see the thicket of raspberry canes, growing tall and close like a tropical jungle, in whose shadow he had played with the Boy on bygone mornings.  He thought of those long sunlit hours in the garden–how happy they were–and a great sadness came over him.  He seemed to see them all pass before him, each more beautiful than the other, the fairy huts in the flower-bed, the quiet evenings in the wood when he lay in the bracken and the little ants ran over his paws; the wonderful day when he first knew that he was Real.  He thought of the Skin Horse, so wise and gentle, and all that he had told him.  Of what use was it to be loved and lose one&#8217;s beauty and become Real if it all ended like this?  And a tear, a real tear, trickled down his little shabby velvet nose and fell to the ground.
+      </p>
+      <p>
+      And then a strange thing happened.  For where the tear had fallen a flower grew out of the ground, a mysterious flower, not at all like any that grew in the garden.  It had slender green leaves the colour of emeralds, and in the centre of the leaves a blossom like a golden cup.  It was so beautiful that the little Rabbit forgot to cry, and just lay there watching it.  And presently the blossom opened, and out of it there stepped a fairy.
+      </p>
+      <p>
+      She was quite the loveliest fairy in the whole world.  Her dress was of pearl and dew-drops, and there were flowers round her neck and in her hair, and her face was like the most perfect flower of all.  And she came close to the little Rabbit and gathered him up in her arms and kissed him on his velveteen nose that was all damp from crying.
+      </p>
+      <p>
+      &#8220;Little Rabbit,&#8221; she said, &#8220;don&#8217;t you know who I am?&#8221;
+      </p>
+      <p>
+      The Rabbit looked up at her, and it seemed to him that he had seen her face before, but he couldn&#8217;t think where.
+      </p>
+      <p>
+      &#8220;I am the nursery magic Fairy,&#8221; she said.  &#8220;I take care of all the playthings that the children have loved.  When they are old and worn out and the children don&#8217;t need them any more, then I come and take them away with me and turn them into Real.&#8221;
+      </p>
+      <p>
+      &#8220;Wasn&#8217;t I Real before?&#8221; asked the little Rabbit.
+      </p>
+      <p>
+      &#8220;You were Real to the Boy,&#8221; the Fairy said, &#8220;because he loved you.  Now you shall be Real to every one.&#8221;
+      </p>
+
+      <p class="center">
+        <img alt="fairy" src="images/fairy.jpg" /><br />
+        <i>The Fairy Flower</i>
+      </p>
+
+      <p>
+      And she held the little Rabbit close in her arms and flew with him into the wood.
+      </p>
+      <p>
+      It was light now, for the moon had risen.  All the forest was beautiful, and the fronds of the bracken shone like frosted silver.  In the open glade between the tree-trunks the wild rabbits danced with their shadows on the velvet grass, but when they saw the Fairy they all stopped dancing and stood round in a ring to stare at her.
+      </p>
+      <p>
+      &#8220;I&#8217;ve brought you a new playfellow,&#8221; the Fairy said.  &#8220;You must be very kind to him and teach him all he needs to know in Rabbit-land, for he is going to live with you for ever and ever!&#8221;
+      </p>
+      <p>
+      And she kissed the little Rabbit again and put him down on the grass.
+      </p>
+      <p>
+      &#8220;Run and play, little Rabbit!&#8221; she said.
+      </p>
+      <p>
+      But the little Rabbit sat quite still for a moment and never moved.  For when he saw all the wild rabbits dancing around him he suddenly remembered about his hind legs, and he didn&#8217;t want them to see that he was made all in one piece.  He did not know that when the Fairy kissed him that last time she had changed him altogether.  And he might have sat there a long time, too shy to move, if just then something hadn&#8217;t tickled his nose, and before he thought what he was doing he lifted his hind toe to scratch it.
+      </p>
+      <p>
+      And he found that he actually had hind legs!  Instead of dingy velveteen he had brown fur, soft and shiny, his ears twitched by themselves, and his whiskers were so long that they brushed the grass.  He gave one leap and the joy of using those hind legs was so great that he went springing about the turf on them, jumping sideways and whirling round as the others did, and he grew so excited that when at last he did stop to look for the Fairy she had gone.
+      </p>
+      <p>
+      He was a Real Rabbit at last, at home with the other rabbits.
+      </p>
+
+      <p class="center"> &asymp; </p>
+
+      <p>
+      Autumn passed and Winter, and in the Spring, when the days grew warm and sunny, the Boy went out to play in the wood behind the house.  And while he was playing, two rabbits crept out from the bracken and peeped at him.  One of them was brown all over, but the other had strange markings under his fur, as though long ago he had been spotted, and the spots still showed through.  And about his little soft nose and his round black eyes there was something familiar, so that the Boy thought to himself:
+      </p>
+      <p>
+      &#8220;Why, he looks just like my old Bunny that was lost when I had scarlet fever!&#8221;
+      </p>
+      <p>
+      But he never knew that it really was his own Bunny, come back to look at the child who had first helped him to be Real.
+      </p>
+      <p class="center">THE END</p>
+    </div>
+
+  </body>
+</html>

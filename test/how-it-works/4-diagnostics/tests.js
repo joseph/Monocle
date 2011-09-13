@@ -1,5 +1,10 @@
 var tests = [
 
+  ["userAgent", function (cb) {
+    cb(navigator.userAgent, "black");
+  }],
+
+
   ["columnsSupported", function (cb) {
     var gps = document.createElement('div').style;
     var supported = (
@@ -66,6 +71,32 @@ var tests = [
     })
   }],
 
+  /*
+  ["relativeWidthFrameExpandsOnResize", function (cb) {
+    loadTestFrame(function (fr) {
+      fr.parentNode.style.width = "20%";
+      setTimeout(function () {
+        alert(fr.offsetWidth);
+        var oldWidth = fr.offsetWidth;
+        fr.parentNode.style.width = "120%";
+        alert(fr.offsetWidth);
+        setTimeout(function () {
+          fr.parentNode.style.width = "20%";
+          alert(fr.offsetWidth);
+          setTimeout(function () {
+            alert(fr.offsetWidth);
+            if (oldWidth == fr.offsetWidth) {
+              cb("100%-width iframe returns to correct size: "+fr.offsetWidth, "green");
+            } else {
+              cb("100%-width iframe expands continually: "+fr.offsetWidth, "orange");
+            }
+          }, 0);
+        }, 0);
+      }, 0);
+
+    });
+  }],
+  */
 
   ["measuresFourPages", function (cb) { measuresNPages(4, cb); }],
 

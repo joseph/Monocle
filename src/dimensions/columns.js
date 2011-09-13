@@ -124,25 +124,15 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   // width of a single page (eg, the client area of the columned element).
   //
   function columnedDimensions() {
-    var elem = columnedElement();
     var cmpt = p.page.m.activeFrame.m.component;
+    var bd = columnedElement();
     var de = p.page.m.activeFrame.contentDocument.documentElement;
     var size = cmpt.getSize();
     if (!size) {
-      // FIXME: this env precalculation doesn't work properly in Gecko & iOS3.
-      //
-      // if (Monocle.Browser.env.iframeWidthFromBody) {
-      //   size = { width: elem.scrollWidth, height: elem.scrollHeight }
-      // } else {
-      //   size = { width: de.scrollWidth, height: de.scrollHeight }
-      // }
-      //
-      size = { width: de.scrollWidth, height: de.scrollHeight }
-      if (size.width <= pageDimensions().width) {
-        size = { width: elem.scrollWidth, height: elem.scrollHeight }
+      size = { width: bd.scrollWidth, height: bd.scrollHeight }
+      if (size.width < de.scrollWidth) {
+        size = { width: de.scrollWidth, height: de.scrollHeight }
       }
-      //
-      // END FIXME
 
       if (Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
         //console.log(size.width + " -> " + (size.width + p.page.m.offset));

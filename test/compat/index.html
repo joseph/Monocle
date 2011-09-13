@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=540" />
+
+    <title>Compatibility diagnostics</title>
+
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
+    <style type="text/css">
+      th {
+        text-align: left;
+      }
+      td {
+        font-family: Consolas, Andale Mono, Menlo, Monaco, monospace;
+      }
+    </style>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/core/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat/env.js"></script>
+    <script type="text/javascript" src="../../src/compat/css.js"></script>
+    <script type="text/javascript" src="../../src/compat/stubs.js"></script>
+    <script type="text/javascript" src="../../src/compat/browser.js"></script>
+
+    <script>
+      (function () {
+        function readUA() {
+          testResult("userAgent", navigator.userAgent);
+        }
+
+
+        function testResult(name, val) {
+          var tbl = document.getElementById('results');
+          var row = document.createElement('tr');
+          var nCell = document.createElement('td');
+          var vCell = document.createElement('td');
+          var nCellText = document.createTextNode(name);
+          var vCellText = document.createTextNode(val);
+          nCell.appendChild(nCellText);
+          vCell.appendChild(vCellText);
+          vCell.style.color = colorForTestResult(name, val);
+          row.appendChild(nCell);
+          row.appendChild(vCell);
+          tbl.appendChild(row);
+        }
+
+
+        function colorForTestResult(name, val) {
+          var neutralNames = ["userAgent", "touch", "embedded"];
+          try {
+            if (neutralNames.indexOf(name) >= 0) {
+              return "black";
+            }
+          } catch (e) {}
+          if (name.match(/^supports/)) {
+            return val ? "green" : "red";
+          }
+          return val ? "orange": "green";
+        }
+
+
+        function init() {
+          readUA();
+          env = new Monocle.Env();
+          env.properties.resultCallback = testResult;
+          env.survey();
+        }
+
+        window.onload = init;
+      })();
+    </script>
+  </head>
+
+  <body>
+
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+
+    <h1>Compatibility diagnostics</h1>
+
+    <table id="results">
+      <tr>
+        <th>Test</th>
+        <th>Result</th>
+      </tr>
+    </table>
+
+    <br />
+
+    <p>
+      Each of these tests is performed by Monocle.Env during the first
+      Monocle.Reader initialisation. The tests are described in
+      <code>src/compat/env.js</code>.
+    </p>
+
+    <p>
+      As a general guide, any <code>supports</code> test should be
+      <code>true</code>, "touch" and "embedded" may be either, and all other
+      tests are for specific bugs needing workarounds -- therefore best result
+      is <code>false</code>.
+    </p>
+
+  </body>
+
+</html>

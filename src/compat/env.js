@@ -2,13 +2,19 @@ Monocle.Env = function () {
 
   var API = { constructor: Monocle.Env }
   var k = API.constants = API.constructor;
-  var p = API.properties = {}
+  var p = API.properties = {
+    // Assign to a function before running survey in order to get
+    // results as they come in. The function should take two arguments:
+    // testName and value.
+    resultCallback: null
+  }
 
   // These are private variables so they don't clutter up properties.
   var css = Monocle.Browser.css;
   var activeTestName = null;
   var frameLoadCallback = null;
   var testFrame = null;
+  var testFrameCntr = null;
   var testFrameLoadedWithStandard = false;
   var testFrameSize = 100;
   var surveyCallback = null;
@@ -31,18 +37,20 @@ Monocle.Env = function () {
   // Each test should call this to say "I'm finished, run the next test."
   //
   function result(val) {
-    console.log("["+activeTestName+"] "+val);
+    //console.log("["+activeTestName+"] "+val);
     API[activeTestName] = val;
+    if (p.resultCallback) { p.resultCallback(activeTestName, val); }
     runNextTest();
+    return val;
   }
 
 
   // Invoked after all tests have run.
   //
   function completed() {
-    if (testFrame && testFrame.parentNode) {
-      testFrame.parentNode.removeChild(testFrame);
-    }
+    // Remove the test frame after a slight delay (otherwise Gecko spins).
+    Monocle.defer(removeTestFrame);
+
     if (typeof surveyCallback == "function") {
       surveyCallback();
     }
@@ -98,8 +106,8 @@ Monocle.Env = function () {
       }
       var divStyle = [
         "display:inline-block",
-        "line-height:"+testFrameSize*2+"px",
-        "background:#090"
+        "line-height:"+testFrameSize+"px",
+        "width:"+testFrameSize+"px"
       ].join(";");
       src = "javascript:'<!DOCTYPE html><html>"+
         '<head><meta name="time" content="'+(new Date()).getTime()+'" />'+
@@ -115,19 +123,18 @@ Monocle.Env = function () {
   // Creates the hidden test frame and returns it.
   //
   function createTestFrame() {
-    var box = document.createElement('div');
-    box.className = "problemBox";
-    box.style.cssText = [
+    testFrameCntr = document.createElement('div');
+    testFrameCntr.style.cssText = [
       "width:"+testFrameSize+"px",
       "height:"+testFrameSize+"px",
       "overflow:hidden",
       "position:absolute",
       "visibility:hidden"
     ].join(";");
-    document.body.appendChild(box);
+    document.body.appendChild(testFrameCntr);
 
     var fr = document.createElement('iframe');
-    box.appendChild(fr);
+    testFrameCntr.appendChild(fr);
     fr.setAttribute("scrolling", "no");
     fr.style.cssText = [
       "width:100%",
@@ -171,15 +178,19 @@ Monocle.Env = function () {
   }
 
 
-  function bodyDimensions(fr) {
-    var doc = fr.contentDocument;
-    var dims = {
-      width: doc.documentElement.scrollWidth,
-      height: doc.documentElement.scrollHeight
+  function removeTestFrame() {
+    if (testFrameCntr && testFrameCntr.parentNode) {
+      testFrameCntr.parentNode.removeChild(testFrameCntr);
     }
-    if (dims.width <= testFrameSize) {
-      dims.width = doc.body.scrollWidth;
-      dims.height = doc.body.scrollHeight;
+  }
+
+
+  function bodyDimensions(fr) {
+    var bd = fr.contentDocument.body;
+    var de = fr.contentDocument.documentElement;
+    var dims = { width: bd.scrollWidth, height: bd.scrollHeight };
+    if (dims.width < de.scrollWidth) {
+      dims = { width: de.scrollWidth, height: de.scrollHeight };
     }
     return dims;
   }
@@ -207,15 +218,6 @@ Monocle.Env = function () {
 
     // TEST FOR OPTIONAL CAPABILITIES
 
-    // Does the device have a MobileSafari-style touch interface?
-    //
-    ["touch", function () {
-      result(
-        ('ontouchstart' in window) ||
-        css.supportsMediaQueryProperty('touch-enabled')
-      );
-    }],
-
     // Can we find nodes in a document with an XPath?
     //
     ["supportsXPath", testForFunction("document.evaluate")],
@@ -242,6 +244,17 @@ Monocle.Env = function () {
 
     // CHECK OUT OUR CONTEXT
 
+    // Does the device have a MobileSafari-style touch interface?
+    //
+    ["touch", function () {
+      result(
+        ('ontouchstart' in window) ||
+        css.supportsMediaQueryProperty('touch-enabled')
+      );
+    }],
+
+    // Is the Reader embedded, or in the top-level window?
+    //
     ["embedded", function () { result(top != self) }],
 
 
@@ -279,12 +292,14 @@ Monocle.Env = function () {
     ["widthsIgnoreTranslate", function () {
       loadTestFrame(function (fr) {
         var firstWidth = bodyDimensions(fr).width;
+        //console.log(firstWidth);
         var s = fr.contentDocument.body.style;
         var props = css.toDOMProps("transform");
         for (var i = 0, ii = props.length; i < ii; ++i) {
           s[props[i]] = "translateX(-600px)";
         }
         var secondWidth = bodyDimensions(fr).width;
+        //console.log(secondWidth);
         for (i = 0, ii = props.length; i < ii; ++i) {
           s[props[i]] = "none";
         }
@@ -302,8 +317,11 @@ Monocle.Env = function () {
     // In iOS, the frame is clipped by overflow:hidden, so this doesn't seem to
     // be a problem.
     //
-    // FIXME: Detection not yet implemented.
-    ["relativeIframeExpands", testNotYetImplemented(false)],
+    // TODO: Can anyone think of a way to detect this?
+    //
+    ["relativeIframeExpands", function () {
+      result(navigator.userAgent.indexOf("Android 2") >= 0);
+    }],
 
     // Some combination of Webkit and OSX 10.6 cause a flicker during slider
     // "jumps" (ie, when the page instantly moves to a different translate
@@ -331,16 +349,31 @@ Monocle.Env = function () {
       });
     }],
 
-    // FIXME: This is not detecting correctly for Gecko (should be false) or
-    // iOS3 (should be true).
-    ["iframeWidthFromBody", function () {
-      loadTestFrame(function (fr) {
-        //console.log(fr.contentDocument.documentElement.scrollWidth);
-        //console.log(fr.contentDocument.body.scrollWidth);
-        result(fr.contentDocument.documentElement.scrollWidth <= testFrameSize);
-        //result(true);
-      })
-    }],
+    // A component iframe's body is absolutely positioned. This means that
+    // the documentElement should have a height of 0, since it contains nothing
+    // other than an absolutely positioned element.
+    //
+    // But for some browsers (Gecko and Opera), the documentElement is as
+    // wide as the full columned content, and the body is only as wide as
+    // the iframe element (ie, the first column).
+    //
+    // It gets weirder. Gecko sometimes behaves like WebKit (not clipping the
+    // body) IF the component has been loaded via HTML/JS/Nodes, not URL. Still
+    // can't reproduce outside Monocle.
+    //
+    // FIXME: If we can figure out a reliable behaviour for Gecko, we should
+    // use it to precalculate the workaround. At the moment, this test isn't
+    // used, but it belongs in src/dimensions/columns.js#columnedDimensions().
+    //
+    // ["iframeBodyWidthClipped", function () {
+    //   loadTestFrame(function (fr) {
+    //     var doc = fr.contentDocument;
+    //     result(
+    //       doc.body.scrollWidth <= testFrameSize &&
+    //       doc.documentElement.scrollWidth > testFrameSize
+    //     );
+    //   })
+    // }],
 
     // Finding the page that a given HTML node is on is typically done by
     // calculating the offset of its rectange from the body's rectangle.

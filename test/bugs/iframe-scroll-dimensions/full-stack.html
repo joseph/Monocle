@@ -2,11 +2,37 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=540" />
 
-    <title>Iframe scroll dimensions</title>
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../../src/core/monocle.js"></script>
+    <script type="text/javascript" src="../../../src/compat/env.js"></script>
+    <script type="text/javascript" src="../../../src/compat/css.js"></script>
+    <script type="text/javascript" src="../../../src/compat/stubs.js"></script>
+    <script type="text/javascript" src="../../../src/compat/browser.js"></script>
+    <script type="text/javascript" src="../../../src/core/events.js"></script>
+    <script type="text/javascript" src="../../../src/core/factory.js"></script>
+    <script type="text/javascript" src="../../../src/core/styles.js"></script>
+    <script type="text/javascript" src="../../../src/core/reader.js"></script>
+    <script type="text/javascript" src="../../../src/core/book.js"></script>
+    <script type="text/javascript" src="../../../src/core/component.js"></script>
+    <script type="text/javascript" src="../../../src/core/place.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../../src/flippers/instant.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../../../styles/monocore.css" />
+
+
+    <title>Iframe scroll dimensions - full stack</title>
 
     <style>
+      .flotationDevice {
+        width: 400px;
+        float: left;
+      }
       .box {
         width: 332px;
         height: 400px;
@@ -20,13 +46,16 @@
         left: 0;
         right: 0;
         bottom: 0;
+        background-color: black;
       }
       .page {
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
+        right: 5px;
+        bottom: 3px;
+        z-index: 1;
+        background: white;
       }
       .sheaf {
         position: absolute;
@@ -46,35 +75,134 @@
 
     <script>
       function printScrollDimensions() {
-        var fr = document.getElementById("problem");
-        var de = fr.contentDocument.documentElement;
-        var bd = fr.contentDocument.body;
-        var out = [
-          "documentElement.scrollWidth: "+de.scrollWidth,
-          "documentElement.scrollHeight: "+de.scrollHeight,
-          "body.scrollWidth: "+bd.scrollWidth,
-          "body.scrollHeight: "+bd.scrollHeight
-        ]
-        document.getElementById("out").innerHTML = out.join("\n");
+        var frames = document.getElementsByTagName('iframe');
+        for (var i = 0, ii = frames.length; i < ii; ++i) {
+          var fr = frames[i];
+          var de = fr.contentDocument.documentElement;
+          var bd = fr.contentDocument.body;
+          var out = [
+            "documentElement.scrollWidth: "+de.scrollWidth,
+            "documentElement.scrollHeight: "+de.scrollHeight,
+            "body.scrollWidth: "+bd.scrollWidth,
+            "body.scrollHeight: "+bd.scrollHeight
+          ]
+          document.getElementById(fr.id+"-out").innerHTML = out.join("\n");
+        }
       }
-      window.addEventListener("load", printScrollDimensions, false);
+
+
+      function getViaAjax(path, clean) {
+        var ajReq = new XMLHttpRequest();
+        ajReq.open("GET", path, false);
+        ajReq.send(null);
+        var src = ajReq.responseText;
+        if (clean) {
+          // Compress whitespace.
+          src = src.replace(/\n/g, '\\n').replace(/\r/, '\\r');
+          // Escape single-quotes.
+          src = src.replace(/\'/g, '\\\'');
+        }
+        return src;
+      }
+
+
+      function init() {
+        var fr = document.getElementById('problem2');
+        fr.contentWindow.location.replace(
+          "javascript:'"+getViaAjax("child.html", true)+"'"
+        );
+        setInterval(printScrollDimensions, 500);
+
+        window.reader = Monocle.Reader(
+          'problem3',
+          {
+            getComponents: function () { return ["child.html"] },
+            getComponent: function (cmpt) {
+              // Go figure: in Firefox if loaded as a HTML String, has the right
+              // body scrollWidth...
+              //
+              return getViaAjax(cmpt);
+
+              // ...whereas if loaded as a URL, it has a clipped body scrollW.
+              //
+              //return { url: cmpt };
+            },
+            getContents: function () { return [] },
+            getMetadata: function (key) { return null; }
+          },
+          {
+            flipper: Monocle.Flippers.Instant
+          }
+        );
+      }
+
+      window.addEventListener("load", init, false);
     </script>
   </head>
 
   <body>
 
-    <div class="box">
-      <div class="container">
-        <div class="page">
-          <div class="sheaf">
-            <iframe id="problem" src="child.html"></iframe>
+    <p>
+      Here we simulate the exact DOM and CSS of the Monocle Reader.
+    </p>
+
+    <hr />
+
+    <div class="flotationDevice">
+
+      <p>This frame is loaded normally.</p>
+      <div class="box">
+        <div class="container">
+          <div class="page">
+            <div class="sheaf">
+              <iframe
+                id="problem1"
+                scrolling="no"
+                frameborder="0"
+                src="child.html"
+              ></iframe>
+            </div>
           </div>
         </div>
       </div>
+
+      <pre><code id="problem1-out"></code></pre>
+
     </div>
 
 
-    <pre><code id="out"></code></pre>
+    <div class="flotationDevice">
+
+      <p>This frame is loaded via Ajax.</p>
+      <div class="box">
+        <div class="container">
+          <div class="page">
+            <div class="sheaf">
+              <iframe
+                id="problem2"
+                scrolling="no"
+                frameborder="0"
+                src="about:blank"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <pre><code id="problem2-out"></code></pre>
+
+    </div>
+
+
+    <div class="flotationDevice">
+
+      <p>This frame is loaded into Monocle.</p>
+      <div class="box" id="problem3">
+      </div>
+
+      <pre><code id="-out"></code></pre>
+
+    </div>
 
   </body>
 </html>

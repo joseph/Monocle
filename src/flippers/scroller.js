@@ -62,7 +62,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
     var x = page().m.dimensions.locusToOffset(locus);
     var bdy = page().m.activeFrame.contentDocument.body;
-    if (typeof WebKitTransitionEvent != "undefined") {
+    if (false && typeof WebKitTransitionEvent != "undefined") {
       bdy.style.webkitTransition = "-webkit-transform " +
         p.duration + "ms ease-out 0ms";
       bdy.style.webkitTransform = "translateX(-"+x+"px)";
