@@ -18,12 +18,17 @@
 // Options:
 //
 //  flipper: The class of page flipper to use.
+//
 //  panels: The class of panels to use
+//
+//  stylesheet: A string of CSS rules to apply to the contents of each
+//    component loaded into the reader.
+//
 //  place: A book locus for the page to open to when the reader is
 //    initialized. (See comments at Book#pageNumberAt for more about
 //    the locus option).
-//  systemId: the id for root elements of components, defaults to "RS:monocle"
 //
+//  systemId: the id for root elements of components, defaults to "RS:monocle"
 //
 Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   if (Monocle == this) {
@@ -80,8 +85,17 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Sets up the container and internal elements.
   //
   function prepareBox() {
-    var box = typeof(node) == "string" ?  document.getElementById(node) : node;
+    var box = node;
+    if (typeof box == "string") { box = document.getElementById(box); }
     dom = API.dom = box.dom = new Monocle.Factory(box, 'box', 0, API);
+
+    if (!Monocle.Browser.env.isCompatible()) {
+      if (dispatchEvent("monocle:incompatible", {}, true)) {
+        // TODO: Something cheerier? More informative?
+        box.innerHTML = "Your browser is not compatible with Monocle.";
+      }
+      return;
+    }
 
     dispatchEvent("monocle:initializing");
 
@@ -104,6 +118,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     // Clamp page frames to a set of styles that reduce Monocle breakage.
     p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
+    if (Monocle.Browser.env.floatsIgnoreColumns) {
+      p.defaultStyles += "html#RS\\:monocle * { float: none !important; }";
+    }
     if (options.stylesheet) {
       p.initialStyles = addPageStyles(options.stylesheet, false);
     }
@@ -141,22 +158,18 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function attachFlipper(flipperClass) {
-    // BROWSERHACK: Supported browsers must do CSS columns (at least?).
-    if (!Monocle.Browser.env.supportsColumns) {
-      flipperClass = Monocle.Flippers[k.FLIPPER_LEGACY_CLASS];
-      if (!flipperClass) {
-        return dom.append(
-          'div',
-          'abortMsg',
-          { 'class': k.abortMessage.CLASSNAME, 'html': k.abortMessage.TEXT }
-        );
+    if (!flipperClass) {
+      if (!Monocle.Browser.env.supportsColumns) {
+        flipperClass = Monocle.Flippers.Legacy;
+      } else if (Monocle.Browser.on.Kindle3) {
+        flipperClass = Monocle.Flippers.Instant;
       }
-    } else if (!flipperClass) {
-      flipperClass = Monocle.Flippers[k.FLIPPER_DEFAULT_CLASS];
-      if (!flipperClass) {
-        throw("No flipper class");
-      }
+
+      flipperClass = flipperClass || Monocle.Flippers.Slider;
     }
+
+    if (!flipperClass) { throw("Flipper not found."); }
+
     p.flipper = new flipperClass(API, null, p.readerOptions);
   }
 
@@ -666,7 +679,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     var head = doc.getElementsByTagName('head')[0];
     if (!head) {
-      if (!doc.documentElement) { return; } // FIXME: IE doesn't like docElem.
       head = doc.createElement('head');
       doc.documentElement.appendChild(head);
     }
@@ -734,16 +746,12 @@ Monocle.Reader.abortMessage = {
 }
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
-Monocle.Reader.FLIPPER_DEFAULT_CLASS = "Slider";
-Monocle.Reader.FLIPPER_LEGACY_CLASS = "Legacy";
 Monocle.Reader.DEFAULT_STYLE_RULES = [
   "html#RS\\:monocle * {" +
     "-webkit-font-smoothing: subpixel-antialiased;" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
     "overflow: visible !important;" +
-    // FIXME - RE-ENABLE
-    //(Monocle.Browser.env.floatsIgnoreColumns ? "float: none !important;" : "")+
   "}",
   "html#RS\\:monocle body {" +
     "-webkit-text-size-adjust: none;" +

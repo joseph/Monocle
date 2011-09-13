@@ -63,9 +63,9 @@ Monocle.Browser.iOSVersionBelow = function (strOrNum) {
 Monocle.Browser.css = new Monocle.CSS();
 
 
-// During Reader initialisation, this method is called to create the
+// During Reader initialization, this method is called to create the
 // "environment", which tests for the existence of various browser
-// features and bugs, then invokes the callback to continue initialisation.
+// features and bugs, then invokes the callback to continue initialization.
 //
 // If the survey has already been conducted and the env exists, calls
 // callback immediately.

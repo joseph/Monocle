@@ -27,8 +27,10 @@
     <script type="text/javascript" src="../../src/panels/twopane.js"></script>
     <script type="text/javascript" src="../../src/panels/marginal.js"></script>
     <script type="text/javascript" src="../../src/panels/imode.js"></script>
+    <script type="text/javascript" src="../../src/panels/eink.js"></script>
     <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
     <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
     <script type="text/javascript" src="../../src/dimensions/vert.js"></script>
     <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
 
@@ -107,10 +109,17 @@
           );
 
           // I-MODE
-          window.reader2 = Monocle.Reader(
+          window.reader3 = Monocle.Reader(
             'imode',
             bookData,
             { panels: Monocle.Panels.IMode }
+          );
+
+          // EINK
+          window.reader3 = Monocle.Reader(
+            'eInk',
+            bookData,
+            { panels: Monocle.Panels.eInk, flipper: Monocle.Flippers.Instant }
           );
         }
       );
@@ -146,6 +155,16 @@
         so that you can interact with the text underneath.
       </p>
     </div>
+
+    <div class="readerInfo">
+      <h2>eInk</h2>
+      <div class="reader" id="eInk"></div>
+      <p>
+        One panel. Only goes forwards. Flashes black briefly between components.
+      </p>
+    </div>
+
+
 
 
 <div id="part1">

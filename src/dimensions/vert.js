@@ -13,16 +13,11 @@ Monocle.Dimensions.Vert = function (pageDiv) {
   }
 
 
-  function hasChanged() {
-    return getBodyHeight() != p.bodyHeight || getPageHeight != p.pageHeight;
-  }
-
-
-  function measure() {
+  function update(callback) {
     p.bodyHeight = getBodyHeight();
     p.pageHeight = getPageHeight();
     p.length = Math.ceil(p.bodyHeight / p.pageHeight);
-    return p.length;
+    callback(p.length);
   }
 
 
@@ -77,8 +72,7 @@ Monocle.Dimensions.Vert = function (pageDiv) {
   }
 
 
-  API.hasChanged = hasChanged;
-  API.measure = measure;
+  API.update = update;
   API.percentageThroughOfNode = percentageThroughOfNode;
   API.locusToOffset = locusToOffset;
 

@@ -402,7 +402,18 @@ Monocle.Env = function () {
   ];
 
 
+  function isCompatible() {
+    return (
+      API.supportsW3CEvents &&
+      API.supportsCustomEvents &&
+      // API.supportsColumns &&     // This is coming in 3.0!
+      API.supportsTransform
+    );
+  }
+
+
   API.survey = survey;
+  API.isCompatible = isCompatible;
 
   return API;
 }

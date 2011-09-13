@@ -33,8 +33,12 @@ Monocle.Flippers.Instant = function (reader) {
 
   function listenForInteraction(panelClass) {
     if (typeof panelClass != "function") {
-      panelClass = k.DEFAULT_PANELS_CLASS;
+      if (Monocle.Browser.on.Kindle3) {
+        panelClass = Monocle.Panels.eInk;
+      }
+      panelClass = panelClass || k.DEFAULT_PANELS_CLASS;
     }
+    if (!panelClass) { throw("Panels not found."); }
     p.panels = new panelClass(API, { 'end': turn });
   }
 
