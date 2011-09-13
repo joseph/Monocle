@@ -117,13 +117,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     createReaderElements();
 
     // Clamp page frames to a set of styles that reduce Monocle breakage.
-    p.defaultStyles = addPageStyles(k.DEFAULT_STYLE_RULES, false);
-    if (Monocle.Browser.env.floatsIgnoreColumns) {
-      p.defaultStyles += "html#RS\\:monocle * { float: none !important; }";
-    }
-    if (options.stylesheet) {
-      p.initialStyles = addPageStyles(options.stylesheet, false);
-    }
+    clampStylesheets(options.stylesheet);
 
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
@@ -188,6 +182,18 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     dom.append('div', 'overlay');
     dispatchEvent("monocle:loading");
+  }
+
+
+  function clampStylesheets(customStylesheet) {
+    var defCSS = k.DEFAULT_STYLE_RULES;
+    if (Monocle.Browser.env.floatsIgnoreColumns) {
+      defCSS += "html#RS\\:monocle * { float: none !important; }";
+    }
+    p.defaultStyles = addPageStyles(defCSS, false);
+    if (customStylesheet) {
+      p.initialStyles = addPageStyles(customStylesheet, false);
+    }
   }
 
 
