@@ -32,7 +32,8 @@ Monocle.Browser.on = {
   iPad: navigator.userAgent.indexOf("iPad") != -1,
   BlackBerry: navigator.userAgent.indexOf("BlackBerry") != -1,
   Android: navigator.userAgent.indexOf('Android') != -1,
-  MacOSX: navigator.userAgent.indexOf('Mac OS X') != -1,
+  MacOSX: navigator.userAgent.indexOf('Mac OS X') != -1 &&
+    !Monocle.Browser.is.MobileSafari,
   Kindle3: navigator.userAgent.match(/Kindle\/3/)
   // TODO: Mac, Windows, etc
 }

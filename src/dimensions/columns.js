@@ -37,21 +37,22 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
-      console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
       rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
+      if (Monocle.DEBUG) {
+        console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
+      }
     }
 
     if (ce.style.cssText != rules) {
-      console.log(
-        "Changing CSS for page ["+p.page.m.pageIndex+"]: "+
-        (new Date()).getTime()
-      );
-
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
       // Apply body style changes.
       ce.style.cssText = rules;
+
+      if (Monocle.Browser.env.scrollToApplyStyle) {
+        ce.scrollLeft = 0;
+      }
     }
   }
 
@@ -63,29 +64,20 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  // Returns the dimensions of the offsettable area of the columned element. By
-  // definition, the number of pages is always the width of this divided by the
+  // Returns the width of the offsettable area of the columned element. By
+  // definition, the number of pages is always this divided by the
   // width of a single page (eg, the client area of the columned element).
   //
-  function columnedDimensions() {
-    console.log(
-      "columnedDimensions for page ["+p.page.m.pageIndex+"]: "+
-      (new Date()).getTime()
-    );
-    var cmpt = p.page.m.activeFrame.m.component;
+  function columnedWidth() {
     var bd = columnedElement();
     var de = p.page.m.activeFrame.contentDocument.documentElement;
-    size = { width: bd.scrollWidth, height: bd.scrollHeight }
-    console.compatDir(size);
-    if (size.width < de.scrollWidth) {
-      size = { width: de.scrollWidth, height: de.scrollHeight }
-      console.compatDir(size);
-    }
+
+    var w = Math.max(bd.scrollWidth, de.scrollWidth);
 
     if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
-      size.width += p.page.m.offset;
+      w += p.page.m.offset;
     }
-    return size;
+    return w;
   }
 
 
@@ -96,7 +88,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
   function columnCount() {
-    return Math.ceil(columnedDimensions().width / pageDimensions().width)
+    return Math.ceil(columnedWidth() / pageDimensions().width)
   }
 
 
@@ -167,7 +159,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     offset += 1;
 
     // Percent is the offset divided by the total width of the component.
-    var percent = offset / columnedDimensions().width;
+    var percent = offset / (p.length * p.width);
 
     // Page number would be offset divided by the width of a single page.
     // var pageNum = Math.ceil(offset / pageDimensions().width);

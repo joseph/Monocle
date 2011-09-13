@@ -35,7 +35,7 @@ Monocle.Controls.Spinner = function (reader) {
     registerSpinEvt('monocle:componentchanging', 'monocle:componentchange');
     registerSpinEvt('monocle:resizing', 'monocle:resize');
     registerSpinEvt('monocle:jumping', 'monocle:jump');
-    //registerSpinEvt('monocle:stylesheetchanging', 'monocle:stylesheetchange');
+    registerSpinEvt('monocle:recalculating', 'monocle:recalculated');
   }
 
 
@@ -51,7 +51,7 @@ Monocle.Controls.Spinner = function (reader) {
     // don't show the animation. p.global ensures that if an event affects
     // all pages, the animation is always shown, even if other events in this
     // spin cycle are page-specific.
-    var page = evt && evt.m.page ? evt.m.page : null;
+    var page = evt && evt.m && evt.m.page ? evt.m.page : null;
     if (!page) { p.global = true; }
     for (var i = 0; i < p.divs.length; ++i) {
       var owner = p.divs[i].parentNode.parentNode;

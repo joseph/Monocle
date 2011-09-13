@@ -146,8 +146,8 @@ Monocle.Env = function () {
       "load",
       function () {
         if (!fr.contentDocument || !fr.contentDocument.body) { return; }
-        var bdy = fr.contentDocument.body;
-        bdy.style.cssText = ([
+        var bd = fr.contentDocument.body;
+        bd.style.cssText = ([
           "margin:0",
           "padding:0",
           "position:absolute",
@@ -162,12 +162,12 @@ Monocle.Env = function () {
           "column-width:"+testFrameSize+"px",
           "column-gap:0"
         ].join(";"));
-        if (bodyDimensions(fr).height > testFrameSize) {
-          bdy.style.cssText += ["min-width:200%", "overflow:hidden"].join(";");
-          if (bodyDimensions(fr).height <= testFrameSize) {
-            bdy.className = "column-force";
+        if (bd.scrollHeight > testFrameSize) {
+          bd.style.cssText += ["min-width:200%", "overflow:hidden"].join(";");
+          if (bd.scrollHeight <= testFrameSize) {
+            bd.className = "column-force";
           } else {
-            bdy.className = "column-failed "+bodyDimensions(fr).height;
+            bd.className = "column-failed "+bd.scrollHeight;
           }
         }
         frameLoadCallback(fr);
@@ -185,14 +185,10 @@ Monocle.Env = function () {
   }
 
 
-  function bodyDimensions(fr) {
+  function columnedWidth(fr) {
     var bd = fr.contentDocument.body;
     var de = fr.contentDocument.documentElement;
-    var dims = { width: bd.scrollWidth, height: bd.scrollHeight };
-    if (dims.width < de.scrollWidth) {
-      dims = { width: de.scrollWidth, height: de.scrollHeight };
-    }
-    return dims;
+    return Math.max(bd.scrollWidth, de.scrollWidth);
   }
 
 
@@ -291,15 +287,13 @@ Monocle.Env = function () {
     //
     ["widthsIgnoreTranslate", function () {
       loadTestFrame(function (fr) {
-        var firstWidth = bodyDimensions(fr).width;
-        //console.log(firstWidth);
+        var firstWidth = columnedWidth(fr);
         var s = fr.contentDocument.body.style;
         var props = css.toDOMProps("transform");
         for (var i = 0, ii = props.length; i < ii; ++i) {
           s[props[i]] = "translateX(-600px)";
         }
-        var secondWidth = bodyDimensions(fr).width;
-        //console.log(secondWidth);
+        var secondWidth = columnedWidth(fr);
         for (i = 0, ii = props.length; i < ii; ++i) {
           s[props[i]] = "none";
         }
@@ -323,14 +317,12 @@ Monocle.Env = function () {
       result(navigator.userAgent.indexOf("Android 2") >= 0);
     }],
 
-    // Some combination of Webkit and OSX 10.6 cause a flicker during slider
-    // "jumps" (ie, when the page instantly moves to a different translate
-    // position).
+    // iOS3 will pause JavaScript execution if it gets a style-change + a
+    // scroll change on a component body. Weirdly, this seems to break GBCR
+    // in iOS4.
     //
-    // Workaround involves giving these jumps a tiny (but not zero) duration.
-    //
-    ["flickersOnJump", function () {
-      result(Monocle.Browser.on.MacOSX && Monocle.Browser.is.WebKit);
+    ["scrollToApplyStyle", function () {
+      result(Monocle.Browser.iOSVersionBelow("4"));
     }],
 
 
@@ -344,8 +336,8 @@ Monocle.Env = function () {
     // FIXME: This is not detecting correctly for iOS3.
     ["forceColumns", function () {
       loadTestFrame(function (fr) {
-        var bdy = fr.contentDocument.body;
-        result(bdy.className ? true : false);
+        var bd = fr.contentDocument.body;
+        result(bd.className ? true : false);
       });
     }],
 

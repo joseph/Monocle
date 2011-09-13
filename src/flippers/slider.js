@@ -499,17 +499,15 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    var dur = Monocle.Browser.env.flickersOnJump ? 1 : 0;
     Monocle.defer(function () {
-      setX(pageDiv, 0, { duration: dur }, callback);
+      setX(pageDiv, 0, { duration: 0 }, callback);
     });
   }
 
 
   function jumpOut(pageDiv, callback) {
-    var dur = Monocle.Browser.env.flickersOnJump ? 1 : 0;
     Monocle.defer(function () {
-      setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: dur }, callback);
+      setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: 0 }, callback);
     });
   }
 

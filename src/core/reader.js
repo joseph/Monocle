@@ -289,7 +289,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function recalculateDimensions(andRestorePlace) {
     if (!p.book) { return; }
-    dispatchEvent("monocle:resizing", {});
+    dispatchEvent("monocle:recalculating");
 
     var place, locus;
     if (andRestorePlace !== false) {
@@ -305,7 +305,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (locus) {
       Monocle.defer(function () {
         p.flipper.moveTo(locus);
-        dispatchEvent("monocle:resize");
+        dispatchEvent("monocle:recalculated");
       });
     }
   }
