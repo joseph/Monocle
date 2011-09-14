@@ -12,9 +12,14 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
     p.reader = p.flipper.properties.reader;
     p.reader.addControl(p.panel);
 
-    // TODO: wrapper around evtCallbacks.end to change the direction first.
-    p.panel.properties.direction = flipper.constants.FORWARDS;
-    p.panel.listenTo(evtCallbacks);
+    p.panel.listenTo({ end: function (panel, x) {
+      if (x < p.panel.properties.div.offsetWidth / 2) {
+        p.panel.properties.direction = flipper.constants.BACKWARDS;
+      } else {
+        p.panel.properties.direction = flipper.constants.FORWARDS;
+      }
+      evtCallbacks.end(panel, x);
+    } });
 
     var s = p.panel.properties.div.style;
     p.reader.listen("monocle:componentchanging", function () {
@@ -25,7 +30,22 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
     s.background = "#000";
     s.opacity = 0;
 
-    // TODO: register pageUp/Down keypress events?
+    Monocle.Events.listen(document, 'keyup', handleKeyEvent);
+  }
+
+
+  function handleKeyEvent(evt) {
+    var eventCharCode = evt.charCode || evt.keyCode;
+    var dir = null;
+    if (eventCharCode == k.KEYS["PAGEUP"]) {
+      dir = flipper.constants.BACKWARDS;
+    } else if (eventCharCode == k.KEYS["PAGEDOWN"]) {
+      dir = flipper.constants.FORWARDS;
+    }
+    if (dir) {
+      flipper.moveTo({ direction: dir });
+      evt.preventDefault();
+    }
   }
 
 
@@ -33,3 +53,7 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
 
   return API;
 }
+
+
+
+Monocle.Panels.eInk.KEYS = { "PAGEUP": 33, "PAGEDOWN": 34 };
