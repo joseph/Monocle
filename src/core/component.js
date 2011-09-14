@@ -335,16 +335,27 @@ Monocle.Component = function (book, id, index, chapters, source) {
     var doc = pageDiv.m.activeFrame.contentDocument;
     var percent = 0;
     if (Monocle.Browser.env.supportsXPath) {
-      var node = doc.evaluate(
-        xpath,
-        doc,
-        null,
-        9,
-        null
-      ).singleNodeValue;
-      var percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+      var node = doc.evaluate(xpath, doc, null, 9, null).singleNodeValue;
+      if (node) {
+        percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+      }
     } else {
       console.warn("XPath not supported in this client.");
+    }
+    return percentToPageNumber(percent);
+  }
+
+
+  function pageForSelector(selector, pageDiv) {
+    var doc = pageDiv.m.activeFrame.contentDocument;
+    var percent = 0;
+    if (Monocle.Browser.env.supportsQuerySelector) {
+      var node = doc.querySelector(selector);
+      if (node) {
+        percent = pageDiv.m.dimensions.percentageThroughOfNode(node);
+      }
+    } else {
+      console.warn("querySelector not supported in this client.");
     }
     return percentToPageNumber(percent);
   }
@@ -367,6 +378,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
   API.chapterForPage = chapterForPage;
   API.pageForChapter = pageForChapter;
   API.pageForXPath = pageForXPath;
+  API.pageForSelector = pageForSelector;
   API.lastPageNumber = lastPageNumber;
 
   return API;

@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Locus with XPath test</title>
+    <title>Locus search test</title>
 
     <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
     <link rel="stylesheet" type="text/css" href="../tests.css" />
@@ -41,26 +41,62 @@
 
 
     <script>
-      Monocle.DEBUG = true;
-
-      var bd = {
-        getComponents: function () { return ['pt1.html', 'pt2.html']; },
-        getComponent: function (cmptId) { return { url: cmptId } },
-        getContents: function () { return []; },
-        getMetaData: function (key) { return null; }
+      function nodeForXPath(doc, xpath) {
+        return doc.evaluate(xpath, doc, null, 9, null).singleNodeValue;
       }
+
 
       function goToXPath(cmptId, xpath) {
-        window.reader.moveTo({ componentId: cmptId, xpath: xpath });
+        window.reader.moveTo(
+          { componentId: cmptId, xpath: xpath },
+          function () {
+            highlight(function (doc) { return nodeForXPath(doc, xpath) });
+          }
+        );
       }
 
-      Monocle.Events.listen(
-        window,
-        'load',
-        function () {
-          window.reader = Monocle.Reader('reader', bd);
+
+      function goToSelector(cmptId, selector) {
+        window.reader.moveTo(
+          { componentId: cmptId, selector: selector },
+          function () {
+            highlight(function (doc) { return doc.querySelector(selector); });
+          }
+        );
+      }
+
+
+      function highlight(fn) {
+        var cmpt = null, i = 0;
+        while (cmpt = window.reader.dom.find('component', i)) {
+          var doc = cmpt.contentDocument;
+          var hl = doc.querySelector('.hl');
+          if (hl) { hl.className = hl.className.replace(/\s?hl/, ''); }
+          hl = fn(doc);
+          console.log(hl);
+          if (hl) { hl.className += " hl"; }
+          i += 1;
         }
-      );
+      }
+
+
+      (function () {
+        Monocle.DEBUG = true;
+
+        var bd = {
+          getComponents: function () { return ['pt1.html', 'pt2.html']; },
+          getComponent: function (cmptId) { return { url: cmptId } },
+          getContents: function () { return []; },
+          getMetaData: function (key) { return null; }
+        }
+
+        function init() {
+          var options = { stylesheet: ".hl { background: #FFC !important; }" }
+          window.reader = Monocle.Reader('reader', bd, options);
+        }
+
+        Monocle.Events.listen(window, 'load', init);
+      })();
     </script>
   </head>
   <body class="narrow">
@@ -77,13 +113,34 @@
     </p>
     <ul>
       <li>
-        <a href="javascript:goToXPath('pt1.html', '//p[2]');">Second paragraph of Part I</a>
+        <a href="javascript:goToXPath('pt1.html', '//p[3]');">
+          XPath: Third paragraph of Part I
+        </a>
       </li>
       <li>
-        <a href="javascript:goToXPath('pt2.html', '//p[6]');">Sixth paragraph of Part II</a>
+        <a href="javascript:goToXPath('pt2.html', '//p[6]');">
+          XPath: Sixth paragraph of Part II
+        </a>
       </li>
       <li>
-        <a href="javascript:goToXPath('pt2.html', '//*[contains(text(), \'gremlins\')]');">First occurrence of 'gremlins' in Part II</a>
+        <a href="javascript:goToXPath('pt2.html', '//*[contains(text(), \'gremlins\')]');">
+          XPath: First occurrence of 'gremlins' in Part II
+        </a>
+      </li>
+      <li>
+        <a href="javascript:goToSelector('pt1.html', 'h3')">
+          CSS selector: The heading in Part I
+        </a>
+      </li>
+      <li>
+        <a href="javascript:goToSelector('pt1.html', 'p:nth-of-type(3)')">
+          CSS selector: Third paragraph of Part I
+        </a>
+      </li>
+      <li>
+        <a href="javascript:goToSelector('pt2.html', 'p:nth-of-type(6)')">
+          CSS selector: Sixth paragraph of Part II
+        </a>
       </li>
     </ul>
 
