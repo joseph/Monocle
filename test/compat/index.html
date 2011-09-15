@@ -15,6 +15,23 @@
       td {
         font-family: Consolas, Andale Mono, Menlo, Monaco, monospace;
       }
+
+      #compatibility {
+        display: none;
+        font: 15pt Helvetica Neue, sans-serif;
+        color: white;
+        width: 400px;
+        padding: 20px;
+        margin: 20px 0 0;
+      }
+
+      #compatibility.compatible {
+        background: green;
+      }
+
+      #compatibility.incompatible {
+        background: green;
+      }
     </style>
 
     <!-- MONOCLE CORE -->
@@ -63,11 +80,20 @@
         }
 
 
+        function assertCompatibility(env) {
+          var div = document.getElementById('compatibility');
+          div.style.display = 'block';
+          var x = env.isCompatible() ? "compatible" : "incompatible";
+          div.innerHTML = "This browser is "+x+" with Monocle.";
+          div.className = x;
+        }
+
+
         function init() {
           readUA();
           env = new Monocle.Env();
           env.properties.resultCallback = testResult;
-          env.survey();
+          env.survey(assertCompatibility);
         }
 
         window.onload = init;
@@ -87,6 +113,8 @@
         <th>Result</th>
       </tr>
     </table>
+
+    <div id="compatibility"></div>
 
     <br />
 
