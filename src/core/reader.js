@@ -269,13 +269,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
           dispatchEvent('monocle:firstcomponentchange', evt.m);
           return (pageCount += 1) == p.flipper.pageCount;
         },
-        'monocle:turn': function () {
+        'monocle:turn': function (evt) {
           callback();
           return true;
         }
       }
       var listener = function (evt) {
-        if (watchers[evt.type]()) { deafen(evt.type, listener); }
+        if (watchers[evt.type](evt)) { deafen(evt.type, listener); }
       }
       for (evtType in watchers) { listen(evtType, listener) }
     }
