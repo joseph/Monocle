@@ -44,10 +44,16 @@
       function toggleMinWidth() {
         updateStyle("minWidth", "200%", "auto");
       }
+
+
+      function toggleOverflow() {
+        updateStyle("overflow", "hidden", "visible");
+      }
     </script>
   </head>
 
   <body>
+    <h1>Q: What's the minimum CSS to force columns on an iframe body?</h1>
 
     <p>
       If this iframe's content is being rendered in columns correctly,
@@ -59,6 +65,11 @@
     </div>
 
 
+    <br />
+
+    <p>
+      These toggles may force columns if they're not rendering:
+    </p>
     <ul>
       <li>
         <a href="javascript:toggleWidth()">Toggle body width: auto</a>
@@ -67,6 +78,11 @@
       <li>
         <a href="javascript:toggleMinWidth()">Toggle body min-width: 200%</a>
         &mdash; <span id="minWidthStatus">auto</span>
+      </li>
+
+      <li>
+        <a href="javascript:toggleOverflow()">Toggle body overflow: hidden</a>
+        &mdash; <span id="overflowStatus">visible</span>
       </li>
     </ul>
 

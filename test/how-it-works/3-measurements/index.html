@@ -3,145 +3,66 @@
   <head>
     <meta charset="utf-8" />
 
-    <meta name="viewport" content="width=540" />
+    <title>Measuring iframe dimensions</title>
 
-    <title>Measuring iframe content width</title>
-
-    <!-- THESE STYLES SHOULD MERELY BE DECORATIVE AND IRRELEVANT -->
-    <link rel="stylesheet" href="../common.css" />
-
-    <!-- THESE STYLES ARE PERTINENT AND YOU MAY CHANGE THEM -->
     <style>
       .problemBox {
         width: 300px;
-        height: 300px;
-
-        /*
-          This is considered necessary in iOS5 to constrain the iframe.
-          See the component-scrollbars test for more info.
-        */
+        height: 365px;
         overflow: hidden;
       }
       .problemBox iframe {
+        border: none;
+        background: #EEE;
         width: 100%;
         height: 100%;
       }
+      p {
+        max-width: 25em;
+        line-height: 1.2;
+      }
     </style>
-    <script src="scratch.js"></script>
 
     <script>
-      window.addEventListener(
-        "load",
-        function () {
-          var prob2 = document.getElementById('problem2');
-          var bdy = prob2.contentDocument.body;
-          var s = bdy.style;
-          s.transform = "translateX(-600px)";
-          s.webkitTransform = "translate3d(-600px, 0, 0)";
-          s.MozTransform = s.transform;
-          s.OTransform = s.transform;
-        },
-        false
-      );
+      function printScrollDimensions() {
+        var fr = document.getElementById("problem");
+        var de = fr.contentDocument.documentElement;
+        var bd = fr.contentDocument.body;
+        var out = [
+          "documentElement.scrollWidth: "+de.scrollWidth,
+          "documentElement.scrollHeight: "+de.scrollHeight,
+          "body.scrollWidth: "+bd.scrollWidth,
+          "body.scrollHeight: "+bd.scrollHeight
+        ]
+        document.getElementById("out").innerHTML = out.join("\n");
+      }
+      window.addEventListener("load", printScrollDimensions, false);
     </script>
-    <script src="../column-force.js"></script>
   </head>
 
   <body>
 
-    <p>
-      This is the biggest unresolved problem in
-      <a href="http://github.com/joseph/Monocle">Monocle</a>.
-    </p>
+    <h1>Q: How wide is the iframe body content?</h1>
 
     <p>
-      Here is a 300x300 <code>div</code>, containing an
-      <code>iframe</code> with arbitrary HTML content. The body of
-      the <code>iframe</code> has a height of 300px and a
-      <code>column-width</code> of 300px.
+      This is a simple test of a container <code>div</code>
+      holding an <code>iframe</code> with content exactly 4
+      pages long. See also the <a href="full-stack.html">full-stack</a>
+      variant, which duplicates the DOM and CSS of a Monocle Reader.
     </p>
 
     <div class="problemBox">
-      <iframe id="problem1" src="child-long.html" scrolling="no"></iframe>
+      <iframe id="problem" scrolling="no" src="child.html"></iframe>
     </div>
 
 
-    <h1>
-      Q: How wide is the content of the <code>iframe</code>?
-    </h1>
-
-    <h2>
-      Rules
-    </h2>
-
-    <ol>
-      <li>
-        No scrollbars may be visible within the <code>div</code>.
-      </li>
-      <li>
-        You may change the DOM or any CSS in the parent document.
-      </li>
-      <li>
-        You may change the CSS of the <code>body</code> of the
-        <code>iframe</code>. You may not change the DOM of the
-        <code>iframe</code>, nor any CSS other than the
-        <code>body</code>.
-      </li>
-      <li>
-        Your solution must work and be correct in the latest
-        Gecko/WebKit/Opera, Android 2.2+ and iOS 4.2+. It doesn't
-        need to be <em>the same</em>, just <em>correct</em>.
-      </li>
-    </ol>
-
-    <h2>
-      Extra credit
-    </h2>
+    <pre><code id="out"></code></pre>
 
     <p>
-      This problem is identical, except that the <code>body</code>
-      of the <code>iframe</code> has a <code>transform</code> applied:
-      <code>translateX(-600px)</code>. The content of the iframe is
-      always &gt; 600px. How wide is it?
+      Because the <code>body</code> has an absolute position, we would expect
+      it to measure 1200x365. Its parent, the <code>documentElement</code>,
+      should be 300x0.
     </p>
-
-    <div class="problemBox">
-      <iframe id="problem2" src="child-long.html" scrolling="no"></iframe>
-    </div>
-
-    <p>
-      This should be trivial. The content of the iframe &lt;= 300px.
-      Does your solution give you 300px?
-    </p>
-
-    <div class="problemBox">
-      <iframe id="problem3" src="child-short.html" scrolling="no"></iframe>
-    </div>
-
-
-    <h2>
-      Scratch
-    </h2>
-
-    <p>
-      In this box, you can evaluate arbitrary JavaScript.
-      Several variables are already populated: <code>_div</code>,
-      <code>_frame</code>, <code>_window</code>, _documentElement and
-      <code>_body</code>. The return value of your code will appear below,
-      for each problem.
-    </p>
-
-    <form id="scratch">
-      <textarea id="scratchText" rows="5">
-if (_documentElement.scrollWidth &lt;= _frame.offsetWidth) {
-  _body.scrollWidth;
-} else {
-  _documentElement.scrollWidth;
-}
-      </textarea>
-      <input type="submit" value="Evaluate" />
-      <pre><code id="scratchResult"></code></pre>
-    </form>
 
   </body>
 </html>
