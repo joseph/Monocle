@@ -499,7 +499,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (ctrl.properties) {
       ctrl.properties.hidden = true;
     }
-    dispatchEvent('controlhide', ctrl, false);
+    dispatchEvent('monocle:controlhide', { control: ctrl }, false);
   }
 
 
@@ -548,7 +548,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (ctrl.properties) {
       ctrl.properties.hidden = false;
     }
-    dispatchEvent('controlshow', ctrl, false);
+    dispatchEvent('monocle:controlshow', { control: ctrl }, false);
     return true;
   }
 
