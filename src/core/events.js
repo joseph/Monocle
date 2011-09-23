@@ -26,6 +26,7 @@ Monocle.Events.dispatch = function (elem, evtType, data, cancelable) {
 // Register a function to be invoked when an event fires.
 //
 Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
+  if (typeof elem == "string") { elem = document.getElementById(elem); }
   return elem.addEventListener(evtType, fn, useCapture || false);
 }
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Events - Initialisation and page turning</title>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
+    <style type="text/css">
+      #reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+        overflow: hidden;
+      }
+      #out {
+        font: 9pt Consolas, Inconsolata, Menlo, Andale Mono, Monaco, monospace;
+        white-space: pre;
+      }
+      #out span {
+        color: #AAA;
+      }
+    </style>
+
+    <!-- MONOCLE CORE -->
+    <script type="text/javascript" src="../../src/core/monocle.js"></script>
+    <script type="text/javascript" src="../../src/compat/env.js"></script>
+    <script type="text/javascript" src="../../src/compat/css.js"></script>
+    <script type="text/javascript" src="../../src/compat/stubs.js"></script>
+    <script type="text/javascript" src="../../src/compat/browser.js"></script>
+    <script type="text/javascript" src="../../src/core/factory.js"></script>
+    <script type="text/javascript" src="../../src/core/events.js"></script>
+    <script type="text/javascript" src="../../src/core/styles.js"></script>
+    <script type="text/javascript" src="../../src/core/reader.js"></script>
+    <script type="text/javascript" src="../../src/core/book.js"></script>
+    <script type="text/javascript" src="../../src/core/component.js"></script>
+    <script type="text/javascript" src="../../src/core/place.js"></script>
+
+    <!-- MONOCLE FLIPPERS -->
+    <script type="text/javascript" src="../../src/controls/panel.js"></script>
+    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
+    <script type="text/javascript" src="../../src/panels/imode.js"></script>
+    <script type="text/javascript" src="../../src/panels/eink.js"></script>
+    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
+    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
+    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
+
+
+    <script>
+      (function () {
+        Monocle.DEBUG = true;
+
+        var bd = {
+          getComponents: function () { return ['pt1.html', 'pt2.html']; },
+          getComponent: function (cmptId) { return { url: cmptId } },
+          getContents: function () { return []; },
+          getMetaData: function (key) { return null; }
+        }
+
+
+        function listenFor(evtName) {
+          Monocle.Events.listen('reader', evtName, report);
+        }
+
+
+        var counter = 0;
+        function report(evt) {
+          var ol = document.getElementById('out');
+          var li = document.createElement('li');
+          li.setAttribute('value', ++counter);
+          li.appendChild(document.createTextNode(evt.type+" "));
+          var span = document.createElement('span');
+          if (evt.m) {
+            var props = [];
+            for (prop in evt.m) { props.push(prop); }
+            span.appendChild(document.createTextNode("{"+props.join(", ")+"}"));
+            li.appendChild(span);
+          }
+          if (ol.firstChild) {
+            ol.insertBefore(li, ol.firstChild);
+          } else {
+            ol.appendChild(li);
+          }
+        }
+
+
+        function init() {
+          var options = {
+            panels: Monocle.Panels.IMode
+          }
+
+          listenFor('monocle:incompatible');
+          listenFor('monocle:initializing');
+          listenFor('monocle:loading');
+          listenFor('monocle:styles');
+          listenFor('monocle:frameprimed');
+          listenFor('monocle:loaded');
+          listenFor('monocle:notfound');
+          listenFor('monocle:componentloading');
+          listenFor('monocle:componentloaded');
+          listenFor('monocle:componentfailed');
+          listenFor('monocle:componentchanging');
+          listenFor('monocle:componentmodify');
+          listenFor('monocle:componentchange');
+          listenFor('monocle:firstcomponentchange');
+          listenFor('monocle:pagechange');
+          listenFor('monocle:boundarystart');
+          listenFor('monocle:boundaryend');
+          listenFor('monocle:turn');
+          listenFor('monocle:resizing');
+          listenFor('monocle:resize');
+          listenFor('monocle:recalculating');
+          listenFor('monocle:recalculated');
+          listenFor('monocle:jumping');
+          listenFor('monocle:jump');
+          listenFor('monocle:stylesheetchanging');
+          listenFor('monocle:stylesheetchange');
+          listenFor('monocle:interactive:on');
+          listenFor('monocle:interactive:off');
+          listenFor('controlhide'); // FIXME
+          listenFor('controlshow'); // FIXME
+
+          window.reader = Monocle.Reader('reader', bd, options);
+        }
+
+        Monocle.Events.listen(window, 'load', init);
+      })();
+    </script>
+  </head>
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+
+    <h1>Events - Initialisation and page turning</h1>
+    <p>
+      This instantiates a simple reader with an IMode panel and a Slider
+      flipper. Below the reader, the events dispatched on it are listed
+      in reverse order, with properties of the <code>evt.m</code> object
+      in braces.
+    </p>
+
+    <div id="reader"></div>
+
+    <ol id="out"></ol>
+
+  </body>
+</html>

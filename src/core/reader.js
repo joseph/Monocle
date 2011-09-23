@@ -264,14 +264,20 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.book = bk;
     var pageCount = 0;
     if (typeof callback == 'function') {
-      var watcher = function (evt) {
-        dispatchEvent('monocle:firstcomponentchange', evt.m);
-        if ((pageCount += 1) == p.flipper.pageCount) {
-          deafen('monocle:componentchange', watcher);
+      var watchers = {
+        'monocle:componentchange': function (evt) {
+          dispatchEvent('monocle:firstcomponentchange', evt.m);
+          return (pageCount += 1) == p.flipper.pageCount;
+        },
+        'monocle:turn': function () {
           callback();
+          return true;
         }
       }
-      listen('monocle:componentchange', watcher);
+      var listener = function (evt) {
+        if (watchers[evt.type]()) { deafen(evt.type, listener); }
+      }
+      for (evtType in watchers) { listen(evtType, listener) }
     }
     p.flipper.moveTo(place || { page: 1 });
   }
@@ -303,7 +309,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       k.durations.RESIZE_DELAY
     );
   }
-
 
 
   function recalculateDimensions(andRestorePlace) {
