@@ -30,7 +30,9 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
     s.background = "#000";
     s.opacity = 0;
 
-    Monocle.Events.listen(document, 'keyup', handleKeyEvent);
+    if (k.LISTEN_FOR_KEYS) {
+      Monocle.Events.listen(window.top.document, 'keyup', handleKeyEvent);
+    }
   }
 
 
@@ -55,5 +57,5 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
 }
 
 
-
+Monocle.Panels.eInk.LISTEN_FOR_KEYS = true;
 Monocle.Panels.eInk.KEYS = { "PAGEUP": 33, "PAGEDOWN": 34 };

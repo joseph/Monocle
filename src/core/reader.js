@@ -172,10 +172,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var cntr = dom.append('div', 'container');
     for (var i = 0; i < p.flipper.pageCount; ++i) {
       var page = cntr.dom.append('div', 'page', i);
+      page.style.visibility = "hidden";
       page.m = { reader: API, pageIndex: i, place: null }
       page.m.sheafDiv = page.dom.append('div', 'sheaf', i);
       page.m.activeFrame = page.m.sheafDiv.dom.append('iframe', 'component', i);
-      page.m.activeFrame.m = { 'pageDiv': page }
+      page.m.activeFrame.m = { 'pageDiv': page };
+      page.m.activeFrame.setAttribute('frameBorder', 0);
+      page.m.activeFrame.setAttribute('scrolling', 'no');
       p.flipper.addPage(page);
       // BROWSERHACK: hook up the iframe to the touchmonitor if it exists.
       Monocle.Events.listenOnIframe(page.m.activeFrame);
@@ -217,9 +220,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
 
     forEachPage(function (page) {
-      page.m.activeFrame.style.visibility = "hidden";
-      page.m.activeFrame.setAttribute('frameBorder', 0);
-      page.m.activeFrame.setAttribute('scrolling', 'no');
       Monocle.Events.listen(page.m.activeFrame, 'load', cb);
       page.m.activeFrame.src = url;
     });
@@ -321,12 +321,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
     });
 
-    if (locus) {
-      Monocle.defer(function () {
-        p.flipper.moveTo(locus);
-        dispatchEvent("monocle:recalculated");
-      });
-    }
+    Monocle.defer(function () {
+      if (locus) { p.flipper.moveTo(locus); }
+      dispatchEvent("monocle:recalculated");
+    });
   }
 
 

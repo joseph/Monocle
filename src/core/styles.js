@@ -80,7 +80,8 @@ Monocle.Styles.page = {
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
   "user-select": "none",
-  "-webkit-transform": "translate3d(0,0,0)"
+  "-webkit-transform": "translate3d(0,0,0)",
+  "visibility": "visible"
 
   /*
   "background": "white",
