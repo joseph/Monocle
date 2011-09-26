@@ -259,6 +259,14 @@ Monocle.Env = function () {
 
     // TEST FOR CERTAIN RENDERING OR INTERACTION BUGS
 
+    // iOS (at least up to version 4.1) makes a complete hash of touch events
+    // when an iframe is overlapped by other elements. It's a dog's breakfast.
+    // See test/bugs/ios-frame-touch-bug for details.
+    //
+    ["brokenIframeTouchModel", function () {
+      result(Monocle.Browser.iOSVersionBelow("4.2"));
+    }],
+
     // Webkit-based browsers put floated elements in the wrong spot when
     // columns are used -- they appear way down where they would be if there
     // were no columns.  Presumably the float positions are calculated before
@@ -395,7 +403,8 @@ Monocle.Env = function () {
       API.supportsW3CEvents &&
       API.supportsCustomEvents &&
       API.supportsColumns &&
-      API.supportsTransform
+      API.supportsTransform &&
+      !API.brokenIframeTouchModel
     );
   }
 
