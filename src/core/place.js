@@ -61,6 +61,11 @@ Monocle.Place = function () {
   }
 
 
+  function pagesInComponent() {
+    return p.component.lastPageNumber();
+  }
+
+
   function chapterInfo() {
     if (p.chapter) {
       return p.chapter;
@@ -133,6 +138,7 @@ Monocle.Place = function () {
   API.percentageThrough = percentAtBottomOfPage;
   API.pageAtPercentageThrough = pageAtPercentageThrough;
   API.pageNumber = pageNumber;
+  API.pagesInComponent = pagesInComponent;
   API.chapterInfo = chapterInfo;
   API.chapterTitle = chapterTitle;
   API.chapterSrc = chapterSrc;
