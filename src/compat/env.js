@@ -388,7 +388,7 @@ Monocle.Env = function () {
     return (
       API.supportsW3CEvents &&
       API.supportsCustomEvents &&
-      // API.supportsColumns &&     // This is coming in 3.0!
+      API.supportsColumns &&
       API.supportsTransform
     );
   }
