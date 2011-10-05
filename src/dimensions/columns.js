@@ -33,7 +33,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
     rules += Monocle.Browser.css.toCSSDeclaration('column-width', p.width+'px');
-    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', 0);
+    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP);
     rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
@@ -74,6 +74,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     var w = Math.max(bd.scrollWidth, de.scrollWidth);
 
+    // Add one because the final column doesn't have right gutter.
+    w += k.GAP;
+
     if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
       w += p.page.m.offset;
     }
@@ -83,7 +86,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
-    return { width: elem.clientWidth, height: elem.clientHeight }
+    return { width: elem.clientWidth + k.GAP, height: elem.clientHeight }
   }
 
 
@@ -97,16 +100,25 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  function translateToLocus(locus) {
+  // Moves the columned element to the offset implied by the locus.
+  //
+  // The 'transition' argument is optional, allowing the translation to be
+  // animated. If not given, no change is made to the columned element's
+  // transition property.
+  //
+  function translateToLocus(locus, transition) {
     var offset = locusToOffset(locus);
     p.page.m.offset = offset;
-    translateToOffset(offset);
+    translateToOffset(offset, transition);
     return offset;
   }
 
 
-  function translateToOffset(offset) {
+  function translateToOffset(offset, transition) {
     var ce = columnedElement();
+    if (transition) {
+      Monocle.Styles.affix(ce, "transition", transition);
+    }
     Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
   }
 
@@ -188,5 +200,6 @@ Monocle.Dimensions.Columns.STYLE = {
   }
 }
 
+Monocle.Dimensions.Columns.GAP = 20;
 
 Monocle.pieceLoaded("dimensions/columns");
