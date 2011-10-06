@@ -32,7 +32,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     p.width = pdims.width;
 
     var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
-    rules += Monocle.Browser.css.toCSSDeclaration('column-width', p.width+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('column-width', ce.clientWidth+'px');
     rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP);
     rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
 
@@ -193,6 +193,7 @@ Monocle.Dimensions.Columns.STYLE = {
     "height": "100%",
     "width": "100%",
     "position": "absolute"
+    /*"-webkit-transform-style": "preserve-3d"*/
   },
   "column-force": {
     "min-width": "200%",

@@ -22,7 +22,7 @@ Monocle.Flippers.Slider = function (reader) {
 
     // BROWSERHACK: Firefox 4 is prone to beachballing on the first page turn
     // unless a zeroed translateX has been applied to the page div.
-    Monocle.Styles.setX(pageDiv, "0px");
+    Monocle.Styles.setX(pageDiv, 0);
   }
 
 
@@ -351,150 +351,66 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function setX(elem, x, options, callback) {
-    var duration;
+    var duration, transition;
 
     if (!options.duration) {
       duration = 0;
     } else {
-      duration = parseInt(options['duration']);
+      duration = parseInt(options.duration);
     }
 
-    if (typeof(x) == "number") { x = x + "px"; }
-
-    // BROWSERHACK: WEBKIT (transitions & transition events)
-    if (typeof WebKitTransitionEvent != "undefined") {
+    if (Monocle.Browser.env.supportsTransition) {
       if (duration) {
-        // Accelerate durations if we have a backlog of work...
-        transition = '-webkit-transform';
-        transition += ' ' + duration + "ms";
-        transition += ' ' + (options['timing'] || 'linear');
-        transition += ' ' + (options['delay'] || 0) + 'ms';
+        transition = duration + "ms";
+        transition += ' ' + (options.timing || 'linear');
+        transition += ' ' + (options.delay || 0) + 'ms';
       } else {
-        transition = 'none';
+        transition = "none";
       }
-      elem.style.webkitTransition = transition;
+      Monocle.Styles.affix(elem, 'transition', transition);
+
       if (Monocle.Browser.env.supportsTransform3d) {
-        elem.style.webkitTransform = "translate3d("+x+",0,0)";
+        Monocle.Styles.affix(elem, 'transform', 'translate3d('+x+'px,0,0)');
       } else {
-        elem.style.webkitTransform = "translateX("+x+")";
+        Monocle.Styles.affix(elem, 'transform', 'translateX('+x+'px)');
       }
 
-    // BROWSERHACK: NON-WEBKIT (no transitions)
-    } else if (duration > 0) {
-      // Exit any existing transition loop.
-      clearTimeout(elem.setXTransitionInterval)
-
-      var stamp = (new Date()).getTime();
-      var frameRate = 40;
-      var finalX = parseInt(x);
-      var currX = getX(elem);
-      var step = (finalX - currX) * (frameRate / duration);
-      var stepFn = function () {
-        var destX = currX + step;
-        if (
-          (new Date()).getTime() - stamp > duration ||
-          Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
-        ) {
-          clearTimeout(elem.setXTransitionInterval);
-          Monocle.Styles.setX(elem, finalX);
-          if (elem.setXTCB) {
-            elem.setXTCB();
-          }
+      if (typeof callback == "function") {
+        if (duration) {
+          Monocle.Events.afterTransition(elem, callback);
         } else {
-          Monocle.Styles.setX(elem, destX);
-          currX = destX;
+          Monocle.defer(callback);
         }
       }
-
-      elem.setXTransitionInterval = setInterval(stepFn, frameRate);
     } else {
-      Monocle.Styles.setX(elem, x);
-    }
-
-    if (elem.setXTCB) {
-      Monocle.Events.deafen(elem, 'webkitTransitionEnd', elem.setXTCB);
-      elem.setXTCB = null;
-    }
-
-    elem.setXTCB = function () {
-      if (callback) { callback(); }
-    }
-
-    var sX = getX(elem);
-    if (!duration || sX == parseInt(x)) {
-      elem.setXTCB();
-    } else {
-      Monocle.Events.listen(elem, 'webkitTransitionEnd', elem.setXTCB);
-    }
-  }
-
-
-  // This is a replacement setX with better cross-browser support.
-  // Two problems keep it from going in:
-  //
-  // * It removes the simulated transition support required for Moz less than 4.
-  // * getX is still not cross-browser, so it sometimes fails to detect when
-  //   a transition has already occurred. Resulting in freezes.
-  /*
-  function setX(elem, x, options, callback) {
-    var duration, transition;
-
-    // NB: if the browser lacks transition support, moves immediately to x.
-    if (!Monocle.Browser.env.supportsTransitions) {
-      duration = 0;
-    } else if (!options.duration) {
-      duration = 0;
-    } else {
-      duration = parseInt(options['duration']);
-    }
-
-    if (typeof(x) == "number") { x = x + "px"; }
-
-    if (duration) {
-      transition = duration + "ms";
-      transition += ' ' + (options['timing'] || 'linear');
-      transition += ' ' + (options['delay'] || 0) + 'ms';
-    } else {
-      transition = "none";
-    }
-
-    if (elem.setXTCB) {
-      Monocle.Events.deafen(elem, 'webkitTransitionEnd', elem.setXTCB);
-      Monocle.Events.deafen(elem, 'transitionend', elem.setXTCB);
-      elem.setXTCB = null;
-    }
-
-    elem.setXTCB = function () {
-      if (callback) { callback(); }
-    }
-
-    // Set the styles
-    elem.dom.setBetaStyle('transition', transition);
-    if (Monocle.Browser.env.supportsTransform3d) {
-      elem.dom.setBetaStyle('transform', 'translate3d('+x+',0,0)');
-    } else {
-      elem.dom.setBetaStyle('transform', 'translateX('+x+')');
-    }
-
-    if (!duration) {
-      elem.setXTCB();
-    } else {
-      Monocle.Events.listen(elem, 'webkitTransitionEnd', elem.setXTCB);
-      Monocle.Events.listen(elem, 'transitionend', elem.setXTCB);
-    }
-  }
-  */
-
-
-  function getX(elem) {
-    if (typeof WebKitCSSMatrix == "object") {
-      var matrix = window.getComputedStyle(elem).webkitTransform;
-      matrix = new WebKitCSSMatrix(matrix);
-      return matrix.m41;
-    } else {
-      var prop = elem.style.MozTransform;
-      if (!prop || prop == "") { return 0; }
-      return parseFloat((/translateX\((\-?.*)px\)/).exec(prop)[1]) || 0;
+      // Old-school JS animation.
+      elem.currX = elem.currX || 0;
+      var completeTransition = function () {
+        elem.currX = x;
+        Monocle.Styles.setX(elem, x);
+        if (typeof callback == "function") { callback(); }
+      }
+      if (!duration) {
+        completeTransition();
+      } else {
+        var stamp = (new Date()).getTime();
+        var frameRate = 40;
+        var step = (x - elem.currX) * (frameRate / duration);
+        var stepFn = function () {
+          var destX = elem.currX + step;
+          var timeElapsed = ((new Date()).getTime() - stamp) >= duration;
+          var pastDest = (destX > x && elem.currX < x) ||
+            (destX < x && elem.currX > x);
+          if (timeElapsed || pastDest) {
+            completeTransition();
+          } else {
+            Monocle.Styles.setX(elem, destX);
+            elem.currX = destX;
+            setTimeout(stepFn, frameRate);
+          }
+        }
+        stepFn();
+      }
     }
   }
 
