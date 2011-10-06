@@ -32,9 +32,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     p.width = pdims.width;
 
     var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
-    rules += Monocle.Browser.css.toCSSDeclaration('column-width', ce.clientWidth+'px');
-    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP);
-    rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
+    rules += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('transform', 'translateX(0)');
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
       rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
@@ -86,7 +86,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
-    return { width: elem.clientWidth + k.GAP, height: elem.clientHeight }
+    return {
+      col: elem.clientWidth,
+      width: elem.clientWidth + k.GAP,
+      height: elem.clientHeight
+    }
   }
 
 
