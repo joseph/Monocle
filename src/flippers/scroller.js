@@ -65,13 +65,16 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
     var bdy = fr.contentDocument.body;
     var anim = true;
     if (p.activeComponent != fr.m.component) {
+      // No animation.
       p.activeComponent = fr.m.component;
       dims.translateToLocus(locus, "none");
       Monocle.defer(turned);
-    } else if (typeof WebKitTransitionEvent != "undefined") {
+    } else if (Monocle.Browser.env.supportsTransition) {
+      // Native animation.
       dims.translateToLocus(locus, p.duration+"ms ease-in 0ms");
-      Monocle.Events.listen(bdy, 'webkitTransitionEnd', turned);
+      Monocle.Events.afterTransition(bdy, turned);
     } else {
+      // Old-school JS animation.
       var x = dims.locusToOffset(locus);
       var finalX = 0 - x;
       var stamp = (new Date()).getTime();

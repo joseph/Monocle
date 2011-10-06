@@ -214,6 +214,11 @@ Monocle.Env = function () {
 
     // TEST FOR OPTIONAL CAPABILITIES
 
+    // Does it do CSS transitions?
+    ["supportsTransition", function () {
+      result(css.supportsPropertyWithAnyPrefix('transition'))
+    }],
+
     // Can we find nodes in a document with an XPath?
     //
     ["supportsXPath", testForFunction("document.evaluate")],
