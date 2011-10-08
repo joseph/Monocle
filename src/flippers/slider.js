@@ -359,6 +359,10 @@ Monocle.Flippers.Slider = function (reader) {
       duration = parseInt(options.duration);
     }
 
+    var xSet = function () {
+      if (typeof callback == "function") { Monocle.defer(callback); }
+    }
+
     if (Monocle.Browser.env.supportsTransition) {
       if (duration) {
         transition = duration + "ms";
@@ -375,20 +379,14 @@ Monocle.Flippers.Slider = function (reader) {
         Monocle.Styles.affix(elem, 'transform', 'translateX('+x+'px)');
       }
 
-      if (typeof callback == "function") {
-        if (duration) {
-          Monocle.Events.afterTransition(elem, callback);
-        } else {
-          Monocle.defer(callback);
-        }
-      }
+      duration ? Monocle.Events.afterTransition(elem, xSet) : xSet();
     } else {
       // Old-school JS animation.
       elem.currX = elem.currX || 0;
       var completeTransition = function () {
         elem.currX = x;
         Monocle.Styles.setX(elem, x);
-        if (typeof callback == "function") { callback(); }
+        xSet();
       }
       if (!duration) {
         completeTransition();
