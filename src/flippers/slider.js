@@ -364,14 +364,13 @@ Monocle.Flippers.Slider = function (reader) {
     }
 
     if (Monocle.Browser.env.supportsTransition) {
-      if (duration) {
-        transition = duration + "ms";
-        transition += ' ' + (options.timing || 'linear');
-        transition += ' ' + (options.delay || 0) + 'ms';
-      } else {
-        transition = "none";
-      }
-      Monocle.Styles.affix(elem, 'transition', transition);
+      Monocle.Styles.transitionFor(
+        elem,
+        'transform',
+        duration,
+        options.timing,
+        options.delay
+      );
 
       if (Monocle.Browser.env.supportsTransform3d) {
         Monocle.Styles.affix(elem, 'transform', 'translate3d('+x+'px,0,0)');
