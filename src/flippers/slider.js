@@ -493,6 +493,5 @@ Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.FOLLOW_DURATION = 100;
-Monocle.Flippers.Slider.SLIDE_OPTS = { duration: 120, timing: 'ease-in' };
 
 Monocle.pieceLoaded('flippers/slider');
