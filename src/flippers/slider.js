@@ -358,10 +358,6 @@ Monocle.Flippers.Slider = function (reader) {
       duration = parseInt(options.duration);
     }
 
-    var xSet = function () {
-      if (typeof callback == "function") { Monocle.defer(callback); }
-    }
-
     if (Monocle.Browser.env.supportsTransition) {
       Monocle.Styles.transitionFor(
         elem,
@@ -377,14 +373,20 @@ Monocle.Flippers.Slider = function (reader) {
         Monocle.Styles.affix(elem, 'transform', 'translateX('+x+'px)');
       }
 
-      duration ? Monocle.Events.afterTransition(elem, xSet) : xSet();
+      if (typeof callback == "function") {
+        if (duration) {
+          Monocle.Events.afterTransition(elem, callback);
+        } else {
+          Monocle.defer(callback);
+        }
+      }
     } else {
       // Old-school JS animation.
       elem.currX = elem.currX || 0;
       var completeTransition = function () {
         elem.currX = x;
         Monocle.Styles.setX(elem, x);
-        xSet();
+        if (typeof callback == "function") { callback(); }
       }
       if (!duration) {
         completeTransition();
@@ -412,40 +414,24 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    Monocle.defer(function () {
-      setX(pageDiv, 0, { duration: 0 }, callback);
-    });
+    setX(pageDiv, 0, { duration: 0 }, callback);
   }
 
 
   function jumpOut(pageDiv, callback) {
-    Monocle.defer(function () {
-      setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: 0 }, callback);
-    });
+    setX(pageDiv, 0 - pageDiv.offsetWidth, { duration: 0 }, callback);
   }
 
 
   // NB: Slides are always done by the visible upper page.
 
   function slideIn(callback) {
-    var slideOpts = {
-      duration: k.durations.SLIDE,
-      timing: 'ease-in'
-    };
-    Monocle.defer(function () {
-      setX(upperPage(), 0, slideOpts, callback);
-    });
+    setX(upperPage(), 0, k.SLIDE_OPTS, callback);
   }
 
 
   function slideOut(callback) {
-    var slideOpts = {
-      duration: k.durations.SLIDE,
-      timing: 'ease-in'
-    };
-    Monocle.defer(function () {
-      setX(upperPage(), 0 - upperPage().offsetWidth, slideOpts, callback);
-    });
+    setX(upperPage(), 0 - upperPage().offsetWidth, k.SLIDE_OPTS, callback);
   }
 
 
@@ -453,7 +439,7 @@ Monocle.Flippers.Slider = function (reader) {
     setX(
       upperPage(),
       Math.min(0, cursorX - upperPage().offsetWidth),
-      { duration: duration || k.durations.FOLLOW_CURSOR },
+      { duration: duration || k.FOLLOW_DURATION },
       callback
     );
   }
@@ -502,9 +488,7 @@ Monocle.Flippers.Slider = function (reader) {
 Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
-Monocle.Flippers.Slider.durations = {
-  SLIDE: 220,
-  FOLLOW_CURSOR: 100
-}
+Monocle.Flippers.Slider.FOLLOW_DURATION = 100;
+Monocle.Flippers.Slider.SLIDE_OPTS = { duration: 220, timing: 'ease-in' };
 
 Monocle.pieceLoaded('flippers/slider');
