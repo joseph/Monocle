@@ -246,18 +246,19 @@ Monocle.Flippers.Slider = function (reader) {
   function onGoingBackward(x) {
     var lp = lowerPage(), up = upperPage();
     showWaitControl(up);
-    setPage( // set lower to "the page before upper"
+
+    // set lower to "the page before upper"
+    setPage(
       lp,
       getPlace(up).getLocus({ direction: k.BACKWARDS }),
       function () {
-        jumpOut( // move lower off the screen
-          lp,
-          function () {
-            flipPages(); // flip lower to upper
-            lifted(x);
-            hideWaitControl(up);
-          }
-        );
+        flipPages();
+        // move lower off the screen to the left
+        jumpOut(lp, function () {
+          // flip lower to upper, ready to slide in from left
+          lifted(x);
+          hideWaitControl(up);
+        });
       }
     );
   }
@@ -268,34 +269,29 @@ Monocle.Flippers.Slider = function (reader) {
     if (p.interactive) {
       showWaitControl(up);
       showWaitControl(lp);
-      setPage( // set upper (off screen) to current
-        up,
-        getPlace().getLocus({ direction: k.FORWARDS }),
-        function () {
-          // move upper back onto screen
-          // then set lower to next and reset turn
-          jumpIn(up, function () { prepareNextPage(announceTurn); });
-        }
-      );
+      // set upper (off screen) to current
+      setPage(up, getPlace().getLocus({ direction: k.FORWARDS }));
+      // move upper back onto screen
+      jumpIn(up);
+      // then set lower to next and reset turn
+      prepareNextPage(announceTurn);
     } else {
       showWaitControl(lp);
       flipPages();
-      jumpIn(up, function () { prepareNextPage(announceTurn); });
+      jumpIn(up);
+      prepareNextPage(announceTurn);
     }
   }
 
 
   function afterGoingBackward() {
     if (p.interactive) {
-      setPage( // set lower page to current
-        lowerPage(),
-        getPlace().getLocus(),
-        function () {
-          flipPages(); // flip lower to upper
-          // set lower to next and reset turn:
-          prepareNextPage(announceTurn);
-        }
-      );
+      // set lower page to current
+      setPage(lowerPage(), getPlace().getLocus());
+      // flip lower to upper
+      flipPages();
+      // set lower to next and reset turn
+      prepareNextPage(announceTurn);
     } else {
       announceTurn();
     }
@@ -309,10 +305,8 @@ Monocle.Flippers.Slider = function (reader) {
 
   function afterCancellingBackward() {
     flipPages(); // flip upper to lower
-    jumpIn( // move lower back onto screen
-      lowerPage(),
-      function () { prepareNextPage(resetTurnData); }
-    );
+    jumpIn(lowerPage());
+    prepareNextPage(resetTurnData);
   }
 
 
@@ -427,12 +421,12 @@ Monocle.Flippers.Slider = function (reader) {
   // NB: Slides are always done by the visible upper page.
 
   function slideIn(callback) {
-    setX(upperPage(), 0, k.SLIDE_OPTS, callback);
+    setX(upperPage(), 0, slideOpts(), callback);
   }
 
 
   function slideOut(callback) {
-    setX(upperPage(), 0 - upperPage().offsetWidth, k.SLIDE_OPTS, callback);
+    setX(upperPage(), 0 - upperPage().offsetWidth, slideOpts(), callback);
   }
 
 
@@ -443,6 +437,15 @@ Monocle.Flippers.Slider = function (reader) {
       { duration: duration || k.FOLLOW_DURATION },
       callback
     );
+  }
+
+
+  function slideOpts() {
+    var opts = { timing: 'ease-in', duration: 300 }
+    var now = (new Date()).getTime();
+    if (p.lastSlide && now - p.lastSlide < 1500) { opts.duration *= 0.5; }
+    p.lastSlide = now;
+    return opts;
   }
 
 
@@ -490,6 +493,6 @@ Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.FOLLOW_DURATION = 100;
-Monocle.Flippers.Slider.SLIDE_OPTS = { duration: 220, timing: 'ease-in' };
+Monocle.Flippers.Slider.SLIDE_OPTS = { duration: 120, timing: 'ease-in' };
 
 Monocle.pieceLoaded('flippers/slider');
