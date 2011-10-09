@@ -199,7 +199,7 @@ Monocle.Flippers.Slider = function (reader) {
     checkPoint(boxPointX);
 
     p.turnData.releasing = true;
-    showWaitControl(lowerPage());
+    //showWaitControl(lowerPage());
 
     if (dir == k.FORWARDS) {
       if (
@@ -454,13 +454,13 @@ Monocle.Flippers.Slider = function (reader) {
 
   function showWaitControl(page) {
     var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
-    ctrl.style.visibility = "visible";
+    ctrl.style.opacity = 1;
   }
 
 
   function hideWaitControl(page) {
     var ctrl = p.reader.dom.find('flippers_slider_wait', page.m.pageIndex);
-    ctrl.style.visibility = "hidden";
+    ctrl.style.opacity = 0;
   }
 
   // THIS IS THE CORE API THAT ALL FLIPPERS MUST PROVIDE.
