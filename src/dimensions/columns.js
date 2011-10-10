@@ -9,6 +9,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     width: 0
   }
 
+  // Logically, forceColumn browsers can't have a gap, because that would
+  // make the minWidth > 200%. But how much greater? Not worth the effort.
+  k.GAP = Monocle.Browser.env.forceColumns ? 0 : 20;
 
   function update(callback) {
     setColumnWidth();
@@ -197,14 +200,11 @@ Monocle.Dimensions.Columns.STYLE = {
     "height": "100%",
     "width": "100%",
     "position": "absolute"
-    /*"-webkit-transform-style": "preserve-3d"*/
   },
   "column-force": {
     "min-width": "200%",
     "overflow": "hidden"
   }
 }
-
-Monocle.Dimensions.Columns.GAP = 20;
 
 Monocle.pieceLoaded("dimensions/columns");
