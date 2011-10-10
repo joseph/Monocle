@@ -409,7 +409,8 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    setX(pageDiv, 0, { duration: 0 }, callback);
+    opts = { duration: (Monocle.Browser.env.stickySlideOut ? 1 : 0) }
+    setX(pageDiv, 0, opts, callback);
   }
 
 
@@ -441,7 +442,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function slideOpts() {
-    var opts = { timing: 'ease-in', duration: 300 }
+    var opts = { timing: 'ease-in', duration: 360 }
     var now = (new Date()).getTime();
     if (p.lastSlide && now - p.lastSlide < 1500) { opts.duration *= 0.5; }
     p.lastSlide = now;
