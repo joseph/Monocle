@@ -306,7 +306,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         recalculateDimensions(true);
         dispatchEvent("monocle:resize");
       },
-      k.durations.RESIZE_DELAY
+      k.RESIZE_DELAY
     );
   }
 
@@ -746,13 +746,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   return API;
 }
 
-Monocle.Reader.durations = {
-  RESIZE_DELAY: 100
-}
-Monocle.Reader.abortMessage = {
-  CLASSNAME: "monocleAbortMessage",
-  TEXT: "Your browser does not support this technology."
-}
+Monocle.Reader.RESIZE_DELAY = 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.DEFAULT_STYLE_RULES = [
@@ -763,6 +757,9 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "overflow: visible !important;" +
   "}",
   "html#RS\\:monocle body {" +
+    "margin: 0;"+
+    "border: none;"+
+    "padding: 0;"+
     "-webkit-text-size-adjust: none;" +
   "}",
   "html#RS\\:monocle body * {" +

@@ -4,7 +4,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   var k = API.constants = API.constructor;
   var p = API.properties = {
     pageCount: 1,
-    duration: 200
+    duration: 300
   }
 
 
@@ -58,23 +58,24 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
 
   function frameToLocus(locus) {
+    if (locus.boundarystart || locus.boundaryend) { return; }
     p.turning = true;
-
-    var x = page().m.dimensions.locusToOffset(locus);
-    var bdy = page().m.activeFrame.contentDocument.body;
-    if (false && typeof WebKitTransitionEvent != "undefined") {
-      bdy.style.webkitTransition = "-webkit-transform " +
-        p.duration + "ms ease-out 0ms";
-      bdy.style.webkitTransform = "translateX(-"+x+"px)";
-      Monocle.Events.listen(
-        bdy,
-        'webkitTransitionEnd',
-        function () {
-          p.turning = false;
-          p.reader.dispatchEvent('monocle:turn');
-        }
-      );
+    var dims = page().m.dimensions;
+    var fr = page().m.activeFrame;
+    var bdy = fr.contentDocument.body;
+    var anim = true;
+    if (p.activeComponent != fr.m.component) {
+      // No animation.
+      p.activeComponent = fr.m.component;
+      dims.translateToLocus(locus, "none");
+      Monocle.defer(turned);
+    } else if (Monocle.Browser.env.supportsTransition) {
+      // Native animation.
+      dims.translateToLocus(locus, p.duration+"ms ease-in 0ms");
+      Monocle.Events.afterTransition(bdy, turned);
     } else {
+      // Old-school JS animation.
+      var x = dims.locusToOffset(locus);
       var finalX = 0 - x;
       var stamp = (new Date()).getTime();
       var frameRate = 40;
@@ -86,18 +87,23 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
           (new Date()).getTime() - stamp > p.duration ||
           Math.abs(currX - finalX) <= Math.abs((currX + step) - finalX)
         ) {
-          clearTimeout(bdy.animInterval)
           Monocle.Styles.setX(bdy, finalX);
-          p.turning = false;
-          p.reader.dispatchEvent('monocle:turn');
+          turned();
         } else {
           Monocle.Styles.setX(bdy, destX);
           currX = destX;
+          setTimeout(stepFn, frameRate);
         }
         p.currX = destX;
       }
-      bdy.animInterval = setInterval(stepFn, frameRate);
+      stepFn();
     }
+  }
+
+
+  function turned() {
+    p.turning = false;
+    p.reader.dispatchEvent('monocle:turn');
   }
 
 

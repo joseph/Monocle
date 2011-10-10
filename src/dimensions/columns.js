@@ -9,6 +9,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     width: 0
   }
 
+  // Logically, forceColumn browsers can't have a gap, because that would
+  // make the minWidth > 200%. But how much greater? Not worth the effort.
+  k.GAP = Monocle.Browser.env.forceColumns ? 0 : 20;
 
   function update(callback) {
     setColumnWidth();
@@ -32,9 +35,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     p.width = pdims.width;
 
     var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
-    rules += Monocle.Browser.css.toCSSDeclaration('column-width', p.width+'px');
-    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', 0);
-    rules += Monocle.Browser.css.toCSSDeclaration('transform', "translateX(0)");
+    rules += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('transform', 'translateX(0)');
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
       rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
@@ -74,6 +77,9 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     var w = Math.max(bd.scrollWidth, de.scrollWidth);
 
+    // Add one because the final column doesn't have right gutter.
+    w += k.GAP;
+
     if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
       w += p.page.m.offset;
     }
@@ -83,7 +89,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
-    return { width: elem.clientWidth, height: elem.clientHeight }
+    return {
+      col: elem.clientWidth,
+      width: elem.clientWidth + k.GAP,
+      height: elem.clientHeight
+    }
   }
 
 
@@ -97,16 +107,25 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
-  function translateToLocus(locus) {
+  // Moves the columned element to the offset implied by the locus.
+  //
+  // The 'transition' argument is optional, allowing the translation to be
+  // animated. If not given, no change is made to the columned element's
+  // transition property.
+  //
+  function translateToLocus(locus, transition) {
     var offset = locusToOffset(locus);
     p.page.m.offset = offset;
-    translateToOffset(offset);
+    translateToOffset(offset, transition);
     return offset;
   }
 
 
-  function translateToOffset(offset) {
+  function translateToOffset(offset, transition) {
     var ce = columnedElement();
+    if (transition) {
+      Monocle.Styles.affix(ce, "transition", transition);
+    }
     if (Monocle.Browser.env.translateIframeIn3d) {
       ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
     } else {
@@ -191,6 +210,5 @@ Monocle.Dimensions.Columns.STYLE = {
     "overflow": "hidden"
   }
 }
-
 
 Monocle.pieceLoaded("dimensions/columns");

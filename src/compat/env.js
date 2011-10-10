@@ -214,6 +214,11 @@ Monocle.Env = function () {
 
     // TEST FOR OPTIONAL CAPABILITIES
 
+    // Does it do CSS transitions?
+    ["supportsTransition", function () {
+      result(css.supportsPropertyWithAnyPrefix('transition'))
+    }],
+
     // Can we find nodes in a document with an XPath?
     //
     ["supportsXPath", testForFunction("document.evaluate")],
@@ -275,10 +280,14 @@ Monocle.Env = function () {
     // Webkit-based browsers put floated elements in the wrong spot when
     // columns are used -- they appear way down where they would be if there
     // were no columns.  Presumably the float positions are calculated before
-    // the columns. A bug has been lodged.
+    // the columns. A bug has been lodged, and it's fixed in recent WebKits.
     //
-    // FIXME: Detection not yet implemented.
-    ["floatsIgnoreColumns", testNotYetImplemented(false)],
+    ["floatsIgnoreColumns", function () {
+      if (!Monocle.Browser.is.WebKit) { return result(false); }
+      match = navigator.userAgent.match(/AppleWebKit\/([\d\.]+)/);
+      if (!match) { return result(false); }
+      return result(match[1] < "534.30");
+    }],
 
     // The latest engines all agree that if a body is translated leftwards,
     // its scrollWidth is shortened. But some older WebKits (notably iOS4)
@@ -311,8 +320,6 @@ Monocle.Env = function () {
     // In iOS, the frame is clipped by overflow:hidden, so this doesn't seem to
     // be a problem.
     //
-    // TODO: Is there a way to detect this?
-    //
     ["relativeIframeExpands", function () {
       result(navigator.userAgent.indexOf("Android 2") >= 0);
     }],
@@ -333,7 +340,6 @@ Monocle.Env = function () {
     // min-width is set, it's more difficult to recognise 1 page components,
     // so we generally don't want to force it unless we have to.
     //
-    // FIXME: This is not detecting correctly for iOS3.
     ["forceColumns", function () {
       loadTestFrame(function (fr) {
         var bd = fr.contentDocument.body;
@@ -398,6 +404,16 @@ Monocle.Env = function () {
         Monocle.Browser.is.MobileSafari &&
         !Monocle.Browser.iOSVersionBelow("5")
       );
+    }],
+
+    // For some reason, WebKit on the iPad sometimes loses track of a page after
+    // slideOut -- it thinks it has an x-translation of 0, rather than -768 or
+    // whatever. So the page gets "stuck" there, until it is given a non-zero
+    // x-translation. The workaround is to set a non-zero duration on the jumpIn,
+    // which seems to force WebKit to recalculate the x of the page. Weird, yeah.
+    //
+    ["stickySlideOut", function () {
+      result(Monocle.Browser.on.iPad);
     }]
   ];
 
