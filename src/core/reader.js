@@ -191,7 +191,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   function clampStylesheets(customStylesheet) {
     var defCSS = k.DEFAULT_STYLE_RULES;
     if (Monocle.Browser.env.floatsIgnoreColumns) {
-      defCSS += "html#RS\\:monocle * { float: none !important; }";
+      defCSS.push("html#RS\\:monocle * { float: none !important; }");
     }
     p.defaultStyles = addPageStyles(defCSS, false);
     if (customStylesheet) {
