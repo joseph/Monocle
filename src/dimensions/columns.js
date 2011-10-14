@@ -107,11 +107,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function translateToOffset(offset) {
     var ce = columnedElement();
-    if (Monocle.Browser.env.translateIframeIn3d) {
-      ce.style.cssText += "-webkit-transform: translate3d(-"+offset+"px,0,0)";
-    } else {
-      Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
-    }
+    Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
   }
 
 

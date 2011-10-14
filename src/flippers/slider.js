@@ -246,13 +246,14 @@ Monocle.Flippers.Slider = function (reader) {
   function onGoingBackward(x) {
     var lp = lowerPage(), up = upperPage();
     showWaitControl(up);
-    jumpOut(lp, // move lower page off-screen
+    setPage( // set lower to "the page before upper"
+      lp,
+      getPlace(up).getLocus({ direction: k.BACKWARDS }),
       function () {
-        flipPages(); // flip lower to upper
-        setPage( // set upper page to previous
+        jumpOut( // move lower off the screen
           lp,
-          getPlace(lowerPage()).getLocus({ direction: k.BACKWARDS }),
           function () {
+            flipPages(); // flip lower to upper
             lifted(x);
             hideWaitControl(up);
           }

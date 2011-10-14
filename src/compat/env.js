@@ -387,18 +387,8 @@ Monocle.Env = function () {
       loadTestFrame(function (fr) {
         result(fr.parentNode.scrollWidth > testFrameSize);
       });
-    }],
-
-    // In iOS5, a normal translateX on the iframe body comes up blank when
-    // going backwards. translate3d doesn't have this problem. Should probably
-    // isolate and file a Radar bug.
-    //
-    ["translateIframeIn3d", function () {
-      result(
-        Monocle.Browser.is.MobileSafari &&
-        !Monocle.Browser.iOSVersionBelow("5")
-      );
     }]
+
   ];
 
 
