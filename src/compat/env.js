@@ -395,14 +395,14 @@ Monocle.Env = function () {
       });
     }],
 
-    // For some reason, WebKit on the iPad sometimes loses track of a page after
+    // For some reason, iOS MobileSafari sometimes loses track of a page after
     // slideOut -- it thinks it has an x-translation of 0, rather than -768 or
     // whatever. So the page gets "stuck" there, until it is given a non-zero
     // x-translation. The workaround is to set a non-zero duration on the jumpIn,
     // which seems to force WebKit to recalculate the x of the page. Weird, yeah.
     //
     ["stickySlideOut", function () {
-      result(Monocle.Browser.on.iPad);
+      result(Monocle.Browser.is.MobileSafari);
     }]
 
   ];

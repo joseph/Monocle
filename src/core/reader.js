@@ -757,9 +757,9 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "overflow: visible !important;" +
   "}",
   "html#RS\\:monocle body {" +
-    "margin: 0;"+
-    "border: none;"+
-    "padding: 0;"+
+    "margin: 0 !important;"+
+    "border: none !important;"+
+    "padding: 0 !important;"+
     "-webkit-text-size-adjust: none;" +
   "}",
   "html#RS\\:monocle body * {" +

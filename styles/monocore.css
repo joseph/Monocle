@@ -99,9 +99,6 @@ div.monelem_flippers_slider_wait {
   -webkit-background-size: 100%;
   -moz-background-size: 100%;
   background-size: 100%;
-  -webkit-transition: opacity 160ms ease-out 0ms;
-  -moz-transition: opacity 160ms ease-out 0ms;
-  transition: opacity 160ms ease-out 0ms;
 }
 
 @media screen and (max-width: 640px) {
