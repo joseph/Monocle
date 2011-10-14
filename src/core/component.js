@@ -38,24 +38,22 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Makes this component the active component for the pageDiv. There are
   // several strategies for this (see loadFrame).
   //
-  // Some strategies are time-consuming (and usually asynchronous), some are
-  // not. When the component has been loaded into the pageDiv's frame, the
-  // callback will be invoked with the pageDiv and this component as arguments.
+  // When the component has been loaded into the pageDiv's frame, the callback
+  // will be invoked with the pageDiv and this component as arguments.
   //
   function applyTo(pageDiv, callback) {
     var evtData = { 'page': pageDiv, 'source': p.source };
     pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData);
 
-    return loadFrame(
-      pageDiv,
-      function () {
-        setupFrame(
-          pageDiv,
-          pageDiv.m.activeFrame,
-          function () { callback(pageDiv, API) }
-        );
-      }
-    );
+    var onLoaded = function () {
+      setupFrame(
+        pageDiv,
+        pageDiv.m.activeFrame,
+        function () { callback(pageDiv, API) }
+      );
+    }
+
+    Monocle.defer(function () { loadFrame(pageDiv, onLoaded); });
   }
 
 
