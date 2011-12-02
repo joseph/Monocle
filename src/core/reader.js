@@ -367,6 +367,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (!p.initialized) {
       console.warn('Attempt to move place before initialization.');
     }
+    if (!p.book.isValidLocus(locus)) {
+      dispatchEvent(
+        "monocle:notfound",
+        { href: locus ? locus.componentId : "anonymous" }
+      );
+      return false;
+    }
     var fn = callback;
     if (!locus.direction) {
       dispatchEvent('monocle:jumping', { locus: locus });
@@ -376,6 +383,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       }
     }
     p.flipper.moveTo(locus, fn);
+    return true;
   }
 
 
@@ -383,13 +391,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   //
   function skipToChapter(src) {
     var locus = p.book.locusOfChapter(src);
-    if (locus) {
-      moveTo(locus);
-      return true;
-    } else {
-      dispatchEvent("monocle:notfound", { href: src });
-      return false;
-    }
+    return moveTo(locus);
   }
 
 
