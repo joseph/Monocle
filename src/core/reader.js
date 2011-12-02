@@ -203,7 +203,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Opens the frame to a particular URL (usually 'about:blank').
   //
   function primeFrames(url, callback) {
-    url = url || "about:blank";
+    url = url || (Monocle.Browser.on.UIWebView ? "blank.html" : "about:blank");
 
     var pageCount = 0;
 
