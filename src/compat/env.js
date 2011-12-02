@@ -15,7 +15,7 @@ Monocle.Env = function () {
   var frameLoadCallback = null;
   var testFrame = null;
   var testFrameCntr = null;
-  var testFrameLoadedWithStandard = false;
+  var testFrameLastSrc = null;
   var testFrameSize = 100;
   var surveyCallback = null;
 
@@ -90,14 +90,11 @@ Monocle.Env = function () {
     if (!testFrame) { testFrame = createTestFrame(); }
     frameLoadCallback = cb;
 
-    if (typeof src == "undefined") {
-      if (testFrameLoadedWithStandard) {
-        frameLoadCallback(testFrame);
-      } else {
-        testFrameLoadedWithStandard = true;
-        src = 4;
-      }
+    src = src || 4;
+    if (src == testFrameLastSrc) {
+      return frameLoadCallback();
     }
+    testFrameLastSrc = src;
 
     if (typeof src == "number") {
       var pgs = [];
