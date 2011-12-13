@@ -15,7 +15,6 @@ Monocle.Env = function () {
   var frameLoadCallback = null;
   var testFrame = null;
   var testFrameCntr = null;
-  var testFrameLastSrc = null;
   var testFrameSize = 100;
   var surveyCallback = null;
 
@@ -91,10 +90,6 @@ Monocle.Env = function () {
     frameLoadCallback = cb;
 
     src = src || 4;
-    if (src == testFrameLastSrc) {
-      return frameLoadCallback();
-    }
-    testFrameLastSrc = src;
 
     if (typeof src == "number") {
       var pgs = [];
