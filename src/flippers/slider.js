@@ -370,7 +370,7 @@ Monocle.Flippers.Slider = function (reader) {
       }
 
       if (typeof callback == "function") {
-        if (duration) {
+        if (duration && Monocle.Styles.getX(elem) != x) {
           Monocle.Events.afterTransition(elem, callback);
         } else {
           Monocle.defer(callback);
