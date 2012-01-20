@@ -748,6 +748,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   return API;
 }
 
+
 Monocle.Reader.RESIZE_DELAY = 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
@@ -760,8 +761,10 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
   "}",
   "html#RS\\:monocle body {" +
     "margin: 0 !important;"+
-    "border: none !important;"+
-    "padding: 0 !important;"+
+    "border: none !important;" +
+    "padding: 0 !important;" +
+    "width: 100% !important;" +
+    "position: absolute !important;" +
     "-webkit-text-size-adjust: none;" +
   "}",
   "html#RS\\:monocle body * {" +

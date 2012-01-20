@@ -194,6 +194,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
 Monocle.Dimensions.Columns.STYLE = {
+  // Most of these are already applied to body, but they're repeated here
+  // in case columnedElement() is ever anything other than body.
   "columned": {
     "margin": "0",
     "padding": "0",
