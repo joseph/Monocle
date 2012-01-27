@@ -5,7 +5,7 @@ Monocle.Browser = {}
 Monocle.Browser.is = {
   IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
   Opera: navigator.userAgent.indexOf('Opera') > -1,
-  WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
+  WebKit: navigator.userAgent.indexOf('AppleWebKit') > -1,
   Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
     navigator.userAgent.indexOf('KHTML') === -1,
   MobileSafari: !!navigator.userAgent.match(/AppleWebKit.*Mobile/)
@@ -28,13 +28,16 @@ if (Monocle.Browser.is.IE) {
 // Detect the client platform (typically device/operating system).
 //
 Monocle.Browser.on = {
-  iPhone: navigator.userAgent.indexOf("iPhone") != -1,
-  iPad: navigator.userAgent.indexOf("iPad") != -1,
+  iPhone: Monocle.Browser.is.MobileSafari && screen.width == 320,
+  iPad: Monocle.Browser.is.MobileSafari && screen.width == 768,
+  UIWebView: Monocle.Browser.is.MobileSafari &&
+    navigator.userAgent.indexOf("Safari") < 0 &&
+    !navigator.standalone,
   BlackBerry: navigator.userAgent.indexOf("BlackBerry") != -1,
   Android: navigator.userAgent.indexOf('Android') != -1,
   MacOSX: navigator.userAgent.indexOf('Mac OS X') != -1 &&
     !Monocle.Browser.is.MobileSafari,
-  Kindle3: navigator.userAgent.match(/Kindle\/3/)
+  Kindle3: !!navigator.userAgent.match(/Kindle\/3/)
   // TODO: Mac, Windows, etc
 }
 

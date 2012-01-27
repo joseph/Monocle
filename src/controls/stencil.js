@@ -172,6 +172,11 @@ Monocle.Controls.Stencil = function (reader) {
   function fixLink(link, hrefObject, handler) {
     link.setAttribute('target', '_blank');
     link.deconstructedHref = hrefObject;
+    if (hrefObject.external) {
+      link.href = hrefObject.external;
+    } else if (link.relatedLink) {
+      link.removeAttribute('href');
+    }
     if (link.stencilClickHandler) { return; }
     link.stencilClickHandler = handler;
     Monocle.Events.listen(link, 'click', link.stencilClickHandler);
@@ -312,7 +317,6 @@ Monocle.Controls.Stencil = function (reader) {
       return;
     }
     if (href.external) {
-      link.href = href.external;
       return;
     }
     var cmptId = href.componentId + href.hash;
