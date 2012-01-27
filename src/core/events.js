@@ -34,13 +34,7 @@ Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
 // De-register a function from an event.
 //
 Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
-  if (elem.removeEventListener) {
-    return elem.removeEventListener(evtType, fn, useCapture || false);
-  } else if (elem.detachEvent) {
-    try {
-      return elem.detachEvent('on'+evtType, fn);
-    } catch(e) {}
-  }
+  return elem.removeEventListener(evtType, fn, useCapture || false);
 }
 
 
