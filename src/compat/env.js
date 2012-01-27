@@ -233,6 +233,21 @@ Monocle.Env = function () {
     }],
 
 
+    // Commonly-used browser functionality
+    ["supportsOfflineCache", function () {
+      result(typeof window.applicationCache != 'undefined');
+    }],
+
+    ["supportsLocalStorage", function () {
+      // NB: Some duplicitous early Android browsers claim to have
+      // localStorage, but calls to getItem() fail.
+      result(
+        typeof window.localStorage != "undefined" &&
+        typeof window.localStorage.getItem == "function"
+      )
+    }],
+
+
     // CHECK OUT OUR CONTEXT
 
     // Does the device have a MobileSafari-style touch interface?
