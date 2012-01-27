@@ -1,4 +1,5 @@
 Monocle.Controls.Stencil = function (reader) {
+
   if (Monocle.Controls == this) { return new this.Stencil(reader); }
 
   var API = { constructor: Monocle.Controls.Stencil }
@@ -15,15 +16,13 @@ Monocle.Controls.Stencil = function (reader) {
   //
   function createControlElements(holder) {
     p.container = holder.dom.make('div', k.CLS.container);
-    p.reader.listen('monocle:turn', draw);
+    p.reader.listen('monocle:turn', update);
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
-    p.reader.listen('monocle:componentchange', function (evt) {
-      Monocle.defer(update);
-    });
     p.reader.listen('monocle:interactive:on', disable);
     p.reader.listen('monocle:interactive:off', enable);
     p.baseURL = getBaseURL();
+    update();
     return p.container;
   }
 
@@ -89,18 +88,25 @@ Monocle.Controls.Stencil = function (reader) {
       calcRects = true;
     }
 
-    var iElems = doc.getElementsByTagName('a');
-    for (var i = 0; i < iElems.length; ++i) {
-      if (iElems[i].href) {
-        var href = deconstructHref(iElems[i].href);
-        fixLink(iElems[i], href, clickHandler);
+    var links = doc.getElementsByTagName('a');
+    for (var i = 0; i < links.length; ++i) {
+      var link = links[i];
+      if (link.href) {
+        var hrefObject = deconstructHref(link.href);
+        link.setAttribute('target', '_blank');
+        link.deconstructedHref = hrefObject;
+        if (hrefObject.external) {
+          link.href = hrefObject.external;
+        } else if (link.relatedLink) {
+          link.removeAttribute('href');
+        }
 
-        if (calcRects && iElems[i].getClientRects) {
-          var r = iElems[i].getClientRects();
+        if (calcRects && link.getClientRects) {
+          var r = link.getClientRects();
           for (var j = 0; j < r.length; j++) {
             p.components[cmptId].push({
-              link: iElems[i],
-              href: href,
+              link: link,
+              href: hrefObject,
               left: Math.ceil(r[j].left + offset.l),
               top: Math.ceil(r[j].top),
               width: Math.floor(r[j].width),
@@ -140,51 +146,31 @@ Monocle.Controls.Stencil = function (reader) {
       if (!p.cutouts[i]) {
         p.cutouts[i] = createCutout();
       }
-      var link = p.cutouts[i];
-      link.dom.setStyles({
+      var cutout = p.cutouts[i];
+      cutout.dom.setStyles({
         display: 'block',
         left: (visRects[i].left - offset.l)+"px",
         top: visRects[i].top+"px",
         width: visRects[i].width+"px",
         height: visRects[i].height+"px"
       });
-      link.relatedLink = visRects[i].link;
-      fixLink(link, visRects[i].href, cutoutClick);
+      cutout.relatedLink = visRects[i].link;
+      var extURL = visRects[i].href.external;
+      if (extURL) {
+        cutout.setAttribute('href', extURL);
+      } else {
+        cutout.removeAttribute('href');
+      }
     }
 
     return i;
   }
 
 
-  // Set the link (either the original <a> tag or a cutout) to listen for
-  // clicks and go to the corresponding component (or open the external URL
-  // in a new window).
-  //
-  // NB: if the original link already has a click handler on it (eg, if the
-  // content is scripted), that click handler can:
-  //
-  // * stopPropagation if it is defined first
-  // * run Monocle.Events.deafen(link, 'click', link.stencilClickHandler)
-  //
-  // in order to prevent the default stencil click behaviour when in
-  // interactive mode.
-  //
-  function fixLink(link, hrefObject, handler) {
-    link.setAttribute('target', '_blank');
-    link.deconstructedHref = hrefObject;
-    if (hrefObject.external) {
-      link.href = hrefObject.external;
-    } else if (link.relatedLink) {
-      link.removeAttribute('href');
-    }
-    if (link.stencilClickHandler) { return; }
-    link.stencilClickHandler = handler;
-    Monocle.Events.listen(link, 'click', link.stencilClickHandler);
-  }
-
-
   function createCutout() {
     var cutout =  p.container.dom.append('a', k.CLS.cutout);
+    cutout.setAttribute('target', '_blank');
+    Monocle.Events.listen(cutout, 'click', cutoutClick);
     return cutout;
   }
 
@@ -278,8 +264,9 @@ Monocle.Controls.Stencil = function (reader) {
   // or moves to an internal component.
   //
   function cutoutClick(evt) {
-    var link = evt.currentTarget;
-    olink = link.relatedLink;
+    var cutout = evt.currentTarget;
+    if (cutout.getAttribute('href')) { return; }
+    var olink = cutout.relatedLink;
     Monocle.Events.listen(olink, 'click', clickHandler);
     var mimicEvt = document.createEvent('MouseEvents');
     mimicEvt.initMouseEvent(
@@ -312,14 +299,14 @@ Monocle.Controls.Stencil = function (reader) {
       return;
     }
     var link = evt.currentTarget;
-    var href = link.deconstructedHref;
-    if (!href) {
+    var hrefObject = link.deconstructedHref;
+    if (!hrefObject) {
       return;
     }
-    if (href.external) {
+    if (hrefObject.external) {
       return;
     }
-    var cmptId = href.componentId + href.hash;
+    var cmptId = hrefObject.componentId + hrefObject.hash;
     p.reader.skipToChapter(cmptId);
     evt.preventDefault();
   }
