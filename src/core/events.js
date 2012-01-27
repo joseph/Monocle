@@ -99,11 +99,11 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     var r;
     if (elem.getBoundingClientRect) {
       var er = elem.getBoundingClientRect();
-      var dr = document.body.getBoundingClientRect();
+      var dr = document.documentElement.getBoundingClientRect();
       r = { left: er.left - dr.left, top: er.top - dr.top };
     } else {
       r = { left: elem.offsetLeft, top: elem.offsetTop }
-      while (elem = elem.parentNode) {
+      while (elem = elem.offsetParent) {
         if (elem.offsetLeft || elem.offsetTop) {
           r.left += elem.offsetLeft;
           r.top += elem.offsetTop;
