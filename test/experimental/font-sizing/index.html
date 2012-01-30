@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Proportional Font-sizing test</title>
+    <link rel="stylesheet" type="text/css" href="../../tests.css" />
+    <style>
+      iframe#reader {
+        border: 1px solid #F0F;
+        margin: 20px 0;
+        overflow: auto;
+      }
+    </style>
+    <script src="test.js"></script>
+  </head>
+
+  <body class="narrow">
+
+    <a href="../../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Proportional Font-sizing test</h1>
+
+    <p>
+      Select a font-scale:
+      <select id="sizeSelect">
+        <option value="">&mdash;</option>
+        <option value="0.1">10%</option>
+        <option value="0.5">50%</option>
+        <option value="0.8">80%</option>
+        <option value="1.0">100%</option>
+        <option value="1.1">110%</option>
+        <option value="1.3">130%</option>
+        <option value="1.6">160%</option>
+        <option value="2.0">200%</option>
+        <option value="2.5">250%</option>
+        <option value="4.0">400%</option>
+        <option value="8.0">800%</option>
+      </select>
+    </p>
+
+    <iframe
+      id="reader"
+      src="content.html"
+      width="330"
+      height="400"
+      frameborder="0"
+    ></iframe>
+    <!--
+      src="../../showcase/02-dickens/components/2.html"
+    -->
+
+    <hr />
+
+    <p>
+      Proportional font-sizing is tricky for a few reasons.
+      Firstly, we need to scale against the original font-size (in pixels)
+      for each element, so we have to traverse the DOM tree twice &mdash;
+      once to find font-size information and once to apply it.
+    </p>
+    <p>
+      Then, once applied, the font-size is "fixed" &mdash; it will no longer
+      respond to changes in the parent. So class changes triggered by
+      scripts won't work as expected for font-sizing.
+    </p>
+
+    <p>
+      The approach taken here mitigates the amount of behavioural modification
+      as a result of font-size changes. Primarily, whenever the scale is
+      unset (by choosing &mdash;), all font-size changes are reversed so that
+      full inheritance can again cascade.
+    </p>
+
+    <p>
+    To see this:
+    </p>
+
+    <ol>
+      <li>
+        Set scale to 100% &rarr; no change
+      </li>
+      <li>
+        Click 'Change body font size...' link &rarr; no change
+        because font-sizes do not cascade
+      </li>
+      <li>
+        Set scale to &mdash; &rarr; substantial increase to size of first para
+      </li>
+      <li>
+        Set scale to 100% &rarr; no change because calculating off new baseline
+      </li>
+    </ol>
+
+  </body>
+</html>
