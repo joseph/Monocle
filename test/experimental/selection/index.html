@@ -23,7 +23,7 @@
         padding: 6px;
         visibility: hidden;
         height: 5em;
-        overflow: scroll;
+        overflow: auto;
       }
     </style>
     <script src="test.js"></script>
@@ -50,9 +50,15 @@
     <hr />
 
     <p>
-      Monocle needs a set of events for "some text has been selected",
-      "the selection has changed", and "selection deselected". This is so
-      we can build contextual menus for these cases.
+      Monocle needs custom events for "text has been selected" and
+      "text has been deselected". (These events could form the basis of
+      annotations or selection context menus, perhaps.)
+    </p>
+
+    <p>
+      Custom events are working here if the yellow box appears and displays
+      selected text from the iframe, then disappears when text in the iframe is
+      deselected.
     </p>
 
     <p>
@@ -65,7 +71,8 @@
     <p>
       The <strong>Remove Selection</strong> button is wired to
       take effect on a tap or a swipe, on touch-based and cursor-based
-      browsers.
+      browsers. The best test is to drag from inside to outside the button
+      &mdash; text in the frame should be deselected.
     </p>
 
   </body>

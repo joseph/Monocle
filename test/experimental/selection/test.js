@@ -1,28 +1,77 @@
 (function () {
 
   var SELECTION_POLLING_INTERVAL = 250;
+  var lastSelection = {};
 
 
   function init() {
-    setInterval(pollSelection, SELECTION_POLLING_INTERVAL);
+    if (SELECTION_POLLING_INTERVAL) {
+      setInterval(pollSelection, SELECTION_POLLING_INTERVAL);
+    }
     var btn = document.getElementById('deselectBtn');
     btn.addEventListener('mousedown', deselectAction, false);
     btn.addEventListener('touchstart', deselectAction, false);
+    var frame = document.getElementById('reader');
+    frame.addEventListener('experimental:selection', textSelected, false);
+    frame.addEventListener('experimental:deselection', textDeselected, false);
   }
 
 
   function pollSelection() {
-    var st = document.getElementById('statusSelect');
     var frame = document.getElementById('reader');
-    var sel = frame.contentWindow.getSelection().toString();
-    if (sel) {
-      if (sel != st.innerHTML) {
-        st.innerHTML = sel;
-        st.style.visibility = 'visible';
+    var sel = frame.contentWindow.getSelection();
+    var lm = lastSelection;
+    var nm = lastSelection = {
+      range: sel.rangeCount ? sel.getRangeAt(0) : null,
+      string: sel.toString()
+    };
+    if (nm.range && nm.string) {
+      // Gecko keeps returning the same range object as the selection changes,
+      // so we have to store and compare start and end points directly.
+      nm.rangeStartContainer = nm.range.startContainer;
+      nm.rangeEndContainer = nm.range.endContainer;
+      nm.rangeStartOffset = nm.range.startOffset;
+      nm.rangeEndOffset = nm.range.endOffset;
+      if (!sameRange(nm, lm)) {
+        dispatchEvent(frame, 'experimental:selection', nm);
       }
-    } else {
-      st.style.visibility = 'hidden';
+    } else if (lm.string) {
+      dispatchEvent(frame, 'experimental:deselection', lm);
     }
+  }
+
+
+  function sameRange(m1, m2) {
+    return (
+      m1.rangeStartContainer == m2.rangeStartContainer &&
+      m1.rangeEndContainer == m2.rangeEndContainer &&
+      m1.rangeStartOffset == m2.rangeStartOffset &&
+      m1.rangeEndOffset == m2.rangeEndOffset
+    );
+  }
+
+
+  function dispatchEvent(elem, evtType, data) {
+    var evt = document.createEvent("Events");
+    evt.initEvent(evtType, false, false);
+    evt.m = data;
+    return elem.dispatchEvent(evt);
+  }
+
+
+  function textSelected(evt) {
+    console.log("Selection: "+evt.m.string);
+    var st = document.getElementById('statusSelect');
+    var sel = evt.m.string;
+    st.innerHTML = sel;
+    st.style.visibility = 'visible';
+  }
+
+
+  function textDeselected(evt) {
+    console.log("Deselection.");
+    var st = document.getElementById('statusSelect');
+    st.style.visibility = 'hidden';
   }
 
 
@@ -99,14 +148,14 @@
 
     if (ovp) {
       var ovpcontent = ovp.getAttribute('content');
-      var re = /user-scalable\s*=\s*([^,$])*/;
+      var re = /user-scalable\s*=\s*([^,$\s])*/;
       var result = ovpcontent.match(re);
       if (result && ['no', '0'].indexOf(result[1]) >= 0) {
         console.log("Existing viewport is already non-scalable.");
         fn();
       } else {
         console.log("Replacing existing viewport with non-scalable one.");
-        var nvpcontent = ovpcontent.replace(/user-scalable\s*=\s*[^,$]*/, '');
+        var nvpcontent = ovpcontent.replace(re, '');
         nvpcontent += nvpcontent ? ', ' : '';
         nvpcontent += 'user-scalable=no';
         head.removeChild(ovp);
