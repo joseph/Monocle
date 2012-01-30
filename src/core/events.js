@@ -44,6 +44,9 @@ Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
 }
 
 
+// Register a series of functions to listen for the start, move, end
+// events of a mouse or touch interaction.
+//
 // 'fns' argument is an object like:
 //
 //   {
@@ -54,6 +57,12 @@ Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
 //   }
 //
 // All of the functions in this object are optional.
+//
+// Each function is passed the event, with additional generic info about the
+// cursor/touch position:
+//
+//    event.m.offsetX (& offsetY) -- relative to top-left of document
+//    event.m.registrantX (& registrantY) -- relative to top-left of elem
 //
 // 'options' argument:
 //
