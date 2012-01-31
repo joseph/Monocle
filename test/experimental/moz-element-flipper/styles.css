@@ -1,0 +1,69 @@
+body {
+  padding: 100px;
+}
+section {
+  position: relative;
+  background: -moz-linear-gradient(0deg, #FFF, #555, #FFF, #555, #FFF);
+  width: 320px;
+  height: 380px;
+}
+.columns {
+  width: 2700px;
+  -moz-column-width: 300px;
+  -moz-column-gap: 20px;
+  height: 380px;
+}
+.colCntr {
+  height: 0;
+  overflow: hidden;
+}
+.imposter {
+  background-color: white;
+  background-image: -moz-element(#origin);
+  background-repeat: no-repeat;
+  position: absolute;
+  width: 160px;
+  height: 380px;
+  top: 0;
+  left: 0;
+  -moz-backface-visibility: hidden;
+  background-color: #FFF;
+}
+#imp1 {
+  background-position: 0px 0px;
+}
+#imp2 {
+  background-position: -160px 0px;
+}
+#imp3 {
+  background-position: -340px 0px;
+  -moz-transform: rotateY(180deg);
+}
+#imp4 {
+  background-position: -500px 0px;
+  left: 160px;
+  opacity: 0.25;
+}
+#gate {
+  position: absolute;
+  -moz-transform-origin: 1px 50%;
+  -moz-transform-style: preserve-3d;
+  z-index: 1;
+  top: 0px;
+  left: 160px;
+  width: 160px;
+  height: 382px;
+  background: #FFF;
+}
+.pageTurn #gate{
+  -moz-transition: -moz-transform linear 400ms;
+  -moz-transform: perspective(500px) rotateY(-180deg);
+}
+.pageTurn #imp1 {
+  -moz-transition: opacity linear 200ms 200ms;
+  opacity: 0.25;
+}
+.pageTurn #imp4 {
+  -moz-transition: opacity linear 200ms;
+  opacity: 1;
+}
