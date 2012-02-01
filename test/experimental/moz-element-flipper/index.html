@@ -7,26 +7,32 @@
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js"></script>
   </head>
-  <body onclick="jump()">
+  <body class="narrow">
 
     <a href="../../index.html" class="backToGuide">&larr; Back to Guide</a>
-    <h1><code>-moz-element</code> Flipper test</h1>
+    <h1><code>-moz-element</code> Flipper</h1>
 
     <p>
-      Designed for recent versions of Firefox (11+?). A bit stuttery.
+      Designed for recent versions of Firefox (11+?).
       Only goes forward.
     </p>
 
-    <hr />
+    <hr class="softBreak" />
 
-    <section>
-      <div id="imp1" class="imposter"></div>
-      <div id="gate">
-        <div id="imp2" class="imposter"></div>
-        <div id="imp3" class="imposter"></div>
+    <div id="mode">
+      <div id="frame">
+        <section>
+          <div id="imp1" class="imposter"></div>
+          <div id="gate">
+            <div id="imp2" class="imposter"></div>
+            <div id="imp3" class="imposter"></div>
+          </div>
+          <div id="imp4" class="imposter"></div>
+        </section>
       </div>
-      <div id="imp4" class="imposter"></div>
-    </section>
+    </div>
+
+    <hr />
 
     <div class="colCntr">
       <div id="origin" class="columns">

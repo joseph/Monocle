@@ -1,5 +1,6 @@
-body {
-  padding: 100px;
+hr.softBreak {
+  border: none;
+  border-top: 1px dotted #999;
 }
 section {
   position: relative;
@@ -14,6 +15,7 @@ section {
   height: 380px;
 }
 .colCntr {
+  width: 0;
   height: 0;
   overflow: hidden;
 }
@@ -30,23 +32,18 @@ section {
   background-color: #FFF;
 }
 #imp1 {
-  background-position: 0px 0px;
 }
 #imp2 {
-  background-position: -160px 0px;
 }
 #imp3 {
-  background-position: -340px 0px;
-  -moz-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg) translateZ(1px);
 }
 #imp4 {
-  background-position: -500px 0px;
   left: 160px;
-  opacity: 0.25;
 }
 #gate {
   position: absolute;
-  -moz-transform-origin: 1px 50%;
+  -moz-transform-origin: 0% 50%;
   -moz-transform-style: preserve-3d;
   z-index: 1;
   top: 0px;
@@ -55,15 +52,51 @@ section {
   height: 382px;
   background: #FFF;
 }
+
 .pageTurn #gate{
-  -moz-transition: -moz-transform linear 400ms;
+  -moz-transition: -moz-transform linear 600ms;
   -moz-transform: perspective(500px) rotateY(-180deg);
 }
-.pageTurn #imp1 {
-  -moz-transition: opacity linear 200ms 200ms;
+
+
+.forwardTurn #imp4 {
   opacity: 0.25;
 }
-.pageTurn #imp4 {
-  -moz-transition: opacity linear 200ms;
+
+.forwardTurn .pageTurn #imp1 {
+  -moz-transition: opacity linear 300ms 300ms;
+  opacity: 0.25;
+}
+
+.forwardTurn .pageTurn #imp4 {
+  -moz-transition: opacity linear 300ms;
   opacity: 1;
+}
+
+
+.reverseTurn #gate {
+  -moz-transform-origin: 100% 50%;
+  left: 0;
+}
+
+.reverseTurn .pageTurn #gate {
+  -moz-transform: perspective(500px) rotateY(180deg);
+}
+
+.reverseTurn #imp1 {
+  opacity: 0.25;
+}
+
+.reverseTurn #imp4 {
+  opacity: 1;
+}
+
+.reverseTurn .pageTurn #imp1 {
+  -moz-transition: opacity linear 300ms;
+  opacity: 1;
+}
+
+.reverseTurn .pageTurn #imp4 {
+  -moz-transition: opacity linear 300ms 300ms;
+  opacity: 0.25;
 }
