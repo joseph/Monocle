@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Selected Text test</title>
+    <link rel="stylesheet" type="text/css" href="../../tests.css" />
+    <style>
+      iframe#reader {
+        border: 1px solid #F0F;
+        margin: 20px 0;
+      }
+      #deselectBtn {
+        margin: 20px 0;
+        padding: 6px;
+        background: #900;
+        color: #FFF;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #statusSelect {
+        margin: 20px 0;
+        background: #FFC;
+        padding: 6px;
+        visibility: hidden;
+        height: 5em;
+        overflow: auto;
+      }
+    </style>
+    <script src="test.js"></script>
+  </head>
+
+  <body class="narrow">
+
+    <a href="../../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Selected Text test</h1>
+
+    <iframe
+      id="reader"
+      src="content.html"
+      width="330"
+      height="400"
+      scrolling="no"
+      frameborder="0"
+    ></iframe>
+
+    <div id="deselectBtn">Remove selection</div>
+
+    <div id="statusSelect"></div>
+
+    <hr />
+
+    <p>
+      Monocle needs custom events for "text has been selected" and
+      "text has been deselected". (These events could form the basis of
+      annotations or selection context menus, perhaps.)
+    </p>
+
+    <p>
+      Custom events are working here if the yellow box appears and displays
+      selected text from the iframe, then disappears when text in the iframe is
+      deselected.
+    </p>
+
+    <p>
+      Furthermore, as soon as a page <em>begins</em> turning, any selected
+      text should be deselected. This is trivial in most browsers &mdash;
+      <code>window.getSelection().removeAllRanges()</code> &mdash; but
+      bizarrely difficult in MobileSafari.
+    </p>
+
+    <p>
+      The <strong>Remove Selection</strong> button is wired to
+      take effect on a tap or a swipe, on touch-based and cursor-based
+      browsers. The best test is to drag from inside to outside the button
+      &mdash; text in the frame should be deselected.
+    </p>
+
+  </body>
+</html>

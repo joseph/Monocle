@@ -38,6 +38,9 @@ Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
 }
 
 
+// Register a series of functions to listen for the start, move, end
+// events of a mouse or touch interaction.
+//
 // 'fns' argument is an object like:
 //
 //   {
@@ -48,6 +51,12 @@ Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
 //   }
 //
 // All of the functions in this object are optional.
+//
+// Each function is passed the event, with additional generic info about the
+// cursor/touch position:
+//
+//    event.m.offsetX (& offsetY) -- relative to top-left of document
+//    event.m.registrantX (& registrantY) -- relative to top-left of elem
 //
 // 'options' argument:
 //
@@ -93,11 +102,11 @@ Monocle.Events.listenForContact = function (elem, fns, options) {
     var r;
     if (elem.getBoundingClientRect) {
       var er = elem.getBoundingClientRect();
-      var dr = document.body.getBoundingClientRect();
+      var dr = document.documentElement.getBoundingClientRect();
       r = { left: er.left - dr.left, top: er.top - dr.top };
     } else {
       r = { left: elem.offsetLeft, top: elem.offsetTop }
-      while (elem = elem.parentNode) {
+      while (elem = elem.offsetParent) {
         if (elem.offsetLeft || elem.offsetTop) {
           r.left += elem.offsetLeft;
           r.top += elem.offsetTop;
