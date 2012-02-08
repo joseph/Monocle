@@ -77,5 +77,3 @@ Monocle.Controls.Magnifier.RESET_STYLESHEET =
   "h4 { font-size: 1.4em !important }" +
   "h5 { font-size: 1.2em !important }" +
   "h6 { font-size: 1.0em !important }";
-
-Monocle.pieceLoaded('controls/magnifier');

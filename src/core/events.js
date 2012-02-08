@@ -285,7 +285,3 @@ Monocle.Events.afterTransition = function (elem, fn) {
   Monocle.Events.listen(elem, evtName, l);
   return cancel;
 }
-
-
-
-Monocle.pieceLoaded('core/events');

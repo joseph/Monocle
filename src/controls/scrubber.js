@@ -141,5 +141,3 @@ Monocle.Controls.Scrubber.CLS = {
   trail: 'controls_scrubber_trail',
   bubble: 'controls_scrubber_bubble'
 }
-
-Monocle.pieceLoaded('controls/scrubber');

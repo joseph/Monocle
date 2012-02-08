@@ -769,5 +769,3 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "height: auto !important;" +
   "}"
 ]
-
-Monocle.pieceLoaded('core/reader');

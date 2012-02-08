@@ -196,5 +196,3 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
 Monocle.Panels.IMode.CAMEO_DURATION = 250;
 Monocle.Panels.IMode.LINGER_DURATION = 250;
-
-Monocle.pieceLoaded('panels/imode');

@@ -95,5 +95,3 @@ Monocle.Browser.survey = function (callback) {
     callback();
   }
 }
-
-Monocle.pieceLoaded('compat/browser');

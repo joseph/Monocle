@@ -27,6 +27,3 @@ window.console.compatDir = function (obj) {
 
   window.console.log(stringify(obj));
 }
-
-
-Monocle.pieceLoaded('compat/stubs');

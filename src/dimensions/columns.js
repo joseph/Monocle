@@ -208,5 +208,3 @@ Monocle.Dimensions.Columns.STYLE = {
     "overflow": "hidden"
   }
 }
-
-Monocle.pieceLoaded("dimensions/columns");

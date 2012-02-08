@@ -19,5 +19,3 @@
 //= require "flippers/slider"
 //= require "flippers/scroller"
 //= require "flippers/instant"
-
-Monocle.pieceLoaded('monocore');

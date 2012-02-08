@@ -421,7 +421,3 @@ Monocle.Env = function () {
 
   return API;
 }
-
-
-
-Monocle.pieceLoaded('compat/env');

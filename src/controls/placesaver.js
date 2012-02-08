@@ -107,6 +107,3 @@ Monocle.Controls.PlaceSaver = function (bookId) {
 
 Monocle.Controls.PlaceSaver.COOKIE_NAMESPACE = "monocle.controls.placesaver.";
 Monocle.Controls.PlaceSaver.COOKIE_EXPIRES_IN_DAYS = 7; // Set to 0 for session-based expiry.
-
-
-Monocle.pieceLoaded('controls/placesaver');

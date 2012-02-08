@@ -32,5 +32,3 @@ Monocle.Panels.TwoPane = function (flipper, evtCallbacks) {
 }
 
 Monocle.Panels.TwoPane.WIDTH = "50%";
-
-Monocle.pieceLoaded('panels/twopane');

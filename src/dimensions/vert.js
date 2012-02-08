@@ -85,5 +85,3 @@ Monocle.Dimensions.Vert = function (pageDiv) {
 }
 
 Monocle.Dimensions.Vert.GUTTER = 10;
-
-Monocle.pieceLoaded("dimensions/vert");

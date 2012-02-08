@@ -338,6 +338,3 @@ Monocle.Controls.Stencil.CLS = {
   cutout: 'controls_stencil_cutout',
   highlights: 'controls_stencil_highlighted'
 }
-
-
-Monocle.pieceLoaded('controls/stencil');

@@ -128,6 +128,3 @@ Monocle.Controls.Panel.DEFAULT_STYLES = {
   position: 'absolute',
   height: '100%'
 }
-
-
-Monocle.pieceLoaded('controls/panel');

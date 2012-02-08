@@ -376,5 +376,3 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   return API;
 }
-
-Monocle.pieceLoaded('core/component');

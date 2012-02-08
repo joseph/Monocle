@@ -86,4 +86,3 @@ Monocle.Controls.Spinner = function (reader) {
 }
 
 Monocle.Controls.Spinner.GENERIC_LABEL = "generic";
-Monocle.pieceLoaded('controls/spinner');

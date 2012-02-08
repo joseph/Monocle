@@ -141,6 +141,3 @@ Monocle.CSS = function () {
 Monocle.CSS.engines = ["W3C", "WebKit", "Gecko", "Opera", "IE", "Konqueror"];
 Monocle.CSS.prefixes = ["", "-webkit-", "-moz-", "-o-", "-ms-", "-khtml-"];
 Monocle.CSS.domprefixes = ["", "Webkit", "Moz", "O", "ms", "Khtml"];
-
-
-Monocle.pieceLoaded('compat/css');

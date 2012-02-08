@@ -152,7 +152,3 @@ Monocle.Styles.overlay = {
   "height": "100%",
   "z-index": "1000"
 }
-
-
-
-Monocle.pieceLoaded('core/styles');

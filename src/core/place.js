@@ -176,5 +176,3 @@ Monocle.Place.percentOfBookToLocus = function (reader, percent) {
     percent: (percent % componentSize) / componentSize
   }
 }
-
-Monocle.pieceLoaded('core/place');

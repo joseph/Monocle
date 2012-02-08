@@ -60,5 +60,3 @@ Monocle.Controls.Contents = function (reader) {
 
   return API;
 }
-
-Monocle.pieceLoaded('controls/contents');

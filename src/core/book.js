@@ -443,5 +443,3 @@ Monocle.Book.fromNodes = function (nodes) {
 
   return new Monocle.Book(bookData);
 }
-
-Monocle.pieceLoaded('core/book');
