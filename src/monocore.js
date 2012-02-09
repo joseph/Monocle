@@ -10,6 +10,7 @@
 //= require "core/book"
 //= require "core/place"
 //= require "core/component"
+//= require "core/billboard"
 //= require "controls/panel"
 //= require "panels/twopane"
 //= require "panels/imode"

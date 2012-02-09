@@ -86,10 +86,11 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (typeof box == "string") { box = document.getElementById(box); }
     dom = API.dom = box.dom = new Monocle.Factory(box, 'box', 0, API);
 
+    API.billboard = new Monocle.Billboard(API);
+
     if (!Monocle.Browser.env.isCompatible()) {
       if (dispatchEvent("monocle:incompatible", {}, true)) {
-        // TODO: Something cheerier? More informative?
-        box.innerHTML = "Your browser is not compatible with Monocle.";
+        API.billboard.show(k.SUPPORT_URL, { closeButton: false });
       }
       return;
     }
@@ -766,3 +767,4 @@ Monocle.Reader.DEFAULT_STYLE_RULES = [
     "height: auto !important;" +
   "}"
 ]
+Monocle.Reader.SUPPORT_URL = 'http://unsupported.monoclejs.com';
