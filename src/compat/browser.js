@@ -77,6 +77,17 @@ Monocle.Browser.iOSVersionBelow = function (strOrNum) {
 }
 
 
+// Some browser environments are too slow or too problematic for
+// special animation effects.
+//
+// FIXME: These tests are too opinionated. Replace with more targeted tests.
+//
+Monocle.Browser.renders = {
+  eInk: Monocle.Browser.on.Kindle3,
+  slow: Monocle.Browser.on.Android || Monocle.Browser.on.Blackberry
+}
+
+
 // A helper class for sniffing CSS features and creating CSS rules
 // appropriate to the current rendering engine.
 //
