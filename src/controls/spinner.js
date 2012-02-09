@@ -1,7 +1,4 @@
 Monocle.Controls.Spinner = function (reader) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Spinner(reader);
-  }
 
   var API = { constructor: Monocle.Controls.Spinner }
   var k = API.constants = API.constructor;

@@ -1,7 +1,4 @@
 Monocle.Controls.Scrubber = function (reader) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Scrubber(reader);
-  }
 
   var API = { constructor: Monocle.Controls.Scrubber }
   var k = API.constants = API.constructor;

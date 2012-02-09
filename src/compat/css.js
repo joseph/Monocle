@@ -1,3 +1,5 @@
+// A class for manipulating CSS properties in a browser-engine-aware way.
+//
 Monocle.CSS = function () {
 
   var API = { constructor: Monocle.CSS }

@@ -1,7 +1,5 @@
 Monocle.Controls.Stencil = function (reader) {
 
-  if (Monocle.Controls == this) { return new this.Stencil(reader); }
-
   var API = { constructor: Monocle.Controls.Stencil }
   var k = API.constants = API.constructor;
   var p = API.properties = {

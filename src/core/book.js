@@ -10,7 +10,6 @@
  *
  */
 Monocle.Book = function (dataSource) {
-  if (Monocle == this) { return new Monocle.Book(dataSource); }
 
   var API = { constructor: Monocle.Book }
   var k = API.constants = API.constructor;

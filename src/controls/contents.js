@@ -1,7 +1,4 @@
 Monocle.Controls.Contents = function (reader) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Contents(reader);
-  }
 
   var API = { constructor: Monocle.Controls.Contents }
   var k = API.constants = API.constructor;

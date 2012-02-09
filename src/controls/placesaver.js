@@ -1,7 +1,4 @@
 Monocle.Controls.PlaceSaver = function (bookId) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.PlaceSaver(bookId);
-  }
 
   var API = { constructor: Monocle.Controls.PlaceSaver }
   var k = API.constants = API.constructor;

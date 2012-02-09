@@ -1,3 +1,6 @@
+// A class that tests the browser environment for required capabilities and
+// known bugs (for which we have workarounds).
+//
 Monocle.Env = function () {
 
   var API = { constructor: Monocle.Env }

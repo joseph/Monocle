@@ -1,4 +1,4 @@
-Monocle.Events = {}
+Monocle.Events = {};
 
 
 // Fire a custom event on a given target element. The attached data object will

@@ -1,7 +1,4 @@
 Monocle.Flippers.Slider = function (reader) {
-  if (Monocle.Flippers == this) {
-    return new Monocle.Flippers.Slider(reader);
-  }
 
   var API = { constructor: Monocle.Flippers.Slider }
   var k = API.constants = API.constructor;

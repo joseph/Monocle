@@ -1,4 +1,4 @@
-Monocle.Browser = {}
+Monocle.Browser = {};
 
 // Compare the user-agent string to a string or regex pattern.
 //
@@ -20,6 +20,8 @@ Monocle.Browser.is = {
 }
 
 
+// Set the browser engine string.
+//
 if (Monocle.Browser.is.IE) {
   Monocle.Browser.engine = "IE";
 } else if (Monocle.Browser.is.Opera) {
@@ -29,6 +31,7 @@ if (Monocle.Browser.is.IE) {
 } else if (Monocle.Browser.is.Gecko) {
   Monocle.Browser.engine = "Gecko";
 } else {
+  console.warn("Unknown engine; assuming W3C compliant.");
   Monocle.Browser.engine = "W3C";
 }
 

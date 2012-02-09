@@ -1,9 +1,5 @@
 Monocle.Controls.Magnifier = function (reader) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Magnifier(reader);
-  }
 
-  // Public methods and properties.
   var API = { constructor: Monocle.Controls.Magnifier }
   var k = API.constants = API.constructor;
   var p = API.properties = {

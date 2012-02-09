@@ -31,9 +31,6 @@
 //  systemId: the id for root elements of components, defaults to "RS:monocle"
 //
 Monocle.Reader = function (node, bookData, options, onLoadCallback) {
-  if (Monocle == this) {
-    return new Monocle.Reader(node, bookData, options, onLoadCallback);
-  }
 
   var API = { constructor: Monocle.Reader }
   var k = API.constants = API.constructor;
