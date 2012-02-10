@@ -422,7 +422,6 @@ Monocle.Book = function (dataSource) {
 // Legacy function. Deprecated.
 //
 Monocle.Book.fromNodes = function (nodes) {
-  return new Monocle.Book(Monocle.Book.bookDataFromNodes(nodes));
+  console.deprecation("Book.fromNodes() will soon be removed.");
+  return new Monocle.Book(Monocle.bookDataFromNodes(nodes));
 }
-
-
