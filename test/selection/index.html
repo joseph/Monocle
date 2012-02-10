@@ -66,9 +66,18 @@
   <body class="narrow">
     <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
 
-    <h1>Selection events</h1>
+    <h1>Selection</h1>
     <p>
-      <!-- TODO -->
+      The Monocle.Selection object performs two roles. Firstly, it polls
+      components for any selected text.
+      It fires a <code>monocle:selection</code> event whenever text is
+      selected (and when that selection changes), and
+      fires a <code>monocle:deselection</code> event whenever all text is
+      deselected.
+    </p>
+    <p>
+      Secondly, it ensures that all text is deselected when a page turn
+      interaction commences.
     </p>
 
     <div id="reader"></div>

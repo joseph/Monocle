@@ -58,7 +58,16 @@ Monocle.Selection = function (reader) {
   // Given a window object, remove any user selections within. Trivial in
   // most browsers, but involving major mojo on iOS.
   //
-  function deselect(win) {
+  function deselect() {
+    var index = 0, frame = null;
+    while (frame = reader.dom.find('component', index)) {
+      deselectOnWindow(frame.contentWindow);
+      index += 1;
+    }
+  }
+
+
+  function deselectOnWindow(win) {
     win = win || window;
     if (!anythingSelected(win)) { return; }
 
@@ -78,11 +87,12 @@ Monocle.Selection = function (reader) {
           document.body.removeChild(inp);
         })
       });
-    } else {
     }
 
     var sel = win.getSelection();
     sel.removeAllRanges();
+    win.document.body.scrollLeft = 0;
+    win.document.body.scrollTop = 0;
   }
 
 

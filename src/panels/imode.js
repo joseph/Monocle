@@ -99,7 +99,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
     p.panels.central.contract();
 
-    deselect();
+    p.reader.selection.deselect();
 
     startCameo(function () {
       p.divs.forwards.style.width = "33%";
@@ -168,18 +168,6 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
 
     if (p.cameoListener) {
       Monocle.Events.deafen(p.divs.central, 'webkitTransitionEnd', endCameo);
-    }
-  }
-
-
-  function deselect() {
-    for (var i = 0, cmpt; cmpt = p.reader.dom.find('component', i); ++i) {
-      var sel = cmpt.contentWindow.getSelection() || cmpt.contentDocument.selection;
-      //if (sel.collapse) { sel.collapse(true); }
-      if (sel.removeAllRanges) { sel.removeAllRanges(); }
-      if (sel.empty) { sel.empty(); }
-      cmpt.contentDocument.body.scrollLeft = 0;
-      cmpt.contentDocument.body.scrollTop = 0;
     }
   }
 

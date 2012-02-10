@@ -39,7 +39,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   function turn(dir) {
     if (p.turning) { return; }
-    p.reader.selection.deselect(page().m.activeFrame.contentWindow);
+    p.reader.selection.deselect();
     moveTo({ page: getPlace().pageNumber() + dir});
   }
 

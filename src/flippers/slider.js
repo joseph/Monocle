@@ -113,15 +113,10 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
-  function deselect() {
-    p.reader.selection.deselect(upperPage().m.activeFrame.contentWindow);
-  }
-
-
   function lift(dir, boxPointX) {
     if (p.turnData.lifting || p.turnData.releasing) { return; }
 
-    deselect();
+    p.reader.selection.deselect();
 
     p.turnData.points = {
       start: boxPointX,
