@@ -25,16 +25,34 @@
 
     <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
     <script type="text/javascript">
-      Monocle.DEBUG = true;
+      (function () {
+        function init() {
+          var bd = Monocle.bookDataFromIds(['part1', 'part2']);
+          var opts = { stylesheet: 'body { color: #090; }' };
+          window.reader = Monocle.Reader('reader', bd, opts, readerLoaded);
+        }
 
-      // Initialize the reader element.
-      Monocle.Events.listen(window, 'load', function () {
-        window.reader = Monocle.Reader(
-          'reader',
-          Monocle.bookDataFromIds(['part1', 'part2']),
-          { stylesheet: "body { color: #090; }" }
-        );
-      });
+
+        function readerLoaded() {
+          var sSel = document.getElementById('sizeSelect');
+          sSel.addEventListener('change', function (evt) {
+            reader.formatting.setFontScale(parseFloat(sSel.value), true);
+          });
+
+          var cSel = document.getElementById('colorSelect');
+          cSel.addEventListener('change', function (evt) {
+            reader.formatting.updatePageStyles(
+              reader.formatting.properties.initialStyles,
+              'body { color: '+cSel.value+'; }',
+              true
+            );
+          });
+        }
+
+
+        Monocle.DEBUG = true;
+        Monocle.Events.listen(window, 'load', init);
+      })();
     </script>
 
   </head>
@@ -48,8 +66,31 @@
       turns the component's body text <span style="color: #090;">green</span>.
     </p>
 
-    <div id="reader"></div>
+    <p>
+      Font-scale:
+      <select id="sizeSelect">
+        <option value="">&mdash;</option>
+        <option value="0.1">10%</option>
+        <option value="0.5">50%</option>
+        <option value="0.8">80%</option>
+        <option value="1.0">100%</option>
+        <option value="1.1">110%</option>
+        <option value="1.3">130%</option>
+        <option value="1.6">160%</option>
+        <option value="2.0">200%</option>
+        <option value="2.5">250%</option>
+        <option value="4.0">400%</option>
+        <option value="8.0">800%</option>
+      </select>
 
+      Color:
+      <select id="colorSelect">
+        <option value="#090">Green</option>
+        <option value="#009">Blue</option>
+      </select>
+    </p>
+
+    <div id="reader"></div>
 
     <div id="part1">
       <p>

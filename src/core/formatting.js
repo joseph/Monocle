@@ -14,6 +14,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
 
 
   function initialize() {
+    p.fontScale = optScale;
     clampStylesheets(optStyles);
     p.reader.listen('monocle:componentmodify', persistOnComponentChange);
   }
@@ -36,6 +37,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   function persistOnComponentChange(evt) {
     var doc = evt.m['document'];
     doc.documentElement.id = p.reader.properties.systemId;
+    adjustFontScaleForDoc(doc, p.fontScale);
     for (var i = 0; i < p.stylesheets.length; ++i) {
       if (p.stylesheets[i]) {
         addPageStylesheet(doc, i);
@@ -59,9 +61,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
 
       var i = 0, cmpt = null;
       while (cmpt = p.reader.dom.find('component', i++)) {
-        if (cmpt.contentDocument) {
         addPageStylesheet(cmpt.contentDocument, sheetIndex);
-        }
       }
       return sheetIndex;
     }, restorePlace);
@@ -122,7 +122,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   function changingStylesheet(callback, restorePlace) {
     restorePlace = (restorePlace === false) ? false : true;
     if (restorePlace) {
-      p.reader.dispatchEvent("monocle:stylesheetchanging", {});
+      dispatchChanging();
     }
     var result = callback();
     if (restorePlace) {
@@ -132,6 +132,11 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       p.reader.recalculateDimensions(false);
     }
     return result;
+  }
+
+
+  function dispatchChanging() {
+    p.reader.dispatchEvent("monocle:stylesheetchanging", {});
   }
 
 
@@ -175,9 +180,93 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   }
 
 
+  /* FONT SCALING */
+
+  function setFontScale(scale, restorePlace) {
+    p.fontScale = scale;
+    if (restorePlace) {
+      dispatchChanging();
+    }
+    var i = 0, cmpt = null;
+    while (cmpt = p.reader.dom.find('component', i++)) {
+      adjustFontScaleForDoc(cmpt.contentDocument, scale);
+    }
+    if (restorePlace) {
+      p.reader.recalculateDimensions(true);
+      dispatchChange();
+    } else {
+      p.reader.recalculateDimensions(false);
+    }
+  }
+
+
+  function adjustFontScaleForDoc(doc, scale) {
+    var elems = doc.getElementsByTagName('*');
+    if (scale) {
+      scale = parseFloat(scale);
+      if (!doc.pfsSwept) {
+        sweepElements(doc, elems);
+      }
+
+      // Iterate over each element, applying scale to the original
+      // font-size. If a proportional font sizing is already applied to
+      // the element, update existing cssText, otherwise append new cssText.
+      //
+      for (var j = 0, jj = elems.length; j < jj; ++j) {
+        var newFs = fsProperty(elems[j].pfsOriginal, scale);
+        if (elems[j].pfsApplied) {
+          replaceFontSizeInStyle(elems[j], newFs);
+        } else {
+          elems[j].style.cssText += newFs;
+        }
+        elems[j].pfsApplied = scale;
+      }
+    } else if (doc.pfsSwept) {
+      // Iterate over each element, removing proportional font-sizing flag
+      // and property from cssText.
+      for (var j = 0, jj = elems.length; j < jj; ++j) {
+        if (elems[j].pfsApplied) {
+          var oprop = elems[j].pfsOriginalProp;
+          var opropDec = oprop ? 'font-size: '+oprop+' ! important;' : '';
+          replaceFontSizeInStyle(elems[j], opropDec);
+          elems[j].pfsApplied = null;
+        }
+      }
+
+      // Establish new baselines in case classes have changed.
+      sweepElements(doc, elems);
+    }
+  }
+
+
+  function sweepElements(doc, elems) {
+    // Iterate over each element, looking at its font size and storing
+    // the original value against the element.
+    for (var i = 0, ii = elems.length; i < ii; ++i) {
+      var currStyle = doc.defaultView.getComputedStyle(elems[i], null);
+      var fs = parseFloat(currStyle.getPropertyValue('font-size'));
+      elems[i].pfsOriginal = fs;
+      elems[i].pfsOriginalProp = elems[i].style.fontSize;
+    }
+    doc.pfsSwept = true;
+  }
+
+
+  function fsProperty(orig, scale) {
+    return 'font-size: '+(orig*scale)+'px ! important;';
+  }
+
+
+  function replaceFontSizeInStyle(elem, newProp) {
+    var lastFs = /font-size:[^;]/
+    elem.style.cssText = elem.style.cssText.replace(lastFs, newProp);
+  }
+
+
   API.addPageStyles = addPageStyles;
   API.updatePageStyles = updatePageStyles;
   API.removePageStyles = removePageStyles;
+  API.setFontScale = setFontScale;
 
   initialize();
 

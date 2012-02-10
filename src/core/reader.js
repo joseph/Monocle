@@ -24,6 +24,9 @@
 //  stylesheet: A string of CSS rules to apply to the contents of each
 //    component loaded into the reader.
 //
+//  fontScale: a float to multiply against the default font-size of each
+//    element in each component.
+//
 //  place: A book locus for the page to open to when the reader is
 //    initialized. (See comments at Book#pageNumberAt for more about
 //    the locus option).
