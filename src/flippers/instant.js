@@ -49,6 +49,7 @@ Monocle.Flippers.Instant = function (reader) {
 
 
   function turn(panel) {
+    p.reader.selection.deselect(page().m.activeFrame.contentWindow);
     var dir = panel.properties.direction;
     moveTo({ page: getPlace().pageNumber() + dir});
   }

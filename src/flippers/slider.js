@@ -3,6 +3,7 @@ Monocle.Flippers.Slider = function (reader) {
   var API = { constructor: Monocle.Flippers.Slider }
   var k = API.constants = API.constructor;
   var p = API.properties = {
+    reader: reader,
     pageCount: 2,
     activeIndex: 1,
     turnData: {}
@@ -10,7 +11,6 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function initialize() {
-    p.reader = reader;
     p.reader.listen("monocle:componentchanging", showWaitControl);
   }
 
@@ -113,8 +113,15 @@ Monocle.Flippers.Slider = function (reader) {
   }
 
 
+  function deselect() {
+    p.reader.selection.deselect(upperPage().m.activeFrame.contentWindow);
+  }
+
+
   function lift(dir, boxPointX) {
     if (p.turnData.lifting || p.turnData.releasing) { return; }
+
+    deselect();
 
     p.turnData.points = {
       start: boxPointX,
