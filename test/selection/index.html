@@ -14,6 +14,15 @@
         border: 1px solid #000;
         background-color: #CCC;
       }
+      #statusSelect {
+        margin: 20px 0;
+        background: #FFC;
+        padding: 6px;
+        visibility: hidden;
+        width: 300px;
+        height: 5em;
+        overflow: auto;
+      }
     </style>
 
     <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
@@ -21,12 +30,31 @@
       (function () {
         Monocle.DEBUG = true;
 
+        function textSelected(evt) {
+          console.log("Selection: "+evt.m.string);
+          var st = document.getElementById('statusSelect');
+          var sel = evt.m.string;
+          st.innerHTML = sel;
+          st.style.visibility = 'visible';
+        }
+
+
+        function textDeselected(evt) {
+          console.log("Deselection.");
+          var st = document.getElementById('statusSelect');
+          st.style.visibility = 'hidden';
+        }
+
 
         function init() {
           window.reader = Monocle.Reader(
             'reader',
             Monocle.bookData({ components: ['pt1.html', 'pt2.html'] }),
-            { panels: Monocle.Panels.Marginal }
+            { panels: Monocle.Panels.Marginal },
+            function (rdr) {
+              rdr.listen('monocle:selection', textSelected);
+              rdr.listen('monocle:deselection', textDeselected);
+            }
           );
         }
 
@@ -44,5 +72,8 @@
     </p>
 
     <div id="reader"></div>
+
+    <div id="statusSelect"></div>
+
   </body>
 </html>

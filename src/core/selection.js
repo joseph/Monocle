@@ -2,8 +2,57 @@ Monocle.Selection = function (reader) {
   var API = { constructor: Monocle.Selection };
   var k = API.constants = API.constructor;
   var p = API.properties = {
-    reader: reader
+    reader: reader,
+    lastSelection: []
   };
+
+
+  function initialize() {
+    if (k.SELECTION_POLLING_INTERVAL) {
+      setInterval(pollSelection, k.SELECTION_POLLING_INTERVAL);
+    }
+  }
+
+
+  function pollSelection() {
+    var index = 0, frame = null;
+    while (frame = reader.dom.find('component', index)) {
+      pollSelectionOnWindow(frame.contentWindow, index);
+      index += 1;
+    }
+  }
+
+
+  function pollSelectionOnWindow(win, index) {
+    var sel = win.getSelection();
+    var lm = p.lastSelection[index] || {};
+    var nm = p.lastSelection[index] = {
+      selected: anythingSelected(win),
+      range: sel.rangeCount ? sel.getRangeAt(0) : null,
+      string: sel.toString()
+    };
+    if (nm.selected) {
+      nm.rangeStartContainer = nm.range.startContainer;
+      nm.rangeEndContainer = nm.range.endContainer;
+      nm.rangeStartOffset = nm.range.startOffset;
+      nm.rangeEndOffset = nm.range.endOffset;
+      if (!sameRange(nm, lm)) {
+        p.reader.dispatchEvent('monocle:selection', nm);
+      }
+    } else if (lm.selected) {
+      p.reader.dispatchEvent('monocle:deselection', lm);
+    }
+  }
+
+
+  function sameRange(m1, m2) {
+    return (
+      m1.rangeStartContainer == m2.rangeStartContainer &&
+      m1.rangeEndContainer == m2.rangeEndContainer &&
+      m1.rangeStartOffset == m2.rangeStartOffset &&
+      m1.rangeEndOffset == m2.rangeEndOffset
+    );
+  }
 
 
   // Given a window object, remove any user selections within. Trivial in
@@ -86,5 +135,11 @@ Monocle.Selection = function (reader) {
 
   API.deselect = deselect;
 
+
+  initialize();
+
   return API;
 }
+
+
+Monocle.Selection.SELECTION_POLLING_INTERVAL = 250;
