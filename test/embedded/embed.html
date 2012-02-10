@@ -24,41 +24,15 @@
       Monocle.DEBUG = true;
 
       (function () {
-        var bookData = {
-          getComponents: function () {
-            return ['content/1.html', 'content/2.html'];
-          },
-          getComponent: function (cmptId) {
-            return { url: cmptId }
-          },
-          getContents: function () {
-            return [
-              {
-                title: "Part I",
-                src: "content/1.html"
-              },
-              {
-                title: "Part II",
-                src: "content/2.html"
-              }
-            ];
-          },
-          getMetaData: function(key) {
-            return { title: "Lorem Ipsum", creator: "Mr Monocle" }[key];
-          }
+        function init() {
+          var bookData = Monocle.bookData({
+            components: ['content/1.html', 'content/2.html']
+          });
+          var options = { panels: Monocle.Panels.IMode };
+          window.reader = Monocle.Reader('reader', bookData, options);
         }
 
-        // Initialize the reader element.
-        var rdrOptions = {
-          panels: Monocle.Panels.IMode
-        }
-        Monocle.Events.listen(
-          window,
-          'load',
-          function () {
-            window.reader = Monocle.Reader('reader', bookData, rdrOptions);
-          }
-        );
+        Monocle.Events.listen(window, 'load', init);
       })();
     </script>
 

@@ -97,12 +97,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     dispatchEvent("monocle:initializing");
 
-    var bk;
-    if (bookData) {
-      bk = new Monocle.Book(bookData);
-    } else {
-      bk = Monocle.Book.fromNodes([box.cloneNode(true)]);
-    }
+    bookData = bookData || Monocle.bookDataFromNodes([box.cloneNode(true)]);
+    var bk = new Monocle.Book(bookData);
+
     box.innerHTML = "";
 
     // Make sure the box div is absolutely or relatively positioned.

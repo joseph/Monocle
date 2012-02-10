@@ -28,13 +28,7 @@
       (function () {
         Monocle.DEBUG = true;
 
-        var bd = {
-          getComponents: function () { return ['pt1.html', 'pt2.html']; },
-          getComponent: function (cmptId) { return { url: cmptId } },
-          getContents: function () { return []; },
-          getMetaData: function (key) { return null; }
-        }
-
+        var bd = Monocle.bookData({ components: ['pt1.html', 'pt2.html'] });
 
         function listenFor(evtName) {
           Monocle.Events.listen('reader', evtName, report);

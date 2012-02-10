@@ -28,35 +28,7 @@
     <script type="text/javascript">
       Monocle.DEBUG = true;
 
-      var bookData = {
-        getComponents: function () {
-          return [
-            'part1',
-            'part2'
-          ];
-        },
-        getContents: function () {
-          return [
-            {
-              title: "I",
-              src: 'part1'
-            },
-            {
-              title: "II",
-              src: 'part2'
-            }
-          ]
-        },
-        getComponent: function (cmptId) {
-          return { nodes: [document.getElementById(cmptId).cloneNode(true)] };
-        },
-        getMetaData: function(key) {
-          return {
-            title: "Lorem Ipsum",
-            creator: "Monocle"
-          }[key];
-        }
-      }
+      var bookData = Monocle.bookDataFromIds(['part1', 'part2']);
 
       // Initialize the reader element.
       Monocle.Events.listen(

@@ -60,14 +60,8 @@
       (function () {
         Monocle.DEBUG = true;
 
-        var bd = {
-          getComponents: function () { return ['pt1.html', 'pt2.html']; },
-          getComponent: function (cmptId) { return { url: cmptId } },
-          getContents: function () { return []; },
-          getMetaData: function (key) { return null; }
-        }
-
         function init() {
+          var bd = Monocle.bookData({ components: ['pt1.html', 'pt2.html'] });
           var options = { stylesheet: ".hl { background: #FFC !important; }" }
           window.reader = Monocle.Reader('reader', bd, options);
         }
