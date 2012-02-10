@@ -7,6 +7,7 @@
 //= require "core/factory"
 //= require "core/events"
 //= require "core/styles"
+//= require "core/formatting"
 //= require "core/reader"
 //= require "core/book"
 //= require "core/place"

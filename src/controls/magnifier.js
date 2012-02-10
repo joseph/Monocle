@@ -28,10 +28,10 @@ Monocle.Controls.Magnifier = function (reader) {
       opacities = [0.3, 1]
       var reset = k.RESET_STYLESHEET;
       reset += "html body { font-size: "+k.MAGNIFICATION*100+"% !important; }";
-      p.sheetIndex = p.reader.addPageStyles(reset);
+      p.sheetIndex = p.reader.formatting.addPageStyles(reset);
     } else {
       opacities = [1, 0.3]
-      p.reader.removePageStyles(p.sheetIndex);
+      p.reader.formatting.removePageStyles(p.sheetIndex);
       p.sheetIndex = null;
     }
 

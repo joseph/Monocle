@@ -44,9 +44,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // DOM graph of factory-generated objects.
     graph: {},
 
-    // An array of style rules that are automatically applied to every page.
-    pageStylesheets: [],
-
     // Id applied to the HTML element of each component, can be used to scope
     // CSS rules.
     systemId: (options ? options.systemId : null) || k.DEFAULT_SYSTEM_ID,
@@ -86,7 +83,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     if (typeof box == "string") { box = document.getElementById(box); }
     dom = API.dom = box.dom = new Monocle.Factory(box, 'box', 0, API);
 
-    API.selection = new Monocle.Selection(API);
     API.billboard = new Monocle.Billboard(API);
 
     if (!Monocle.Browser.env.isCompatible()) {
@@ -112,14 +108,19 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     // Create the essential DOM elements.
     createReaderElements();
 
-    // Clamp page frames to a set of styles that reduce Monocle breakage.
-    clampStylesheets(options.stylesheet);
+    // Create the selection object.
+    API.selection = new Monocle.Selection(API);
+
+    // Create the formatting object.
+    API.formatting = new Monocle.Formatting(
+      API,
+      options.stylesheet,
+      options.fontScale
+    );
 
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
       applyStyles();
-
-      listen('monocle:componentmodify', persistPageStylesOnComponentChange);
 
       p.flipper.listenForInteraction(options.panels);
 
@@ -175,18 +176,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     dom.append('div', 'overlay');
     dispatchEvent("monocle:loading");
-  }
-
-
-  function clampStylesheets(customStylesheet) {
-    var defCSS = k.DEFAULT_STYLE_RULES;
-    if (Monocle.Browser.env.floatsIgnoreColumns) {
-      defCSS.push("html#RS\\:monocle * { float: none !important; }");
-    }
-    p.defaultStyles = addPageStyles(defCSS, false);
-    if (customStylesheet) {
-      p.initialStyles = addPageStyles(customStylesheet, false);
-    }
   }
 
 
@@ -566,145 +555,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
-  /* PAGE STYLESHEETS */
-
-  // API for adding a new stylesheet to all components. styleRules should be
-  // a string of CSS rules. restorePlace defaults to true.
-  //
-  // Returns a sheet index value that can be used with updatePageStyles
-  // and removePageStyles.
-  //
-  function addPageStyles(styleRules, restorePlace) {
-    return changingStylesheet(function () {
-      p.pageStylesheets.push(styleRules);
-      var sheetIndex = p.pageStylesheets.length - 1;
-
-      for (var i = 0; i < p.flipper.pageCount; ++i) {
-        var doc = dom.find('component', i).contentDocument;
-        addPageStylesheet(doc, sheetIndex);
-      }
-      return sheetIndex;
-    }, restorePlace);
-  }
-
-
-  // API for updating the styleRules in an existing page stylesheet across
-  // all components. Takes a sheet index value obtained via addPageStyles.
-  //
-  function updatePageStyles(sheetIndex, styleRules, restorePlace) {
-    return changingStylesheet(function () {
-      p.pageStylesheets[sheetIndex] = styleRules;
-      if (typeof styleRules.join == "function") {
-        styleRules = styleRules.join("\n");
-      }
-      for (var i = 0; i < p.flipper.pageCount; ++i) {
-        var doc = dom.find('component', i).contentDocument;
-        var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-        if (!styleTag) {
-          console.warn('No such stylesheet: ' + sheetIndex);
-          return;
-        }
-        if (styleTag.styleSheet) {
-          styleTag.styleSheet.cssText = styleRules;
-        } else {
-          styleTag.replaceChild(
-            doc.createTextNode(styleRules),
-            styleTag.firstChild
-          );
-        }
-      }
-    }, restorePlace);
-  }
-
-
-  // API for removing a page stylesheet from all components. Takes a sheet
-  // index value obtained via addPageStyles.
-  //
-  function removePageStyles(sheetIndex, restorePlace) {
-    return changingStylesheet(function () {
-      p.pageStylesheets[sheetIndex] = null;
-      for (var i = 0; i < p.flipper.pageCount; ++i) {
-        var doc = dom.find('component', i).contentDocument;
-        var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-        styleTag.parentNode.removeChild(styleTag);
-      }
-    }, restorePlace);
-  }
-
-
-  // Called when a page changes its component. Injects our current page
-  // stylesheets into the new component.
-  //
-  function persistPageStylesOnComponentChange(evt) {
-    var doc = evt.m['document'];
-    doc.documentElement.id = p.systemId;
-    for (var i = 0; i < p.pageStylesheets.length; ++i) {
-      if (p.pageStylesheets[i]) {
-        addPageStylesheet(doc, i);
-      }
-    }
-  }
-
-
-  // Wraps all API-based stylesheet changes (add, update, remove) in a
-  // brace of custom events (stylesheetchanging/stylesheetchange), and
-  // recalculates component dimensions if specified (default to true).
-  //
-  function changingStylesheet(callback, restorePlace) {
-    restorePlace = (restorePlace === false) ? false : true;
-    if (restorePlace) {
-      dispatchEvent("monocle:stylesheetchanging", {});
-    }
-    var result = callback();
-    if (restorePlace) {
-      recalculateDimensions(true);
-      Monocle.defer(
-        function () { dispatchEvent("monocle:stylesheetchange", {}); }
-      );
-    } else {
-      recalculateDimensions(false);
-    }
-    return result;
-  }
-
-
-  // Private method for adding a stylesheet to a component. Used by
-  // addPageStyles.
-  //
-  function addPageStylesheet(doc, sheetIndex) {
-    var styleRules = p.pageStylesheets[sheetIndex];
-
-    if (!styleRules) {
-      return;
-    }
-
-    var head = doc.getElementsByTagName('head')[0];
-    if (!head) {
-      head = doc.createElement('head');
-      doc.documentElement.appendChild(head);
-    }
-
-    if (typeof styleRules.join == "function") {
-      styleRules = styleRules.join("\n");
-    }
-
-    var styleTag = doc.createElement('style');
-    styleTag.type = 'text/css';
-    styleTag.id = "monStylesheet"+sheetIndex;
-    if (styleTag.styleSheet) {
-      styleTag.styleSheet.cssText = styleRules;
-    } else {
-      styleTag.appendChild(doc.createTextNode(styleRules));
-    }
-
-    head.appendChild(styleTag);
-
-    return styleTag;
-  }
-
-
   function visiblePages() {
-    return p.flipper.visiblePages ? p.flipper.visiblePages() : [dom.find('page')];
+    return p.flipper.visiblePages ?
+      p.flipper.visiblePages() :
+      [dom.find('page')];
   }
 
 
@@ -716,11 +570,32 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  /* The Reader PageStyles API is deprecated - it has moved to Formatting */
+
+  function addPageStyles(styleRules, restorePlace) {
+    console.deprecation("Use reader.formatting.addPageStyles instead.");
+    return API.formatting.addPageStyles(styleRules, restorePlace);
+  }
+
+
+  function updatePageStyles(sheetIndex, styleRules, restorePlace) {
+    console.deprecation("Use reader.formatting.updatePageStyles instead.");
+    return API.formatting.updatePageStyles(sheetIndex, styleRules, restorePlace);
+  }
+
+
+  function removePageStyles(sheetIndex, restorePlace) {
+    console.deprecation("Use reader.formatting.removePageStyles instead.");
+    return API.formatting.removePageStyles(sheetIndex, restorePlace);
+  }
+
+
   API.getBook = getBook;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
   API.skipToChapter = skipToChapter;
   API.resized = resized;
+  API.recalculateDimensions = recalculateDimensions;
   API.addControl = addControl;
   API.hideControl = hideControl;
   API.showControl = showControl;
@@ -728,10 +603,12 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   API.dispatchEvent = dispatchEvent;
   API.listen = listen;
   API.deafen = deafen;
+  API.visiblePages = visiblePages;
+
+  // Deprecated!
   API.addPageStyles = addPageStyles;
   API.updatePageStyles = updatePageStyles;
   API.removePageStyles = removePageStyles;
-  API.visiblePages = visiblePages;
 
   initialize();
 
@@ -739,30 +616,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 }
 
 
+
+Monocle.Reader.SUPPORT_URL = 'http://unsupported.monoclejs.com';
 Monocle.Reader.RESIZE_DELAY = 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
-Monocle.Reader.DEFAULT_STYLE_RULES = [
-  "html#RS\\:monocle * {" +
-    "-webkit-font-smoothing: subpixel-antialiased;" +
-    "text-rendering: auto !important;" +
-    "word-wrap: break-word !important;" +
-    "overflow: visible !important;" +
-  "}",
-  "html#RS\\:monocle body {" +
-    "margin: 0 !important;"+
-    "border: none !important;" +
-    "padding: 0 !important;" +
-    "width: 100% !important;" +
-    "position: absolute !important;" +
-    "-webkit-text-size-adjust: none;" +
-  "}",
-  "html#RS\\:monocle body * {" +
-    "max-width: 100% !important;" +
-  "}",
-  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object {" +
-    "max-height: 95% !important;" +
-    "height: auto !important;" +
-  "}"
-]
-Monocle.Reader.SUPPORT_URL = 'http://unsupported.monoclejs.com';
+Monocle.Reader.DEFAULT_STYLE_RULES = Monocle.Formatting.DEFAULT_STYLE_RULES;
