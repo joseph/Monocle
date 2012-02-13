@@ -15,6 +15,8 @@ section {
   -webkit-column-width: 300px;
   -moz-column-gap: 20px;
   -webkit-column-gap: 20px;
+  -moz-column-fill: auto;
+  -webkit-column-fill: auto;
   height: 380px;
 }
 .colCntr {

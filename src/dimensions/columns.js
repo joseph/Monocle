@@ -37,6 +37,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
     rules += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
     rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
+    rules += Monocle.Browser.css.toCSSDeclaration('column-fill', 'auto');
     rules += Monocle.Browser.css.toCSSDeclaration('transform', 'translateX(0)');
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {

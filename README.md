@@ -119,6 +119,8 @@ on GitHub).
 
 ## History
 
+2.3.1 - Fix for serious Firefox 12 bug in paginating content.
+
 2.3.0 - Smoother transitions and animations in more browsers.
 
 2.2.1 - Slider fixes for better iOS performance.
