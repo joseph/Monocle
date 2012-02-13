@@ -147,12 +147,16 @@ Monocle.Env = function () {
           "width:100%",
           "-webkit-column-width:"+testFrameSize+"px",
           "-webkit-column-gap:0",
+          "-webkit-column-fill:auto",
           "-moz-column-width:"+testFrameSize+"px",
           "-moz-column-gap:0",
+          "-moz-column-fill:auto",
           "-o-column-width:"+testFrameSize+"px",
           "-o-column-gap:0",
+          "-o-column-fill:auto",
           "column-width:"+testFrameSize+"px",
-          "column-gap:0"
+          "column-gap:0",
+          "column-fill:auto"
         ].join(";"));
         if (bd.scrollHeight > testFrameSize) {
           bd.style.cssText += ["min-width:200%", "overflow:hidden"].join(";");

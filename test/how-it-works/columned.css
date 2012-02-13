@@ -41,6 +41,14 @@ body {
   -moz-column-gap: 0;
   -o-column-gap: 0;
   column-gap: 0;
+
+  /*
+    Since Firefox 12, it's necessary to set column-fill specifically.
+  */
+  -webkit-column-fill: auto;
+  -moz-column-fill: auto;
+  -o-column-fill: auto;
+  column-fill: auto;
 }
 
 
