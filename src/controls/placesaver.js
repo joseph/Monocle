@@ -39,7 +39,7 @@ Monocle.Controls.PlaceSaver = function (bookId) {
       expires = "; expires="+d.toGMTString();
     }
     var path = "; path=/";
-    document.cookie = p.prefix + key + " = " + value + expires + path;
+    document.cookie = p.prefix + key + "=" + value + expires + path;
     return value;
   }
 
