@@ -4,7 +4,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   var k = API.constants = API.constructor;
   var p = API.properties = {
     pageCount: 1,
-    duration: 300
+    duration: k.speed
   }
 
 
@@ -119,7 +119,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
   return API;
 }
 
-Monocle.Flippers.Scroller.speed = 200; // How long the animation takes
+Monocle.Flippers.Scroller.speed = 100; // How long the animation takes
 Monocle.Flippers.Scroller.rate = 20; // frame-rate of the animation
 Monocle.Flippers.Scroller.FORWARDS = 1;
 Monocle.Flippers.Scroller.BACKWARDS = -1;
