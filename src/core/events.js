@@ -34,6 +34,7 @@ Monocle.Events.listen = function (elem, evtType, fn, useCapture) {
 // De-register a function from an event.
 //
 Monocle.Events.deafen = function (elem, evtType, fn, useCapture) {
+  if (typeof elem == "string") { elem = document.getElementById(elem); }
   return elem.removeEventListener(evtType, fn, useCapture || false);
 }
 
