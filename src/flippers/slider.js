@@ -40,21 +40,13 @@ Monocle.Flippers.Slider = function (reader) {
         console.warn("Invalid panel class.")
       }
     }
-    var q = function (action, panel, x) {
-      var dir = panel.properties.direction;
-      if (action == "lift") {
-        lift(dir, x);
-      } else if (action == "release") {
-        release(dir, x);
-      }
-    }
     p.panels = new panelClass(
       API,
       {
-        'start': function (panel, x) { q('lift', panel, x); },
-        'move': function (panel, x) { turning(panel.properties.direction, x); },
-        'end': function (panel, x) { q('release', panel, x); },
-        'cancel': function (panel, x) { q('release', panel, x); }
+        'start': lift,
+        'move': turning,
+        'end': release,
+        'cancel': release
       }
     );
   }

@@ -31,7 +31,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
     p.panels = new panelClass(
       API,
       {
-        'end': function (panel) { turn(panel.properties.direction); }
+        'end': turn
       }
     );
   }

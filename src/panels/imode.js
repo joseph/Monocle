@@ -25,7 +25,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
       p.reader.addControl(p.panels[dir]);
       p.divs[dir] = p.panels[dir].properties.div;
       p.panels[dir].listenTo(evtCallbacks);
-      p.panels[dir].properties.direction = flipper.constants[dir.toUpperCase()];
+      p.panels[dir].setDirection(flipper.constants[dir.toUpperCase()]);
       p.divs[dir].style.width = "33%";
       p.divs[dir].style[dir == "forwards" ? "right" : "left"] = 0;
     }

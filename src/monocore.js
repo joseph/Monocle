@@ -19,6 +19,7 @@
 //= require ./panels/imode
 //= require ./panels/eink
 //= require ./panels/marginal
+//= require ./panels/magic
 //= require ./dimensions/columns
 //= require ./flippers/slider
 //= require ./flippers/scroller

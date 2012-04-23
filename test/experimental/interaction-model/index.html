@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html id="topdoc">
+  <head>
+    <title>Interaction Model test</title>
+    <link rel="stylesheet" type="text/css" href="../../tests.css" />
+
+    <style>
+      #reader {
+        border: 1px dotted #F0F;
+        margin: 20px 0;
+        width: 330px;
+        height: 400px;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      .cmpt {
+        position: absolute;
+        background: #EEE;
+        width: 230px;
+        height: 300px;
+        top: 50px;
+        left: 50px;
+        bottom: 50px;
+        right: 50px;
+      }
+
+      #status {
+        font-weight: bold;
+        color: blue;
+        min-height: 1.5em;
+        white-space: pre-wrap;
+      }
+    </style>
+
+    <script type="text/javascript" src="../../../src/core/monocle.js"></script>
+    <script type="text/javascript" src="../../../src/compat/env.js"></script>
+    <script type="text/javascript" src="../../../src/compat/css.js"></script>
+    <script type="text/javascript" src="../../../src/compat/stubs.js"></script>
+    <script type="text/javascript" src="../../../src/compat/browser.js"></script>
+    <script type="text/javascript" src="../../../src/core/events.js"></script>
+
+    <script src="test.js"></script>
+  </head>
+
+  <body class="narrow">
+
+    <a href="../../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Interaction Model test</h1>
+
+    <div id="reader">
+      <iframe
+        class="cmpt"
+        id="cmpt1"
+        src="content.html"
+        scrolling="no"
+        frameborder="no"
+      ></iframe>
+      <iframe
+        class="cmpt"
+        id="cmpt2"
+        src="content.html"
+        scrolling="no"
+        frameborder="no"
+      ></iframe>
+    </div>
+
+    <div id="status"></div>
+
+    <hr />
+
+    <p>
+      Monocle will move to a new interaction model with the 3.0 release:
+    </p>
+
+    <ol>
+      <li>
+        A tap in the left/right margins immediately turns the page.
+      </li>
+      <li>
+        A horizontal swipe beginning in the left/right margins lifts
+        the page to track the cursor. If a swipe starts left and goes
+        right, go back one page. If a swipe starts right and goes left,
+        go forward one page. If a swipe starts left and goes left,
+        or starts right and goes right, cancel the lift.
+      </li>
+      <li>
+        A tap in left/right third of the content will turn page
+        unless the content cancels the action.* There
+        will be no visible indicator until the end event has fired.
+      </li>
+      <li>
+        A swipe that starts in content will turn the page in the direction
+        of the swipe <em>irrespective of where it starts</em> unless the
+        content cancels the action.* There will
+        be no visible indicator until the end event.
+      </li>
+    </ol>
+
+    <p>
+      * The content can cancel the action in two ways: 1) any of the
+      constituent events (start/move/end) are <code>defaultPrevented</code>;
+      or 2) a selection event occurs at any point.
+    </p>
+
+  </body>
+</html>

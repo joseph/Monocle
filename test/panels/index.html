@@ -62,6 +62,13 @@
             bookData,
             { panels: Monocle.Panels.eInk, flipper: Monocle.Flippers.Instant }
           );
+
+          // MAGIC
+          window.reader4 = Monocle.Reader(
+            'magic',
+            bookData,
+            { panels: Monocle.Panels.Magic }
+          );
         }
       );
     </script>
@@ -107,6 +114,14 @@
       </p>
     </div>
 
+
+    <div class="readerInfo">
+      <h2>Magic</h2>
+      <div class="reader" id="magic"></div>
+      <p>
+        Look ma, no panels!
+      </p>
+    </div>
 
 
 <div id="part1">
