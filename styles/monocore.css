@@ -51,13 +51,25 @@ div.monelem_billboard_container {
   left: 0;
   height: 100%;
   width: 100%;
-  z-index: 9999;
+  z-index: 2000;
+  -webkit-transform: scale(0);
+  -moz-transform: scale(0);
+  transform: scale(0);
+  -webkit-transform-origin: 0 0;
+  -moz-transform-origin: 0 0;
+  transform-origin: 0 0;
 }
 
-div.monelem_billboard_container iframe {
-  border: none;
-  width: 100%;
+.monelem_billboard_inner {
   height: 100%;
+  width: 100%;
+  border: none;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+div.monelem_billboard_inner {
+  background: #000;
 }
 
 div.monelem_billboard_close {
@@ -65,7 +77,7 @@ div.monelem_billboard_close {
   top: 0;
   right: 0;
   width: 50px;
-  height: 20px;
+  height: 30px;
   color: white;
   background: #C00;
   cursor: pointer;
@@ -78,7 +90,7 @@ div.monelem_billboard_close:after {
   display: block;
   content: 'Close';
   width: 100%;
-  line-height: 20px;
+  line-height: 30px;
   text-align: center;
 }
 

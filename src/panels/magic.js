@@ -36,19 +36,14 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
       }
       initListeners();
     });
+
+    p.reader.listen('monocle:magic:init', initListeners);
+    p.reader.listen('monocle:magic:stop', stopListeners);
   }
 
 
   function initListeners() {
-    // FIXME: also kludgy
-    if (p.startListeners.length) {
-      for (var j = 0, jj = p.startListeners.length; j < jj; ++j) {
-        Monocle.Events.deafenForContact(
-          p.startListeners[j][0],
-          p.startListeners[j][1]
-        );
-      }
-    }
+    stopListeners();
 
     p.startListeners = [];
 
@@ -68,6 +63,19 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
           { 'start': translatorFunction(p.parts.cmpts[i], cmptContactStart) }
         )
       ]);
+    }
+  }
+
+
+  function stopListeners() {
+    // FIXME: also kludgy
+    if (p.startListeners.length) {
+      for (var j = 0, jj = p.startListeners.length; j < jj; ++j) {
+        Monocle.Events.deafenForContact(
+          p.startListeners[j][0],
+          p.startListeners[j][1]
+        );
+      }
     }
   }
 

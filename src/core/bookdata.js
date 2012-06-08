@@ -24,7 +24,8 @@ Monocle.bookData = function (data) {
     },
     getMetaData: function (key) {
       return (data.metadata || {})[key];
-    }
+    },
+    data: data
   }
 }
 
