@@ -29,6 +29,9 @@ Monocle.Billboard = function (reader) {
       if (p.inner.offsetHeight > elem.offsetHeight) {
         p.inner.style.paddingTop = (p.inner.offsetHeight - elem.offsetHeight) / 2 + 'px';
       }
+      if (p.inner.offsetWidth > elem.offsetWidth) {
+        p.inner.style.paddingLeft = (p.inner.offsetWidth - elem.offsetWidth) / 2 + 'px';
+      }
     } else {
       p.inner.scrollLeft = 1;
     }
@@ -40,10 +43,7 @@ Monocle.Billboard = function (reader) {
 
   function hide(evt) {
     shrink();
-    if (evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-    }
+    p.reader.dispatchEvent('monocle:magic:init');
     Monocle.Events.afterTransition(p.cntr, remove);
   }
 

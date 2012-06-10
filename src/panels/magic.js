@@ -23,20 +23,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     }
     initListeners();
 
-    // FIXME: kludgy stencil replacement
-    p.reader.listen('monocle:componentmodify', function (evt) {
-      var links = evt.m.document.getElementsByTagName('a');
-      for (var j = 0, jj = links.length; j < jj; ++j) {
-        if (links[j].getAttribute('href')) {
-          links[j].setAttribute('target', '_blank');
-          var stop = function (e) { e.preventDefault(); }
-          Monocle.Events.listen(links[j], 'mouseup', stop);
-          Monocle.Events.listen(links[j], 'touchend', stop);
-        }
-      }
-      initListeners();
-    });
-
+    p.reader.listen('monocle:componentmodify', initListeners);
     p.reader.listen('monocle:magic:init', initListeners);
     p.reader.listen('monocle:magic:stop', stopListeners);
   }
@@ -44,6 +31,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
 
   function initListeners() {
     stopListeners();
+    console.log('magic:init');
 
     p.startListeners = [];
 
@@ -68,6 +56,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
 
 
   function stopListeners() {
+    console.log('magic:stop');
     // FIXME: also kludgy
     if (p.startListeners.length) {
       for (var j = 0, jj = p.startListeners.length; j < jj; ++j) {
