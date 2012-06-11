@@ -8,35 +8,38 @@ Monocle.Billboard = function (reader) {
 
 
   function show(urlOrElement, options) {
+    p.reader.dispatchEvent('monocle:magic:stop');
+    if (p.cntr) { return console.warn("Modal billboard already showing."); }
+
     var options = options || {};
     var elem = urlOrElement;
+    var inner = null;
     p.cntr = reader.dom.append('div', k.CLS.cntr);
     if (typeof urlOrElement == 'string') {
       var url = urlOrElement;
-      p.inner = elem = p.cntr.dom.append('iframe', k.CLS.inner);
+      inner = elem = p.cntr.dom.append('iframe', k.CLS.inner);
       elem.setAttribute('src', url);
     } else {
-      p.inner = p.cntr.dom.append('div', k.CLS.inner);
-      p.inner.appendChild(elem);
+      inner = p.cntr.dom.append('div', k.CLS.inner);
+      inner.appendChild(elem);
     }
     if (options.closeButton != false) {
       var cBtn = p.cntr.dom.append('div', k.CLS.closeButton);
       Monocle.Events.listenForTap(cBtn, hide);
     }
     if (options.scrollTo == 'center') {
-      p.inner.scrollLeft = (p.inner.scrollWidth - p.inner.offsetWidth) / 2;
-      p.inner.scrollTop = (p.inner.scrollHeight - p.inner.offsetHeight) / 2;
-      if (p.inner.offsetHeight > elem.offsetHeight) {
-        p.inner.style.paddingTop = (p.inner.offsetHeight - elem.offsetHeight) / 2 + 'px';
+      inner.scrollLeft = (inner.scrollWidth - inner.offsetWidth) / 2;
+      inner.scrollTop = (inner.scrollHeight - inner.offsetHeight) / 2;
+      if (inner.offsetHeight > elem.offsetHeight) {
+        inner.style.paddingTop = (inner.offsetHeight-elem.offsetHeight)/2+'px';
       }
-      if (p.inner.offsetWidth > elem.offsetWidth) {
-        p.inner.style.paddingLeft = (p.inner.offsetWidth - elem.offsetWidth) / 2 + 'px';
+      if (inner.offsetWidth > elem.offsetWidth) {
+        inner.style.paddingLeft = (inner.offsetWidth-elem.offsetWidth)/2+'px';
       }
     } else {
-      p.inner.scrollLeft = 1;
+      inner.scrollLeft = 1;
     }
     shrink(options.from);
-    p.reader.dispatchEvent('monocle:magic:stop');
     Monocle.defer(grow);
   }
 
@@ -58,12 +61,17 @@ Monocle.Billboard = function (reader) {
     p.from = from || p.from || [0,0];
     var x = p.from[0]+'px';
     var y = p.from[1]+'px';
-    Monocle.Styles.affix(p.cntr, 'transform', 'translate('+x+','+y+') scale(0)');
+    Monocle.Styles.affix(
+      p.cntr,
+      'transform',
+      'translate('+x+','+y+') scale(0)'
+    );
   }
 
 
   function remove () {
     p.cntr.parentNode.removeChild(p.cntr);
+    p.cntr = null;
     p.reader.dispatchEvent('monocle:magic:init');
   }
 
