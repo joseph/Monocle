@@ -13,32 +13,23 @@ Monocle.Billboard = function (reader) {
 
     var options = options || {};
     var elem = urlOrElement;
-    var inner = null;
     p.cntr = reader.dom.append('div', k.CLS.cntr);
     if (typeof urlOrElement == 'string') {
       var url = urlOrElement;
-      inner = elem = p.cntr.dom.append('iframe', k.CLS.inner);
+      p.inner = elem = p.cntr.dom.append('iframe', k.CLS.inner);
       elem.setAttribute('src', url);
     } else {
-      inner = p.cntr.dom.append('div', k.CLS.inner);
-      inner.appendChild(elem);
+      p.inner = p.cntr.dom.append('div', k.CLS.inner);
+      p.inner.appendChild(elem);
     }
+    p.dims = [elem.offsetWidth, elem.offsetHeight];
     if (options.closeButton != false) {
       var cBtn = p.cntr.dom.append('div', k.CLS.closeButton);
       Monocle.Events.listenForTap(cBtn, hide);
     }
-    if (options.scrollTo == 'center') {
-      inner.scrollLeft = (inner.scrollWidth - inner.offsetWidth) / 2;
-      inner.scrollTop = (inner.scrollHeight - inner.offsetHeight) / 2;
-      if (inner.offsetHeight > elem.offsetHeight) {
-        inner.style.paddingTop = (inner.offsetHeight-elem.offsetHeight)/2+'px';
-      }
-      if (inner.offsetWidth > elem.offsetWidth) {
-        inner.style.paddingLeft = (inner.offsetWidth-elem.offsetWidth)/2+'px';
-      }
-    } else {
-      inner.scrollLeft = 1;
-    }
+    align(options.align || 'left top');
+    p.reader.listen('monocle:resize', align);
+
     shrink(options.from);
     Monocle.defer(grow);
   }
@@ -46,7 +37,6 @@ Monocle.Billboard = function (reader) {
 
   function hide(evt) {
     shrink();
-    p.reader.dispatchEvent('monocle:magic:init');
     Monocle.Events.afterTransition(p.cntr, remove);
   }
 
@@ -71,19 +61,51 @@ Monocle.Billboard = function (reader) {
 
   function remove () {
     p.cntr.parentNode.removeChild(p.cntr);
-    p.cntr = null;
+    p.cntr = p.inner = null;
+    p.reader.deafen('monocle:resize', align);
     p.reader.dispatchEvent('monocle:magic:init');
+  }
+
+
+  function align(loc) {
+    p.alignment = (typeof loc == 'string') ? loc : p.alignment;
+    if (!p.alignment) { return; }
+    if (p.dims[0] > p.inner.offsetWidth || p.dims[1] > p.inner.offsetHeight) {
+      p.cntr.dom.addClass(k.CLS.oversized);
+    } else {
+      p.cntr.dom.removeClass(k.CLS.oversized);
+    }
+
+    var s = p.alignment.split(' ');
+    var l = 0, t = 0;
+    var w = (p.inner.scrollWidth - p.inner.offsetWidth);
+    var h = (p.inner.scrollHeight - p.inner.offsetHeight);
+    if (s[0] == 'center') {
+      l = w / 2;
+    } else if (s[0] == 'right') {
+      l = w;
+    }
+    if (!s[1] || s[1] == 'center') {
+      t =  h / 2;
+    } else if (s[1] == 'bottom') {
+      t = h;
+    }
+    p.inner.scrollLeft = l;
+    p.inner.scrollTop = t;
   }
 
 
   API.show = show;
   API.hide = hide;
+  API.align= align;
 
   return API;
 }
 
+
 Monocle.Billboard.CLS = {
   cntr: 'billboard_container',
   inner: 'billboard_inner',
-  closeButton: 'billboard_close'
+  closeButton: 'billboard_close',
+  oversized: 'billboard_oversized'
 }

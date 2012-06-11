@@ -69,8 +69,16 @@ div.monelem_billboard_container {
 }
 
 div.monelem_billboard_inner {
+  min-width: 100%;
+  min-height: 100%;
   background: #000;
+  text-align: center;
+  vertical-align: middle;
+  display: -webkit-box;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
 }
+
 
 div.monelem_billboard_close {
   position: absolute;
