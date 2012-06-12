@@ -101,8 +101,6 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
 
     var doc = pageDiv.m.activeFrame.contentDocument;
     var offset = getOffset(pageDiv);
-    // BROWSERHACK: Gecko doesn't subtract translations from GBCR values.
-    if (Monocle.Browser.is.Gecko) { offset.l = 0; }
 
     for (var b = 0, bb = p.behaviors.length; b < bb; ++b) {
       var bhvr = p.behaviors[b];
