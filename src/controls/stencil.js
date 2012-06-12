@@ -1,10 +1,10 @@
-Monocle.Controls.Stencil = function (reader, behaviors) {
+Monocle.Controls.Stencil = function (reader, behaviorClasses) {
 
   var API = { constructor: Monocle.Controls.Stencil }
   var k = API.constants = API.constructor;
   var p = API.properties = {
     reader: reader,
-    behaviors: behaviors || [ new Monocle.Controls.Stencil.Links(API) ],
+    behaviors: [],
     components: {},
     masks: []
   }
@@ -13,6 +13,10 @@ Monocle.Controls.Stencil = function (reader, behaviors) {
   // Create the stencil container and listen for draw/update events.
   //
   function createControlElements(holder) {
+    behaviorClasses = behaviorClasses || k.DEFAULT_BEHAVIORS;
+    for (var i = 0, ii = behaviorClasses.length; i < ii; ++i) {
+      addBehavior(behaviorClasses[i]);
+    }
     p.container = holder.dom.make('div', k.CLS.container);
     p.reader.listen('monocle:turn', update);
     p.reader.listen('monocle:stylesheetchange', update);
@@ -22,13 +26,21 @@ Monocle.Controls.Stencil = function (reader, behaviors) {
   }
 
 
-  function addBehavior(bhvr) {
+  // Pass this method an object that responds to 'findElements(doc)' with
+  // an array of DOM elements for that document, and to 'fitMask(elem, mask)'.
+  //
+  // After you have added all your behaviors this way, you would typically
+  // call update() to make them take effect immediately.
+  //
+  function addBehavior(bhvrClass) {
+    var bhvr = new bhvrClass(API);
     if (typeof bhvr.findElements != 'function') {
-      console.warn('Missing "findElements" property for behavior: %o', bhvr);
-      return;
+      console.warn('Missing "findElements" method for behavior: %o', bhvr);
+    }
+    if (typeof bhvr.fitMask != 'function') {
+      console.warn('Missing "fitMask" method for behavior: %o', bhvr);
     }
     p.behaviors.push(bhvr);
-    update();
   }
 
 
@@ -37,8 +49,11 @@ Monocle.Controls.Stencil = function (reader, behaviors) {
   // rectangular locations).
   //
   function update() {
-    var pageDiv = p.reader.visiblePages()[0];
+    var visPages = p.reader.visiblePages();
+    if (!visPages || !visPages.length) { return; }
+    var pageDiv = visPages[0];
     var cmptId = pageComponentId(pageDiv);
+    if (!cmptId) { return; }
     p.components[cmptId] = null;
     calculateRectangles(pageDiv);
     draw();
@@ -168,6 +183,7 @@ Monocle.Controls.Stencil = function (reader, behaviors) {
   //
   function pageComponentId(pageDiv) {
     pageDiv = pageDiv || p.reader.visiblePages()[0];
+    if (!pageDiv.m.activeFrame.m.component) { return; }
     return pageDiv.m.activeFrame.m.component.properties.id;
   }
 
@@ -250,6 +266,8 @@ Monocle.Controls.Stencil.CLS = {
   mask: 'controls_stencil_mask',
   highlights: 'controls_stencil_highlighted'
 }
+
+Monocle.Controls.Stencil.DEFAULT_BEHAVIORS = [Monocle.Controls.Stencil.Links];
 
 
 Monocle.Controls.Stencil.Links = function (stencil) {

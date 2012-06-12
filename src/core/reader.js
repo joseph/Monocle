@@ -95,7 +95,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       return;
     }
 
-    dispatchEvent("monocle:initializing");
+    dispatchEvent("monocle:initializing", API);
 
     bookData = bookData || Monocle.bookDataFromNodes([box.cloneNode(true)]);
     var bk = new Monocle.Book(bookData);
@@ -130,7 +130,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       setBook(bk, options.place, function () {
         p.initialized = true;
         if (onLoadCallback) { onLoadCallback(API); }
-        dispatchEvent("monocle:loaded");
+        dispatchEvent("monocle:loaded", API);
       });
     });
   }
@@ -178,7 +178,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       p.flipper.addPage(page);
     }
     dom.append('div', 'overlay');
-    dispatchEvent("monocle:loading");
+    dispatchEvent("monocle:loading", API);
   }
 
 
