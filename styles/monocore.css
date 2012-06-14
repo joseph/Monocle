@@ -65,7 +65,7 @@ div.monelem_billboard_container {
   width: 100%;
   border: none;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  /*-webkit-overflow-scrolling: touch;*/ /* This is sexy, but crashy. */
 }
 
 div.monelem_billboard_inner {

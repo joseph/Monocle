@@ -8,7 +8,8 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     parts: {},
     action: {},
     contacts: [],
-    startListeners: []
+    startListeners: [],
+    disabled: false
   }
 
 
@@ -25,15 +26,41 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
 
     p.reader.listen('monocle:componentmodify', initListeners);
     p.reader.listen('monocle:magic:init', initListeners);
-    p.reader.listen('monocle:magic:stop', stopListeners);
+    p.reader.listen('monocle:magic:halt', haltListeners);
+    p.reader.listen('monocle:modal:on', disable);
+    p.reader.listen('monocle:modal:off', enable);
   }
 
 
-  function initListeners() {
-    stopListeners();
-    console.log('magic:init');
+  function initListeners(evt) {
+    //console.log('magic:init');
+    stopListening();
+    startListening();
+  }
 
-    p.startListeners = [];
+
+  function haltListeners(evt) {
+    //console.log('magic:halt');
+    stopListening();
+  }
+
+
+  function disable(evt) {
+    //console.log('modal:on - halting magic');
+    stopListening();
+    p.disabled = true;
+  }
+
+
+  function enable(evt) {
+    //console.log('modal:off - initing magic');
+    p.disabled = false;
+    startListening();
+  }
+
+
+  function startListening() {
+    if (p.disabled || p.startListeners.length) { return; }
 
     p.startListeners.push([
       p.parts.reader,
@@ -55,17 +82,15 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
   }
 
 
-  function stopListeners() {
-    console.log('magic:stop');
-    // FIXME: also kludgy
-    if (p.startListeners.length) {
-      for (var j = 0, jj = p.startListeners.length; j < jj; ++j) {
-        Monocle.Events.deafenForContact(
-          p.startListeners[j][0],
-          p.startListeners[j][1]
-        );
-      }
+  function stopListening() {
+    if (p.disabled || !p.startListeners.length) { return; }
+    for (var j = 0, jj = p.startListeners.length; j < jj; ++j) {
+      Monocle.Events.deafenForContact(
+        p.startListeners[j][0],
+        p.startListeners[j][1]
+      );
     }
+    p.startListeners = [];
   }
 
 
@@ -233,6 +258,9 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     }
   }
 
+
+  API.enable = enable;
+  API.disable = disable;
 
   initialize();
 

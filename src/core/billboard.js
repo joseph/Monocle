@@ -8,7 +8,7 @@ Monocle.Billboard = function (reader) {
 
 
   function show(urlOrElement, options) {
-    p.reader.dispatchEvent('monocle:magic:stop');
+    p.reader.dispatchEvent('monocle:modal:on');
     if (p.cntr) { return console.warn("Modal billboard already showing."); }
 
     var options = options || {};
@@ -42,7 +42,7 @@ Monocle.Billboard = function (reader) {
 
 
   function grow() {
-    Monocle.Styles.transitionFor(p.cntr, 'transform', 300, 'ease-in');
+    Monocle.Styles.transitionFor(p.cntr, 'transform', k.ANIM_MS, 'ease-in');
     Monocle.Styles.affix(p.cntr, 'transform', 'translate(0, 0) scale(1)');
   }
 
@@ -63,7 +63,7 @@ Monocle.Billboard = function (reader) {
     p.cntr.parentNode.removeChild(p.cntr);
     p.cntr = p.inner = null;
     p.reader.deafen('monocle:resize', align);
-    p.reader.dispatchEvent('monocle:magic:init');
+    p.reader.dispatchEvent('monocle:modal:off');
   }
 
 
@@ -76,16 +76,20 @@ Monocle.Billboard = function (reader) {
       p.cntr.dom.removeClass(k.CLS.oversized);
     }
 
-    var s = p.alignment.split(' ');
+    var s = p.alignment.split(/\s+/);
     var l = 0, t = 0;
     var w = (p.inner.scrollWidth - p.inner.offsetWidth);
     var h = (p.inner.scrollHeight - p.inner.offsetHeight);
-    if (s[0] == 'center') {
+    if (s[0].match(/^\d+$/)) {
+      l = Math.max(0, parseInt(s[0]) - (p.inner.offsetWidth / 2));
+    } else if (s[0] == 'center') {
       l = w / 2;
     } else if (s[0] == 'right') {
       l = w;
     }
-    if (!s[1] || s[1] == 'center') {
+    if (s[1] && s[1].match(/^\d+$/)) {
+      t = Math.max(0, parseInt(s[1]) - (p.inner.offsetHeight / 2));
+    } else if (!s[1] || s[1] == 'center') {
       t =  h / 2;
     } else if (s[1] == 'bottom') {
       t = h;
@@ -109,3 +113,5 @@ Monocle.Billboard.CLS = {
   closeButton: 'billboard_close',
   oversized: 'billboard_oversized'
 }
+
+Monocle.Billboard.ANIM_MS = 400;

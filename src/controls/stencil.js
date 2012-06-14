@@ -200,7 +200,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   function createMask(element, bhvr) {
     var mask = p.container.dom.append(bhvr.maskTagName || 'div', k.CLS.mask);
     Monocle.Events.listenForContact(mask, {
-      start: function () { p.reader.dispatchEvent('monocle:magic:stop'); },
+      start: function () { p.reader.dispatchEvent('monocle:magic:halt'); },
       end: function () { p.reader.dispatchEvent('monocle:magic:init'); }
     });
     bhvr.fitMask(element, mask);
