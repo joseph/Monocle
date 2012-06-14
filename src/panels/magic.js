@@ -151,6 +151,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
 
   function readerContactEnd(evt) {
     p.action.endX = evt.m.readerX;
+    p.action.endY = evt.m.readerY;
     invoke('end', evt);
     p.action = {};
   }
@@ -180,13 +181,18 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     if (actionIsEmpty()) { return; }
     if (actionIsCancelled(evt)) { return resetAction(); }
     p.action.endX = evt.m.readerX;
+    p.action.endY = evt.m.readerY;
     if (Math.abs(p.action.endX - p.action.startX) < k.LEEWAY) {
       p.action.dir = p.action.startX > halfway() ? k.FORWARDS : k.BACKWARDS;
     } else {
       p.action.dir = p.action.startX > p.action.endX ? k.FORWARDS : k.BACKWARDS;
     }
-    invoke('start', evt);
-    invoke('end', evt);
+    if (true) {
+      p.menuCallbacks.end(p.action.dir, evt.m.offsetX, evt.m.offsetY, API);
+    } else {
+      invoke('start', evt);
+      invoke('end', evt);
+    }
     p.action = {};
   }
 
@@ -259,8 +265,14 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
   }
 
 
+  function menuCallbacks(callbacks) {
+    p.menuCallbacks = callbacks;
+  }
+
+
   API.enable = enable;
   API.disable = disable;
+  API.menuCallbacks = menuCallbacks;
 
   initialize();
 
