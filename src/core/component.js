@@ -126,10 +126,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
   //
   function loadFrameFromJavaScript(src, frame, callback) {
     src = "javascript:'"+src+"';";
-    frame.onload = function () {
-      frame.onload = null;
+    var fn = function () {
+      Monocle.Events.deafen(iframe, 'DOMContentLoaded', fn);
       Monocle.defer(callback);
     }
+    Monocle.Events.listen(iframe, 'DOMContentLoaded', fn);
     frame.src = src;
   }
 
