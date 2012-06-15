@@ -265,7 +265,6 @@ Monocle.Controls.Stencil.CLS = {
   highlights: 'controls_stencil_highlighted'
 }
 
-Monocle.Controls.Stencil.DEFAULT_BEHAVIORS = [Monocle.Controls.Stencil.Links];
 
 
 Monocle.Controls.Stencil.Links = function (stencil) {
@@ -338,3 +337,6 @@ Monocle.Controls.Stencil.Links = function (stencil) {
 
   return API;
 }
+
+
+Monocle.Controls.Stencil.DEFAULT_BEHAVIORS = [Monocle.Controls.Stencil.Links];
