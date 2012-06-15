@@ -187,9 +187,14 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     } else {
       p.action.dir = p.action.startX > p.action.endX ? k.FORWARDS : k.BACKWARDS;
     }
-    if (true) {
-      p.menuCallbacks.end(p.action.dir, evt.m.offsetX, evt.m.offsetY, API);
-    } else {
+
+    var rr = p.parts.reader.getBoundingClientRect();
+    var evtData = {
+      start: { x: p.action.startX, y: p.action.startY },
+      end: { x: p.action.endX, y: p.action.endY },
+      max: { x: rr.right - rr.left, y: rr.bottom - rr.top }
+    }
+    if (p.reader.dispatchEvent('monocle:magic:contact', evtData, true)) {
       invoke('start', evt);
       invoke('end', evt);
     }
@@ -265,14 +270,8 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
   }
 
 
-  function menuCallbacks(callbacks) {
-    p.menuCallbacks = callbacks;
-  }
-
-
   API.enable = enable;
   API.disable = disable;
-  API.menuCallbacks = menuCallbacks;
 
   initialize();
 
