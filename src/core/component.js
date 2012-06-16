@@ -127,10 +127,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function loadFrameFromJavaScript(src, frame, callback) {
     src = "javascript:'"+src+"';";
     var fn = function () {
-      Monocle.Events.deafen(iframe, 'DOMContentLoaded', fn);
+      Monocle.Events.deafen(frame, 'load', fn);
       Monocle.defer(callback);
     }
-    Monocle.Events.listen(iframe, 'DOMContentLoaded', fn);
+    Monocle.Events.listen(frame, 'load', fn);
     frame.src = src;
   }
 
@@ -147,10 +147,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
       url = link.href;
       delete(link);
     }
-    frame.onload = function () {
-      frame.onload = null;
+    var fn = function () {
+      Monocle.Events.deafen(frame, 'load', fn);
       Monocle.defer(callback);
     }
+    Monocle.Events.listen(frame, 'load', fn);
     frame.contentWindow.location.replace(url);
   }
 
