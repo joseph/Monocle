@@ -22,7 +22,10 @@ Monocle.Billboard = function (reader) {
       p.inner = p.cntr.dom.append('div', k.CLS.inner);
       p.inner.appendChild(elem);
     }
-    p.dims = [elem.offsetWidth, elem.offsetHeight];
+    p.dims = [
+      elem.naturalWidth || elem.offsetWidth,
+      elem.naturalHeight || elem.offsetHeight
+    ];
     if (options.closeButton != false) {
       var cBtn = p.cntr.dom.append('div', k.CLS.closeButton);
       Monocle.Events.listenForTap(cBtn, hide);
