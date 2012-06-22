@@ -218,6 +218,7 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 // need to.
 Monocle.Events.listenForTap = function (elem, fn, activeClass) {
   var startPos;
+  var elemRect;
 
   // On Kindle, register a noop function with click to make the elem a
   // cursor target.
@@ -231,6 +232,10 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
   }
 
   var annulIfOutOfBounds = function (evt) {
+    // Do nothing if annulled.
+    if (!startPos) {
+      return;
+    }
     // We don't have to track this nonsense for mouse events.
     if (evt.type.match(/^mouse/)) {
       return;
@@ -239,6 +244,14 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
     if (Monocle.Browser.is.MobileSafari && Monocle.Browser.iOSVersion < "3.2") {
       return;
     }
+    // Check whether element has changed location (due to scrolling?).
+    if (elemRect) {
+      var newRect = elem.getBoundingClientRect();
+      if (newRect.left != elemRect.left || newRect.top != elemRect.top) {
+        annul();
+      }
+    }
+    // Check whether contact has left the bounds of the element.
     if (
       evt.m.registrantX < 0 || evt.m.registrantX > elem.offsetWidth ||
       evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
@@ -252,6 +265,9 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
     {
       start: function (evt) {
         startPos = [evt.m.pageX, evt.m.pageY];
+        if (elem.getBoundingClientRect) {
+          elemRect = elem.getBoundingClientRect();
+        }
         if (activeClass && elem.dom) { elem.dom.addClass(activeClass); }
       },
       move: annulIfOutOfBounds,
