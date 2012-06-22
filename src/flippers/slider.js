@@ -296,6 +296,7 @@ Monocle.Flippers.Slider = function (reader) {
 
   function lifted(x) {
     p.turnData.lifting = false;
+    p.reader.dispatchEvent('monocle:turning');
     var releaseArgs = p.turnData.releaseArgs;
     if (releaseArgs) {
       p.turnData.releaseArgs = null;

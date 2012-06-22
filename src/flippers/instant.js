@@ -51,6 +51,7 @@ Monocle.Flippers.Instant = function (reader) {
   function turn(dir) {
     p.reader.selection.deselect();
     moveTo({ page: getPlace().pageNumber() + dir});
+    p.reader.dispatchEvent('monocle:turning');
   }
 
 

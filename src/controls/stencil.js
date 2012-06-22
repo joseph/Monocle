@@ -18,6 +18,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
       addBehavior(behaviorClasses[i]);
     }
     p.container = holder.dom.make('div', k.CLS.container);
+    p.reader.listen('monocle:turning', clear);
     p.reader.listen('monocle:turn', update);
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
@@ -60,6 +61,14 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   }
 
 
+  // Removes any existing masks.
+  function clear() {
+    while (p.container.childNodes.length) {
+      p.container.removeChild(p.container.lastChild);
+    }
+  }
+
+
   // Aligns the stencil container to the shape of the page, then moves the
   // masks to sit above any currently visible rectangles.
   //
@@ -74,9 +83,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
     alignToComponent(pageDiv);
 
     // Clear old masks.
-    while (p.container.childNodes.length) {
-      p.container.removeChild(p.container.lastChild);
-    }
+    clear();
 
     // Layout the masks.
     if (!p.disabled) {
