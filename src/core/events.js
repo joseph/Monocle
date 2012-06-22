@@ -274,7 +274,8 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
       end: function (evt) {
         annulIfOutOfBounds(evt);
         if (startPos) {
-          evt.m.startOffset = startPos;
+          evt.m.pageXStart = startPos[0];
+          evt.m.pageYStart = startPos[1];
           fn(evt);
         }
         annul();
