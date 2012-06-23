@@ -275,13 +275,13 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function afterCancellingForward() {
-    resetTurnData();
+    announceCancel();
   }
 
 
   function afterCancellingBackward() {
     flipPages(); // flip upper to lower
-    jumpIn(lowerPage(), function () { prepareNextPage(resetTurnData); });
+    jumpIn(lowerPage(), function () { prepareNextPage(announceCancel); });
   }
 
 
@@ -309,6 +309,12 @@ Monocle.Flippers.Slider = function (reader) {
 
   function announceTurn() {
     p.reader.dispatchEvent('monocle:turn');
+    resetTurnData();
+  }
+
+
+  function announceCancel() {
+    p.reader.dispatchEvent('monocle:turn:cancel');
     resetTurnData();
   }
 
