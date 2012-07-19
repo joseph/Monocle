@@ -404,6 +404,20 @@ Monocle.Book = function (dataSource) {
   }
 
 
+  function componentWeights() {
+    if (!p.weights) {
+      p.weights = dataSource.getMetaData('componentWeights') || [];
+      if (!p.weights.length) {
+        var cmptSize = 1.0 / p.componentIds.length;
+        for (var i = 0, ii = p.componentIds.length; i < ii; ++i) {
+          p.weights.push(cmptSize);
+        }
+      }
+    }
+    return p.weights;
+  }
+
+
   API.getMetaData = dataSource.getMetaData;
   API.pageNumberAt = pageNumberAt;
   API.setPageAt = setPageAt;
@@ -412,6 +426,7 @@ Monocle.Book = function (dataSource) {
   API.chaptersForComponent = chaptersForComponent;
   API.locusOfChapter = locusOfChapter;
   API.isValidLocus = isValidLocus;
+  API.componentWeights = componentWeights;
 
   initialize();
 
