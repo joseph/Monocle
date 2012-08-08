@@ -478,6 +478,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       var overlay = dom.find('overlay');
       overlay.style.display = "none";
       Monocle.Events.deafenForContact(overlay, overlay.listeners);
+      if (controlData.controlType != 'hud') {
+        dispatchEvent('monocle:modal:off');
+      }
     }
     controlData.hidden = true;
     if (ctrl.properties) {
@@ -506,6 +509,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         }
       }
       overlay.style.display = "block";
+      dispatchEvent('monocle:modal:on');
     }
 
     for (var i = 0; i < controlData.elements.length; ++i) {
