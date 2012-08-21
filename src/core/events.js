@@ -245,7 +245,7 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
       return;
     }
     // Check whether element has changed location (due to scrolling?).
-    if (elemRect) {
+    if (elemRect && !activeClass) {
       var newRect = elem.getBoundingClientRect();
       if (newRect.left != elemRect.left || newRect.top != elemRect.top) {
         annul();
