@@ -171,7 +171,8 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
         left: cr.left+"px",
         top: cr.top+"px",
         width: cr.width+"px",
-        height: cr.height+"px"
+        height: cr.height+"px",
+        position: 'absolute'
       });
       mask.stencilRect = cr;
     }
