@@ -350,10 +350,10 @@ Monocle.Book = function (dataSource) {
       return p.chapters[cmptId];
     }
     p.chapters[cmptId] = [];
-    var matcher = new RegExp('^'+cmptId+"(\#(.+)|$)");
+    var matcher = new RegExp('^'+decodeURIComponent(cmptId)+"(\#(.+)|$)");
     var matches;
     var recurser = function (chp) {
-      if (matches = chp.src.match(matcher)) {
+      if (matches = decodeURIComponent(chp.src).match(matcher)) {
         p.chapters[cmptId].push({
           title: chp.title,
           fragment: matches[2] || null
@@ -400,7 +400,11 @@ Monocle.Book = function (dataSource) {
 
 
   function componentIdMatching(str) {
-    return p.componentIds.indexOf(str) >= 0 ? str : null;
+    str = decodeURIComponent(str);
+    for (var i = 0, ii = p.componentIds.length; i < ii; ++i) {
+      if (decodeURIComponent(p.componentIds[i]) == str) { return str; }
+    }
+    return null;
   }
 
 
