@@ -107,6 +107,7 @@ Monocle.Styles.page = {
   "z-index": "1",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
+  "-ms-user-select": "none",
   "user-select": "none",
   "-webkit-transform": "translate3d(0,0,0)",
   "visibility": "visible"
@@ -138,6 +139,7 @@ Monocle.Styles.component = {
   "border": "none",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
+  "-ms-user-select": "none",
   "user-select": "none"
 }
 

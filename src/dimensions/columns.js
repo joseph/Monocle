@@ -51,6 +51,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
+      // IE10 hack.
+      if (Monocle.Browser.is.IE) {
+        ce.ownerDocument.documentElement.style.overflow = 'hidden';
+      }
+
       // Apply body style changes.
       ce.style.cssText = rules;
 
@@ -92,7 +97,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var elem = p.page.m.sheafDiv;
     var w = elem.clientWidth;
     if (elem.getBoundingClientRect) { w = elem.getBoundingClientRect().width; }
-    w = Math.round(w);
+    if (Monocle.Browser.env.roundPageDimensions) { w = Math.round(w); }
     return { col: w, width: w + k.GAP, height: elem.clientHeight }
   }
 

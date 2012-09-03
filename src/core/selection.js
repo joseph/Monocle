@@ -17,7 +17,9 @@ Monocle.Selection = function (reader) {
   function pollSelection() {
     var index = 0, frame = null;
     while (frame = reader.dom.find('component', index++)) {
-      pollSelectionOnWindow(frame.contentWindow, index);
+      if (frame.contentWindow) {
+        pollSelectionOnWindow(frame.contentWindow, index);
+      }
     }
   }
 

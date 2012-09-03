@@ -155,6 +155,10 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       return;
     }
 
+    if (!doc || !doc.documentElement) {
+      return;
+    }
+
     var head = doc.getElementsByTagName('head')[0];
     if (!head) {
       head = doc.createElement('head');

@@ -407,6 +407,15 @@ Monocle.Env = function () {
     //
     ["stickySlideOut", function () {
       result(Monocle.Browser.is.MobileSafari);
+    }],
+
+
+    // Chrome and Firefox incorrectly clip text when the dimensions of
+    // a page are not an integer. IE10 clips text when the page dimensions
+    // are rounded.
+    //
+    ['roundPageDimensions', function () {
+      result(!Monocle.Browser.is.IE);
     }]
 
   ];
