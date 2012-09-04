@@ -65,7 +65,7 @@
         return { doc: this.frameFor(cmptId).contentDocument };
       });
       var bookData_NODES = basicBookData(function (cmptId, callback) {
-        return { nodes: this.frameFor(cmptId).contentDocument.body.childNodes };
+        return { nodes: [this.frameFor(cmptId).contentDocument.documentElement] };
       });
 
 

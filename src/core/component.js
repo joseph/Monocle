@@ -101,37 +101,33 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // loadFrameFromJavaScript directly.
   //
   function loadFrameFromHTML(src, frame, callback) {
-    // Compress whitespace.
-    src = src.replace(/\n/g, '\\n').replace(/\r/, '\\r');
-
-    // Escape single-quotes.
-    src = src.replace(/\'/g, '\\\'');
-
-    // Remove scripts. (DISABLED -- Monocle should leave this to implementers.)
-    //var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-    //src = src.replace(new RegExp(scriptFragment, 'img'), '');
-
-    // BROWSERHACK: Gecko chokes on the DOCTYPE declaration.
-    if (Monocle.Browser.is.Gecko) {
-      var doctypeFragment = "<!DOCTYPE[^>]*>";
-      src = src.replace(new RegExp(doctypeFragment, 'm'), '');
+    var fn = function () {
+      Monocle.Events.deafen(frame, 'load', fn);
+      Monocle.defer(callback);
     }
+    Monocle.Events.listen(frame, 'load', fn);
 
-    loadFrameFromJavaScript(src, frame, callback);
+    // Load the component into the iframe using document.write().
+    frame.contentDocument.open('text/html', 'replace');
+    frame.contentDocument.write(src);
+    frame.contentDocument.close();
+
+    // ALTERNATIVE: load the component into the iframe with a JS URL.
+    // frame.contentWindow['monCmptData'] = src;
+    // src = "javascript:window['monCmptData'];"
+    // frame.src = src;
   }
 
 
   // LOAD STRATEGY: JAVASCRIPT
   // Like the HTML strategy, but assumes that the src string is already clean.
   //
+  // DEPRECATED: HTML strategy is faster now, so this just unescapes the string
+  // and loads it as HTML.
+  //
   function loadFrameFromJavaScript(src, frame, callback) {
-    src = "javascript:'"+src+"';";
-    var fn = function () {
-      Monocle.Events.deafen(frame, 'load', fn);
-      Monocle.defer(callback);
-    }
-    Monocle.Events.listen(frame, 'load', fn);
-    frame.src = src;
+    console.deprecation("Use { 'html': src } -- no need to clean the string.");
+    loadFrameFromHTML(eval("'"+src+"'"), frame, callback);
   }
 
 
@@ -160,30 +156,15 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Loads the array of DOM nodes into the body of the frame (replacing all
   // existing nodes), then invokes the callback.
   //
+  // DEPRECATED: now just transforms to HTML and loads as that.
+  //
   function loadFrameFromNodes(nodes, frame, callback) {
-    var destDoc = frame.contentDocument;
-    destDoc.documentElement.innerHTML = "";
-    var destHd = destDoc.createElement("head");
-    var destBdy = destDoc.createElement("body");
-
+    console.deprecation("Use { 'html': node.outerHTML } or similar.");
+    var src = "";
     for (var i = 0; i < nodes.length; ++i) {
-      var node = destDoc.importNode(nodes[i], true);
-      destBdy.appendChild(node);
+      src += nodes[i].outerHTML || '';
     }
-
-    var oldHead = destDoc.getElementsByTagName('head')[0];
-    if (oldHead) {
-      destDoc.documentElement.replaceChild(destHd, oldHead);
-    } else {
-      destDoc.documentElement.appendChild(destHd);
-    }
-    if (destDoc.body) {
-      destDoc.documentElement.replaceChild(destBdy, destDoc.body);
-    } else {
-      destDoc.documentElement.appendChild(destBdy);
-    }
-
-    if (callback) { callback(); }
+    loadFrameFromHTML(src, frame, callback);
   }
 
 
