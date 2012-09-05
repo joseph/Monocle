@@ -98,7 +98,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     dispatchEvent("monocle:initializing", API);
 
     bookData = bookData || Monocle.bookDataFromNodes([box.cloneNode(true)]);
-    var bk = new Monocle.Book(bookData);
+    var bk = new Monocle.Book(bookData, options.preloadWindow || 1);
 
     box.innerHTML = "";
 
