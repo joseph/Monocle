@@ -40,7 +40,7 @@ Monocle.bookDataFromIds = function (elementIds) {
   return Monocle.bookData({
     components: elementIds,
     getComponent: function (cmptId) {
-      return { nodes: [document.getElementById(cmptId).cloneNode(true)] }
+      return { nodes: [document.getElementById(cmptId)] }
     }
   });
 }

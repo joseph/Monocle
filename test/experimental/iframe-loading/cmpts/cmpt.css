@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  padding: 12px;
+}
+
+h1 {
+  font-size: 14pt;
+  color: green;
+}
+
+p {
+  text-indent: 1em;
+}
+
+h1, h2, h3, h4, .caption {
+  font-family: 'Belgrano', serif;
+  text-align: center;
+  display: block;
+}
+
+* {
+  max-width: 300px !important;
+}

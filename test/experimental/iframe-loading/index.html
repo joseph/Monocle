@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html id="topdoc">
+  <head>
+    <title>Iframe load tests</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="../../tests.css" />
+
+    <style>
+      #reader {
+        border: 1px dotted #F0F;
+        margin: 20px 0;
+        width: 330px;
+        height: 400px;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        overflow: hidden;
+      }
+      #reader iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      select {
+        max-width: 35%;
+      }
+      #loadHiddenFrame {
+        width: 0;
+        height: 0;
+        visibility: hidden;
+      }
+    </style>
+
+    <script src="loader.js"></script>
+  </head>
+
+  <body class="narrow">
+
+    <a href="../../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Interaction Model test</h1>
+
+    <div id="reader">
+      <iframe id="loadFrame" src="about:blank"></iframe>
+    </div>
+
+    <p>
+      <label>Load with:
+        <select id="loadWith">
+          <option value="url">Normal URL</option>
+          <option value="jsurl">JavaScript URL</option>
+          <option value="escapedjsurl">Escaped JavaScript URL</option>
+          <option value="docWrite">document.write</option>
+          <option value="dataurienc">Data URI (URI-enc)</option>
+          <option value="iframedocument">Import from iframe</option>
+        </select>
+      </label>
+      <input id="loadGo" type="button" value="Load!" />
+      <input id="loadReset" type="button" value="Reset" />
+    </p>
+
+    <pre id="loadResults"></pre>
+
+    <hr />
+
+    <iframe id="loadHiddenFrame" src="cmpts/cmpt.html"></iframe>
+
+  </body>
+</html>
