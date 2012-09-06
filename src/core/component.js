@@ -89,10 +89,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // LOAD STRATEGY: HTML
   // Loads a HTML string into the given frame, invokes the callback once loaded.
   //
-  // Cleans the string so it can be used in a JavaScript statement. This is
-  // slow, so if the string is already clean, skip this and use
-  // loadFrameFromJavaScript directly.
-  //
   function loadFrameFromHTML(src, frame, callback) {
     var fn = function () {
       Monocle.Events.deafen(frame, 'load', fn);
@@ -322,7 +318,11 @@ Monocle.Component = function (book, id, index, chapters, source) {
         "Loading a component by 'javascript' is deprecated. " +
         "Use { 'html': src } -- no need to escape or clean the string."
       );
-      p.source = { html: eval("'"+p.source.javascript+"'") };
+      var src = p.source.javascript;
+      src = src.replace(/\\n/g, "\n");
+      src = src.replace(/\\r/g, "\r");
+      src = src.replace(/\\'/g, "'");
+      p.source = { html: src };
     }
 
     // If supplied as DOM nodes, convert to HTML by concatenating outerHTMLs.
