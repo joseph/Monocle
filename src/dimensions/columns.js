@@ -52,7 +52,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       p.page.m.offset = 0;
 
       // IE10 hack.
-      if (Monocle.Browser.is.IE) {
+      if (Monocle.Browser.env.documentElementHasScrollbars) {
         ce.ownerDocument.documentElement.style.overflow = 'hidden';
       }
 

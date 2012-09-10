@@ -416,6 +416,23 @@ Monocle.Env = function () {
     //
     ['roundPageDimensions', function () {
       result(!Monocle.Browser.is.IE);
+    }],
+
+
+
+    // In IE10, the <html> element of the iframe's document has scrollbars,
+    // unless you set its style.overflow to 'hidden'.
+    //
+    ['documentElementHasScrollbars', function () {
+      result(Monocle.Browser.is.IE);
+    }],
+
+
+    // Older versions of iOS (<6) would render blank pages if they were
+    // off the screen when their layout/position was updated.
+    //
+    ['offscreenRenderingClipped', function () {
+      result(Monocle.Browser.iOSVersionBelow('6'));
     }]
 
   ];

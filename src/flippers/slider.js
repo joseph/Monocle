@@ -220,19 +220,30 @@ Monocle.Flippers.Slider = function (reader) {
   function onGoingBackward(x) {
     var lp = lowerPage(), up = upperPage();
 
-    // set lower to "the page before upper"
-    setPage(
-      lp,
-      getPlace(up).getLocus({ direction: k.BACKWARDS }),
-      function () {
-        // flip lower to upper, ready to slide in from left
+    if (Monocle.Browser.env.offscreenRenderingClipped) {
+      // set lower to "the page before upper"
+      setPage(
+        lp,
+        getPlace(up).getLocus({ direction: k.BACKWARDS }),
+        function () {
+          // flip lower to upper, ready to slide in from left
+          flipPages();
+          // move lower off the screen to the left
+          jumpOut(lp, function () {
+            lifted(x);
+          });
+        }
+      );
+    } else {
+      jumpOut(lp, function () {
         flipPages();
-        // move lower off the screen to the left
-        jumpOut(lp, function () {
-          lifted(x);
-        });
-      }
-    );
+        setPage(
+          lp,
+          getPlace(up).getLocus({ direction: k.BACKWARDS }),
+          function () { lifted(x); }
+        );
+      });
+    }
   }
 
 
