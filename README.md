@@ -2,13 +2,17 @@
 
 A silky, tactile browser-based ebook reader.
 
-Invented by [Inventive Labs](http://inventivelabs.com.au). Released under the
+Initial development by Joseph Pearson of Inventive Labs. Released under the
 MIT license.
 
 More information (including demos): http://monocle.inventivelabs.com.au
 
 Contributions welcome - fork the repository on
 [GitHub](http://github.com/joseph/monocle).
+
+MONOCLE NOW HAS A GOOGLE GROUP! If you're new to Monocle and you have questions
+that aren't answered by [the Wiki](https://github.com/joseph/monocle/wiki),
+you can ask them here: https://groups.google.com/forum/#!forum/monocle-js
 
 
 ## Getting Monocle
@@ -118,6 +122,12 @@ on GitHub).
 
 
 ## History
+
+3.0.0 - Magic panel, IE10 support, iOS6 support, better Android support,
+        selection events, billboard feature, Monocle.Formatting to clean up
+        Reader, removing deprecated flippers, Stencil refactor, component
+        weights (for more accurate component percentages), and many bug
+        fixes. See https://github.com/joseph/Monocle/compare/v2.3.1...v3.0.0
 
 2.3.1 - Fix for serious Firefox 12 bug in paginating content.
 
