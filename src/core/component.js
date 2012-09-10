@@ -76,6 +76,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // Hide the frame while we're changing it.
     frame.style.visibility = "hidden";
 
+    frame.whenDocumentReady = function () {
+      var doc = frame.contentDocument;
+      var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
+      pageDiv.m.reader.dispatchEvent('monocle:componentmodify', evtData);
+      frame.whenDocumentReady = null;
+    }
+
     if (p.source.html) {
       return loadFrameFromHTML(p.source.html || p.source, frame, callback);
     } else if (p.source.url) {
@@ -100,6 +107,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
     frame.contentDocument.open('text/html', 'replace');
     frame.contentDocument.write(src);
     frame.contentDocument.close();
+    frame.whenDocumentReady();
 
     // ALTERNATIVE: load the component into the iframe with a JS URL.
     // frame.contentWindow['monCmptData'] = src;
@@ -116,11 +124,16 @@ Monocle.Component = function (book, id, index, chapters, source) {
     if (!url.match(/^\//)) {
       url = absoluteURL(url);
     }
-    var fn = function () {
-      Monocle.Events.deafen(frame, 'load', fn);
+    var onDocumentReady = function () {
+      Monocle.Events.deafen(frame, 'load', onDocumentReady);
+      frame.whenDocumentReady();
+    }
+    var onDocumentLoad = function () {
+      Monocle.Events.deafen(frame, 'load', onDocumentLoad);
       Monocle.defer(callback);
     }
-    Monocle.Events.listen(frame, 'load', fn);
+    Monocle.Events.listen(frame, 'load', onDocumentReady);
+    Monocle.Events.listen(frame, 'load', onDocumentLoad);
     frame.contentWindow.location.replace(url);
   }
 
@@ -167,12 +180,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // and measure its contents.
   //
   function setupFrame(pageDiv, frame, callback) {
-    var doc = frame.contentDocument;
-    var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
-
-    // Announce that the component is loaded.
-    pageDiv.m.reader.dispatchEvent('monocle:componentmodify', evtData);
-
     updateDimensions(pageDiv, function () {
       frame.style.visibility = "visible";
 
@@ -180,6 +187,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
       locateChapters(pageDiv);
 
       // Announce that the component has changed.
+      var doc = frame.contentDocument;
+      var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
       pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
       callback();
