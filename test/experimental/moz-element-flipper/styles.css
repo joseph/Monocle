@@ -6,6 +6,7 @@ section {
   position: relative;
   background: -moz-linear-gradient(0deg, #FFF, #555, #FFF, #555, #FFF);
   background: -webkit-linear-gradient(0deg, #FFF, #555, #FFF, #555, #FFF);
+  background: linear-gradient(90deg, #FFF, #555, #FFF, #555, #FFF);
   width: 320px;
   height: 380px;
 }
@@ -13,10 +14,13 @@ section {
   width: 2700px;
   -moz-column-width: 300px;
   -webkit-column-width: 300px;
+  column-width: 300px;
   -moz-column-gap: 20px;
   -webkit-column-gap: 20px;
+  column-gap: 20px;
   -moz-column-fill: auto;
   -webkit-column-fill: auto;
+  column-fill: auto;
   height: 380px;
 }
 .colCntr {
@@ -28,6 +32,7 @@ section {
   background-color: white;
   background-image: -moz-element(#origin);
   background-image: -webkit-element(#origin);
+  background-image: element(#origin);
   background-repeat: no-repeat;
   position: absolute;
   width: 160px;
@@ -36,6 +41,7 @@ section {
   left: 0;
   -moz-backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   background-color: #FFF;
 }
 #imp1 {
@@ -45,6 +51,7 @@ section {
 #imp3 {
   -moz-transform: rotateY(180deg) translateZ(1px);
   -webkit-transform: rotateY(180deg) translateZ(1px);
+  transform: rotateY(180deg) translateZ(1px);
 }
 #imp4 {
   left: 160px;
@@ -53,8 +60,10 @@ section {
   position: absolute;
   -moz-transform-origin: 0% 50%;
   -webkit-transform-origin: 0% 50%;
+  transform-origin: 0% 50%;
   -moz-transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
   z-index: 1;
   top: 0px;
   left: 160px;
@@ -66,8 +75,10 @@ section {
 .pageTurn #gate{
   -moz-transition: -moz-transform linear 600ms;
   -webkit-transition: -webkit-transform linear 600ms;
+  transition: -moz-transform linear 600ms;
   -moz-transform: perspective(500px) rotateY(-180deg);
   -webkit-transform: perspective(500px) rotateY(-180deg);
+  transform: perspective(500px) rotateY(-180deg);
 }
 
 
@@ -78,12 +89,14 @@ section {
 .forwardTurn .pageTurn #imp1 {
   -moz-transition: opacity linear 300ms 300ms;
   -webkit-transition: opacity linear 300ms 300ms;
+  transition: opacity linear 300ms 300ms;
   opacity: 0.25;
 }
 
 .forwardTurn .pageTurn #imp4 {
   -moz-transition: opacity linear 300ms;
   -webkit-transition: opacity linear 300ms;
+  transition: opacity linear 300ms;
   opacity: 1;
 }
 
@@ -91,12 +104,14 @@ section {
 .reverseTurn #gate {
   -moz-transform-origin: 100% 50%;
   -webkit-transform-origin: 100% 50%;
+  transform-origin: 100% 50%;
   left: 0;
 }
 
 .reverseTurn .pageTurn #gate {
   -moz-transform: perspective(500px) rotateY(180deg);
   -webkit-transform: perspective(500px) rotateY(180deg);
+  transform: perspective(500px) rotateY(180deg);
 }
 
 .reverseTurn #imp1 {
@@ -110,11 +125,13 @@ section {
 .reverseTurn .pageTurn #imp1 {
   -moz-transition: opacity linear 300ms;
   -webkit-transition: opacity linear 300ms;
+  transition: opacity linear 300ms;
   opacity: 1;
 }
 
 .reverseTurn .pageTurn #imp4 {
   -moz-transition: opacity linear 300ms 300ms;
   -webkit-transition: opacity linear 300ms 300ms;
+  transition: opacity linear 300ms 300ms;
   opacity: 0.25;
 }

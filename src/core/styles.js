@@ -95,6 +95,7 @@ Monocle.Styles = {
 //
 Monocle.Styles.container = {
   "position": "absolute",
+  "overflow": "hidden",
   "top": "0",
   "left": "0",
   "bottom": "0",
@@ -106,6 +107,7 @@ Monocle.Styles.page = {
   "z-index": "1",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
+  "-ms-user-select": "none",
   "user-select": "none",
   "-webkit-transform": "translate3d(0,0,0)",
   "visibility": "visible"
@@ -137,6 +139,7 @@ Monocle.Styles.component = {
   "border": "none",
   "-webkit-user-select": "none",
   "-moz-user-select": "none",
+  "-ms-user-select": "none",
   "user-select": "none"
 }
 
@@ -152,7 +155,3 @@ Monocle.Styles.overlay = {
   "height": "100%",
   "z-index": "1000"
 }
-
-
-
-Monocle.pieceLoaded('core/styles');

@@ -192,5 +192,3 @@ Monocle.Factory = function (element, label, index, reader) {
 
   return API;
 }
-
-Monocle.pieceLoaded('core/factory');

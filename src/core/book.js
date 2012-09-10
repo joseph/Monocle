@@ -9,13 +9,14 @@
  * It should set and know the place of each page element too.
  *
  */
-Monocle.Book = function (dataSource) {
-  if (Monocle == this) { return new Monocle.Book(dataSource); }
+Monocle.Book = function (dataSource, preloadWindow) {
 
   var API = { constructor: Monocle.Book }
   var k = API.constants = API.constructor;
   var p = API.properties = {
     dataSource: dataSource,
+    preloadWindow: preloadWindow,
+    cmptLoadQueue: {},
     components: [],
     chapters: {} // flat arrays of chapters per component
   }
@@ -249,6 +250,9 @@ Monocle.Book = function (dataSource) {
 
     var applyComponent = function (component) {
       component.applyTo(pageDiv, pgFindPageNumber);
+      for (var l = 1; l <= p.preloadWindow; ++l) {
+        deferredPreloadComponent(cIndex+l, l*k.PRELOAD_INTERVAL);
+      }
     }
 
     var pgApplyComponent = function (component) {
@@ -287,34 +291,66 @@ Monocle.Book = function (dataSource) {
   // the reader object that has requested this component, ONLY if
   // the source has not already been received.
   //
-  function loadComponent(index, callback, pageDiv) {
+  function loadComponent(index, successCallback, pageDiv) {
     if (p.components[index]) {
-      return callback(p.components[index]);
+      return successCallback(p.components[index]);
     }
-    var cmptId = p.componentIds[index];
-    if (pageDiv) {
-      var evtData = { 'page': pageDiv, 'component': cmptId, 'index': index };
-      pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
+
+    var cmptId = p.components[index];
+    var evtData = { 'page': pageDiv, 'component': cmptId, 'index': index };
+    pageDiv.m.reader.dispatchEvent('monocle:componentloading', evtData);
+
+    var onCmptLoad = function (cmpt) {
+      evtData['component'] = cmpt;
+      pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
+      successCallback(cmpt);
     }
-    var failedToLoadComponent = function () {
+
+    var onCmptFail = function () {
       console.warn("Failed to load component: "+cmptId);
       pageDiv.m.reader.dispatchEvent('monocle:componentfailed', evtData);
       try {
         var currCmpt = pageDiv.m.activeFrame.m.component;
         evtData.cmptId = currCmpt.properties.id;
-        callback(currCmpt);
+        successCallback(currCmpt);
       } catch (e) {
         console.warn("Failed to fall back to previous component.");
       }
     }
 
-    var fn = function (cmptSource) {
-      if (cmptSource === false) { return failedToLoadComponent(); }
-      if (pageDiv) {
-        evtData['source'] = cmptSource;
-        pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
-        html = evtData['html'];
-      }
+    _loadComponent(index, onCmptLoad, onCmptFail);
+  }
+
+
+  function preloadComponent(index) {
+    if (p.components[index]) { return; }
+    var cmptId = p.componentIds[index];
+    if (!cmptId) { return; }
+    if (p.cmptLoadQueue[cmptId]) { return; }
+    _loadComponent(index);
+  }
+
+
+  function deferredPreloadComponent(index, delay) {
+    Monocle.defer(function () { preloadComponent(index); }, delay);
+  }
+
+
+  function _loadComponent(index, successCallback, failureCallback) {
+    var cmptId = p.componentIds[index];
+    var queueItem = { success: successCallback, failure: failureCallback };
+    if (p.cmptLoadQueue[cmptId]) {
+      return p.cmptLoadQueue[cmptId] = queueItem;
+    } else {
+      p.cmptLoadQueue[cmptId] = queueItem;
+    }
+
+    var onCmptFail = function () {
+      fireLoadQueue(cmptId, 'failure');
+    }
+
+    var onCmptLoad = function (cmptSource) {
+      if (cmptSource === false) { return onCmptFail(); }
       p.components[index] = new Monocle.Component(
         API,
         cmptId,
@@ -322,14 +358,23 @@ Monocle.Book = function (dataSource) {
         chaptersForComponent(cmptId),
         cmptSource
       );
-      callback(p.components[index]);
+      fireLoadQueue(cmptId, 'success', p.components[index]);
     }
-    var cmptSource = p.dataSource.getComponent(cmptId, fn);
+
+    var cmptSource = p.dataSource.getComponent(cmptId, onCmptLoad);
     if (cmptSource && !p.components[index]) {
-      fn(cmptSource);
+      onCmptLoad(cmptSource);
     } else if (cmptSource === false) {
-      return failedToLoadComponent();
+      onCmptFail();
     }
+  }
+
+
+  function fireLoadQueue(cmptId, cbName, args) {
+    if (typeof p.cmptLoadQueue[cmptId][cbName] == 'function') {
+      p.cmptLoadQueue[cmptId][cbName](args);
+    }
+    p.cmptLoadQueue[cmptId] = null;
   }
 
 
@@ -351,10 +396,10 @@ Monocle.Book = function (dataSource) {
       return p.chapters[cmptId];
     }
     p.chapters[cmptId] = [];
-    var matcher = new RegExp('^'+cmptId+"(\#(.+)|$)");
+    var matcher = new RegExp('^'+decodeURIComponent(cmptId)+"(\#(.+)|$)");
     var matches;
     var recurser = function (chp) {
-      if (matches = chp.src.match(matcher)) {
+      if (matches = decodeURIComponent(chp.src).match(matcher)) {
         p.chapters[cmptId].push({
           title: chp.title,
           fragment: matches[2] || null
@@ -401,7 +446,25 @@ Monocle.Book = function (dataSource) {
 
 
   function componentIdMatching(str) {
-    return p.componentIds.indexOf(str) >= 0 ? str : null;
+    str = decodeURIComponent(str);
+    for (var i = 0, ii = p.componentIds.length; i < ii; ++i) {
+      if (decodeURIComponent(p.componentIds[i]) == str) { return str; }
+    }
+    return null;
+  }
+
+
+  function componentWeights() {
+    if (!p.weights) {
+      p.weights = dataSource.getMetaData('componentWeights') || [];
+      if (!p.weights.length) {
+        var cmptSize = 1.0 / p.componentIds.length;
+        for (var i = 0, ii = p.componentIds.length; i < ii; ++i) {
+          p.weights.push(cmptSize);
+        }
+      }
+    }
+    return p.weights;
   }
 
 
@@ -413,6 +476,7 @@ Monocle.Book = function (dataSource) {
   API.chaptersForComponent = chaptersForComponent;
   API.locusOfChapter = locusOfChapter;
   API.isValidLocus = isValidLocus;
+  API.componentWeights = componentWeights;
 
   initialize();
 
@@ -420,28 +484,11 @@ Monocle.Book = function (dataSource) {
 }
 
 
-// A shortcut for creating a book from an array of nodes.
-//
-// You could use this as follows, for eg:
-//
-//  Monocle.Book.fromNodes([document.getElementById('content')]);
+// Legacy function. Deprecated.
 //
 Monocle.Book.fromNodes = function (nodes) {
-  var bookData = {
-    getComponents: function () {
-      return ['anonymous'];
-    },
-    getContents: function () {
-      return [];
-    },
-    getComponent: function (n) {
-      return { 'nodes': nodes };
-    },
-    getMetaData: function (key) {
-    }
-  }
-
-  return new Monocle.Book(bookData);
+  console.deprecation("Book.fromNodes() will soon be removed.");
+  return new Monocle.Book(Monocle.bookDataFromNodes(nodes));
 }
 
-Monocle.pieceLoaded('core/book');
+Monocle.Book.PRELOAD_INTERVAL = 1000;

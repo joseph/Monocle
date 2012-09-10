@@ -2,41 +2,10 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
     <title>Panels test</title>
-
-    <!-- MONOCLE CORE -->
-    <script type="text/javascript" src="../../src/core/monocle.js"></script>
-    <script type="text/javascript" src="../../src/compat/env.js"></script>
-    <script type="text/javascript" src="../../src/compat/css.js"></script>
-    <script type="text/javascript" src="../../src/compat/stubs.js"></script>
-    <script type="text/javascript" src="../../src/compat/browser.js"></script>
-    <script type="text/javascript" src="../../src/core/events.js"></script>
-    <script type="text/javascript" src="../../src/core/factory.js"></script>
-    <script type="text/javascript" src="../../src/core/styles.js"></script>
-    <script type="text/javascript" src="../../src/core/reader.js"></script>
-    <script type="text/javascript" src="../../src/core/book.js"></script>
-    <script type="text/javascript" src="../../src/core/component.js"></script>
-    <script type="text/javascript" src="../../src/core/place.js"></script>
-
-    <!-- MONOCLE FLIPPERS -->
-    <script type="text/javascript" src="../../src/controls/panel.js"></script>
-    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
-    <script type="text/javascript" src="../../src/panels/marginal.js"></script>
-    <script type="text/javascript" src="../../src/panels/imode.js"></script>
-    <script type="text/javascript" src="../../src/panels/eink.js"></script>
-    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
-    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
-    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
-    <script type="text/javascript" src="../../src/dimensions/vert.js"></script>
-    <script type="text/javascript" src="../../src/flippers/legacy.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
     <link rel="stylesheet" type="text/css" href="../tests.css" />
 
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
     <style type="text/css">
       .readerInfo {
         width: 300px;
@@ -49,45 +18,17 @@
         height: 400px;
         border: 1px solid #000;
         background-color: #CCC;
-        overflow: hidden;
       }
       #part1, #part2 {
         display: none;
       }
     </style>
 
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
     <script type="text/javascript">
       Monocle.DEBUG = true;
 
-      var bookData = {
-        getComponents: function () {
-          return [
-            'part1',
-            'part2'
-          ];
-        },
-        getContents: function () {
-          return [
-            {
-              title: "I",
-              src: 'part1'
-            },
-            {
-              title: "II",
-              src: 'part2'
-            }
-          ]
-        },
-        getComponent: function (cmptId) {
-          return { nodes: [document.getElementById(cmptId).cloneNode(true)] };
-        },
-        getMetaData: function(key) {
-          return {
-            title: "Lorem Ipsum",
-            creator: "Monocle"
-          }[key];
-        }
-      }
+      var bookData = Monocle.bookDataFromIds(['part1', 'part2']);
 
       // Initialize the reader element.
       Monocle.Events.listen(
@@ -120,6 +61,13 @@
             'eInk',
             bookData,
             { panels: Monocle.Panels.eInk, flipper: Monocle.Flippers.Instant }
+          );
+
+          // MAGIC
+          window.reader4 = Monocle.Reader(
+            'magic',
+            bookData,
+            { panels: Monocle.Panels.Magic }
           );
         }
       );
@@ -166,6 +114,14 @@
       </p>
     </div>
 
+
+    <div class="readerInfo">
+      <h2>Magic</h2>
+      <div class="reader" id="magic"></div>
+      <p>
+        Look ma, no panels!
+      </p>
+    </div>
 
 
 <div id="part1">

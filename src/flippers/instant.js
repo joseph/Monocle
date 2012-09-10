@@ -48,9 +48,10 @@ Monocle.Flippers.Instant = function (reader) {
   }
 
 
-  function turn(panel) {
-    var dir = panel.properties.direction;
+  function turn(dir) {
+    p.reader.selection.deselect();
     moveTo({ page: getPlace().pageNumber() + dir});
+    p.reader.dispatchEvent('monocle:turning');
   }
 
 
@@ -75,7 +76,3 @@ Monocle.Flippers.Instant = function (reader) {
 Monocle.Flippers.Instant.FORWARDS = 1;
 Monocle.Flippers.Instant.BACKWARDS = -1;
 Monocle.Flippers.Instant.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
-
-
-
-Monocle.pieceLoaded('flippers/instant');

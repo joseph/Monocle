@@ -1,7 +1,4 @@
 Monocle.Controls.Scrubber = function (reader) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.Scrubber(reader);
-  }
 
   var API = { constructor: Monocle.Controls.Scrubber }
   var k = API.constants = API.constructor;
@@ -141,5 +138,3 @@ Monocle.Controls.Scrubber.CLS = {
   trail: 'controls_scrubber_trail',
   bubble: 'controls_scrubber_bubble'
 }
-
-Monocle.pieceLoaded('controls/scrubber');

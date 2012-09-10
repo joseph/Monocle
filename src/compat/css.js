@@ -1,3 +1,5 @@
+// A class for manipulating CSS properties in a browser-engine-aware way.
+//
 Monocle.CSS = function () {
 
   var API = { constructor: Monocle.CSS }
@@ -141,6 +143,3 @@ Monocle.CSS = function () {
 Monocle.CSS.engines = ["W3C", "WebKit", "Gecko", "Opera", "IE", "Konqueror"];
 Monocle.CSS.prefixes = ["", "-webkit-", "-moz-", "-o-", "-ms-", "-khtml-"];
 Monocle.CSS.domprefixes = ["", "Webkit", "Moz", "O", "ms", "Khtml"];
-
-
-Monocle.pieceLoaded('compat/css');

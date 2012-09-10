@@ -1,3 +1,1 @@
-//= require_tree "./controls"
-
-Monocle.pieceLoaded('monoctrl');
+//= require_tree ./controls

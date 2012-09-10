@@ -43,6 +43,67 @@ div.monelem_overlay {
 }
 
 
+/* A full-size panel to display an announcement (iframe or div) */
+div.monelem_billboard_container {
+  background: #FFF;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 2000;
+  -webkit-transform: scale(0);
+  -moz-transform: scale(0);
+  transform: scale(0);
+  -webkit-transform-origin: 0 0;
+  -moz-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+.monelem_billboard_inner {
+  height: 100%;
+  width: 100%;
+  border: none;
+  overflow: auto;
+  /*-webkit-overflow-scrolling: touch;*/ /* This is sexy, but crashy. */
+}
+
+div.monelem_billboard_inner {
+  min-width: 100%;
+  min-height: 100%;
+  text-align: center;
+  vertical-align: middle;
+  display: -webkit-box;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+}
+
+
+div.monelem_billboard_close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 30px;
+  color: white;
+  background: #C00;
+  cursor: pointer;
+  border-bottom-left-radius: 4px;
+  text-shadow: 1px 1px 1px #900;
+  font: 9pt Helvetica Neue, Helvetica, sans-serif;
+}
+
+div.monelem_billboard_close:after {
+  display: block;
+  content: 'Close';
+  width: 100%;
+  line-height: 30px;
+  text-align: center;
+}
+
+
+
+
 /*===========================================================================
   PANELS
 ---------------------------------------------------------------------------*/

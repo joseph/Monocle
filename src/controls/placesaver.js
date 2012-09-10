@@ -1,7 +1,4 @@
 Monocle.Controls.PlaceSaver = function (bookId) {
-  if (Monocle.Controls == this) {
-    return new Monocle.Controls.PlaceSaver(bookId);
-  }
 
   var API = { constructor: Monocle.Controls.PlaceSaver }
   var k = API.constants = API.constructor;
@@ -16,12 +13,6 @@ Monocle.Controls.PlaceSaver = function (bookId) {
   function assignToReader(reader) {
     p.reader = reader;
     p.reader.listen('monocle:turn', savePlaceToCookie);
-    p.reader.listen(
-      'monocle:bookchange',
-      function (evt) {
-        applyToBook(evt.m.book.getMetaData('title'));
-      }
-    );
   }
 
 
@@ -107,6 +98,3 @@ Monocle.Controls.PlaceSaver = function (bookId) {
 
 Monocle.Controls.PlaceSaver.COOKIE_NAMESPACE = "monocle.controls.placesaver.";
 Monocle.Controls.PlaceSaver.COOKIE_EXPIRES_IN_DAYS = 7; // Set to 0 for session-based expiry.
-
-
-Monocle.pieceLoaded('controls/placesaver');

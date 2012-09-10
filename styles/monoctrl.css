@@ -142,12 +142,12 @@ div.monelem_controls_stencil_container {
   height: 0;
 }
 
-a.monelem_controls_stencil_cutout {
+.monelem_controls_stencil_mask {
   display: block;
   position: absolute;
 }
 
-div.monelem_controls_stencil_highlighted a {
+div.monelem_controls_stencil_highlighted .monelem_controls_stencil_mask {
   background: rgba(0,0,255,0.15);
 }
 

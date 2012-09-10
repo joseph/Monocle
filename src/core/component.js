@@ -42,6 +42,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // will be invoked with the pageDiv and this component as arguments.
   //
   function applyTo(pageDiv, callback) {
+    prepareSource(pageDiv.m.reader);
+
     var evtData = { 'page': pageDiv, 'source': p.source };
     pageDiv.m.reader.dispatchEvent('monocle:componentchanging', evtData);
 
@@ -74,20 +76,18 @@ Monocle.Component = function (book, id, index, chapters, source) {
     // Hide the frame while we're changing it.
     frame.style.visibility = "hidden";
 
-    // Prevent about:blank overriding imported nodes in Firefox.
-    // Disabled again because it seems to result in blank pages in Saf.
-    //frame.contentWindow.stop();
+    frame.whenDocumentReady = function () {
+      var doc = frame.contentDocument;
+      var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
+      pageDiv.m.reader.dispatchEvent('monocle:componentmodify', evtData);
+      frame.whenDocumentReady = null;
+    }
 
-    if (p.source.html || (typeof p.source == "string")) {   // HTML
+    if (p.source.html) {
       return loadFrameFromHTML(p.source.html || p.source, frame, callback);
-    } else if (p.source.javascript) {                       // JAVASCRIPT
-      //console.log("Loading as javascript: "+p.source.javascript);
-      return loadFrameFromJavaScript(p.source.javascript, frame, callback);
-    } else if (p.source.url) {                              // URL
+    } else if (p.source.url) {
       return loadFrameFromURL(p.source.url, frame, callback);
-    } else if (p.source.nodes) {                            // NODES
-      return loadFrameFromNodes(p.source.nodes, frame, callback);
-    } else if (p.source.doc) {                              // DOCUMENT
+    } else if (p.source.doc) {
       return loadFrameFromDocument(p.source.doc, frame, callback);
     }
   }
@@ -96,41 +96,23 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // LOAD STRATEGY: HTML
   // Loads a HTML string into the given frame, invokes the callback once loaded.
   //
-  // Cleans the string so it can be used in a JavaScript statement. This is
-  // slow, so if the string is already clean, skip this and use
-  // loadFrameFromJavaScript directly.
-  //
   function loadFrameFromHTML(src, frame, callback) {
-    // Compress whitespace.
-    src = src.replace(/\n/g, '\\n').replace(/\r/, '\\r');
-
-    // Escape single-quotes.
-    src = src.replace(/\'/g, '\\\'');
-
-    // Remove scripts. (DISABLED -- Monocle should leave this to implementers.)
-    //var scriptFragment = "<script[^>]*>([\\S\\s]*?)<\/script>";
-    //src = src.replace(new RegExp(scriptFragment, 'img'), '');
-
-    // BROWSERHACK: Gecko chokes on the DOCTYPE declaration.
-    if (Monocle.Browser.is.Gecko) {
-      var doctypeFragment = "<!DOCTYPE[^>]*>";
-      src = src.replace(new RegExp(doctypeFragment, 'm'), '');
-    }
-
-    loadFrameFromJavaScript(src, frame, callback);
-  }
-
-
-  // LOAD STRATEGY: JAVASCRIPT
-  // Like the HTML strategy, but assumes that the src string is already clean.
-  //
-  function loadFrameFromJavaScript(src, frame, callback) {
-    src = "javascript:'"+src+"';";
-    frame.onload = function () {
-      frame.onload = null;
+    var fn = function () {
+      Monocle.Events.deafen(frame, 'load', fn);
       Monocle.defer(callback);
     }
-    frame.src = src;
+    Monocle.Events.listen(frame, 'load', fn);
+
+    // Load the component into the iframe using document.write().
+    frame.contentDocument.open('text/html', 'replace');
+    frame.contentDocument.write(src);
+    frame.contentDocument.close();
+    frame.whenDocumentReady();
+
+    // ALTERNATIVE: load the component into the iframe with a JS URL.
+    // frame.contentWindow['monCmptData'] = src;
+    // src = "javascript:window['monCmptData'];"
+    // frame.src = src;
   }
 
 
@@ -138,50 +120,21 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Loads the URL into the given frame, invokes callback once loaded.
   //
   function loadFrameFromURL(url, frame, callback) {
-    // If it's a relative path, we need to make it absolute, using the
-    // reader's location (not the active component's location).
+    // If it's a relative path, we need to make it absolute.
     if (!url.match(/^\//)) {
-      var link = document.createElement('a');
-      link.setAttribute('href', url);
-      url = link.href;
-      delete(link);
+      url = absoluteURL(url);
     }
-    frame.onload = function () {
-      frame.onload = null;
+    var onDocumentReady = function () {
+      Monocle.Events.deafen(frame, 'load', onDocumentReady);
+      frame.whenDocumentReady();
+    }
+    var onDocumentLoad = function () {
+      Monocle.Events.deafen(frame, 'load', onDocumentLoad);
       Monocle.defer(callback);
     }
+    Monocle.Events.listen(frame, 'load', onDocumentReady);
+    Monocle.Events.listen(frame, 'load', onDocumentLoad);
     frame.contentWindow.location.replace(url);
-  }
-
-
-  // LOAD STRATEGY: NODES
-  // Loads the array of DOM nodes into the body of the frame (replacing all
-  // existing nodes), then invokes the callback.
-  //
-  function loadFrameFromNodes(nodes, frame, callback) {
-    var destDoc = frame.contentDocument;
-    destDoc.documentElement.innerHTML = "";
-    var destHd = destDoc.createElement("head");
-    var destBdy = destDoc.createElement("body");
-
-    for (var i = 0; i < nodes.length; ++i) {
-      var node = destDoc.importNode(nodes[i], true);
-      destBdy.appendChild(node);
-    }
-
-    var oldHead = destDoc.getElementsByTagName('head')[0];
-    if (oldHead) {
-      destDoc.documentElement.replaceChild(destHd, oldHead);
-    } else {
-      destDoc.documentElement.appendChild(destHd);
-    }
-    if (destDoc.body) {
-      destDoc.documentElement.replaceChild(destBdy, destDoc.body);
-    } else {
-      destDoc.documentElement.appendChild(destBdy);
-    }
-
-    if (callback) { callback(); }
   }
 
 
@@ -190,37 +143,35 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // Invokes the callback when loaded.
   //
   function loadFrameFromDocument(srcDoc, frame, callback) {
-    var destDoc = frame.contentDocument;
+    var doc = frame.contentDocument;
 
-    var srcBases = srcDoc.getElementsByTagName('base');
-    if (srcBases[0]) {
-      var head = destDoc.getElementsByTagName('head')[0];
-      if (!head) {
-        try {
-          head = destDoc.createElement('head');
-          if (destDoc.body) {
-            destDoc.insertBefore(head, destDoc.body);
-          } else {
-            destDoc.appendChild(head);
+    // WebKit has an interesting quirk. The <base> tag must exist in the
+    // document being replaced, not the new document.
+    if (Monocle.Browser.is.WebKit) {
+      var srcBase = srcDoc.querySelector('base');
+      if (srcBase) {
+        var head = doc.querySelector('head');
+        if (!head) {
+          try {
+            head = doc.createElement('head');
+            prependChild(doc.documentElement, head);
+          } catch (e) {
+            head = doc.body;
           }
-        } catch (e) {
-          head = destDoc.body;
         }
+        var base = doc.createElement('base');
+        base.setAttribute('href', srcBase.href);
+        head.appendChild(base);
       }
-      var bases = destDoc.getElementsByTagName('base');
-      var base = bases[0] ? bases[0] : destDoc.createElement('base');
-      base.setAttribute('href', srcBases[0].getAttribute('href'));
-      head.appendChild(base);
     }
 
-    destDoc.replaceChild(
-      destDoc.importNode(srcDoc.documentElement, true),
-      destDoc.documentElement
+    doc.replaceChild(
+      doc.importNode(srcDoc.documentElement, true),
+      doc.documentElement
     );
 
-    // DISABLED: immediate readiness - webkit has some difficulty with this.
-    // if (callback) { callback(); }
-
+    // NB: It's a significant problem with this load strategy that there's
+    // no indication when it is complete.
     Monocle.defer(callback);
   }
 
@@ -229,17 +180,6 @@ Monocle.Component = function (book, id, index, chapters, source) {
   // and measure its contents.
   //
   function setupFrame(pageDiv, frame, callback) {
-    // iOS touch events on iframes are busted. See comments in
-    // events.js for an explanation of this hack.
-    //
-    Monocle.Events.listenOnIframe(frame);
-
-    var doc = frame.contentDocument;
-    var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
-
-    // Announce that the component is loaded.
-    pageDiv.m.reader.dispatchEvent('monocle:componentmodify', evtData);
-
     updateDimensions(pageDiv, function () {
       frame.style.visibility = "visible";
 
@@ -247,6 +187,8 @@ Monocle.Component = function (book, id, index, chapters, source) {
       locateChapters(pageDiv);
 
       // Announce that the component has changed.
+      var doc = frame.contentDocument;
+      var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
       pageDiv.m.reader.dispatchEvent('monocle:componentchange', evtData);
 
       callback();
@@ -371,6 +313,88 @@ Monocle.Component = function (book, id, index, chapters, source) {
   }
 
 
+  function prepareSource(reader) {
+    if (p.sourcePrepared) { return; }
+    p.sourcePrepared = true;
+
+    if (typeof p.source == "string") {
+      p.source = { html: p.source };
+    }
+
+    // If supplied as escaped javascript, unescape it to HTML by evalling it.
+    if (p.source.javascript) {
+      console.deprecation(
+        "Loading a component by 'javascript' is deprecated. " +
+        "Use { 'html': src } -- no need to escape or clean the string."
+      );
+      var src = p.source.javascript;
+      src = src.replace(/\\n/g, "\n");
+      src = src.replace(/\\r/g, "\r");
+      src = src.replace(/\\'/g, "'");
+      p.source = { html: src };
+    }
+
+    // If supplied as DOM nodes, convert to HTML by concatenating outerHTMLs.
+    if (p.source.nodes) {
+      var srcs = [];
+      for (var i = 0, ii = p.source.nodes.length; i < ii; ++i) {
+        var node = p.source.nodes[i];
+        if (node.outerHTML) {
+          srcs.push(node.outerHTML);
+        } else {
+          var div = document.createElement('div');
+          div.appendChild(node.cloneNode(true));
+          srcs.push(div.innerHTML);
+          delete(div);
+        }
+      }
+      p.source = { html: srcs.join('') };
+    }
+
+    if (p.source.html && !p.source.html.match(new RegExp("<base\s.+>", "im"))) {
+      var baseURI = computeBaseURI(reader);
+      if (baseURI) {
+        p.source.html = p.source.html.replace(
+          new RegExp("(<head(\s[^>]*>)|>)", "im"),
+          '$1<base href="'+baseURI+'" />'
+        );
+      }
+    }
+
+    if (p.source.doc && !p.source.doc.querySelector('base')) {
+      var srcHead = p.source.doc.querySelector('head') || p.source.doc.body;
+      var baseURI = computeBaseURI(reader);
+      if (srcHead && baseURI) {
+        var srcBase = p.source.doc.createElement('base');
+        srcBase.setAttribute('href', baseURI);
+        prependChild(srcHead, srcBase);
+      }
+    }
+  }
+
+
+  function computeBaseURI(reader) {
+    var evtData = { cmptId: p.id, cmptURI: absoluteURL(p.id) }
+    if (reader.dispatchEvent('monocle:component:baseuri', evtData, true)) {
+      return evtData.cmptURI;
+    }
+  }
+
+
+  function absoluteURL(url) {
+    var link = document.createElement('a');
+    link.setAttribute('href', url);
+    result = link.href;
+    delete(link);
+    return result;
+  }
+
+
+  function prependChild(pr, el) {
+    pr.firstChild ? pr.insertBefore(el, pr.firstChild) : pr.appendChild(el);
+  }
+
+
   API.applyTo = applyTo;
   API.updateDimensions = updateDimensions;
   API.chapterForPage = chapterForPage;
@@ -381,5 +405,3 @@ Monocle.Component = function (book, id, index, chapters, source) {
 
   return API;
 }
-
-Monocle.pieceLoaded('core/component');

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Selection events</title>
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
+
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
+    <style type="text/css">
+      #reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+      }
+      #statusSelect {
+        margin: 20px 0;
+        background: #FFC;
+        padding: 6px;
+        visibility: hidden;
+        width: 300px;
+        height: 5em;
+        overflow: auto;
+      }
+    </style>
+
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
+    <script>
+      (function () {
+        Monocle.DEBUG = true;
+
+        function textSelected(evt) {
+          console.log("Selection: "+evt.m.string);
+          var st = document.getElementById('statusSelect');
+          var sel = evt.m.string;
+          st.innerHTML = sel;
+          st.style.visibility = 'visible';
+        }
+
+
+        function textDeselected(evt) {
+          console.log("Deselection.");
+          var st = document.getElementById('statusSelect');
+          st.style.visibility = 'hidden';
+        }
+
+
+        function init() {
+          window.reader = Monocle.Reader(
+            'reader',
+            Monocle.bookData({ components: ['pt1.html', 'pt2.html'] }),
+            { panels: Monocle.Panels.Marginal },
+            function (rdr) {
+              rdr.listen('monocle:selection', textSelected);
+              rdr.listen('monocle:deselection', textDeselected);
+            }
+          );
+        }
+
+
+        Monocle.Events.listen(window, 'load', init);
+      })();
+    </script>
+  </head>
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+
+    <h1>Selection</h1>
+    <p>
+      The Monocle.Selection object performs two roles. Firstly, it polls
+      components for any selected text.
+      It fires a <code>monocle:selection</code> event whenever text is
+      selected (and when that selection changes), and
+      fires a <code>monocle:deselection</code> event whenever all text is
+      deselected.
+    </p>
+    <p>
+      Secondly, it ensures that all text is deselected when a page turn
+      interaction commences.
+    </p>
+
+    <div id="reader"></div>
+
+    <div id="statusSelect"></div>
+
+  </body>
+</html>

@@ -1,17 +1,27 @@
-Monocle.Browser = {}
+Monocle.Browser = {};
+
+// Compare the user-agent string to a string or regex pattern.
+//
+Monocle.Browser.uaMatch = function (test) {
+  var ua = navigator.userAgent;
+  if (typeof test == "string") { return ua.indexOf(test) >= 0; }
+  return !!ua.match(test);
+}
+
 
 // Detect the browser engine and set boolean flags for reference.
 //
 Monocle.Browser.is = {
-  IE: !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1),
-  Opera: navigator.userAgent.indexOf('Opera') > -1,
-  WebKit: navigator.userAgent.indexOf('AppleWebKit') > -1,
-  Gecko: navigator.userAgent.indexOf('Gecko') > -1 &&
-    navigator.userAgent.indexOf('KHTML') === -1,
-  MobileSafari: !!navigator.userAgent.match(/AppleWebKit.*Mobile/)
-} // ... with thanks to PrototypeJS.
+  IE: !!(window.attachEvent && !Monocle.Browser.uaMatch('Opera')),
+  Opera: Monocle.Browser.uaMatch('Opera'),
+  WebKit: Monocle.Browser.uaMatch(/Apple\s?WebKit/),
+  Gecko: Monocle.Browser.uaMatch('Gecko') && !Monocle.Browser.uaMatch('KHTML'),
+  MobileSafari: Monocle.Browser.uaMatch(/AppleWebKit.*Mobile/)
+}
 
 
+// Set the browser engine string.
+//
 if (Monocle.Browser.is.IE) {
   Monocle.Browser.engine = "IE";
 } else if (Monocle.Browser.is.Opera) {
@@ -21,6 +31,7 @@ if (Monocle.Browser.is.IE) {
 } else if (Monocle.Browser.is.Gecko) {
   Monocle.Browser.engine = "Gecko";
 } else {
+  console.warn("Unknown engine; assuming W3C compliant.");
   Monocle.Browser.engine = "W3C";
 }
 
@@ -30,15 +41,21 @@ if (Monocle.Browser.is.IE) {
 Monocle.Browser.on = {
   iPhone: Monocle.Browser.is.MobileSafari && screen.width == 320,
   iPad: Monocle.Browser.is.MobileSafari && screen.width == 768,
-  UIWebView: Monocle.Browser.is.MobileSafari &&
-    navigator.userAgent.indexOf("Safari") < 0 &&
-    !navigator.standalone,
-  BlackBerry: navigator.userAgent.indexOf("BlackBerry") != -1,
-  Android: navigator.userAgent.indexOf('Android') != -1,
-  MacOSX: navigator.userAgent.indexOf('Mac OS X') != -1 &&
-    !Monocle.Browser.is.MobileSafari,
-  Kindle3: !!navigator.userAgent.match(/Kindle\/3/)
-  // TODO: Mac, Windows, etc
+  UIWebView: (
+    Monocle.Browser.is.MobileSafari &&
+    !Monocle.Browser.uaMatch('Safari') &&
+    !navigator.standalone
+  ),
+  BlackBerry: Monocle.Browser.uaMatch('BlackBerry'),
+  Android: (
+    Monocle.Browser.uaMatch('Android') ||
+    Monocle.Browser.uaMatch(/Linux;.*EBRD/) // Sony Readers
+  ),
+  MacOSX: (
+    Monocle.Browser.uaMatch('Mac OS X') &&
+    !Monocle.Browser.is.MobileSafari
+  ),
+  Kindle3: Monocle.Browser.uaMatch(/Kindle\/3/)
 }
 
 
@@ -57,6 +74,17 @@ if (Monocle.Browser.is.MobileSafari) {
 }
 Monocle.Browser.iOSVersionBelow = function (strOrNum) {
   return !!Monocle.Browser.iOSVersion && Monocle.Browser.iOSVersion < strOrNum;
+}
+
+
+// Some browser environments are too slow or too problematic for
+// special animation effects.
+//
+// FIXME: These tests are too opinionated. Replace with more targeted tests.
+//
+Monocle.Browser.renders = {
+  eInk: Monocle.Browser.on.Kindle3,
+  slow: Monocle.Browser.on.Android || Monocle.Browser.on.Blackberry
 }
 
 
@@ -81,5 +109,3 @@ Monocle.Browser.survey = function (callback) {
     callback();
   }
 }
-
-Monocle.pieceLoaded('compat/browser');

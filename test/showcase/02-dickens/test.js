@@ -4,50 +4,41 @@ Monocle.DEBUG = true;
 
   Monocle.Styles.container.right = "24px";
 
-  var bookData = {
-    getComponents: function () {
-      return [
-        'components/1.html',
-        'components/2.html',
-        'components/3.html'
-      ];
-    },
-    getContents: function () {
-      return [
-        {
-          title: "The Signal Man",
-          src: "components/1.html"
-        },
-        {
-          title: "The Haunted House",
-          src: "components/2.html",
-          children: [
-            {
-              title: "Chapter I — The Mortals in the House",
-              src: "components/2.html#p2ch1"
-            },
-            {
-              title: "Chapter II — The Ghost in Master B.'s Room",
-              src: "components/2.html#p2ch2"
-            }
-          ]
-        },
-        {
-          title: "The Trial for Murder",
-          src: "components/3.html"
-        }
-      ]
-    },
-    getComponent: function (componentId) {
-      return { url: componentId }
-    },
-    getMetaData: function(key) {
-      return {
-        title: "Three Ghost Stories",
-        creator: "Charles Dickens"
-      }[key];
+  var bookData = Monocle.bookData({
+    components: [
+      'components/1.html',
+      'components/2.html',
+      'components/3.html'
+    ],
+    chapters:[
+      {
+        title: "The Signal Man",
+        src: "components/1.html"
+      },
+      {
+        title: "The Haunted House",
+        src: "components/2.html",
+        children: [
+          {
+            title: "Chapter I — The Mortals in the House",
+            src: "components/2.html#p2ch1"
+          },
+          {
+            title: "Chapter II — The Ghost in Master B.'s Room",
+            src: "components/2.html#p2ch2"
+          }
+        ]
+      },
+      {
+        title: "The Trial for Murder",
+        src: "components/3.html"
+      }
+    ],
+    metadata: {
+      title: "Three Ghost Stories",
+      creator: "Charles Dickens"
     }
-  }
+  });
 
   // Initialize the reader element.
   Monocle.Events.listen(

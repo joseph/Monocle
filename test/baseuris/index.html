@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Base URI tests</title>
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
+
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
+    <style type="text/css">
+      .readerInfo {
+        width: 300px;
+        float: left;
+        padding-right: 20px;
+      }
+      .reader {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        border: 1px solid #000;
+        background-color: #CCC;
+      }
+
+      #hiddenFrames {
+        visibility: hidden;
+        width: 0;
+        height: 0;
+      }
+    </style>
+
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
+    <script type="text/javascript">
+      Monocle.DEBUG = true;
+
+      function iframeComponent(idpart) {
+        return function () {
+          var ifr = document.getElementById('ifr_'+idpart);
+          return { doc: ifr.contentDocument };
+        }
+      }
+
+      var bookData_url_1 = Monocle.bookData({
+        components: ['cmpts/url-1.html']
+      });
+
+      var bookData_doc_1 = Monocle.bookData({
+        components: ['cmpts/doc-1.html'],
+        getComponent: iframeComponent('doc_1')
+      });
+
+      var bookData_doc_2 = Monocle.bookData({
+        components: ['cmpts/doc-2.html'],
+        getComponent: iframeComponent('doc_2')
+      });
+
+      var bookData_doc_3 = Monocle.bookData({
+        components: ['cmpts/doc-3.html'],
+        getComponent: iframeComponent('doc_3')
+      });
+
+      var bookData_doc_4 = Monocle.bookData({
+        components: ['doc-4'],
+        getComponent: iframeComponent('doc_4')
+      });
+
+      var bookData_doc_5 = Monocle.bookData({
+        components: ['doc-5'],
+        getComponent: iframeComponent('doc_5')
+      });
+
+      // Initialize the reader element.
+      Monocle.Events.listen(
+        window,
+        'load',
+        function () {
+          window.reader1 = Monocle.Reader('reader_url_1', bookData_url_1);
+          window.reader2 = Monocle.Reader('reader_doc_1', bookData_doc_1);
+          window.reader3 = Monocle.Reader('reader_doc_2', bookData_doc_2);
+          Monocle.Events.listen(
+            document.getElementById('reader_doc_3'),
+            'monocle:component:baseuri',
+            function (e) { e.preventDefault(); }
+          );
+          window.reader3 = Monocle.Reader('reader_doc_3', bookData_doc_3);
+          Monocle.Events.listen(
+            document.getElementById('reader_doc_4'),
+            'monocle:component:baseuri',
+            function (e) {
+              e.m.cmptURI = 'http://monocle.dev/test/baseuris/cmpts/doc-4.html';
+            }
+          );
+          window.reader4 = Monocle.Reader('reader_doc_4', bookData_doc_4);
+          window.reader5 = Monocle.Reader('reader_doc_5', bookData_doc_5);
+        }
+      );
+    </script>
+
+  </head>
+
+  <body>
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+
+    <div class="readerInfo">
+      <h2>URL-1</h2>
+      <div class="reader" id="reader_url_1"></div>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOC-1</h2>
+      <div class="reader" id="reader_doc_1"></div>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOC-2</h2>
+      <div class="reader" id="reader_doc_2"></div>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOC-3</h2>
+      <div class="reader" id="reader_doc_3"></div>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOC-4</h2>
+      <div class="reader" id="reader_doc_4"></div>
+    </div>
+
+    <div class="readerInfo">
+      <h2>DOC-5</h2>
+      <div class="reader" id="reader_doc_5"></div>
+    </div>
+
+    <div id="hiddenFrames">
+      <iframe id="ifr_doc_1" src="cmpts/doc-1.html"></iframe>
+      <iframe id="ifr_doc_2" src="cmpts/doc-2.html"></iframe>
+      <iframe id="ifr_doc_3" src="cmpts/doc-3.html"></iframe>
+      <iframe id="ifr_doc_4" src="cmpts/doc-4.html"></iframe>
+      <iframe id="ifr_doc_5" src="cmpts/doc-5.html"></iframe>
+    </div>
+
+  </body>
+</html>

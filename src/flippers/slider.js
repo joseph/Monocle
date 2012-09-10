@@ -1,11 +1,9 @@
 Monocle.Flippers.Slider = function (reader) {
-  if (Monocle.Flippers == this) {
-    return new Monocle.Flippers.Slider(reader);
-  }
 
   var API = { constructor: Monocle.Flippers.Slider }
   var k = API.constants = API.constructor;
   var p = API.properties = {
+    reader: reader,
     pageCount: 2,
     activeIndex: 1,
     turnData: {}
@@ -13,7 +11,6 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function initialize() {
-    p.reader = reader;
     p.reader.listen("monocle:componentchanging", showWaitControl);
   }
 
@@ -43,21 +40,13 @@ Monocle.Flippers.Slider = function (reader) {
         console.warn("Invalid panel class.")
       }
     }
-    var q = function (action, panel, x) {
-      var dir = panel.properties.direction;
-      if (action == "lift") {
-        lift(dir, x);
-      } else if (action == "release") {
-        release(dir, x);
-      }
-    }
     p.panels = new panelClass(
       API,
       {
-        'start': function (panel, x) { q('lift', panel, x); },
-        'move': function (panel, x) { turning(panel.properties.direction, x); },
-        'end': function (panel, x) { q('release', panel, x); },
-        'cancel': function (panel, x) { q('release', panel, x); }
+        'start': lift,
+        'move': turning,
+        'end': release,
+        'cancel': release
       }
     );
   }
@@ -67,24 +56,6 @@ Monocle.Flippers.Slider = function (reader) {
   // to be able to select or otherwise interact with text.
   function interactiveMode(bState) {
     p.reader.dispatchEvent('monocle:interactive:'+(bState ? 'on' : 'off'));
-    if (!Monocle.Browser.env.selectIgnoresZOrder) { return; }
-    if (p.interactive = bState) {
-      if (p.activeIndex != 0) {
-        var place = getPlace();
-        if (place) {
-          setPage(
-            p.reader.dom.find('page', 0),
-            place.getLocus(),
-            function () {
-              flipPages();
-              prepareNextPage();
-            }
-          );
-        } else {
-          flipPages();
-        }
-      }
-    }
   }
 
 
@@ -136,6 +107,8 @@ Monocle.Flippers.Slider = function (reader) {
 
   function lift(dir, boxPointX) {
     if (p.turnData.lifting || p.turnData.releasing) { return; }
+
+    p.reader.selection.deselect();
 
     p.turnData.points = {
       start: boxPointX,
@@ -247,19 +220,30 @@ Monocle.Flippers.Slider = function (reader) {
   function onGoingBackward(x) {
     var lp = lowerPage(), up = upperPage();
 
-    // set lower to "the page before upper"
-    setPage(
-      lp,
-      getPlace(up).getLocus({ direction: k.BACKWARDS }),
-      function () {
-        // flip lower to upper, ready to slide in from left
+    if (Monocle.Browser.env.offscreenRenderingClipped) {
+      // set lower to "the page before upper"
+      setPage(
+        lp,
+        getPlace(up).getLocus({ direction: k.BACKWARDS }),
+        function () {
+          // flip lower to upper, ready to slide in from left
+          flipPages();
+          // move lower off the screen to the left
+          jumpOut(lp, function () {
+            lifted(x);
+          });
+        }
+      );
+    } else {
+      jumpOut(lp, function () {
         flipPages();
-        // move lower off the screen to the left
-        jumpOut(lp, function () {
-          lifted(x);
-        });
-      }
-    );
+        setPage(
+          lp,
+          getPlace(up).getLocus({ direction: k.BACKWARDS }),
+          function () { lifted(x); }
+        );
+      });
+    }
   }
 
 
@@ -302,13 +286,13 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function afterCancellingForward() {
-    resetTurnData();
+    announceCancel();
   }
 
 
   function afterCancellingBackward() {
     flipPages(); // flip upper to lower
-    jumpIn(lowerPage(), function () { prepareNextPage(resetTurnData); });
+    jumpIn(lowerPage(), function () { prepareNextPage(announceCancel); });
   }
 
 
@@ -323,6 +307,7 @@ Monocle.Flippers.Slider = function (reader) {
 
   function lifted(x) {
     p.turnData.lifting = false;
+    p.reader.dispatchEvent('monocle:turning');
     var releaseArgs = p.turnData.releaseArgs;
     if (releaseArgs) {
       p.turnData.releaseArgs = null;
@@ -335,6 +320,12 @@ Monocle.Flippers.Slider = function (reader) {
 
   function announceTurn() {
     p.reader.dispatchEvent('monocle:turn');
+    resetTurnData();
+  }
+
+
+  function announceCancel() {
+    p.reader.dispatchEvent('monocle:turn:cancel');
     resetTurnData();
   }
 
@@ -498,5 +489,3 @@ Monocle.Flippers.Slider.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
 Monocle.Flippers.Slider.FORWARDS = 1;
 Monocle.Flippers.Slider.BACKWARDS = -1;
 Monocle.Flippers.Slider.FOLLOW_DURATION = 100;
-
-Monocle.pieceLoaded('flippers/slider');

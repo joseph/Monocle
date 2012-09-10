@@ -3,9 +3,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Locus search test</title>
-
-    <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
     <link rel="stylesheet" type="text/css" href="../tests.css" />
+
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
     <style type="text/css">
       #reader {
         position: relative;
@@ -13,33 +13,10 @@
         height: 400px;
         border: 1px solid #000;
         background-color: #CCC;
-        overflow: hidden;
       }
     </style>
 
-    <!-- MONOCLE CORE -->
-    <script type="text/javascript" src="../../src/core/monocle.js"></script>
-    <script type="text/javascript" src="../../src/compat/env.js"></script>
-    <script type="text/javascript" src="../../src/compat/css.js"></script>
-    <script type="text/javascript" src="../../src/compat/stubs.js"></script>
-    <script type="text/javascript" src="../../src/compat/browser.js"></script>
-    <script type="text/javascript" src="../../src/core/factory.js"></script>
-    <script type="text/javascript" src="../../src/core/events.js"></script>
-    <script type="text/javascript" src="../../src/core/styles.js"></script>
-    <script type="text/javascript" src="../../src/core/reader.js"></script>
-    <script type="text/javascript" src="../../src/core/book.js"></script>
-    <script type="text/javascript" src="../../src/core/component.js"></script>
-    <script type="text/javascript" src="../../src/core/place.js"></script>
-
-    <!-- MONOCLE FLIPPERS -->
-    <script type="text/javascript" src="../../src/controls/panel.js"></script>
-    <script type="text/javascript" src="../../src/panels/twopane.js"></script>
-    <script type="text/javascript" src="../../src/panels/eink.js"></script>
-    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
-    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
-    <script type="text/javascript" src="../../src/flippers/instant.js"></script>
-
-
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
     <script>
       function nodeForXPath(doc, xpath) {
         return doc.evaluate(xpath, doc, null, 9, null).singleNodeValue;
@@ -83,14 +60,8 @@
       (function () {
         Monocle.DEBUG = true;
 
-        var bd = {
-          getComponents: function () { return ['pt1.html', 'pt2.html']; },
-          getComponent: function (cmptId) { return { url: cmptId } },
-          getContents: function () { return []; },
-          getMetaData: function (key) { return null; }
-        }
-
         function init() {
+          var bd = Monocle.bookData({ components: ['pt1.html', 'pt2.html'] });
           var options = { stylesheet: ".hl { background: #FFC !important; }" }
           window.reader = Monocle.Reader('reader', bd, options);
         }

@@ -51,6 +51,11 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
+      // IE10 hack.
+      if (Monocle.Browser.env.documentElementHasScrollbars) {
+        ce.ownerDocument.documentElement.style.overflow = 'hidden';
+      }
+
       // Apply body style changes.
       ce.style.cssText = rules;
 
@@ -79,7 +84,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var w = Math.max(bd.scrollWidth, de.scrollWidth);
 
     // Add one because the final column doesn't have right gutter.
-    w += k.GAP;
+    // w += k.GAP;
 
     if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
       w += p.page.m.offset;
@@ -90,11 +95,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
-    return {
-      col: elem.clientWidth,
-      width: elem.clientWidth + k.GAP,
-      height: elem.clientHeight
-    }
+    var w = elem.clientWidth;
+    if (elem.getBoundingClientRect) { w = elem.getBoundingClientRect().width; }
+    if (Monocle.Browser.env.roundPageDimensions) { w = Math.round(w); }
+    return { col: w, width: w + k.GAP, height: elem.clientHeight }
   }
 
 
@@ -209,5 +213,3 @@ Monocle.Dimensions.Columns.STYLE = {
     "overflow": "hidden"
   }
 }
-
-Monocle.pieceLoaded("dimensions/columns");

@@ -1,15 +1,10 @@
 Monocle.DEBUG = true;
 
 (function () {
-  var bookData = {
-    getComponents: function () {
-      return ['content/0.html', 'content/1/1.html', 'content/2/2.html'];
-    },
-    getComponent: function (cmptId) {
-      return { url: cmptId }
-    },
-    getContents: function () {
-      return [
+  function init() {
+    var bookData = Monocle.bookData({
+      components: ['content/0.html', 'content/1/1.html', 'content/2/2.html'],
+      chapters: [
         {
           title: "0",
           src: "content/0.html"
@@ -26,29 +21,16 @@ Monocle.DEBUG = true;
           title: "3 (does not exist)",
           src: "content/3/3.html"
         }
-      ];
-    },
-    getMetaData: function(key) {
-      return { title: "Lorem Ipsum", creator: "Mr Monocle" }[key];
-    }
+      ],
+      metadata: { title: "Lorem Ipsum", creator: "Mr Monocle" }
+    });
+    var options = { panels: Monocle.Panels.IMode }
+    Monocle.Reader('reader', bookData, options, function (rdr) {
+      window.reader = rdr;
+      alertIfComponentNotFound(rdr);
+      createStencil(rdr);
+    });
   }
-
-  var rdrOptions = {
-    panels: Monocle.Panels.IMode
-  }
-
-  // Initialize the reader element.
-  Monocle.Events.listen(
-    window,
-    'load',
-    function () {
-      Monocle.Reader('reader', bookData, rdrOptions, function (rdr) {
-        window.reader = rdr;
-        alertIfComponentNotFound(rdr);
-        createStencil(rdr);
-      });
-    }
-  );
 
 
   function alertIfComponentNotFound(rdr) {
@@ -63,5 +45,9 @@ Monocle.DEBUG = true;
     // it highlights the stencil's link cutouts.
     stencil.toggleHighlights();
   }
+
+
+  // Initialize the reader element.
+  Monocle.Events.listen(window, 'load', init);
 
 })();

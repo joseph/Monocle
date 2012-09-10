@@ -5,12 +5,11 @@
 // A little console stub if not initialized in a console-equipped browser.
 //
 if (typeof window.console == "undefined") {
-  window.console = {
-    messages: [],
-    log: function (msg) {
-      this.messages.push(msg);
-    }
+  window.console = { messages: [] }
+  window.console.log = function (msg) {
+    this.messages.push(msg);
   }
+  window.console.warn = window.console.log;
 }
 
 
@@ -22,11 +21,30 @@ window.console.compatDir = function (obj) {
     for (x in o) {
       parts.push(x + ": " + o[x]);
     }
-    return parts.join("; ");
+    return parts.join(";\n");
   }
 
-  window.console.log(stringify(obj));
+  var out = stringify(obj);
+  window.console.log(out);
+  return out;
 }
 
 
-Monocle.pieceLoaded('compat/stubs');
+// This is called by Monocle methods and practices that are no longer
+// recommended and will soon be removed.
+//
+window.console.deprecation = function (msg) {
+  console.warn("[DEPRECATION]: "+msg);
+  if (typeof console.trace == "function") {
+    console.trace();
+  }
+}
+
+
+// A convenient alias for setTimeout that assumes 0 if no timeout is specified.
+//
+Monocle.defer = function (fn, time) {
+  if (fn && typeof fn == "function") {
+    return setTimeout(fn, time || 0);
+  }
+}

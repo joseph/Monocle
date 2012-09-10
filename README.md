@@ -81,24 +81,21 @@ read the [Monocle Wiki](https://github.com/joseph/Monocle/wiki).
 
 At this time, Monocle aims for full support of all browsers with a
 W3C-compliant CSS column module implementation. That is Gecko, WebKit and
-Opera at this point. Legacy support is provided for some other browsers,
-including recent versions of Internet Explorer. Please encourage your
-browser-maker to work on implementing these standards in particular:
+Opera at this point. Please encourage your browser-maker to work on
+implementing these standards in particular:
 
 * CSS Multi-Column Layout
 * W3C DOM Level 2 Event Model
 * CSS 2D Transforms (better: 3D Transforms, even better: hardware acceleration)
 
-Monocle has a particular focus on mobile devices. Monocle either supports or
-is trying to support:
+Monocle has a particular focus on mobile devices. Monocle supports:
 
-* iOS 3.1+
-* Android 2.0+
-* Blackberry 6
+* iOS 4.2+
+* Android 2.2+
 * Kindle 3
 
 All these mobile platforms implement columned iframes differently, so support
-may be patchy in places, but we're working on it. Patches that improve or
+may be imperfect in places, but we're working on it. Patches that improve or
 broaden Monocle's browser support are very welcome (but please provide tests).
 
 Inventive Labs would like to thank Ebooq for providing a device to assist with
@@ -116,7 +113,7 @@ Monocle has a small set of big goals:
 We'd also like to provide more implementation showcases in the tests, and
 offer more developer documentation in the wiki. 
 
-If you can help out with any of these things, fork away (or contact 'joseph'
+If you can help out with any of these things, fork away (or create an issue
 on GitHub).
 
 

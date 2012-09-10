@@ -35,6 +35,11 @@ Monocle.Controls.Panel = function () {
   }
 
 
+  function setDirection(dir) {
+    p.direction = dir;
+  }
+
+
   function listenTo(evtCallbacks) {
     p.evtCallbacks = evtCallbacks;
   }
@@ -86,7 +91,7 @@ Monocle.Controls.Panel = function () {
 
   function invoke(evtType, evt) {
     if (p.evtCallbacks[evtType]) {
-      p.evtCallbacks[evtType](API, evt.m.offsetX, evt.m.offsetY);
+      p.evtCallbacks[evtType](p.direction, evt.m.offsetX, evt.m.offsetY, API);
     }
     evt.preventDefault();
   }
@@ -115,6 +120,7 @@ Monocle.Controls.Panel = function () {
   API.deafen = deafen;
   API.expand = expand;
   API.contract = contract;
+  API.setDirection = setDirection;
 
   return API;
 }
@@ -128,6 +134,3 @@ Monocle.Controls.Panel.DEFAULT_STYLES = {
   position: 'absolute',
   height: '100%'
 }
-
-
-Monocle.pieceLoaded('controls/panel');

@@ -61,6 +61,11 @@ Monocle.Place = function () {
   }
 
 
+  function pagesInComponent() {
+    return p.component.lastPageNumber();
+  }
+
+
   function chapterInfo() {
     if (p.chapter) {
       return p.chapter;
@@ -103,10 +108,23 @@ Monocle.Place = function () {
   // Returns how far this place is in the entire book (0 - start, 1.0 - end).
   //
   function percentageOfBook() {
-    componentIds = p.component.properties.book.properties.componentIds;
-    componentSize = 1.0 / componentIds.length;
-    var pc = componentIds.indexOf(componentId()) * componentSize;
-    pc += componentSize * p.percent;
+    var book = p.component.properties.book;
+    var componentIds = book.properties.componentIds;
+    var weights = book.componentWeights();
+    var cmptIndex = p.component.properties.index;
+    var pc = weights[cmptIndex] * p.percent;
+    for (var i = 0, ii = cmptIndex; i < ii; ++i) { pc += weights[i]; }
+
+    // Note: This is a decent estimation of current page number and total
+    // number of pages, but it's very approximate. Could be improved by storing
+    // the page counts of all components accessed (since the dimensions of the
+    // reader last changed), and averaging the result across them. (You
+    // probably want to ignore calcs for components < 2 or 3 pages long, too.
+    // The bigger the component, the more accurate the calculation.)
+    //
+    // var bkPages = p.component.lastPageNumber() / weights[cmptIndex];
+    // console.log('Page: '+ Math.floor(pc*bkPages)+ ' of '+ Math.floor(bkPages));
+
     return pc;
   }
 
@@ -133,6 +151,7 @@ Monocle.Place = function () {
   API.percentageThrough = percentAtBottomOfPage;
   API.pageAtPercentageThrough = pageAtPercentageThrough;
   API.pageNumber = pageNumber;
+  API.pagesInComponent = pagesInComponent;
   API.chapterInfo = chapterInfo;
   API.chapterTitle = chapterTitle;
   API.chapterSrc = chapterSrc;
@@ -163,12 +182,22 @@ Monocle.Place.FromPercentageThrough = function (component, percent) {
 // component may not have been loaded yet. But we can get a locus.
 //
 Monocle.Place.percentOfBookToLocus = function (reader, percent) {
-  var componentIds = reader.getBook().properties.componentIds;
-  var componentSize = 1.0 / componentIds.length;
-  return {
-    componentId: componentIds[Math.floor(percent / componentSize)],
-    percent: (percent % componentSize) / componentSize
+  var book = reader.getBook();
+  var componentIds = book.properties.componentIds;
+  var weights = book.componentWeights();
+  var cmptIndex = 0, cmptWeight = 0;
+  percent = Math.min(percent, 0.99999);
+  while (percent >= 0) {
+    cmptWeight = weights[cmptIndex];
+    percent -= weights[cmptIndex];
+    if (percent >= 0) {
+      cmptIndex += 1;
+      if (cmptIndex >= weights.length) {
+        console.error('Unable to calculate locus from percentage: '+percent);
+        return;
+      }
+    }
   }
+  var cmptPercent = (percent + cmptWeight) / cmptWeight;
+  return { componentId: componentIds[cmptIndex], percent: cmptPercent }
 }
-
-Monocle.pieceLoaded('core/place');

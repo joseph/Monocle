@@ -21,7 +21,7 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
     for (dir in p.panels) {
       flipper.properties.reader.addControl(p.panels[dir]);
       p.panels[dir].listenTo(evtCallbacks);
-      p.panels[dir].properties.direction = flipper.constants[dir.toUpperCase()];
+      p.panels[dir].setDirection(flipper.constants[dir.toUpperCase()]);
       with (p.panels[dir].properties.div.style) {
         dir == "forwards" ? right = 0 : left = 0;
       }
@@ -39,8 +39,8 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
     var sheaf = page.m.sheafDiv;
     var bw = sheaf.offsetLeft;
     var fw = page.offsetWidth - (sheaf.offsetLeft + sheaf.offsetWidth);
-    bw = Math.floor(((bw - 2) / page.offsetWidth) * 10000 / 100 ) + "%";
-    fw = Math.floor(((fw - 2) / page.offsetWidth) * 10000 / 100 ) + "%";
+    bw = Math.floor(((bw - 2) / page.offsetWidth) * 10000 / 100) + "%";
+    fw = Math.floor(((fw - 2) / page.offsetWidth) * 10000 / 100) + "%";
     p.panels.forwards.properties.div.style.width = fw;
     p.panels.backwards.properties.div.style.width = bw;
   }
@@ -52,5 +52,3 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
 
   return API;
 }
-
-Monocle.pieceLoaded('panels/marginal');

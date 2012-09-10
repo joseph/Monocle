@@ -31,10 +31,13 @@ body {
   background-color: #FCF6F0;
   -webkit-box-shadow: 2px 2px 4px #754;
   -moz-box-shadow: 2px 2px 4px #754;
+  box-shadow: 2px 2px 4px #754;
   -webkit-border-top-left-radius: 26px 6px;
   -webkit-border-bottom-left-radius: 26px 6px;
-  -moz-border-radius-topleft: 26px 6px;
-  -moz-border-radius-bottomleft: 26px 6px;
+  -moz-border-top-left-radius: 26px 6px;
+  -moz-border-bottom-left-radius: 26px 6px;
+  border-top-left-radius: 26px 6px;
+  border-bottom-left-radius: 26px 6px;
 }
 .dummyPage + .dummyPage {
   top: 16px;
@@ -42,6 +45,7 @@ body {
   right: 16px;
   -webkit-box-shadow: 1px 0 2px #A99;
   -moz-box-shadow: 1px 0 2px #A99;
+  box-shadow: 1px 0 2px #A99;
 }
 .dummyPage + .dummyPage + .dummyPage {
   top: 13px;
@@ -67,12 +71,17 @@ body {
   left: 65%;
   -webkit-box-shadow: -3px 0 3px #311;
   -moz-box-shadow: -3px 0 3px #311;
+  box-shadow: -3px 0 3px #311;
   -webkit-border-top-right-radius: 3px;
   -webkit-border-bottom-right-radius: 3px;
-  -moz-border-radius-topright: 3px;
-  -moz-border-radius-bottomright: 3px;
+  -moz-border-top-right-radius: 3px;
+  -moz-border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
   background-color: #F7F7F7;
-  background: -webkit-gradient(linear, left top, right bottom, from(#FFF), to(#DDD));
+  background: -webkit-linear-gradient(0deg, #DDD, #FFF);
+  background: -moz-linear-gradient(0deg , #DDD, #FFF);
+  background: linear-gradient(90deg, #DDD, #FFF);
 }
 .board {
   position: absolute;
@@ -129,6 +138,7 @@ body {
   -moz-box-shadow: 1px 2px 2px #652;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
+  border-radius: 10px;
   overflow-y: auto;
   color: #432;
   font: 11pt Georgia, serif;
@@ -193,11 +203,14 @@ div.monelem_page {
   box-shadow: 1px 0 2px #CBA;
   -webkit-border-top-left-radius: 26px 4px;
   -webkit-border-bottom-left-radius: 26px 4px;
-  -moz-border-radius-topleft: 26px 4px;
-  -moz-border-radius-bottomleft: 26px 4px;
+  -moz-border-top-left-radius: 26px 4px;
+  -moz-border-bottom-left-radius: 26px 4px;
+  border-top-left-radius: 26px 4px;
+  border-bottom-left-radius: 26px 4px;
   background-color: #FFFFFE;
+  background-image: -webkit-linear-gradient(0deg, #EDEAE8 0px, #FFFFFE 24px);
   background-image: -moz-linear-gradient(0deg, #EDEAE8 0px, #FFFFFE 24px);
-  background: -webkit-gradient(linear, 0 0, 24 0, from(#EDEAE8), to(#FFFFFE));
+  background-image: linear-gradient(90deg, #EDEAE8 0px, #FFFFFE 24px);
 }
 
 div.monelem_sheaf {

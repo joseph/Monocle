@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Default stylesheet test</title>
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
+
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
+    <style type="text/css">
+      #reader {
+        width: 300px;
+        height: 420px;
+        border: 1px solid #000;
+        background-color: #CCC;
+      }
+      #part1, #part2 {
+        display: none;
+      }
+    </style>
+
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
+    <script type="text/javascript">
+      (function () {
+        function init() {
+          var bd = Monocle.bookDataFromIds(['part1', 'part2']);
+          var opts = { stylesheet: 'body { color: #090; }' };
+          window.reader = Monocle.Reader('reader', bd, opts, readerLoaded);
+        }
+
+
+        function readerLoaded() {
+          var sSel = document.getElementById('sizeSelect');
+          sSel.addEventListener('change', function (evt) {
+            reader.formatting.setFontScale(parseFloat(sSel.value), true);
+          });
+
+          var cSel = document.getElementById('colorSelect');
+          cSel.addEventListener('change', function (evt) {
+            reader.formatting.updatePageStyles(
+              reader.formatting.properties.initialStyles,
+              'body { color: '+cSel.value+'; }',
+              true
+            );
+          });
+        }
+
+
+        Monocle.DEBUG = true;
+        Monocle.Events.listen(window, 'load', init);
+      })();
+    </script>
+
+  </head>
+
+  <body class="narrow">
+    <a href="../index.html" class="backToGuide">&larr; Back to Guide</a>
+    <h1>Formatting</h1>
+    <p>
+      Demonstrates how to apply styles to each component on load in
+      the Monocle Reader's initialisation options. In this case, it
+      turns the component's body text <span style="color: #090;">green</span>.
+    </p>
+
+    <p>
+      Font-scale:
+      <select id="sizeSelect">
+        <option value="">&mdash;</option>
+        <option value="0.1">10%</option>
+        <option value="0.5">50%</option>
+        <option value="0.8">80%</option>
+        <option value="1.0">100%</option>
+        <option value="1.1">110%</option>
+        <option value="1.3">130%</option>
+        <option value="1.6">160%</option>
+        <option value="2.0">200%</option>
+        <option value="2.5">250%</option>
+        <option value="4.0">400%</option>
+        <option value="8.0">800%</option>
+      </select>
+
+      Color:
+      <select id="colorSelect">
+        <option value="#090">Green</option>
+        <option value="#009">Blue</option>
+      </select>
+    </p>
+
+    <div id="reader"></div>
+
+    <div id="part1">
+      <p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer neque neque, varius volutpat cursus vel, tristique vel mi. Etiam tincidunt metus sed libero fringilla venenatis. Suspendisse interdum, neque sit amet fringilla consectetur, nunc nulla accumsan est, vitae porta ligula eros non felis. Donec volutpat viverra metus, eu tincidunt lectus dapibus ac. Sed porttitor tristique libero, at feugiat ligula feugiat ut.
+      </p>
+      <p>
+    Etiam sem nunc, tristique id suscipit id, vulputate at tellus. Etiam tempus orci a nulla convallis id imperdiet tellus ultrices. Morbi faucibus enim id lectus porttitor sollicitudin scelerisque neque commodo. Proin tempor ultrices posuere. Suspendisse et quam neque. Proin imperdiet dolor in libero volutpat elementum. Nunc accumsan tristique nisi, sit amet vestibulum nisi ultrices et. Nam vestibulum, erat et varius mattis, lectus enim auctor tellus, sed tincidunt metus tortor sed tortor. Nam fermentum tristique sapien sed fermentum. Ut interdum mauris eget purus tempus viverra.
+      </p>
+
+      <p>
+    Fusce ut ipsum id lorem tristique scelerisque non ut sem. Sed sapien ligula, imperdiet hendrerit vulputate quis, lobortis sit amet justo. Vivamus eu ante sit amet tortor aliquam congue. Curabitur tincidunt felis in augue facilisis ac pharetra elit aliquet. Sed at nulla quis purus egestas condimentum. Nunc ornare odio sed urna feugiat pellentesque. Cras volutpat euismod eros, sollicitudin pellentesque purus sollicitudin et. Aenean nisl purus, congue id sodales id, tincidunt sit amet arcu. Morbi feugiat erat at leo molestie aliquet. Morbi eu felis mauris, a feugiat lorem. Nulla mattis rhoncus semper. Maecenas porta, velit at mollis auctor, purus purus viverra dolor, ac convallis libero dolor a lectus. Cras at neque erat, at semper elit. Duis at tellus neque. Phasellus tincidunt viverra velit, et hendrerit tortor sagittis commodo. Sed mattis mi vulputate risus laoreet iaculis.
+      </p>
+    </div>
+
+
+    <div id="part2">
+      <p>This is part 2.</p>
+      <p>It should be green too.</p>
+    </div>
+
+  </body>
+</html>

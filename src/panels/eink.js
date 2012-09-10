@@ -14,9 +14,9 @@ Monocle.Panels.eInk = function (flipper, evtCallbacks) {
 
     p.panel.listenTo({ end: function (panel, x) {
       if (x < p.panel.properties.div.offsetWidth / 2) {
-        p.panel.properties.direction = flipper.constants.BACKWARDS;
+        p.panel.setDirection(flipper.constants.BACKWARDS);
       } else {
-        p.panel.properties.direction = flipper.constants.FORWARDS;
+        p.panel.setDirection(flipper.constants.FORWARDS);
       }
       evtCallbacks.end(panel, x);
     } });

@@ -2,37 +2,10 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
     <title>Embedding in an iframe</title>
+    <link rel="stylesheet" type="text/css" href="../tests.css" />
 
-    <!-- MONOCLE CORE -->
-    <script type="text/javascript" src="../../src/core/monocle.js"></script>
-    <script type="text/javascript" src="../../src/compat/env.js"></script>
-    <script type="text/javascript" src="../../src/compat/css.js"></script>
-    <script type="text/javascript" src="../../src/compat/stubs.js"></script>
-    <script type="text/javascript" src="../../src/compat/browser.js"></script>
-    <script type="text/javascript" src="../../src/core/events.js"></script>
-    <script type="text/javascript" src="../../src/core/factory.js"></script>
-    <script type="text/javascript" src="../../src/core/styles.js"></script>
-    <script type="text/javascript" src="../../src/core/reader.js"></script>
-    <script type="text/javascript" src="../../src/core/book.js"></script>
-    <script type="text/javascript" src="../../src/core/component.js"></script>
-    <script type="text/javascript" src="../../src/core/place.js"></script>
-
-    <!-- MONOCLE FLIPPERS -->
-    <script type="text/javascript" src="../../src/controls/panel.js"></script>
-    <script type="text/javascript" src="../../src/panels/imode.js"></script>
-    <script type="text/javascript" src="../../src/dimensions/columns.js"></script>
-    <script type="text/javascript" src="../../src/flippers/slider.js"></script>
-
-    <script type="text/javascript" src="../../src/controls/contents.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="../../styles/monocore.css" />
-    <link rel="stylesheet" type="text/css" href="../../styles/monoctrl.css" />
-
+    <link rel="stylesheet" type="text/css" href="../../dist/styles/monocore.css" />
     <style type="text/css">
       body {
         margin: 0;
@@ -46,45 +19,20 @@
       }
     </style>
 
+    <script type="text/javascript" src="../../dist/scripts/monocore.js"></script>
     <script type="text/javascript">
       Monocle.DEBUG = true;
 
       (function () {
-        var bookData = {
-          getComponents: function () {
-            return ['content/1.html', 'content/2.html'];
-          },
-          getComponent: function (cmptId) {
-            return { url: cmptId }
-          },
-          getContents: function () {
-            return [
-              {
-                title: "Part I",
-                src: "content/1.html"
-              },
-              {
-                title: "Part II",
-                src: "content/2.html"
-              }
-            ];
-          },
-          getMetaData: function(key) {
-            return { title: "Lorem Ipsum", creator: "Mr Monocle" }[key];
-          }
+        function init() {
+          var bookData = Monocle.bookData({
+            components: ['content/1.html', 'content/2.html']
+          });
+          var options = { panels: Monocle.Panels.IMode };
+          window.reader = Monocle.Reader('reader', bookData, options);
         }
 
-        // Initialize the reader element.
-        var rdrOptions = {
-          panels: Monocle.Panels.IMode
-        }
-        Monocle.Events.listen(
-          window,
-          'load',
-          function () {
-            window.reader = Monocle.Reader('reader', bookData, rdrOptions);
-          }
-        );
+        Monocle.Events.listen(window, 'load', init);
       })();
     </script>
 

@@ -31,7 +31,7 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
     p.panels = new panelClass(
       API,
       {
-        'end': function (panel) { turn(panel.properties.direction); }
+        'end': turn
       }
     );
   }
@@ -39,7 +39,9 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
 
   function turn(dir) {
     if (p.turning) { return; }
+    p.reader.selection.deselect();
     moveTo({ page: getPlace().pageNumber() + dir});
+    p.reader.dispatchEvent('monocle:turning');
   }
 
 
@@ -124,6 +126,3 @@ Monocle.Flippers.Scroller.rate = 20; // frame-rate of the animation
 Monocle.Flippers.Scroller.FORWARDS = 1;
 Monocle.Flippers.Scroller.BACKWARDS = -1;
 Monocle.Flippers.Scroller.DEFAULT_PANELS_CLASS = Monocle.Panels.TwoPane;
-
-
-Monocle.pieceLoaded('flippers/scroller');
