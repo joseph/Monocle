@@ -99,20 +99,12 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function loadFrameFromHTML(src, frame, callback) {
     var fn = function () {
       Monocle.Events.deafen(frame, 'load', fn);
+      frame.whenDocumentReady();
       Monocle.defer(callback);
     }
     Monocle.Events.listen(frame, 'load', fn);
-
-    // Load the component into the iframe using document.write().
-    frame.contentDocument.open('text/html', 'replace');
-    frame.contentDocument.write(src);
-    frame.contentDocument.close();
-    frame.whenDocumentReady();
-
-    // ALTERNATIVE: load the component into the iframe with a JS URL.
-    // frame.contentWindow['monCmptData'] = src;
-    // src = "javascript:window['monCmptData'];"
-    // frame.src = src;
+    frame.contentWindow['monCmptData'] = src;
+    frame.src = "javascript:window['monCmptData'];"
   }
 
 
