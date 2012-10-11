@@ -347,7 +347,7 @@ Monocle.Component = function (book, id, index, chapters, source) {
       var baseURI = computeBaseURI(reader);
       if (baseURI) {
         p.source.html = p.source.html.replace(
-          new RegExp("(<head(\s[^>]*>)|>)", "im"),
+          new RegExp("(<head[^>]*>)", "im"),
           '$1<base href="'+baseURI+'" />'
         );
       }
