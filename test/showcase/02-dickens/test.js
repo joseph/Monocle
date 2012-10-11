@@ -152,7 +152,7 @@ Monocle.DEBUG = true;
               runner.className = "runner";
               cntr.appendChild(runner);
               this.runners.push(runner);
-              this.update(page);
+              this.update(page, page.m.place.pageNumber());
               return cntr;
             },
             update: function (page, pageNumber) {
