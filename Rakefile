@@ -1,12 +1,16 @@
+require 'rubygems'
+require 'bundler/setup'
+Bundler.require
+
+require 'fileutils'
+require 'cgi'
+
 class MonocleDistributor
 
   def build(options = {})
-    dep("sprockets")
 
-    minified = (
-      options[:minify] &&
-      dep("yui/compressor", :else => "compression phase skipped")
-    )
+    minified = options[:minify]
+
 
     sproc = Sprockets::Environment.new
     sproc.append_path("src")
@@ -74,20 +78,7 @@ class MonocleDistributor
 
   private
 
-    def dep(gem_name, options = {})
-      begin
-        require(gem_name)
-        true
-      rescue ::LoadError
-        msg = "You do not have the #{gem_name.gsub("/", "-")} gem installed"
-        options[:else] ? puts("#{msg}; #{options[:else]}.") : raise("#{msg}.")
-        false
-      end
-    end
-
-
     def distribute(filename, str)
-      require 'fileutils'
       filepath = File.join(dist_dir, filename)
       FileUtils.mkdir_p(File.dirname(filepath))
       File.open(filepath, 'w') { |f| f.write(str) }
@@ -108,9 +99,7 @@ class MonocleDistributor
 
 
     def upload_packages(pkgs)
-      if dep('highline', :else => "no HighLine, no prompts")
-        return  unless HighLine.new.agree("Upload these packages to Github?")
-      end
+      return  unless HighLine.new.agree("Upload these packages to Github?")
       pkgs.reverse.each { |pkg_path|
         min = pkg_path.index('minified') ? 'minified ' : ''
         upload(pkg_path, "Monocle #{min}script @ #{release_name}")
@@ -119,8 +108,7 @@ class MonocleDistributor
 
 
     def upload(file, desc)
-      require('cgi')
-      dep('net/github-upload')
+
       login = `git config github.user`.strip
       token = `git config github.token`.strip
       gh = Net::GitHub::Upload.new(:login => login, :token => token)
