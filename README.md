@@ -62,10 +62,21 @@ which it can lazily load the contents of the book as the user requests it.
 
 ## Exploring Monocle
 
-If you want to explore all of Monocle's features, clone this repository and
-open `test/index.html` in your browser. This will guide you through Monocle's
-tests, which incidentally demonstrate all the major features. View source or
-browse the test directory in your text editor for implementation details.
+If you want to explore all of Monocle's features, you'll find numerous tests
+and examples here:
+
+* http://test.monoclejs.com/test
+
+Alternatively, you can clone this repository and [build 
+Monocle](https://github.com/joseph/Monocle/wiki/Building) (or simply 
+extract the [pre-built Monocle](https://github.com/joseph/Monocle/downloads)
+to `dist`). Then open `test/index.html` in your browser. This will guide you 
+through Monocle's tests, which incidentally demonstrate all the major 
+features. View source or browse the test directory in your text editor for 
+implementation details.
+
+For more info: 
+https://github.com/joseph/Monocle/wiki/Running-Monocle-locally
 
 
 ## Connecting Monocle to your book content
