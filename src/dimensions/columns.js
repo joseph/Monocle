@@ -115,7 +115,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     var elem = p.page.m.sheafDiv;
     var w = elem.clientWidth;
     if (elem.getBoundingClientRect) { w = elem.getBoundingClientRect().width; }
-    if (Monocle.Browser.env.roundPageDimensions) {
+    if (Monocle.Browser.is.WebKit) {
       var zoom = zoomWebkit();
       w = Math.round(w * zoom) / zoom;
     }
