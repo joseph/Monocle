@@ -96,7 +96,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   // Taken from https://github.com/yonran/detect-zoom
   function zoomWebkit() {
     var container = document.createElement('div')
-      , div = document.createElement('div');
+      , div = document.createElement('div')
       , important = function(str){ return str.replace(/;/g, " !important;"); };
 
     container.setAttribute('style', important('width:0; height:0; overflow:hidden; visibility:hidden; position: absolute;'));
