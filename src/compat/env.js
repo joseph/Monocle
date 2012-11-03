@@ -53,7 +53,9 @@ Monocle.Env = function () {
     Monocle.defer(removeTestFrame);
 
     if (typeof surveyCallback == "function") {
-      surveyCallback(API);
+      fn = surveyCallback;
+      surveyCallback = null;
+      fn(API);
     }
   }
 
