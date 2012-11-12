@@ -6,7 +6,7 @@
  */
 
 Monocle = {
-  VERSION: "2.3.1"
+  VERSION: "3.0.0"
 };
 
 
