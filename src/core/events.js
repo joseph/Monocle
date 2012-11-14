@@ -204,7 +204,7 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 }
 
 
-// Looks for start/end events on an element without significant move events in
+// Looks for start/end events on an element without move events in
 // between. Fires on the end event.
 //
 // Also sets up a dummy click event on Kindle3, so that the elem becomes a
@@ -217,8 +217,7 @@ Monocle.Events.deafenForContact = function (elem, listeners) {
 // Returns a listeners object that you should pass to deafenForTap if you
 // need to.
 Monocle.Events.listenForTap = function (elem, fn, activeClass) {
-  var startPos;
-  var elemRect;
+  var tapPos = null;
 
   // On Kindle, register a noop function with click to make the elem a
   // cursor target.
@@ -226,61 +225,35 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
     Monocle.Events.listen(elem, 'click', function () {});
   }
 
-  var annul = function () {
-    startPos = null;
-    if (activeClass && elem.dom) { elem.dom.removeClass(activeClass); }
+  var cancel = function () {
+    if (tapPos) { annul(); }
   }
 
-  var annulIfOutOfBounds = function (evt) {
-    // Do nothing if annulled.
-    if (!startPos) {
-      return;
-    }
-    // We don't have to track this nonsense for mouse events.
-    if (evt.type.match(/^mouse/)) {
-      return;
-    }
-    // Doesn't work on iOS 3.1 for some reason, so ignore for that version.
-    if (Monocle.Browser.is.MobileSafari && Monocle.Browser.iOSVersion < "3.2") {
-      return;
-    }
-    // Check whether element has changed location (due to scrolling?).
-    if (elemRect && !activeClass) {
-      var newRect = elem.getBoundingClientRect();
-      if (newRect.left != elemRect.left || newRect.top != elemRect.top) {
-        annul();
-      }
-    }
-    // Check whether contact has left the bounds of the element.
-    if (
-      evt.m.registrantX < 0 || evt.m.registrantX > elem.offsetWidth ||
-      evt.m.registrantY < 0 || evt.m.registrantY > elem.offsetHeight
-    ) {
-      annul();
-    }
+  var annul = function () {
+    tapPos = null;
+    if (activeClass && elem.dom) { elem.dom.removeClass(activeClass); }
   }
 
   return Monocle.Events.listenForContact(
     elem,
     {
       start: function (evt) {
-        startPos = [evt.m.pageX, evt.m.pageY];
+        tapPos = [evt.m.pageX, evt.m.pageY];
         if (elem.getBoundingClientRect) {
           elemRect = elem.getBoundingClientRect();
         }
         if (activeClass && elem.dom) { elem.dom.addClass(activeClass); }
       },
-      move: annulIfOutOfBounds,
+      move: cancel,
       end: function (evt) {
-        annulIfOutOfBounds(evt);
-        if (startPos) {
-          evt.m.pageXStart = startPos[0];
-          evt.m.pageYStart = startPos[1];
+        if (tapPos) {
+          evt.m.pageXStart = tapPos[0];
+          evt.m.pageYStart = tapPos[1];
           fn(evt);
         }
         annul();
       },
-      cancel: annul
+      cancel: cancel
     },
     {
       useCapture: false
