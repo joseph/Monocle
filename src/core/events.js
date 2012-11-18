@@ -225,14 +225,16 @@ Monocle.Events.listenForTap = function (elem, fn, activeClass) {
     Monocle.Events.listen(elem, 'click', function () {});
   }
 
-  var cancel = function () {
-    if (tapPos) { annul(); }
-  }
-
   var annul = function () {
     tapPos = null;
     if (activeClass && elem.dom) { elem.dom.removeClass(activeClass); }
   }
+
+  var cancel = function () {
+    if (tapPos) { annul(); }
+  }
+
+  Monocle.Events.listen(window, 'monocle:contact:cancel', cancel);
 
   return Monocle.Events.listenForContact(
     elem,
