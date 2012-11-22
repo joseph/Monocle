@@ -137,12 +137,17 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     p.action.screenX = evt.m.screenX;
     p.action.screenY = evt.m.screenY;
     p.action.dir = evt.m.readerX > halfway() ? k.FORWARDS : k.BACKWARDS;
-    invoke('start', evt);
+    p.action.handled = !dispatch('monocle:magic:contact:start', evt);
+    if (!p.action.handled) { invoke('start', evt); }
   }
 
 
   function readerContactMove(evt) {
-    invoke('move', evt);
+    if (p.action.handled) {
+      dispatch('monocle:magic:contact:move', evt);
+    } else {
+      invoke('move', evt);
+    }
     // Can't prevent mousemove, so has no effect there. Preventing default
     // for touchmove will override scrolling, while still allowing selection.
     evt.preventDefault();
@@ -152,7 +157,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
   function readerContactEnd(evt) {
     p.action.endX = evt.m.readerX;
     p.action.endY = evt.m.readerY;
-    invoke('end', evt);
+    if (dispatch('monocle:magic:contact', evt)) { invoke('end', evt); }
     p.action = {};
   }
 
@@ -188,13 +193,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
       p.action.dir = p.action.startX > p.action.endX ? k.FORWARDS : k.BACKWARDS;
     }
 
-    var rr = p.parts.reader.getBoundingClientRect();
-    var evtData = {
-      start: { x: p.action.startX, y: p.action.startY },
-      end: { x: p.action.endX, y: p.action.endY },
-      max: { x: rr.right - rr.left, y: rr.bottom - rr.top }
-    }
-    if (p.reader.dispatchEvent('monocle:magic:contact', evtData, true)) {
+    if (dispatch('monocle:magic:contact', evt)) {
       invoke('start', evt);
       invoke('end', evt);
     }
@@ -260,6 +259,19 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
 
   function actionIsEmpty() {
     return typeof p.action.startX == 'undefined';
+  }
+
+
+  // Returns true if the event WAS NOT cancelled.
+  function dispatch(evtName, trigger) {
+    var rr = p.parts.reader.getBoundingClientRect();
+    var evtData = {
+      trigger: trigger,
+      start: { x: p.action.startX, y: p.action.startY },
+      end: { x: p.action.endX, y: p.action.endY },
+      max: { x: rr.right - rr.left, y: rr.bottom - rr.top }
+    }
+    return p.reader.dispatchEvent(evtName, evtData, true);
   }
 
 
