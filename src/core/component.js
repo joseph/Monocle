@@ -178,6 +178,13 @@ Monocle.Component = function (book, id, index, chapters, source) {
       // Find the place of any chapters in the component.
       locateChapters(pageDiv);
 
+      // Nothing can prevent iframe scrolling on Android, so we have to undo it.
+      if (Monocle.Browser.on.Android) {
+        Monocle.Events.listen(frame.contentWindow, 'scroll', function () {
+          frame.contentWindow.scrollTo(0,0);
+        });
+      }
+
       // Announce that the component has changed.
       var doc = frame.contentDocument;
       var evtData = { 'page': pageDiv, 'document': doc, 'component': API };
