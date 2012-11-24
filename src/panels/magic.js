@@ -29,6 +29,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
     p.reader.listen('monocle:magic:halt', haltListeners);
     p.reader.listen('monocle:modal:on', disable);
     p.reader.listen('monocle:modal:off', enable);
+    Monocle.Events.listen(window, 'monocle:contact:cancel', resetAction);
   }
 
 
