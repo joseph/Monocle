@@ -64,7 +64,10 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     // After the reader has been resized, this resettable timer must expire
     // the place is restored.
-    resizeTimer: null
+    resizeTimer: null,
+
+    // Scale factor on webkit browsers
+    webKitScaleFactor: 1
   }
 
   var dom;
@@ -110,6 +113,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     // Create the essential DOM elements.
     createReaderElements();
+
+    // update scale factor for WebKit
+    updateScaleFactorOnWebKit();
 
     // Create the selection object.
     API.selection = new Monocle.Selection(API);
@@ -285,6 +291,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     p.resizeTimer = setTimeout(
       function () {
         lockFrameWidths();
+        updateScaleFactorOnWebKit();
         recalculateDimensions(true);
         dispatchEvent("monocle:resize");
       },
@@ -312,6 +319,29 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       if (locus) { p.flipper.moveTo(locus); }
       dispatchEvent("monocle:recalculated");
     });
+  }
+
+  // Taken from https://github.com/yonran/detect-zoom
+  function updateScaleFactorOnWebKit() {
+    if (!Monocle.Browser.is.WebKit) { return; }
+    var container = document.createElement('div');
+    var div = document.createElement('div');
+    var important = function(str) { return str.replace(/;/g, " !important;"); };
+
+    container.setAttribute('style', important('width:0; height:0; overflow:hidden; visibility:hidden; position: absolute;'));
+    div.innerHTML = "1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0";
+    div.setAttribute('style', important('font: 100px/1em sans-serif; -webkit-text-size-adjust: none; height: auto; width: 1em; padding: 0; overflow: visible;'));
+
+    container.appendChild(div);
+    document.body.appendChild(container);
+    var z = 1000 / div.clientHeight;
+    document.body.removeChild(container);
+
+    p.webKitScaleFactor = Math.round(z * 100) / 100;
+  }
+
+  function getWebKitScaleFactor() {
+    return p.webKitScaleFactor;
   }
 
 
@@ -599,6 +629,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   API.getBook = getBook;
   API.getPlace = getPlace;
+  API.getWebKitScaleFactor = getWebKitScaleFactor;
   API.moveTo = moveTo;
   API.skipToChapter = skipToChapter;
   API.resized = resized;
