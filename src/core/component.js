@@ -99,7 +99,10 @@ Monocle.Component = function (book, id, index, chapters, source) {
   function loadFrameFromHTML(src, frame, callback) {
     var fn = function () {
       Monocle.Events.deafen(frame, 'load', fn);
-      frame.whenDocumentReady();
+      if (typeof frame.whenDocumentReady == 'function') {
+        frame.whenDocumentReady();  
+      }
+      
       Monocle.defer(callback);
     }
     Monocle.Events.listen(frame, 'load', fn);
@@ -118,7 +121,9 @@ Monocle.Component = function (book, id, index, chapters, source) {
     }
     var onDocumentReady = function () {
       Monocle.Events.deafen(frame, 'load', onDocumentReady);
-      frame.whenDocumentReady();
+      if (typeof frame.whenDocumentReady == 'function') {
+        frame.whenDocumentReady();  
+      }
     }
     var onDocumentLoad = function () {
       Monocle.Events.deafen(frame, 'load', onDocumentLoad);
