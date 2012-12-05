@@ -435,6 +435,14 @@ Monocle.Env = function () {
     //
     ['offscreenRenderingClipped', function () {
       result(Monocle.Browser.iOSVersionBelow('6'));
+    }],
+
+
+    // Gecko is better at loading content with document.write than with
+    // javascript: URLs. With the latter, it tends to put cruft in history,
+    // and gets confused by <base>.
+    ['loadHTMLWithDocWrite', function () {
+      result(Monocle.Browser.is.Gecko);
     }]
 
   ];

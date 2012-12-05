@@ -208,7 +208,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
     var elems = doc.getElementsByTagName('*');
     if (scale) {
       scale = parseFloat(scale);
-      if (!doc.pfsSwept) {
+      if (!doc.body.pfsSwept) {
         sweepElements(doc, elems);
       }
 
@@ -225,7 +225,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
         }
         elems[j].pfsApplied = scale;
       }
-    } else if (doc.pfsSwept) {
+    } else if (doc.body.pfsSwept) {
       // Iterate over each element, removing proportional font-sizing flag
       // and property from cssText.
       for (var j = 0, jj = elems.length; j < jj; ++j) {
@@ -252,7 +252,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       elems[i].pfsOriginal = fs;
       elems[i].pfsOriginalProp = elems[i].style.fontSize;
     }
-    doc.pfsSwept = true;
+    doc.body.pfsSwept = true;
   }
 
 

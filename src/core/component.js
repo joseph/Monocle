@@ -103,8 +103,14 @@ Monocle.Component = function (book, id, index, chapters, source) {
       Monocle.defer(callback);
     }
     Monocle.Events.listen(frame, 'load', fn);
-    frame.contentWindow['monCmptData'] = src;
-    frame.src = "javascript:window['monCmptData'];"
+    if (Monocle.Browser.env.loadHTMLWithDocWrite) {
+      frame.contentDocument.open('text/html', 'replace');
+      frame.contentDocument.write(src);
+      frame.contentDocument.close();
+    } else {
+      frame.contentWindow['monCmptData'] = src;
+      frame.src = "javascript:window['monCmptData'];"
+    }
   }
 
 
