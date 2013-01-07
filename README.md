@@ -134,6 +134,8 @@ on GitHub).
 
 ## History
 
+3.0.1 - Bugfixes for component loading, cancelling magic panel contacts.
+
 3.0.0 - Magic panel, IE10 support, iOS6 support, better Android support,
         selection events, billboard feature, Monocle.Formatting to clean up
         Reader, removing deprecated flippers, Stencil refactor, component
