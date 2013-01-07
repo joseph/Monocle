@@ -54,7 +54,7 @@ Monocle.Controls.Spinner = function (reader) {
       var owner = p.divs[i].parentNode.parentNode;
       if (page == owner) { p.showForPages.push(page); }
       var show = p.global || p.showForPages.indexOf(page) >= 0;
-      p.divs[i].style.display = show ? 'block' : 'none';
+      p.divs[i].dom[show ? 'removeClass' : 'addClass']('dormant');
     }
   }
 
@@ -70,7 +70,9 @@ Monocle.Controls.Spinner = function (reader) {
     }
     p.global = false;
     p.showForPages = [];
-    p.reader.hideControl(API);
+    for (var i = 0; i < p.divs.length; ++i) {
+      p.divs[i].dom.addClass('dormant');
+    }
   }
 
 

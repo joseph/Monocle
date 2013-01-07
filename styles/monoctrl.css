@@ -74,6 +74,10 @@ li.monelem_controls_contents_chapter_active {
   background-repeat: no-repeat;
   background-position: center center;
 }
+.monelem_controls_spinner_anim.monelem_dormant {
+  width: 0;
+  height: 0;
+}
 
 
 /* Scrubber */
