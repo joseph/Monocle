@@ -341,19 +341,12 @@ Monocle.Controls.Stencil.Links = function (stencil) {
   // 'http://example.com/monocles/foo.html').
   //
   function deconstructHref(elem) {
-    var url = elem.href;
     if (!elem.getAttribute('target')) {
-      var m = url.match(/([^#]*)(#.*)?$/);
-      var path = m[1];
-      var anchor = m[2] || '';
-      var cmpts = stencil.properties.reader.getBook().properties.componentIds;
-      for (var i = 0, ii = cmpts.length; i < ii; ++i) {
-        if (path.substr(0 - cmpts[i].length) == cmpts[i]) {
-          return { internal: cmpts[i] + anchor };
-        }
-      }
+      var re = new RegExp('^'+document.location.href.replace(/#.+/,'')+'(.*)');
+      var m = elem.href.match(re);
+      if (m) { return { internal: m[1] }; }
     }
-    return { external: url };
+    return { external: elem.href };
   }
 
   return API;
