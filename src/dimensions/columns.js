@@ -38,7 +38,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     rules += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
     rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
     rules += Monocle.Browser.css.toCSSDeclaration('column-fill', 'auto');
-    rules += Monocle.Browser.css.toCSSDeclaration('transform', 'translateX(0)');
+    rules += Monocle.Browser.css.toCSSDeclaration('transform', 'none');
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
       rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
@@ -131,7 +131,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     if (transition) {
       Monocle.Styles.affix(ce, "transition", transition);
     }
-    Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
+    Monocle.Styles.setX(ce, 0 - offset);
   }
 
 
