@@ -86,9 +86,6 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     p.reader.showControl(p.toggleIcon);
 
     p.interactive = true;
-    if (flipper.interactiveMode) {
-      flipper.interactiveMode(true);
-    }
   }
 
 
@@ -110,9 +107,6 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     p.reader.hideControl(p.toggleIcon);
 
     p.interactive = false;
-    if (flipper.interactiveMode) {
-      flipper.interactiveMode(false);
-    }
   }
 
 

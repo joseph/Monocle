@@ -27,10 +27,6 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
       }
     }
     setWidths();
-
-    if (flipper.interactiveMode) {
-      flipper.interactiveMode(true);
-    }
   }
 
 

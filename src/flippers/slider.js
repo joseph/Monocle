@@ -30,10 +30,6 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function listenForInteraction(panelClass) {
-    // BROWSERHACK: Firstly, prime interactiveMode for buggy iOS WebKit.
-    interactiveMode(true);
-    interactiveMode(false);
-
     if (typeof panelClass != "function") {
       panelClass = k.DEFAULT_PANELS_CLASS;
       if (!panelClass) {
@@ -49,13 +45,6 @@ Monocle.Flippers.Slider = function (reader) {
         'cancel': release
       }
     );
-  }
-
-
-  // A panel can call this with true/false to indicate that the user needs
-  // to be able to select or otherwise interact with text.
-  function interactiveMode(bState) {
-    p.reader.dispatchEvent('monocle:interactive:'+(bState ? 'on' : 'off'));
   }
 
 
@@ -249,39 +238,13 @@ Monocle.Flippers.Slider = function (reader) {
 
   function afterGoingForward() {
     var up = upperPage(), lp = lowerPage();
-    if (p.interactive) {
-      // set upper (off screen) to current
-      setPage(
-        up,
-        getPlace().getLocus({ direction: k.FORWARDS }),
-        function () {
-          // move upper back onto screen, then set lower to next and reset turn
-          jumpIn(up, function () { prepareNextPage(announceTurn); });
-        }
-      );
-    } else {
-      flipPages();
-      jumpIn(up, function () { prepareNextPage(announceTurn); });
-    }
+    flipPages();
+    jumpIn(up, function () { prepareNextPage(announceTurn); });
   }
 
 
   function afterGoingBackward() {
-    if (p.interactive) {
-      // set lower page to current
-      setPage(
-        lowerPage(),
-        getPlace().getLocus(),
-        function () {
-          // flip lower to upper
-          flipPages();
-          // set lower to next and reset turn
-          prepareNextPage(announceTurn);
-        }
-      );
-    } else {
-      announceTurn();
-    }
+    announceTurn();
   }
 
 
@@ -476,7 +439,6 @@ Monocle.Flippers.Slider = function (reader) {
 
   // OPTIONAL API - WILL BE INVOKED (WHERE RELEVANT) IF PROVIDED.
   API.visiblePages = visiblePages;
-  API.interactiveMode = interactiveMode;
 
   initialize();
 
