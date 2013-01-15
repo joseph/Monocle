@@ -6,8 +6,6 @@
  * and for calculating which component and page number to move to (based on
  * requests from the Reader).
  *
- * It should set and know the place of each page element too.
- *
  */
 Monocle.Book = function (dataSource, preloadWindow) {
 
@@ -41,7 +39,7 @@ Monocle.Book = function (dataSource, preloadWindow) {
   //
   //  - page: positive integer. Counting up from the start of component.
   //  - pagesBack: negative integer. Counting back from the end of component.
-  //  - percent: float
+  //  - percent: float indicating percentage through the component
   //  - direction: integer relative to the current page number for this pageDiv
   //  - position: string, one of "start" or "end", moves to corresponding point
   //      in the given component
@@ -208,74 +206,53 @@ Monocle.Book = function (dataSource, preloadWindow) {
   // As with setPageAt, if you call this you're obliged to move the frame
   // offset to the given page in the locus passed to the callback.
   //
-  // If you pass a function as the progressCallback argument, the logic of this
-  // function will be in your control. The function will be invoked between:
-  //
-  // a) loading the component and
-  // b) applying the component to the frame and
-  // c) loading any further components if required
-  //
-  // with a function argument that performs the next step in the process. So
-  // if you need to do some special handling during the load process, you can.
-  //
-  function loadPageAt(pageDiv, locus, callback, progressCallback) {
+  function loadPageAt(pageDiv, locus, onLoad, onFail) {
     var cIndex = p.componentIds.indexOf(locus.componentId);
     if (!locus.load || cIndex < 0) {
       locus = pageNumberAt(pageDiv, locus);
     }
 
     if (!locus) {
-      return;
+      return onFail ? onFail() : null;
     }
 
     if (!locus.load) {
-      callback(locus);
-      return;
+      return onLoad(locus);
     }
 
     var findPageNumber = function () {
       locus = setPageAt(pageDiv, locus);
       if (!locus) {
-        return;
+        return onFail ? onFail() : null;
       } else if (locus.load) {
-        loadPageAt(pageDiv, locus, callback, progressCallback)
+        loadPageAt(pageDiv, locus, onLoad, onFail)
       } else {
-        callback(locus);
+        onLoad(locus);
       }
     }
 
-    var pgFindPageNumber = function () {
-      progressCallback ? progressCallback(findPageNumber) : findPageNumber();
-    }
-
     var applyComponent = function (component) {
-      component.applyTo(pageDiv, pgFindPageNumber);
+      component.applyTo(pageDiv, findPageNumber);
       for (var l = 1; l <= p.preloadWindow; ++l) {
         deferredPreloadComponent(cIndex+l, l*k.PRELOAD_INTERVAL);
       }
     }
 
-    var pgApplyComponent = function (component) {
-      progressCallback ?
-        progressCallback(function () { applyComponent(component) }) :
-        applyComponent(component);
-    }
-
-    loadComponent(cIndex, pgApplyComponent, pageDiv);
+    loadComponent(cIndex, applyComponent, onFail, pageDiv);
   }
 
 
   // If your flipper doesn't care whether a component needs to be
   // loaded before the page can be set, you can use this shortcut.
   //
-  function setOrLoadPageAt(pageDiv, locus, callback, onProgress, onFail) {
+  function setOrLoadPageAt(pageDiv, locus, onLoad, onFail) {
     locus = setPageAt(pageDiv, locus);
     if (!locus) {
       if (onFail) { onFail(); }
     } else if (locus.load) {
-      loadPageAt(pageDiv, locus, callback, onProgress);
+      loadPageAt(pageDiv, locus, onLoad, onFail);
     } else {
-      callback(locus);
+      onLoad(locus);
     }
   }
 
@@ -285,15 +262,17 @@ Monocle.Book = function (dataSource, preloadWindow) {
   // 'index' is the index of the component in the
   // dataSource.getComponents array.
   //
-  // 'callback' is invoked when the source is received.
+  // 'onLoad' is invoked when the source is received.
+  //
+  // 'onFail' is optional, and is invoked if the source could not be fetched.
   //
   // 'pageDiv' is optional, and simply allows firing events on
   // the reader object that has requested this component, ONLY if
   // the source has not already been received.
   //
-  function loadComponent(index, successCallback, pageDiv) {
+  function loadComponent(index, onLoad, onFail, pageDiv) {
     if (p.components[index]) {
-      return successCallback(p.components[index]);
+      return onLoad(p.components[index]);
     }
 
     var cmptId = p.components[index];
@@ -303,19 +282,13 @@ Monocle.Book = function (dataSource, preloadWindow) {
     var onCmptLoad = function (cmpt) {
       evtData['component'] = cmpt;
       pageDiv.m.reader.dispatchEvent('monocle:componentloaded', evtData);
-      successCallback(cmpt);
+      onLoad(cmpt);
     }
 
-    var onCmptFail = function () {
+    var onCmptFail = function (cmptId) {
       console.warn("Failed to load component: "+cmptId);
       pageDiv.m.reader.dispatchEvent('monocle:componentfailed', evtData);
-      try {
-        var currCmpt = pageDiv.m.activeFrame.m.component;
-        evtData.cmptId = currCmpt.properties.id;
-        successCallback(currCmpt);
-      } catch (e) {
-        console.warn("Failed to fall back to previous component.");
-      }
+      if (onFail) { onFail(); }
     }
 
     _loadComponent(index, onCmptLoad, onCmptFail);
@@ -346,7 +319,7 @@ Monocle.Book = function (dataSource, preloadWindow) {
     }
 
     var onCmptFail = function () {
-      fireLoadQueue(cmptId, 'failure');
+      fireLoadQueue(cmptId, 'failure', cmptId);
     }
 
     var onCmptLoad = function (cmptSource) {

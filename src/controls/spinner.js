@@ -33,6 +33,8 @@ Monocle.Controls.Spinner = function (reader) {
     registerSpinEvt('monocle:resizing', 'monocle:resize');
     registerSpinEvt('monocle:jumping', 'monocle:jump');
     registerSpinEvt('monocle:recalculating', 'monocle:recalculated');
+    p.reader.listen('monocle:notfound', forceSpun);
+    p.reader.listen('monocle:componentfailed', forceSpun);
   }
 
 
@@ -68,6 +70,11 @@ Monocle.Controls.Spinner = function (reader) {
     for (var l in p.repeaters) {
       if (p.repeaters[l]) { return; }
     }
+    forceSpun();
+  }
+
+
+  function forceSpun() {
     p.global = false;
     p.showForPages = [];
     for (var i = 0; i < p.divs.length; ++i) {
