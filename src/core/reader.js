@@ -251,7 +251,16 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
           dispatchEvent('monocle:firstcomponentchange', evt.m);
           return (pageCount += 1) == p.flipper.pageCount;
         },
+        'monocle:componentfailed': function (evt) {
+          var info = dom.make('div', 'book_load_failed');
+          info.innerHTML = k.LOAD_FAILURE_INFO;
+          var box = dom.find('box');
+          var bbOrigin = [box.offsetWidth / 2, box.offsetHeight / 2];
+          API.billboard.show(info, { closeButton: false, from: bbOrigin });
+          return true;
+        },
         'monocle:turn': function (evt) {
+          deafen('monocle:componentfailed', listener);
           callback();
           return true;
         }
@@ -629,3 +638,7 @@ Monocle.Reader.RESIZE_DELAY = 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.DEFAULT_STYLE_RULES = Monocle.Formatting.DEFAULT_STYLE_RULES;
+Monocle.Reader.LOAD_FAILURE_INFO =
+  "<h1>Book could not be loaded</h1>"+
+  "<p>Sorry, parts of the book could not be retrieved. <br />"+
+  "Please check your connection and refresh to try again.</p>";
