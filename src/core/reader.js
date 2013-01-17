@@ -90,7 +90,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     if (!Monocle.Browser.env.isCompatible()) {
       if (dispatchEvent("monocle:incompatible", {}, true)) {
-        API.billboard.show(k.SUPPORT_URL, { closeButton: false });
+        fatalSystemMessage(k.COMPATIBILITY_INFO);
       }
       return;
     }
@@ -252,11 +252,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
           return (pageCount += 1) == p.flipper.pageCount;
         },
         'monocle:componentfailed': function (evt) {
-          var info = dom.make('div', 'book_load_failed');
-          info.innerHTML = k.LOAD_FAILURE_INFO;
-          var box = dom.find('box');
-          var bbOrigin = [box.offsetWidth / 2, box.offsetHeight / 2];
-          API.billboard.show(info, { closeButton: false, from: bbOrigin });
+          fatalSystemMessage(k.LOAD_FAILURE_INFO);
           return true;
         },
         'monocle:turn': function (evt) {
@@ -606,6 +602,14 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
+  function fatalSystemMessage(msg) {
+    var info = dom.make('div', 'book_fatality', { html: msg });
+    var box = dom.find('box');
+    var bbOrigin = [box.offsetWidth / 2, box.offsetHeight / 2];
+    API.billboard.show(info, { closeButton: false, from: bbOrigin });
+  }
+
+
   API.getBook = getBook;
   API.getPlace = getPlace;
   API.moveTo = moveTo;
@@ -632,13 +636,15 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 }
 
 
-
-Monocle.Reader.SUPPORT_URL = 'http://unsupported.monoclejs.com';
 Monocle.Reader.RESIZE_DELAY = 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.DEFAULT_STYLE_RULES = Monocle.Formatting.DEFAULT_STYLE_RULES;
+Monocle.Reader.COMPATIBILITY_INFO =
+  "<h1>Incompatible browser</h1>"+
+  "<p>Unfortunately, your browser isn't able to display this book. "+
+  "If possible, try again in another browser or on another device.</p>";
 Monocle.Reader.LOAD_FAILURE_INFO =
   "<h1>Book could not be loaded</h1>"+
-  "<p>Sorry, parts of the book could not be retrieved. <br />"+
+  "<p>Sorry, parts of the book could not be retrieved.<br />"+
   "Please check your connection and refresh to try again.</p>";

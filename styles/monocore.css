@@ -101,13 +101,13 @@ div.monelem_billboard_close:after {
   text-align: center;
 }
 
-div.monelem_book_load_failed {
+div.monelem_book_fatality {
   font-family: Helvetica Neue, Helvetica, sans-serif;
   margin: 0 auto;
   max-width: 75%;
 }
 
-div.monelem_book_load_failed p {
+div.monelem_book_fatality p {
   line-height: 1.4;
 }
 
