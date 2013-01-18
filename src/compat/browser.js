@@ -16,7 +16,7 @@ Monocle.Browser.is = {
   Opera: Monocle.Browser.uaMatch('Opera'),
   WebKit: Monocle.Browser.uaMatch(/Apple\s?WebKit/),
   Gecko: Monocle.Browser.uaMatch('Gecko') && !Monocle.Browser.uaMatch('KHTML'),
-  MobileSafari: Monocle.Browser.uaMatch(/AppleWebKit.*Mobile/)
+  MobileSafari: Monocle.Browser.uaMatch(/OS \d_.*AppleWebKit.*Mobile/)
 }
 
 
