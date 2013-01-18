@@ -17,7 +17,7 @@ Monocle.Controls.Spinner = function (reader) {
   }
 
 
-  function registerSpinEvt(startEvtType, stopEvtType) {
+  function registerSpinEvent(startEvtType, stopEvtType) {
     var label = startEvtType;
     p.reader.listen(startEvtType, function (evt) { spin(label, evt) });
     p.reader.listen(stopEvtType, function (evt) { spun(label, evt) });
@@ -27,11 +27,11 @@ Monocle.Controls.Spinner = function (reader) {
   // Registers spin/spun event handlers for certain time-consuming events.
   //
   function listenForUsualDelays() {
-    registerSpinEvt('monocle:componentloading', 'monocle:componentloaded');
-    registerSpinEvt('monocle:componentchanging', 'monocle:componentchange');
-    registerSpinEvt('monocle:resizing', 'monocle:resize');
-    registerSpinEvt('monocle:jumping', 'monocle:jump');
-    registerSpinEvt('monocle:recalculating', 'monocle:recalculated');
+    registerSpinEvent('monocle:componentloading', 'monocle:componentloaded');
+    registerSpinEvent('monocle:componentchanging', 'monocle:componentchange');
+    registerSpinEvent('monocle:resizing', 'monocle:resize');
+    registerSpinEvent('monocle:jumping', 'monocle:jump');
+    registerSpinEvent('monocle:recalculating', 'monocle:recalculated');
     p.reader.listen('monocle:notfound', forceSpun);
     p.reader.listen('monocle:componentfailed', forceSpun);
   }
@@ -84,9 +84,11 @@ Monocle.Controls.Spinner = function (reader) {
 
 
   API.createControlElements = createControlElements;
+  API.registerSpinEvent = registerSpinEvent;
   API.listenForUsualDelays = listenForUsualDelays;
   API.spin = spin;
   API.spun = spun;
+  API.forceSpun = forceSpun;
 
   return API;
 }

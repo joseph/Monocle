@@ -278,6 +278,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Attempts to restore the place we were up to in the book before the
   // reader was resized.
   //
+  // The delay ensures that if we get multiple calls to this function in
+  // a short period, we don't do lots of expensive recalculations.
+  //
   function resized() {
     if (!p.initialized) {
       console.warn('Attempt to resize book before initialization.');
@@ -287,18 +290,22 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       return;
     }
     clearTimeout(p.resizeTimer);
-    p.resizeTimer = setTimeout(
-      function () {
-        lockFrameWidths();
-        recalculateDimensions(true);
-        dispatchEvent("monocle:resize");
-      },
-      k.RESIZE_DELAY
-    );
+    p.resizeTimer = Monocle.defer(performResize, k.RESIZE_DELAY);
   }
 
 
-  function recalculateDimensions(andRestorePlace) {
+  function performResize() {
+    lockFrameWidths();
+    recalculateDimensions(true, afterResized);
+  }
+
+
+  function afterResized() {
+    dispatchEvent('monocle:resize');
+  }
+
+
+  function recalculateDimensions(andRestorePlace, callback) {
     if (!p.book) { return; }
     dispatchEvent("monocle:recalculating");
 
@@ -308,15 +315,15 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       var locus = { percent: place ? place.percentageThrough() : 0 };
     }
 
-    // Better to use an event? Or chaining consecutively?
     forEachPage(function (pageDiv) {
       pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
     });
 
-    Monocle.defer(function () {
-      if (locus) { p.flipper.moveTo(locus); }
+    var cb = function () {
       dispatchEvent("monocle:recalculated");
-    });
+      Monocle.defer(callback);
+    }
+    Monocle.defer(function () { locus ? p.flipper.moveTo(locus, cb) : cb; });
   }
 
 
@@ -636,7 +643,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 }
 
 
-Monocle.Reader.RESIZE_DELAY = 100;
+Monocle.Reader.RESIZE_DELAY = Monocle.Browser.renders.slow ? 500 : 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
 Monocle.Reader.DEFAULT_STYLE_RULES = Monocle.Formatting.DEFAULT_STYLE_RULES;

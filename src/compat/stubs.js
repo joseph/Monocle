@@ -44,7 +44,7 @@ window.console.deprecation = function (msg) {
 // A convenient alias for setTimeout that assumes 0 if no timeout is specified.
 //
 Monocle.defer = function (fn, time) {
-  if (fn && typeof fn == "function") {
+  if (typeof fn == "function") {
     return setTimeout(fn, time || 0);
   }
 }

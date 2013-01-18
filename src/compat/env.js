@@ -237,7 +237,8 @@ Monocle.Env = function () {
           'MozPerspective',
           'OPerspective',
           'msPerspective'
-        ])
+        ]) &&
+        !Monocle.Browser.renders.slow // Some older browsers can't be trusted.
       );
     }],
 

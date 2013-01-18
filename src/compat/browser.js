@@ -84,7 +84,9 @@ Monocle.Browser.iOSVersionBelow = function (strOrNum) {
 //
 Monocle.Browser.renders = {
   eInk: Monocle.Browser.on.Kindle3,
-  slow: Monocle.Browser.on.Android || Monocle.Browser.on.Blackberry
+  slow:
+    (Monocle.Browser.on.Android || Monocle.Browser.on.Blackberry) &&
+    (!navigator.userAgent.match(/Chrome/))
 }
 
 
