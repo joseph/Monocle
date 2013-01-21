@@ -49,12 +49,14 @@ Monocle.Controls.Spinner = function (reader) {
     // don't show the animation. p.global ensures that if an event affects
     // all pages, the animation is always shown, even if other events in this
     // spin cycle are page-specific.
-    var page = evt && evt.m && evt.m.page ? evt.m.page : null;
-    if (!page) { p.global = true; }
+    var page = (evt && evt.m && evt.m.page) ? evt.m.page : null;
+    if (page && p.divs.length > 1) {
+      p.showForPages[page.m.pageIndex] = true;
+    } else {
+      p.global = true;
+    }
     for (var i = 0; i < p.divs.length; ++i) {
-      var owner = p.divs[i].parentNode.parentNode;
-      if (page == owner) { p.showForPages.push(page); }
-      var show = p.global || p.showForPages.indexOf(page) >= 0;
+      var show = (p.global || p.showForPages[i]) ? true : false;
       p.divs[i].dom[show ? 'removeClass' : 'addClass']('dormant');
     }
   }
