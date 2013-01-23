@@ -131,7 +131,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     if (transition) {
       Monocle.Styles.affix(ce, "transition", transition);
     }
-    Monocle.Styles.setX(ce, 0 - offset);
+    // NB: can't use setX as it causes a flicker on iOS.
+    Monocle.Styles.affix(ce, "transform", "translateX(-"+offset+"px)");
   }
 
 
