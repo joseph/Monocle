@@ -153,7 +153,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function attachFlipper(flipperClass) {
     if (!flipperClass) {
-      if (Monocle.Browser.renders.eInk || Monocle.Browser.renders.slow) {
+      if (Monocle.Browser.renders.slow) {
         flipperClass = Monocle.Flippers.Instant;
       } else {
         flipperClass = Monocle.Flippers.Slider;

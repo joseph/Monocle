@@ -82,12 +82,18 @@ Monocle.Browser.iOSVersionBelow = function (strOrNum) {
 //
 // FIXME: These tests are too opinionated. Replace with more targeted tests.
 //
-Monocle.Browser.renders = {
-  eInk: Monocle.Browser.on.Kindle3,
-  slow:
-    (Monocle.Browser.on.Android || Monocle.Browser.on.Blackberry) &&
-    (!navigator.userAgent.match(/Chrome/))
-}
+Monocle.Browser.renders = (function () {
+  var ua = navigator.userAgent;
+  var caps = {};
+  caps.eInk = Monocle.Browser.on.Kindle3;
+  caps.slow = (
+    caps.eInk ||
+    (Monocle.Browser.on.Android && !ua.match(/Chrome/)) ||
+    Monocle.Browser.on.Blackberry ||
+    ua.match(/NintendoBrowser/)
+  );
+  return caps;
+})();
 
 
 // A helper class for sniffing CSS features and creating CSS rules
