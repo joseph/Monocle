@@ -310,16 +310,23 @@ Monocle.Controls.Stencil.Links = function (stencil) {
   //
   API.fitMask = function (link, mask) {
     var hrefObject = deconstructHref(link);
+
     if (hrefObject.internal) {
       mask.setAttribute('href', 'javascript:"Skip to chapter"');
-      Monocle.Events.listen(mask, 'click', function (evt) {
+      mask.onclick = function (evt) {
         stencil.properties.reader.skipToChapter(hrefObject.internal);
         evt.preventDefault();
-      });
+        return false;
+      }
     } else {
       mask.setAttribute('href', hrefObject.external);
       mask.setAttribute('target', '_blank');
-      link.setAttribute('target', '_blank'); // For good measure.
+      mask.onclick = function (evt) { return true; }
+    }
+
+    link.onclick = function (evt) {
+      evt.preventDefault();
+      return false;
     }
   }
 
@@ -342,7 +349,8 @@ Monocle.Controls.Stencil.Links = function (stencil) {
   //
   function deconstructHref(elem) {
     if (!elem.getAttribute('target')) {
-      var re = new RegExp('^'+document.location.href.replace(/#.+/,'')+'(.*)');
+      var originPath = document.location.href.replace(/[\?#].+/,'');
+      var re = new RegExp('^'+originPath+'(.*)');
       var m = elem.href.match(re);
       if (m) { return { internal: m[1] }; }
     }
