@@ -431,6 +431,15 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         cntr.appendChild(ctrlElem);
         ctrlData.elements.push(ctrlElem);
       }
+    } else if (cType == "explicit") {
+      if (options.node && options.node.dom) {
+        ctrlElem = ctrl.createControlElements(options.node);
+        options.node.appendChild(ctrlElem);
+        ctrlData.elements.push(ctrlElem);
+      }
+      else {
+        console.warn("You must pass a node that implements Monocle.Factory");
+      }
     } else {
       console.warn("Unknown control type: " + cType);
     }
