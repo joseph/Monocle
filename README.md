@@ -17,8 +17,13 @@ you can ask them here: https://groups.google.com/forum/#!forum/monocle-js
 
 ## Getting Monocle
 
-You can download a unified, redistributable version of Monocle 
-[from Github](https://github.com/joseph/Monocle/downloads).
+The wiki has details on how to build Monocle for production use:
+
+    https://github.com/joseph/Monocle/wiki/Building
+
+... and how to run it locally (to explore, to develop against, etc):
+
+    https://github.com/joseph/Monocle/wiki/Running-Monocle-locally
 
 The scripts and stylesheets are separated into:
 
@@ -133,6 +138,9 @@ on GitHub).
 
 
 ## History
+
+3.1.0 - Numerous stability fixes, plus improvements for Android and Opera,
+        including minor API changes to flippers and slow-browser detection.
 
 3.0.1 - Bugfixes for component loading, cancelling magic panel contacts.
 
