@@ -297,7 +297,7 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
   "html#RS\\:monocle body * {" +
     "max-width: 100% !important;" +
   "}",
-  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object {" +
+  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object, html#RS\\:monocle svg {" +
     "max-height: 95% !important;" +
     "height: auto !important;" +
   "}"
