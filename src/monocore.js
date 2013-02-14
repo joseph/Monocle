@@ -3,6 +3,7 @@
 //= require ./compat/css
 //= require ./compat/stubs
 //= require ./compat/browser
+//= require ./compat/gala
 //= require ./core/bookdata
 //= require ./core/factory
 //= require ./core/events
