@@ -348,14 +348,46 @@ Monocle.Controls.Stencil.Links = function (stencil) {
   // 'http://example.com/monocles/foo.html').
   //
   function deconstructHref(elem) {
-    if (!elem.getAttribute('target')) {
-      var originPath = document.location.href.replace(/[\?#].+/,'');
-      var re = new RegExp('^'+originPath+'(.*)');
-      var m = elem.href.match(re);
-      if (m) { return { internal: m[1] }; }
+    var loc = document.location;
+    var origin = loc.protocol+'//'+loc.host;
+    var href = elem.href;
+    var path = href.substring(origin.length);
+    var ext = { external: href };
+
+    // Anchor tags with 'target' attributes are always external URLs.
+    if (elem.getAttribute('target')) {
+      return ext;
     }
-    return { external: elem.href };
+    // URLs with a different protocol or domain are always external.
+    //console.log("Domain test: %s <=> %s", origin, href);
+    if (href.indexOf(origin) != 0) {
+      return ext;
+    }
+
+    // If it is in a sub-path of the current path, it's internal.
+    var topPath = loc.pathname.replace(/[^\/]*\.[^\/]+$/,'');
+    if (topPath[topPath.length - 1] != '/') {
+      topPath += '/';
+    }
+    //console.log("Sub-path test: %s <=> %s", topPath, path);
+    if (path.indexOf(topPath) == 0) {
+      return { internal: path.substring(topPath.length) }
+    }
+
+    // If it's a root-relative URL and it's in our list of component ids,
+    // it's internal.
+    var cmptIds = stencil.properties.reader.getBook().properties.componentIds;
+    for (var i = 0, ii = cmptIds.length; i < ii; ++i) {
+      //console.log("Component test: %s <=> %s", cmptIds[i], path);
+      if (path.indexOf(cmptIds[i]) == 0) {
+        return { internal: path }
+      }
+    }
+
+    // Otherwise it's external.
+    return ext;
   }
+
 
   return API;
 }
