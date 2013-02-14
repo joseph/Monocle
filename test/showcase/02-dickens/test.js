@@ -8,7 +8,8 @@ Monocle.DEBUG = true;
     components: [
       'components/1.html',
       'components/2.html',
-      'components/3.html'
+      'components/3.html',
+      'components/toc.html'
     ],
     chapters:[
       {
@@ -82,6 +83,10 @@ Monocle.DEBUG = true;
           var magnifier = new Monocle.Controls.Magnifier(reader);
           reader.addControl(magnifier, 'page');
 
+          /* The stencil activates internal links */
+          var stencil = new Monocle.Controls.Stencil(reader);
+          reader.addControl(stencil);
+          //stencil.toggleHighlights();
 
           /* BOOK TITLE RUNNING HEAD */
           var bookTitle = {}
