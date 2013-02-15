@@ -43,7 +43,6 @@ Monocle.Controls.Spinner = function (reader) {
     label = label || k.GENERIC_LABEL;
     p.repeaters[label] = true;
     p.reader.showControl(API);
-    p.reader.dispatchEvent('monocle:modal:on');
 
     // If the delay is on a page other than the page we've been assigned to,
     // don't show the animation. p.global ensures that if an event affects
@@ -54,6 +53,7 @@ Monocle.Controls.Spinner = function (reader) {
       p.showForPages[page.m.pageIndex] = true;
     } else {
       p.global = true;
+      p.reader.dispatchEvent('monocle:modal:on');
     }
     for (var i = 0; i < p.divs.length; ++i) {
       var show = (p.global || p.showForPages[i]) ? true : false;
@@ -75,13 +75,13 @@ Monocle.Controls.Spinner = function (reader) {
 
 
   function forceSpun() {
+    if (p.global) { p.reader.dispatchEvent('monocle:modal:off'); }
     p.global = false;
     p.repeaters = {};
     p.showForPages = [];
     for (var i = 0; i < p.divs.length; ++i) {
       p.divs[i].dom.addClass('dormant');
     }
-    p.reader.dispatchEvent('monocle:modal:off');
   }
 
 
