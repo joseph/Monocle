@@ -178,6 +178,7 @@ Gala.onTap = function (elem, fn, tapClass) {
 Gala.onContact = function (elem, fns, useCapture, initCallback) {
   elem = Gala.$(elem);
   var listeners = null;
+  var inited = false;
 
   // If we see a touchstart event, register all these listeners.
   var touchListeners = function () {
@@ -227,11 +228,13 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
 
   if (typeof Gala.CONTACT_MODE == 'undefined') {
     var contactInit = function (evt, newListeners, mode) {
+      if (inited) { return; }
       Gala.CONTACT_MODE = Gala.CONTACT_MODE || mode;
       if (Gala.CONTACT_MODE != mode) { return; }
       Gala.replaceGroup(elem, listeners, newListeners, useCapture);
       if (typeof initCallback == 'function') { initCallback(listeners); }
       if (listeners[evt.type]) { listeners[evt.type](evt); }
+      inited = true;
     }
     var touchInit = function (evt) {
       contactInit(evt, touchListeners(), 'touch');
