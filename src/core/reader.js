@@ -128,7 +128,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       p.flipper.listenForInteraction(options.panels);
 
       setBook(bk, options.place, function () {
-        p.initialized = true;
         if (onLoadCallback) { onLoadCallback(API); }
         dispatchEvent("monocle:loaded", API);
       });
@@ -266,12 +265,17 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       }
       for (evtType in watchers) { listen(evtType, listener) }
     }
-    p.flipper.moveTo(place || { page: 1 });
+    p.flipper.moveTo(place || { page: 1 }, initialized);
   }
 
 
   function getBook() {
     return p.book;
+  }
+
+
+  function initialized() {
+    p.initialized = true;
   }
 
 
