@@ -38,10 +38,10 @@ Monocle.Selection = function (reader) {
       nm.rangeStartOffset = nm.range.startOffset;
       nm.rangeEndOffset = nm.range.endOffset;
       if (!sameRange(nm, lm)) {
-        p.reader.dispatchEvent('monocle:selection', nm);
+        p.reader.dispatchEvent('monocle:selection', {'range': nm, 'document': win.document});
       }
     } else if (lm.selected) {
-      p.reader.dispatchEvent('monocle:deselection', lm);
+      p.reader.dispatchEvent('monocle:deselection', {'range': lm, 'document': win.document});
     }
   }
 

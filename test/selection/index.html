@@ -31,9 +31,9 @@
         Monocle.DEBUG = true;
 
         function textSelected(evt) {
-          console.log("Selection: "+evt.m.string);
+          console.log("Selection: "+evt.m.range.string);
           var st = document.getElementById('statusSelect');
-          var sel = evt.m.string;
+          var sel = evt.m.range.string;
           st.innerHTML = sel;
           st.style.visibility = 'visible';
         }
