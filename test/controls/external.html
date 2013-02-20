@@ -64,9 +64,8 @@
 
 
       function onReaderLoad(rdr) {
-        var scrDiv = document.getElementById('scrubber');
         var scrCtrl = new Monocle.Controls.Scrubber(rdr);
-        rdr.addControl(scrCtrl, 'standard', { container: scrDiv });
+        rdr.addControl(scrCtrl, 'standard', { container: 'scrubber' });
       }
 
 

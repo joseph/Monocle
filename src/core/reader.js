@@ -418,6 +418,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     var addControlTo = function (cntr) {
       if (cntr == 'container') {
         cntr = options.container || dom.find('container');
+        if (typeof cntr == 'string') { cntr = document.getElementById(cntr); }
         if (!cntr.dom) { dom.claim(cntr, 'controlContainer'); }
       } else if (cntr == 'overlay') {
         cntr = dom.find('overlay');
