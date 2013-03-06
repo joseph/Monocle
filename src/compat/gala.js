@@ -11,20 +11,9 @@ Gala.listen = function (elem, evtType, fn, useCapture) {
     if (evtType.indexOf(':') < 1) {
       elem.attachEvent('on'+evtType, fn);
     } else {
-      var evtProp = Gala.IE_PROP_PREFIX+'{'+evtType+'}';
-      var evtFnHashProp = evtProp+Gala.IE_FUNCTIONS_SUFFIX;
-      elem[evtFnHashProp] = elem[evtFnHashProp] || {};
-      var listener = elem[evtFnHashProp][fn] = function (evt) {
-        evt = evt || window.event;
-        if (evt.propertyName == evtProp && elem[evtProp]) {
-          evt.m = elem[evtProp];
-          evt.preventDefault = function () { evt.defaultPrevented = true; }
-          fn(evt);
-          elem.evtCancelled = elem.evtCancelled || evt.defaultPrevented;
-        }
-      }
-      if (!elem[evtProp]) { elem[evtProp] = ''; }
-      elem.attachEvent('onpropertychange', listener);
+      var h = (Gala.IE_REGISTRATIONS[elem] = Gala.IE_REGISTRATIONS[elem] || {});
+      var a = (h[evtType] = h[evtType] || []);
+      a.push(fn);
     }
   }
 }
@@ -64,12 +53,29 @@ Gala.dispatch = function (elem, evtType, data, cancelable) {
     evt.m = data;
     return elem.dispatchEvent(evt);
   } else if (elem.attachEvent && evtType.indexOf(':') >= 0) {
-    var evtProp = Gala.IE_PROP_PREFIX+'{'+evtType+'}';
-    if (typeof elem[evtProp] != 'undefined') {
-      elem.evtCancelled = false;
-      elem[evtProp] = data || (elem[evtProp] + 1);
-      return !cancelable || !elem.evtCancelled;
+    if (!Gala.IE_REGISTRATIONS[elem]) { return true; }
+    var evtHandlers = Gala.IE_REGISTRATIONS[elem][evtType];
+    if (!evtHandlers || evtHandlers.length < 1) { return true; }
+    var evt = {
+      type: evtType,
+      currentTarget: elem,
+      target: elem,
+      m: data,
+      defaultPrevented: false,
+      preventDefault: function () { evt.defaultPrevented = true; }
     }
+    var q, processQueue = Gala.IE_INVOCATION_QUEUE.length == 0;
+    for (var i = 0, ii = evtHandlers.length; i < ii; ++i) {
+      q = { elem: elem, evtType: evtType, handler: evtHandlers[i], evt: evt }
+      Gala.IE_INVOCATION_QUEUE.push(q);
+    }
+    if (processQueue) {
+      while (q = Gala.IE_INVOCATION_QUEUE.shift()) {
+        console.log("IE EVT on %s: '%s' with data: %s", q.elem, q.evtType, q.evt.m);
+        q.handler(q.evt);
+      }
+    }
+    return !(cancelable && evt.defaultPrevented);
   } else {
     console.warn('[GALA] Cannot dispatch non-namespaced events: '+evtType);
     return true;
@@ -147,6 +153,7 @@ Gala.onTap = function (elem, fn, tapClass) {
     end: function (evt) {
       if (!tapping) { return; }
       fns.move(evt);
+      evt.currentTarget = evt.currentTarget || evt.srcElement;
       fn(evt);
     },
     noop: function (evt) {}
@@ -208,13 +215,13 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
   var mouseListeners = function () {
     var l = {};
     if (fns.start) {
-      l.mousedown = function (evt) { if (evt.button == 0) { fns.start(evt); } }
+      l.mousedown = function (evt) { if (evt.button < 2) { fns.start(evt); } }
     }
     if (fns.move) {
       l.mousemove = fns.move;
     }
     if (fns.end) {
-      l.mouseup = function (evt) { if (evt.button == 0) { fns.end(evt); } }
+      l.mouseup = function (evt) { if (evt.button < 2) { fns.end(evt); } }
     }
     if (fns.cancel) {
       l.mouseout = function (evt) {
@@ -342,5 +349,5 @@ Gala.$ = function (elem) {
 // CONSTANTS
 //
 Gala.TAPPING_CLASS = 'tapping';
-Gala.IE_PROP_PREFIX = 'GalaBinding';
-Gala.IE_FUNCTIONS_SUFFIX = 'Functions';
+Gala.IE_REGISTRATIONS = {}
+Gala.IE_INVOCATION_QUEUE = []
