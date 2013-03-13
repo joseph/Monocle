@@ -29,11 +29,10 @@ Gala.deafen = function (elem, evtType, fn, useCapture) {
     if (evtType.indexOf(':') < 1) {
       elem.detachEvent('on'+evtType, fn);
     } else {
-      var evtProp = Gala.IE_PROP_PREFIX+'{'+evtType+'}';
-      var evtFnHashProp = evtProp+Gala.IE_FUNCTIONS_SUFFIX;
-      var listener = elem[evtFnHashProp][fn];
-      if (listener) {
-        elem.detachEvent('onpropertychange', listener);
+      var h = (Gala.IE_REGISTRATIONS[elem] = Gala.IE_REGISTRATIONS[elem] || {});
+      var a = (h[evtType] = h[evtType] || []);
+      for (var i = 0, ii = a.length; i < ii; ++i) {
+        if (a[i] == fn) { a.splice(i, 1); }
       }
     }
   }
@@ -71,7 +70,7 @@ Gala.dispatch = function (elem, evtType, data, cancelable) {
     }
     if (processQueue) {
       while (q = Gala.IE_INVOCATION_QUEUE.shift()) {
-        console.log("IE EVT on %s: '%s' with data: %s", q.elem, q.evtType, q.evt.m);
+        //console.log("IE EVT on %s: '%s' with data: %s", q.elem, q.evtType, q.evt.m);
         q.handler(q.evt);
       }
     }
@@ -88,13 +87,10 @@ Gala.dispatch = function (elem, evtType, data, cancelable) {
 //
 Gala.stop = function (evt) {
   evt = evt || window.event;
-  if (evt.preventDefault) {
-    evt.preventDefault();
-    evt.stopPropagation();
-  } else {
-    evt.returnValue = false;
-    evt.cancelBubble = true;
-  }
+  if (evt.preventDefault) { evt.preventDefault(); }
+  if (evt.stopPropagation) { evt.stopPropagation(); }
+  evt.returnValue = false;
+  evt.cancelBubble = true;
   return false;
 }
 
