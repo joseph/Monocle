@@ -400,6 +400,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   // Options:
   //  - hidden -- creates and hides the ctrl elements;
   //              use showControl to show them
+  //  - container -- specify an existing DOM element to contain the control.
   //
   function addControl(ctrl, cType, options) {
     for (var i = 0; i < p.controls.length; ++i) {
@@ -411,44 +412,37 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     options = options || {};
 
-    var ctrlData = {
-      control: ctrl,
-      elements: [],
-      controlType: cType
-    }
+    var ctrlData = { control: ctrl, elements: [], controlType: cType }
     p.controls.push(ctrlData);
 
-    var ctrlElem;
-    var cntr = dom.find('container'), overlay = dom.find('overlay');
-    if (!cType || cType == "standard") {
-      ctrlElem = ctrl.createControlElements(cntr);
+    var addControlTo = function (cntr) {
+      if (cntr == 'container') {
+        cntr = options.container || dom.find('container');
+        if (typeof cntr == 'string') { cntr = document.getElementById(cntr); }
+        if (!cntr.dom) { dom.claim(cntr, 'controlContainer'); }
+      } else if (cntr == 'overlay') {
+        cntr = dom.find('overlay');
+      }
+      if (typeof ctrl.createControlElements != 'function') { return; }
+      var ctrlElem = ctrl.createControlElements(cntr);
+      if (!ctrlElem) { return; }
       cntr.appendChild(ctrlElem);
       ctrlData.elements.push(ctrlElem);
-    } else if (cType == "page") {
-      forEachPage(function (page, i) {
-        var runner = ctrl.createControlElements(page);
-        page.appendChild(runner);
-        ctrlData.elements.push(runner);
-      });
-    } else if (cType == "modal" || cType == "popover" || cType == "hud") {
-      ctrlElem = ctrl.createControlElements(overlay);
-      overlay.appendChild(ctrlElem);
-      ctrlData.elements.push(ctrlElem);
-      ctrlData.usesOverlay = true;
-    } else if (cType == "invisible") {
-      if (
-        typeof(ctrl.createControlElements) == "function" &&
-        (ctrlElem = ctrl.createControlElements(cntr))
-      ) {
-        cntr.appendChild(ctrlElem);
-        ctrlData.elements.push(ctrlElem);
-      }
-    } else {
-      console.warn("Unknown control type: " + cType);
+      Monocle.Styles.applyRules(ctrlElem, Monocle.Styles.control);
+      return ctrlElem;
     }
 
-    for (var i = 0; i < ctrlData.elements.length; ++i) {
-      Monocle.Styles.applyRules(ctrlData.elements[i], Monocle.Styles.control);
+    if (!cType || cType == 'standard' || cType == 'invisible') {
+      addControlTo('container');
+    } else if (cType == 'page') {
+      forEachPage(addControlTo);
+    } else if (cType == 'modal' || cType == 'popover' || cType == 'hud') {
+      addControlTo('overlay');
+      ctrlData.usesOverlay = true;
+    } else if (cType == 'invisible') {
+      addControlTo('container');
+    } else {
+      console.warn('Unknown control type: ' + cType);
     }
 
     if (options.hidden) {
