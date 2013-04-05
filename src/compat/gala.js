@@ -219,13 +219,13 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
     if (fns.end) {
       l.mouseup = function (evt) { if (evt.button < 2) { fns.end(evt); } }
     }
-    if (fns.cancel) {
-      l.mouseout = function (evt) {
-        obj = evt.relatedTarget || evt.fromElement;
-        while (obj && (obj = obj.parentNode)) { if (obj == elem) { return; } }
-        fns.cancel(evt);
-      }
-    }
+    // if (fns.cancel) {
+    //   l.mouseout = function (evt) {
+    //     obj = evt.relatedTarget || evt.fromElement;
+    //     while (obj && (obj = obj.parentNode)) { if (obj == elem) { return; } }
+    //     fns.cancel(evt);
+    //   }
+    // }
     return l;
   }
 
@@ -295,7 +295,7 @@ Gala.Cursor = function (evt) {
     API.screenY = ci.screenY;
 
     // Coordinates relative to the target element for the event.
-    var tgt = evt.target || evt.srcElement;
+    var tgt = API.target = evt.target || evt.srcElement;
     while (tgt.nodeType != 1 && tgt.parentNode) { tgt = tgt.parentNode; }
     assignOffsetFor(tgt, 'offset');
 
