@@ -12,6 +12,7 @@ Monocle.Controls.Spinner = function (reader) {
 
   function createControlElements(cntr) {
     var anim = cntr.dom.make('div', 'controls_spinner_anim');
+    anim.dom.append('div', 'controls_spinner_inner');
     p.divs.push(anim);
     return anim;
   }
