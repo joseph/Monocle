@@ -139,6 +139,11 @@ on GitHub).
 
 ## History
 
+3.2.0 - A new event management subsystem, called Gala, replacing the old
+        Monocle.Events. Gala unifies touch and mouse event registration
+        a lot better. It also works as a standalone library, if you need that -
+        there are no dependencies on other parts of Monocle.
+
 3.1.0 - Numerous stability fixes, plus improvements for Android and Opera,
         including minor API changes to flippers and slow-browser detection.
 

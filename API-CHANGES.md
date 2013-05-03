@@ -1,3 +1,6 @@
+Version 3.2.0
+- None.
+
 Version 3.1.0
 - Slider flipper no longer supports 'interactive mode'.
 - Kindle3 is now included in the renders.slow flag.
