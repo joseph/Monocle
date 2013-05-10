@@ -55,9 +55,9 @@ div.monelem_billboard_container {
   -webkit-transform: scale(0);
   -moz-transform: scale(0);
   transform: scale(0);
-  -webkit-transform-origin: 0 0;
-  -moz-transform-origin: 0 0;
-  transform-origin: 0 0;
+  -webkit-transform-origin: -0 -0;
+  -moz-transform-origin: -0 -0;
+  transform-origin: -0 -0;
 }
 
 .monelem_billboard_inner {
