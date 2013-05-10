@@ -93,11 +93,32 @@ Monocle.Dimensions.Columns = function (pageDiv) {
   }
 
 
+  // Taken from https://github.com/yonran/detect-zoom
+  function zoomWebkit() {
+    var container = document.createElement('div')
+      , div = document.createElement('div')
+      , important = function(str){ return str.replace(/;/g, " !important;"); };
+
+    container.setAttribute('style', important('width:0; height:0; overflow:hidden; visibility:hidden; position: absolute;'));
+    div.innerHTML = "1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0";
+    div.setAttribute('style', important('font: 100px/1em sans-serif; -webkit-text-size-adjust: none; height: auto; width: 1em; padding: 0; overflow: visible;'));
+
+    container.appendChild(div);
+    document.body.appendChild(container);
+    var z = 1000 / div.clientHeight;
+    document.body.removeChild(container);
+    return Math.round(z * 100) / 100;
+  }
+
+
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
     var w = elem.clientWidth;
     if (elem.getBoundingClientRect) { w = elem.getBoundingClientRect().width; }
-    if (Monocle.Browser.env.roundPageDimensions) { w = Math.round(w); }
+    if (Monocle.Browser.is.WebKit) {
+      var zoom = zoomWebkit();
+      w = Math.round(w * zoom) / zoom;
+    }
     return { col: w, width: w + k.GAP, height: elem.clientHeight }
   }
 
