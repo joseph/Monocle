@@ -45,20 +45,20 @@ Monocle.Billboard = function (reader) {
 
 
   function grow() {
-    Monocle.Styles.transitionFor(p.cntr, 'transform', k.ANIM_MS, 'ease-in');
+    Monocle.Styles.transitionFor(p.cntr, 'transform', k.ANIM_MS, 'ease-in-out');
     Monocle.Styles.affix(p.cntr, 'transform', 'translate(0, 0) scale(1)');
   }
 
 
   function shrink(from) {
     p.from = from || p.from || [0,0];
-    var x = p.from[0]+'px';
-    var y = p.from[1]+'px';
-    Monocle.Styles.affix(
-      p.cntr,
-      'transform',
-      'translate('+x+','+y+') scale(0)'
-    );
+    var translate = 'translate('+p.from[0]+'px, '+p.from[1]+'px)';
+    var scale = 'scale(0)';
+    if (typeof p.from[2] === 'number') {
+      scale = 'scaleX('+(p.from[2] / p.cntr.offsetWidth)+') ';
+      scale += 'scaleY('+(p.from[3] / p.cntr.offsetHeight)+')';
+    }
+    Monocle.Styles.affix(p.cntr, 'transform', translate+' '+scale);
   }
 
 
