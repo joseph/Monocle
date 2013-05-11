@@ -310,18 +310,24 @@ Monocle.Controls.Stencil.Links = function (stencil) {
   //
   API.fitMask = function (link, mask) {
     var hrefObject = deconstructHref(link);
+    var rdr = stencil.properties.reader;
+    var evtData = { href: hrefObject, link: link, mask: mask }
 
     if (hrefObject.internal) {
       mask.setAttribute('href', 'javascript:"Skip to chapter"');
       mask.onclick = function (evt) {
-        stencil.properties.reader.skipToChapter(hrefObject.internal);
+        if (rdr.dispatchEvent('monocle:link:internal', evtData, true)) {
+          rdr.skipToChapter(hrefObject.internal);
+        }
         evt.preventDefault();
         return false;
       }
     } else {
       mask.setAttribute('href', hrefObject.external);
       mask.setAttribute('target', '_blank');
-      mask.onclick = function (evt) { return true; }
+      mask.onclick = function (evt) {
+        return rdr.dispatchEvent('monocle:link:external', evtData, true);
+      }
     }
 
     link.onclick = function (evt) {
