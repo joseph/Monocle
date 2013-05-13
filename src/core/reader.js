@@ -537,7 +537,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       overlay.listeners = Monocle.Events.listenForContact(
         overlay,
         {
-          start: function (evt) { if (!onControl(evt)) { hideControl(ctrl); } },
+          start: function (evt) { if (!onControl(evt)) { evt.stopPropagation(); hideControl(ctrl); } },
           move: function (evt) { if (!onControl(evt)) { evt.preventDefault(); } }
         }
       );
