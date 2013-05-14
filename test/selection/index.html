@@ -50,7 +50,7 @@
           window.reader = Monocle.Reader(
             'reader',
             Monocle.bookData({ components: ['pt1.html', 'pt2.html'] }),
-            { panels: Monocle.Panels.Marginal },
+            { panels: Monocle.Panels.Magic },
             function (rdr) {
               rdr.listen('monocle:selection', textSelected);
               rdr.listen('monocle:deselection', textDeselected);

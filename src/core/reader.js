@@ -527,20 +527,19 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
 
     if (controlData.controlType == "popover") {
-      var onControl = function (evt) {
+      var beyondControl = function (evt) {
         var obj = evt.target;
         do {
-          if (obj == controlData.elements[0]) { return true; }
+          if (obj == controlData.elements[0]) { return false; }
         } while (obj && (obj = obj.parentNode));
-        return false;
+        Gala.stop(evt);
+        return true;
       }
-      overlay.listeners = Monocle.Events.listenForContact(
-        overlay,
-        {
-          start: function (evt) { if (!onControl(evt)) { evt.stopPropagation(); hideControl(ctrl); } },
-          move: function (evt) { if (!onControl(evt)) { evt.preventDefault(); } }
-        }
-      );
+      var handlers = {
+        start: function (e) { if (beyondControl(e)) { hideControl(ctrl); } },
+        move: beyondControl
+      }
+      overlay.listeners = Monocle.Events.listenForContact(overlay, handlers);
     }
     controlData.hidden = false;
     if (ctrl.properties) {
