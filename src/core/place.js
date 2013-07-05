@@ -55,7 +55,7 @@ Monocle.Place = function () {
   function pageAtPercentageThrough(percent) {
     var pages = pagesInComponent();
     if (typeof percent != 'number') { percent = 0; }
-    return Math.max(Math.ceil(pages * percent), 1);
+    return Math.max(Math.round(pages * percent), 1);
   }
 
 
