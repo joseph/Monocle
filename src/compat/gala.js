@@ -136,24 +136,36 @@ Gala.replaceGroup = function (elem, listeners, newListeners, useCapture) {
 Gala.onTap = function (elem, fn, tapClass) {
   elem = Gala.$(elem);
   if (typeof tapClass == 'undefined') { tapClass = Gala.TAPPING_CLASS; }
-  var tapping = false;
+  var startX, startY, tapping = false;
+  var getTouch = function (evt, field) {
+    return (evt.touches && evt.touches[0] && evt.touches[0][field]) || 0;
+  }
   var fns = {
     start: function (evt) {
       tapping = true;
+      startX = getTouch(evt, "clientX");
+      startY = getTouch(evt, "clientY");
       if (tapClass) { elem.classList.add(tapClass); }
     },
     move: function (evt) {
-      if (!tapping) { return; }
-      tapping = false;
-      if (tapClass) { elem.classList.remove(tapClass); }
+      var moved = Math.abs(getTouch(evt, "clientX") - startX) > 10 ||
+        Math.abs(getTouch(evt, "clientY") - startY) > 10;
+      if (moved) {
+        fns.cancel(evt);
+      }
     },
     end: function (evt) {
       if (!tapping) { return; }
-      fns.move(evt);
+      fns.cancel(evt);
       evt.currentTarget = evt.currentTarget || evt.srcElement;
       fn(evt);
     },
-    noop: function (evt) {}
+    noop: function (evt) {},
+    cancel: function (evt) {
+      if (!tapping) { return; }
+      tapping = false;
+      if (tapClass) { elem.classList.remove(tapClass); }
+    }
   }
   var noopOnClick = function (listeners) {
     Gala.listen(elem, 'click', listeners.click = fns.noop);
