@@ -105,6 +105,7 @@ Monocle.Controls.Scrubber = function (reader) {
     }
 
     var startFn = function (evt) {
+      evt.stopPropagation();
       bubble.style.display = "block";
       moveEvt(evt);
       cntrListeners = Monocle.Events.listenForContact(
