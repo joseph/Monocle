@@ -18,7 +18,7 @@ if (typeof window.console == "undefined") {
 window.console.compatDir = function (obj) {
   var stringify = function (o) {
     var parts = [];
-    for (x in o) {
+    for (var x in o) {
       parts.push(x + ": " + o[x]);
     }
     return parts.join(";\n");

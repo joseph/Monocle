@@ -46,8 +46,9 @@ Gala.deafen = function (elem, evtType, fn, useCapture) {
 //
 Gala.dispatch = function (elem, evtType, data, cancelable) {
   elem = Gala.$(elem);
+  var evt;
   if (elem.dispatchEvent) {
-    var evt = document.createEvent('Events');
+    evt = document.createEvent('Events');
     evt.initEvent(evtType, false, cancelable || false);
     evt.m = data;
     return elem.dispatchEvent(evt);
@@ -55,7 +56,7 @@ Gala.dispatch = function (elem, evtType, data, cancelable) {
     if (!Gala.IE_REGISTRATIONS[elem]) { return true; }
     var evtHandlers = Gala.IE_REGISTRATIONS[elem][evtType];
     if (!evtHandlers || evtHandlers.length < 1) { return true; }
-    var evt = {
+    evt = {
       type: evtType,
       currentTarget: elem,
       target: elem,
@@ -98,7 +99,7 @@ Gala.stop = function (evt) {
 // Add a group of listeners, which is just a hash of { evtType: callback, ... }
 //
 Gala.listenGroup = function (elem, listeners, useCapture) {
-  for (evtType in listeners) {
+  for (var evtType in listeners) {
     Gala.listen(elem, evtType, listeners[evtType], useCapture || false);
   }
 }
@@ -107,7 +108,7 @@ Gala.listenGroup = function (elem, listeners, useCapture) {
 // Remove a group of listeners.
 //
 Gala.deafenGroup = function (elem, listeners, useCapture) {
-  for (evtType in listeners) {
+  for (var evtType in listeners) {
     Gala.deafen(elem, evtType, listeners[evtType], useCapture || false);
   }
 }
@@ -118,7 +119,7 @@ Gala.deafenGroup = function (elem, listeners, useCapture) {
 //
 Gala.replaceGroup = function (elem, listeners, newListeners, useCapture) {
   Gala.deafenGroup(elem, listeners, useCapture || false);
-  for (evtType in listeners) { delete listeners[evtType]; }
+  for (var evtType in listeners) { delete listeners[evtType]; }
   for (evtType in newListeners) { listeners[evtType] = newListeners[evtType]; }
   Gala.listenGroup(elem, listeners, useCapture || false);
   return listeners;

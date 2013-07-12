@@ -21,7 +21,7 @@ Monocle.Panels.IMode = function (flipper, evtCallbacks) {
     }
     p.divs = {}
 
-    for (dir in p.panels) {
+    for (var dir in p.panels) {
       p.reader.addControl(p.panels[dir]);
       p.divs[dir] = p.panels[dir].properties.div;
       p.panels[dir].listenTo(evtCallbacks);
