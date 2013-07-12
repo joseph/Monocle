@@ -321,7 +321,7 @@ Monocle.Flippers.Slider = function (reader) {
     if (!options.duration) {
       duration = 0;
     } else {
-      duration = parseInt(options.duration);
+      duration = parseInt(options.duration, 10);
     }
 
     if (Monocle.Browser.env.supportsTransition) {
