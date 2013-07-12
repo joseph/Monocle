@@ -366,7 +366,7 @@ Monocle.Controls.Stencil.Links = function (stencil) {
     }
     // URLs with a different protocol or domain are always external.
     //console.log("Domain test: %s <=> %s", origin, href);
-    if (href.indexOf(origin) != 0) {
+    if (href.indexOf(origin) !== 0) {
       return ext;
     }
 
@@ -376,7 +376,7 @@ Monocle.Controls.Stencil.Links = function (stencil) {
       topPath += '/';
     }
     //console.log("Sub-path test: %s <=> %s", topPath, path);
-    if (path.indexOf(topPath) == 0) {
+    if (path.indexOf(topPath) === 0) {
       return { internal: path.substring(topPath.length) }
     }
 
@@ -385,7 +385,7 @@ Monocle.Controls.Stencil.Links = function (stencil) {
     var cmptIds = stencil.properties.reader.getBook().properties.componentIds;
     for (var i = 0, ii = cmptIds.length; i < ii; ++i) {
       //console.log("Component test: %s <=> %s", cmptIds[i], path);
-      if (path.indexOf(cmptIds[i]) == 0) {
+      if (path.indexOf(cmptIds[i]) === 0) {
         return { internal: path }
       }
     }

@@ -26,7 +26,7 @@ Monocle.Billboard = function (reader) {
       elem.naturalWidth || elem.offsetWidth,
       elem.naturalHeight || elem.offsetHeight
     ];
-    if (options.closeButton != false) {
+    if (options.closeButton) {
       var cBtn = p.cntr.dom.append('div', k.CLS.closeButton);
       Monocle.Events.listenForTap(cBtn, hide);
     }

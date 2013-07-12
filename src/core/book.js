@@ -134,7 +134,7 @@ Monocle.Book = function (dataSource, preloadWindow) {
     }
 
     if (result.page < 1) {
-      if (cIndex == 0) {
+      if (cIndex === 0) {
         // On first page of book.
         result.page = 1;
         result.boundarystart = true;

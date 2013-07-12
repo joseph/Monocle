@@ -63,7 +63,7 @@ Gala.dispatch = function (elem, evtType, data, cancelable) {
       defaultPrevented: false,
       preventDefault: function () { evt.defaultPrevented = true; }
     }
-    var q, processQueue = Gala.IE_INVOCATION_QUEUE.length == 0;
+    var q, processQueue = Gala.IE_INVOCATION_QUEUE.length === 0;
     for (var i = 0, ii = evtHandlers.length; i < ii; ++i) {
       q = { elem: elem, evtType: evtType, handler: evtHandlers[i], evt: evt }
       Gala.IE_INVOCATION_QUEUE.push(q);
@@ -281,7 +281,7 @@ Gala.Cursor = function (evt) {
 
   function initialize() {
     var ci =
-      evt.type.indexOf('mouse') == 0 ? evt :
+      evt.type.indexOf('mouse') === 0 ? evt :
       ['touchstart', 'touchmove'].indexOf(evt.type) >= 0 ? evt.targetTouches[0] :
       ['touchend', 'touchcancel'].indexOf(evt.type) >= 0 ? evt.changedTouches[0] :
       null;
