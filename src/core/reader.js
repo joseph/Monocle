@@ -401,6 +401,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     var fn = callback;
     if (!locus.direction) {
+      dispatchEvent('monocle:turning');
       dispatchEvent('monocle:jumping', { locus: locus });
       fn = function () {
         dispatchEvent('monocle:jump', { locus: locus });
