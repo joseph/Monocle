@@ -1,0 +1,22 @@
+{
+  "undef" : true,
+  "unused" : false,
+  "asi" : true,
+  "boss" : true,
+  "camelcase" : true,
+  "eqeqeq" : false, // prohibits the user of == and != if true
+  "evil" : true, // true - allow the use of eval
+  "scripturl" : true, // true - allow the use of script url
+  "expr" : true, // true - allows expressions where you expect assigmented
+                // eg, a ? doThingA() : doThingB()
+  "sub" : true, // true - allow the user of obj["field"] in place of obj.field
+  //"maxlen" : 80,
+  "globals" : {
+    "Monocle" : true,
+    "Gala" : true,
+    "BU" : true,
+    "console" : true
+  },
+
+  "browser" : true
+}
