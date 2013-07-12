@@ -71,7 +71,7 @@ Monocle.Factory = function (element, label, index, reader) {
   //
   // Returns the created element.
   //
-  function make(tagName, oLabel, index_or_options, or_options) {
+  function make(tagName, oLabel, indexOrOptions, orOptions) {
     var oIndex, options;
     if (arguments.length == 1) {
       oLabel = null,
@@ -113,7 +113,7 @@ Monocle.Factory = function (element, label, index, reader) {
   // Creates an element by passing all the given arguments to make. Then
   // appends the element as a child of the current element.
   //
-  function append(tagName, oLabel, index_or_options, or_options) {
+  function append(tagName, oLabel, indexOrOptions, orOptions) {
     var oElement = make.apply(this, arguments);
     p.element.appendChild(oElement);
     return oElement;
