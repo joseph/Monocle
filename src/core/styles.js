@@ -66,7 +66,7 @@ Monocle.Styles = {
     while (props.length && !matrix) {
       matrix = currStyle[props.shift()];
     }
-    return parseInt(matrix.match(re)[1]);
+    return parseInt(matrix.match(re)[1], 10);
   },
 
 
