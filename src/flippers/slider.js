@@ -380,7 +380,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function jumpIn(pageDiv, callback) {
-    opts = { duration: (Monocle.Browser.env.stickySlideOut ? 1 : 0) }
+    var opts = { duration: (Monocle.Browser.env.stickySlideOut ? 1 : 0) }
     setX(pageDiv, 0, opts, callback);
   }
 

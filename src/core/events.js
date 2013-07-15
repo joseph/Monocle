@@ -26,7 +26,7 @@ Monocle.Events.deafenForTap = Gala.deafenGroup;
 Monocle.Events.listenForContact = function (elem, fns, options) {
   options = options || { useCapture: false };
   var wrappers = {};
-  for (evtType in fns) {
+  for (var evtType in fns) {
     wrappers[evtType] = Monocle.Events.wrapper(fns[evtType]);
   }
   return Gala.onContact(elem, wrappers, options.useCapture);

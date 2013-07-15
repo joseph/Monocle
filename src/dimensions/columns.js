@@ -145,21 +145,23 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       translateToOffset(0);
 
       // Store scroll offsets for all windows.
-      var win = s = p.page.m.activeFrame.contentWindow;
+      var win, s;
+      win = s = p.page.m.activeFrame.contentWindow;
       var scrollers = [
         [win, win.scrollX, win.scrollY],
         [window, window.scrollX, window.scrollY]
       ];
       //while (s != s.parent) { scrollers.push([s, s.scrollX]); s = s.parent; }
 
+      var scroller, x;
       if (Monocle.Browser.env.sheafIsScroller) {
-        var scroller = p.page.m.sheafDiv;
-        var x = scroller.scrollLeft;
+        scroller = p.page.m.sheafDiv;
+        x = scroller.scrollLeft;
         target.scrollIntoView();
         offset = scroller.scrollLeft;
       } else {
-        var scroller = win;
-        var x = scroller.scrollX;
+        scroller = win;
+        x = scroller.scrollX;
         target.scrollIntoView();
         offset = scroller.scrollX;
       }

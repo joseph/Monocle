@@ -209,7 +209,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   // Positions the stencil container over the active frame.
   //
   function alignToComponent(pageDiv) {
-    cmpt = pageDiv.m.activeFrame.parentNode;
+    var cmpt = pageDiv.m.activeFrame.parentNode;
     p.container.dom.setStyles({
       left: cmpt.offsetLeft+"px",
       top: cmpt.offsetTop+"px"
