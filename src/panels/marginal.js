@@ -18,13 +18,13 @@ Monocle.Panels.Marginal = function (flipper, evtCallbacks) {
       backwards: new Monocle.Controls.Panel()
     }
 
-    for (dir in p.panels) {
+    for (var dir in p.panels) {
       flipper.properties.reader.addControl(p.panels[dir]);
       p.panels[dir].listenTo(evtCallbacks);
       p.panels[dir].setDirection(flipper.constants[dir.toUpperCase()]);
-      with (p.panels[dir].properties.div.style) {
-        dir == "forwards" ? right = 0 : left = 0;
-      }
+
+      var prop = dir == "forwards" ? "right" : "left";
+      p.panels[dir].properties.div.style[prop] = 0
     }
     setWidths();
   }

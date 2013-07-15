@@ -263,7 +263,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       var listener = function (evt) {
         if (watchers[evt.type](evt)) { deafen(evt.type, listener); }
       }
-      for (evtType in watchers) { listen(evtType, listener) }
+      for (var evtType in watchers) { listen(evtType, listener) }
     }
     p.flipper.moveTo(place || { page: 1 }, initialized);
   }
@@ -315,8 +315,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     var place, locus;
     if (andRestorePlace !== false) {
-      var place = getPlace();
-      var locus = { percent: place ? place.percentageThrough() : 0 };
+      place = getPlace();
+      locus = { percent: place ? place.percentageThrough() : 0 };
     }
 
     forEachPage(function (pageDiv) {
@@ -512,8 +512,9 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
 
     var overlay = dom.find('overlay');
+    var i, ii;
     if (controlData.usesOverlay && controlData.controlType != "hud") {
-      for (var i = 0, ii = p.controls.length; i < ii; ++i) {
+      for (i = 0, ii = p.controls.length; i < ii; ++i) {
         if (p.controls[i].usesOverlay && !p.controls[i].hidden) {
           return false;
         }
@@ -522,7 +523,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       dispatchEvent('monocle:modal:on');
     }
 
-    for (var i = 0; i < controlData.elements.length; ++i) {
+    for (i = 0; i < controlData.elements.length; ++i) {
       controlData.elements[i].style.display = "block";
     }
 

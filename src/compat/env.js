@@ -53,7 +53,7 @@ Monocle.Env = function () {
     Monocle.defer(removeTestFrame);
 
     if (typeof surveyCallback == "function") {
-      fn = surveyCallback;
+      var fn = surveyCallback;
       surveyCallback = null;
       fn(API);
     }
@@ -271,7 +271,7 @@ Monocle.Env = function () {
 
     // Is the Reader embedded, or in the top-level window?
     //
-    ["embedded", function () { result(top != self) }],
+    ["embedded", function () { result(top != window.self) }],
 
 
     // TEST FOR CERTAIN RENDERING OR INTERACTION BUGS
@@ -291,7 +291,7 @@ Monocle.Env = function () {
     //
     ["floatsIgnoreColumns", function () {
       if (!Monocle.Browser.is.WebKit) { return result(false); }
-      match = navigator.userAgent.match(/AppleWebKit\/([\d\.]+)/);
+      var match = navigator.userAgent.match(/AppleWebKit\/([\d\.]+)/);
       if (!match) { return result(false); }
       return result(match[1] < "534.30");
     }],

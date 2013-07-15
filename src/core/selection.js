@@ -114,6 +114,7 @@ Monocle.Selection = function (reader) {
       return elem;
     }
 
+    var nvp;
     if (ovp) {
       var ovpcontent = ovp.getAttribute('content');
       var re = /user-scalable\s*=\s*([^,$\s])*/;
@@ -125,13 +126,13 @@ Monocle.Selection = function (reader) {
         nvpcontent += nvpcontent ? ', ' : '';
         nvpcontent += 'user-scalable=no';
         head.removeChild(ovp);
-        var nvp = createViewportMeta(nvpcontent);
+        nvp = createViewportMeta(nvpcontent);
         fn();
         head.removeChild(nvp);
         head.appendChild(ovp);
       }
     } else {
-      var nvp = createViewportMeta('user-scalable=no');
+      nvp = createViewportMeta('user-scalable=no');
       fn();
       nvp.setAttribute('content', 'user-scalable=yes');
     }

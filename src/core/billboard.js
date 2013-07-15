@@ -11,7 +11,7 @@ Monocle.Billboard = function (reader) {
     p.reader.dispatchEvent('monocle:modal:on');
     if (p.cntr) { return console.warn("Modal billboard already showing."); }
 
-    var options = options || {};
+    options = options || {};
     var elem = urlOrElement;
     p.cntr = reader.dom.append('div', k.CLS.cntr);
     if (typeof urlOrElement == 'string') {

@@ -205,6 +205,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
 
 
   function adjustFontScaleForDoc(doc, scale) {
+    var j, jj;
     var elems = doc.getElementsByTagName('*');
     if (scale) {
       scale = parseFloat(scale);
@@ -216,7 +217,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       // font-size. If a proportional font sizing is already applied to
       // the element, update existing cssText, otherwise append new cssText.
       //
-      for (var j = 0, jj = elems.length; j < jj; ++j) {
+      for (j = 0, jj = elems.length; j < jj; ++j) {
         var newFs = fsProperty(elems[j].pfsOriginal, scale);
         if (elems[j].pfsApplied) {
           replaceFontSizeInStyle(elems[j], newFs);
@@ -228,7 +229,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
     } else if (doc.body.pfsSwept) {
       // Iterate over each element, removing proportional font-sizing flag
       // and property from cssText.
-      for (var j = 0, jj = elems.length; j < jj; ++j) {
+      for (j = 0, jj = elems.length; j < jj; ++j) {
         if (elems[j].pfsApplied) {
           var oprop = elems[j].pfsOriginalProp;
           var opropDec = oprop ? 'font-size: '+oprop+' ! important;' : '';
