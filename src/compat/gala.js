@@ -136,57 +136,47 @@ Gala.replaceGroup = function (elem, listeners, newListeners, useCapture) {
 Gala.onTap = function (elem, fn, tapClass) {
   elem = Gala.$(elem);
   if (typeof tapClass == 'undefined') { tapClass = Gala.TAPPING_CLASS; }
-  var tapping = false,
-  maxContactDistance = Gala.TAP_MAX_CONTACT_DISTANCE,
-  startEvent,
 
-  tapIsValid = function (evt) {
-    evt = Gala.Cursor(evt)
+  var tapStartingCoords = {};
 
-    var xDelta = Math.abs(evt.pageX - startEvent.pageX),
-    yDelta = Math.abs(evt.pageY - startEvent.pageY),
-    maxContact = Math.max(xDelta, yDelta),
-    isValid = maxContactDistance >= maxContact;
+  // If the tap extends beyond a few pixels, it's no longer a tap.
+  var tapIsValid = function (evt) {
+    var cur = Gala.Cursor(evt);
+    var xDelta = Math.abs(cur.pageX - tapStartingCoords.x);
+    var yDelta = Math.abs(cur.pageY - tapStartingCoords.y);
+    var maxContact = Math.max(xDelta, yDelta);
+    return Gala.TAP_MAX_CONTACT_DISTANCE >= maxContact;
+  }
 
-    /*
-    console.log(
-      'isTapValid=', isValid,
-      ',maxContact=', maxContact
-    );
-    */
-    return isValid;
-  };
+  // This ensures the element is considered 'clickable' by browsers
+  // like on the Kindle 3.
+  var noopOnClick = function (listeners) {
+    Gala.listen(elem, 'click', listeners.click = fns.noop);
+  }
 
   var fns = {
     start: function (evt) {
-      startEvent = Gala.Cursor(evt);
-      tapping = true;
+      var cur = Gala.Cursor(evt);
+      tapStartingCoords = { x: cur.pageX, y: cur.pageY };
       if (tapClass) { elem.classList.add(tapClass); }
     },
     move: function (evt) {
-      if (!tapping) { return }
-
-      if (!tapIsValid(evt)) {
-        fns.cancel(evt);
-      }
+      if (!tapStartingCoords) { return; }
+      if (!tapIsValid(evt)) { fns.cancel(evt); }
     },
     end: function (evt) {
-      if (!tapping) { return; }
+      if (!tapStartingCoords) { return; }
       fns.cancel(evt);
       evt.currentTarget = evt.currentTarget || evt.srcElement;
       fn(evt);
     },
     noop: function () {},
     cancel: function () {
-      if (!tapping) { return; }
-      tapping = false;
-      startEvent = null;
+      if (!tapStartingCoords) { return; }
+      tapStartingCoords = null;
       if (tapClass) { elem.classList.remove(tapClass); }
     }
-  }
-  var noopOnClick = function (listeners) {
-    Gala.listen(elem, 'click', listeners.click = fns.noop);
-  }
+  };
   Gala.listen(window, Gala.CONTACT_CANCEL, fns.cancel);
   return Gala.onContact(elem, fns, false, noopOnClick);
 }

@@ -14,7 +14,6 @@
   "globals" : {
     "Monocle" : true,
     "Gala" : true,
-    "BU" : true,
     "console" : true
   },
 
