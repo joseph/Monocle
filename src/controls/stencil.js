@@ -313,26 +313,29 @@ Monocle.Controls.Stencil.Links = function (stencil) {
     var rdr = stencil.properties.reader;
     var evtData = { href: hrefObject, link: link, mask: mask }
 
-    if (hrefObject.internal) {
-      mask.setAttribute('href', 'javascript:"Skip to chapter"');
-      mask.onclick = function (evt) {
-        if (rdr.dispatchEvent('monocle:link:internal', evtData, true)) {
-          rdr.skipToChapter(hrefObject.internal);
-        }
+    if (hrefObject.pass) {
+      mask.onclick = function (evt) { return link.click(); }
+    } else {
+      link.onclick = function (evt) {
         evt.preventDefault();
         return false;
       }
-    } else {
-      mask.setAttribute('href', hrefObject.external);
-      mask.setAttribute('target', '_blank');
-      mask.onclick = function (evt) {
-        return rdr.dispatchEvent('monocle:link:external', evtData, true);
+      if (hrefObject.internal) {
+        mask.setAttribute('href', 'javascript:"Skip to chapter"');
+        mask.onclick = function (evt) {
+          if (rdr.dispatchEvent('monocle:link:internal', evtData, true)) {
+            rdr.skipToChapter(hrefObject.internal);
+          }
+          evt.preventDefault();
+          return false;
+        }
+      } else {
+        mask.setAttribute('href', hrefObject.external);
+        mask.setAttribute('target', '_blank');
+        mask.onclick = function (evt) {
+          return rdr.dispatchEvent('monocle:link:external', evtData, true);
+        }
       }
-    }
-
-    link.onclick = function (evt) {
-      evt.preventDefault();
-      return false;
     }
   }
 
@@ -359,6 +362,10 @@ Monocle.Controls.Stencil.Links = function (stencil) {
     var href = elem.href;
     var path = href.substring(origin.length);
     var ext = { external: href };
+
+    if (href.toLowerCase().match(/^javascript:/)) {
+      return { pass: true };
+    }
 
     // Anchor tags with 'target' attributes are always external URLs.
     if (elem.getAttribute('target')) {
