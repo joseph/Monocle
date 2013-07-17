@@ -553,7 +553,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function showingControl(ctrl) {
     var controlData = dataForControl(ctrl);
-    return controlData.hidden == false;
+    return (!controlData.hidden);
   }
 
 
