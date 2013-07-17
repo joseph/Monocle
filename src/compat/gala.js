@@ -136,29 +136,58 @@ Gala.replaceGroup = function (elem, listeners, newListeners, useCapture) {
 Gala.onTap = function (elem, fn, tapClass) {
   elem = Gala.$(elem);
   if (typeof tapClass == 'undefined') { tapClass = Gala.TAPPING_CLASS; }
-  var tapping = false;
+  var tapping = false,
+  maxContactDistance = Gala.TAP_MAX_CONTACT_DISTANCE,
+  startEvent,
+
+  tapIsValid = function (evt) {
+    evt = Gala.Cursor(evt)
+
+    var xDelta = Math.abs(evt.pageX - startEvent.pageX),
+    yDelta = Math.abs(evt.pageY - startEvent.pageY),
+    maxContact = Math.max(xDelta, yDelta),
+    isValid = maxContactDistance >= maxContact;
+
+    /*
+    console.log(
+      'isTapValid=', isValid,
+      ',maxContact=', maxContact
+    );
+    */
+    return isValid;
+  };
+
   var fns = {
     start: function (evt) {
+      startEvent = Gala.Cursor(evt);
       tapping = true;
       if (tapClass) { elem.classList.add(tapClass); }
     },
     move: function (evt) {
-      if (!tapping) { return; }
-      tapping = false;
-      if (tapClass) { elem.classList.remove(tapClass); }
+      if (!tapping) { return }
+
+      if (!tapIsValid(evt)) {
+        fns.cancel(evt);
+      }
     },
     end: function (evt) {
       if (!tapping) { return; }
-      fns.move(evt);
+      fns.cancel(evt);
       evt.currentTarget = evt.currentTarget || evt.srcElement;
       fn(evt);
     },
-    noop: function (evt) {}
+    noop: function () {},
+    cancel: function () {
+      if (!tapping) { return; }
+      tapping = false;
+      startEvent = null;
+      if (tapClass) { elem.classList.remove(tapClass); }
+    }
   }
   var noopOnClick = function (listeners) {
     Gala.listen(elem, 'click', listeners.click = fns.noop);
   }
-  Gala.listen(window, 'gala:contact:cancel', fns.move);
+  Gala.listen(window, Gala.CONTACT_CANCEL, fns.cancel);
   return Gala.onContact(elem, fns, false, noopOnClick);
 }
 
@@ -294,6 +323,7 @@ Gala.Cursor = function (evt) {
     API.clientY = ci.clientY;
     API.screenX = ci.screenX;
     API.screenY = ci.screenY;
+    API.event = evt;
 
     // Coordinates relative to the target element for the event.
     var tgt = API.target = evt.target || evt.srcElement;
@@ -346,5 +376,7 @@ Gala.$ = function (elem) {
 // CONSTANTS
 //
 Gala.TAPPING_CLASS = 'tapping';
-Gala.IE_REGISTRATIONS = {}
-Gala.IE_INVOCATION_QUEUE = []
+Gala.IE_REGISTRATIONS = {};
+Gala.IE_INVOCATION_QUEUE = [];
+Gala.CONTACT_CANCEL = "gala:contact:cancel";
+Gala.TAP_MAX_CONTACT_DISTANCE = 10;
