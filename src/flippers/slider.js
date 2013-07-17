@@ -202,7 +202,7 @@ Monocle.Flippers.Slider = function (reader) {
 
 
   function onGoingForward(x) {
-    if (p.nextPageReady == false) {
+    if (p.nextPageReady === false) {
       prepareNextPage(function () { lifted(x); }, resetTurnData);
     } else {
       lifted(x);

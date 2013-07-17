@@ -143,7 +143,7 @@ Monocle.Place = function () {
 
 
   function onFirstPageOfBook() {
-    return p.component.properties.index == 0 && pageNumber() == 1;
+    return p.component.properties.index === 0 && pageNumber() === 1;
   }
 
 
