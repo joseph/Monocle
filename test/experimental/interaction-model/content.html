@@ -16,13 +16,16 @@
           var cs = document.getElementById('cancelStart');
           cs.addEventListener('mousedown', stopEvent, false);
           cs.addEventListener('touchstart', stopEvent, false);
+          cs.addEventListener('MSPointerDown', stopEvent, false);
           var cm = document.getElementById('cancelMove');
           // PROBLEM: you cannot preventDefault on a mousemove event.
           //   cm.addEventListener('mousemove', stopEvent, false);
           cm.addEventListener('touchmove', stopEvent, false);
+          cm.addEventListener('MSPointerMove', stopEvent, false);
           var ce = document.getElementById('cancelEnd');
           ce.addEventListener('mouseup', stopEvent, false);
           ce.addEventListener('touchend', stopEvent, false);
+          ce.addEventListener('MSPointerUp', stopEvent, false);
         }
 
         function stopEvent(evt) {
