@@ -200,90 +200,130 @@ Gala.onTap = function (elem, fn, tapClass) {
 //
 Gala.onContact = function (elem, fns, useCapture, initCallback) {
   elem = Gala.$(elem);
-  var listeners = null;
-  var inited = false;
 
-  // If we see a touchstart event, register all these listeners.
-  var touchListeners = function () {
-    var l = {}
-    if (fns.start) {
-      l.touchstart = function (evt) {
-        if (evt.touches.length <= 1) { fns.start(evt); }
-      }
-    }
-    if (fns.move) {
-      l.touchmove = function (evt) {
-        if (evt.touches.length <= 1) { fns.move(evt); }
-      }
-    }
-    if (fns.end) {
-      l.touchend = function (evt) {
-        if (evt.touches.length <= 1) { fns.end(evt); }
-      }
-    }
-    if (fns.cancel) {
-      l.touchcancel = fns.cancel;
-    }
-    return l;
-  }
+  var isLeftClick = function (evt) {
+    return evt.button < 1;
+  },
 
-  // Whereas if we see a mousedown event, register all these listeners.
-  var mouseListeners = function () {
-    var l = {};
-    if (fns.start) {
-      l.mousedown = function (evt) { if (evt.button < 2) { fns.start(evt); } }
-    }
-    if (fns.move) {
-      l.mousemove = fns.move;
-    }
-    if (fns.end) {
-      l.mouseup = function (evt) { if (evt.button < 2) { fns.end(evt); } }
-    }
-    // if (fns.cancel) {
-    //   l.mouseout = function (evt) {
-    //     obj = evt.relatedTarget || evt.fromElement;
-    //     while (obj && (obj = obj.parentNode)) { if (obj == elem) { return; } }
-    //     fns.cancel(evt);
-    //   }
-    // }
-    return l;
-  }
+  isSingleTouch = function (evt) {
+    return !!(evt.touches && evt.touches.length < 2);
+  },
 
-  if (typeof Gala.CONTACT_MODE == 'undefined') {
-    var contactInit = function (evt, newListeners, mode) {
-      if (inited) { return; }
-      Gala.CONTACT_MODE = Gala.CONTACT_MODE || mode;
-      if (Gala.CONTACT_MODE != mode) { return; }
-      Gala.replaceGroup(elem, listeners, newListeners, useCapture);
-      if (typeof initCallback == 'function') { initCallback(listeners); }
-      if (listeners[evt.type]) { listeners[evt.type](evt); }
-      inited = true;
+  wrapContact = function (fn) {
+    return function (evt) {
+      if (Gala.Pointers.enabled()) { Gala.Pointers.trackPointers(evt); }
+      var doCallFunc = (Gala.Pointers.isSinglePointer() ||
+        isSingleTouch(evt) ||
+        isLeftClick(evt))
+      if (doCallFunc) { fn(evt) }
     }
-    var touchInit = function (evt) {
-      contactInit(evt, touchListeners(), 'touch');
-    }
-    var mouseInit = function (evt) {
-      contactInit(evt, mouseListeners(), 'mouse');
-    }
-    listeners = {
-      'touchstart': touchInit,
-      'touchmove': touchInit,
-      'touchend': touchInit,
-      'touchcancel': touchInit,
-      'mousedown': mouseInit,
-      'mousemove': mouseInit,
-      'mouseup': mouseInit,
-      'mouseout': mouseInit
-    }
-  } else if (Gala.CONTACT_MODE == 'touch') {
-    listeners = touchListeners();
-  } else if (Gala.CONTACT_MODE == 'mouse') {
-    listeners = mouseListeners();
-  }
+  },
+
+  buildListeners = function (opts) {
+    var types = Gala.getEventTypes();
+
+    var listeners = {};
+    'start move end cancel'.split(' ').forEach(function (type) {
+      if (opts[type]) {
+        types[type].split(' ').forEach(function (eventType) {
+          listeners[eventType] = wrapContact(opts[type]);
+        })
+      }
+    });
+    return listeners;
+  },
+
+  listeners = buildListeners(fns);
 
   Gala.listenGroup(elem, listeners);
   if (typeof initCallback == 'function') { initCallback(listeners); }
   return listeners;
+}
+
+// Support for pointer events
+// http://msdn.microsoft.com/en-us/library/ie/hh673557(v=vs.85).aspx
+// http://www.w3.org/Submission/pointer-events/
+// Primary target of this functionality is windows 8, surface, etc
+//
+Gala.Pointers = {
+  pointers: {},
+  enabled: function () { return Monocle.Browser.env.pointer },
+
+  // Track pointer events
+  //
+  trackPointers: function (evt) {
+    var types = Gala.getEventTypes(),
+    endEvents = types.end.slice().concat(types.cancel);
+
+    // if we have an end event, I'm not sure it makes sense to only clear the
+    // single pointer that sent the end event. I think it makes sense to
+    // clear all pointers...I think it's kind of an edge case.
+    if (endEvents.indexOf(evt.type)) {
+      this.reset();
+    } else {
+      this.pointers[evt.pointerId] = evt;
+    }
+  },
+
+  // This follows the same logic as touches. To be valid, there is less than one
+  //
+  isSinglePointer: function () {
+    return !!(this.enabled() && this.count() < 2);
+  },
+
+  // Get count of currently tracked pointers
+  //
+  count: function () {
+    // This method only exists in IE > 8 but that's ok because this code only
+    // applies to versions of IE > 8;
+    return Object.keys ? Object.keys(this.pointers).length : 0;
+  },
+
+  // Reset the pointes
+  //
+  reset: function () {
+    this.pointers = {};
+  }
+}
+
+// Get Event Types that are used to bind the different event concepts
+// start, move, end, cancel. This method helps normalize event binding and
+// prevent improper event listening, etc
+//
+Gala.getEventTypes = function () {
+  var types;
+
+  if (Gala.Pointers.enabled()) {
+    // Microsoft screwing stuff up with pointers
+    // http://www.w3.org/TR/pointerevents/
+    types = [
+      'pointerdown MSPointerDown',
+      'pointermove MSPointerMove',
+      'pointerup MSPointerUp',
+      'pointercancel MSPointerCancel'
+    ];
+  } else if (Monocle.Browser.env.noMouse) {
+    types = [
+      'touchstart',
+      'touchmove',
+      'touchend',
+      'touchcancel'
+    ];
+  } else {
+    types = [
+      'touchstart mousedown',
+      'touchmove mousemove',
+      'touchend mouseup',
+      'touchcancel'
+    ];
+  }
+
+  return {
+    start: types[0],
+    move: types[1],
+    end: types[2],
+    cancel: types[3]
+  };
 }
 
 
@@ -301,7 +341,7 @@ Gala.Cursor = function (evt) {
 
   function initialize() {
     var ci =
-      evt.type.indexOf('mouse') === 0 ? evt :
+      evt.type.match(/mouse|pointer/i) ? evt :
       ['touchstart', 'touchmove'].indexOf(evt.type) >= 0 ? evt.targetTouches[0] :
       ['touchend', 'touchcancel'].indexOf(evt.type) >= 0 ? evt.changedTouches[0] :
       null;
