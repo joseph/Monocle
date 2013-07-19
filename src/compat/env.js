@@ -444,6 +444,30 @@ Monocle.Env = function () {
     // and gets confused by <base>.
     ['loadHTMLWithDocWrite', function () {
       result(Monocle.Browser.is.Gecko || Monocle.Browser.is.Opera);
+    }],
+
+
+    // Is pointer event supported
+    // http://www.w3.org/Submission/pointer-events/
+    // Not sure how I feel about this spec but it makes sense to unify the events
+    // into a single interface to be used as needed - DS
+    //
+    ['pointer', function () {
+      result(!!(navigator.pointerEnabled || navigator.msPointerEnabled));
+    }],
+
+
+    // Does the system support a mouse
+    // This is required to identify touch devices that do not support
+    // a mouse interface. This is used because mouse events are still fired
+    // from mobile devices.
+    //
+    // This may need updated when android desktops come out but hopefully
+    // everyone will just adopt the pointer spec
+    //
+    ['noMouse', function () {
+      var mobileRegex = /mobile|tablet|ip(ad|hone|od)|android/i;
+      result(API.touch && !!navigator.userAgent.match(mobileRegex));
     }]
 
   ];
