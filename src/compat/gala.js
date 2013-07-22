@@ -203,37 +203,40 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
 
   var isLeftClick = function (evt) {
     return evt.button < 1;
-  },
+  }
 
-  isSingleTouch = function (evt) {
+  var isSingleTouch = function (evt) {
     return !!(evt.touches && evt.touches.length < 2);
-  },
+  }
 
-  wrapContact = function (fn) {
+  var wrapContact = function (fn) {
     return function (evt) {
       if (Gala.Pointers.enabled()) { Gala.Pointers.trackPointers(evt); }
       var doCallFunc = (Gala.Pointers.isSinglePointer() ||
         isSingleTouch(evt) ||
-        isLeftClick(evt))
-      if (doCallFunc) { fn(evt) }
+        isLeftClick(evt));
+      if (doCallFunc) { fn(evt); }
     }
-  },
+  }
 
-  buildListeners = function (opts) {
+  var buildListeners = function (opts) {
     var types = Gala.getEventTypes();
 
     var listeners = {};
-    'start move end cancel'.split(' ').forEach(function (type) {
+    var evtTypes = ['start', 'move', 'end', 'cancel'];
+    for (var i = 0, ii = evtTypes.length; i < ii; ++i) {
+      var type = evtTypes[i];
       if (opts[type]) {
-        types[type].split(' ').forEach(function (eventType) {
-          listeners[eventType] = wrapContact(opts[type]);
-        })
+        var thisEvtTypes = types[type].split(' ');
+        for (var j = 0, jj = thisEvtTypes.length; j < jj; ++j) {
+          listeners[thisEvtTypes[j]] = wrapContact(opts[type]);
+        }
       }
-    });
+    }
     return listeners;
-  },
+  }
 
-  listeners = buildListeners(fns);
+  var listeners = buildListeners(fns);
 
   Gala.listenGroup(elem, listeners);
   if (typeof initCallback == 'function') { initCallback(listeners); }
@@ -247,6 +250,8 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
 //
 Gala.Pointers = {
   pointers: {},
+
+
   enabled: function () { return Monocle.Browser.env.pointer },
 
   // Track pointer events
@@ -265,11 +270,14 @@ Gala.Pointers = {
     }
   },
 
-  // This follows the same logic as touches. To be valid, there is less than one
+
+  // This follows the same logic as touches. To be valid, there
+  // is less than two.
   //
   isSinglePointer: function () {
     return !!(this.enabled() && this.count() < 2);
   },
+
 
   // Get count of currently tracked pointers
   //
@@ -279,7 +287,8 @@ Gala.Pointers = {
     return Object.keys ? Object.keys(this.pointers).length : 0;
   },
 
-  // Reset the pointes
+
+  // Reset the pointers
   //
   reset: function () {
     this.pointers = {};

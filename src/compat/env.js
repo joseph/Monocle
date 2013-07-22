@@ -469,7 +469,6 @@ Monocle.Env = function () {
       var mobileRegex = /mobile|tablet|ip(ad|hone|od)|android/i;
       result(API.touch && !!navigator.userAgent.match(mobileRegex));
     }]
-
   ];
 
 
