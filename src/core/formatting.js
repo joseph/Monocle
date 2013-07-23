@@ -49,12 +49,12 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   /* PAGE STYLESHEETS */
 
   // API for adding a new stylesheet to all components. styleRules should be
-  // a string of CSS rules. restorePlace defaults to true.
+  // a string of CSS rules.
   //
   // Returns a sheet index value that can be used with updatePageStyles
   // and removePageStyles.
   //
-  function addPageStyles(styleRules, restorePlace) {
+  function addPageStyles(styleRules) {
     return changingStylesheet(function () {
       p.stylesheets.push(styleRules);
       var sheetIndex = p.stylesheets.length - 1;
@@ -64,14 +64,14 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
         addPageStylesheet(cmpt.contentDocument, sheetIndex);
       }
       return sheetIndex;
-    }, restorePlace);
+    });
   }
 
 
   // API for updating the styleRules in an existing page stylesheet across
   // all components. Takes a sheet index value obtained via addPageStyles.
   //
-  function updatePageStyles(sheetIndex, styleRules, restorePlace) {
+  function updatePageStyles(sheetIndex, styleRules) {
     return changingStylesheet(function () {
       p.stylesheets[sheetIndex] = styleRules;
       if (typeof styleRules.join == "function") {
@@ -95,14 +95,14 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
           );
         }
       }
-    }, restorePlace);
+    });
   }
 
 
   // API for removing a page stylesheet from all components. Takes a sheet
   // index value obtained via addPageStyles.
   //
-  function removePageStyles(sheetIndex, restorePlace) {
+  function removePageStyles(sheetIndex) {
     return changingStylesheet(function () {
       p.stylesheets[sheetIndex] = null;
       var i = 0, cmpt = null;
@@ -111,7 +111,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
         styleTag.parentNode.removeChild(styleTag);
       }
-    }, restorePlace);
+    });
   }
 
 
@@ -119,18 +119,10 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   // brace of custom events (stylesheetchanging/stylesheetchange), and
   // recalculates component dimensions if specified (default to true).
   //
-  function changingStylesheet(callback, restorePlace) {
-    restorePlace = (restorePlace === false) ? false : true;
-    if (restorePlace) {
-      dispatchChanging();
-    }
+  function changingStylesheet(callback) {
+    dispatchChanging();
     var result = callback();
-    if (restorePlace) {
-      p.reader.recalculateDimensions(true);
-      Monocle.defer(dispatchChange);
-    } else {
-      p.reader.recalculateDimensions(false);
-    }
+    p.reader.recalculateDimensions(true, dispatchChange);
     return result;
   }
 
@@ -186,21 +178,14 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
 
   /* FONT SCALING */
 
-  function setFontScale(scale, restorePlace) {
+  function setFontScale(scale) {
     p.fontScale = scale;
-    if (restorePlace) {
-      dispatchChanging();
-    }
+    dispatchChanging();
     var i = 0, cmpt = null;
     while (cmpt = p.reader.dom.find('component', i++)) {
       adjustFontScaleForDoc(cmpt.contentDocument, scale);
     }
-    if (restorePlace) {
-      p.reader.recalculateDimensions(true);
-      dispatchChange();
-    } else {
-      p.reader.recalculateDimensions(false);
-    }
+    p.reader.recalculateDimensions(true, dispatchChange);
   }
 
 
@@ -301,5 +286,6 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
   "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object, html#RS\\:monocle svg {" +
     "max-height: 95% !important;" +
     "height: auto !important;" +
-  "}"
+  "}",
+  "a:not([href]) { color: inherit; }"
 ]

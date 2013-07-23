@@ -34,27 +34,19 @@ Monocle.Place = function () {
   // 0 - start of book. 1.0 - end of book.
   //
   function percentAtTopOfPage() {
-    if (k.PAGE_ANCHOR == 'bottom') {
-      return p.percent - 1.0 / p.component.lastPageNumber();
-    } else {
-      return p.percent;
-    }
-  }
-
-
-  function percentOnPage() {
-    return percentAtTopOfPage() + k.PAGE_ANCHOR_OFFSET / pagesInComponent();
+    return p.percent - pageSizePercentage();
   }
 
 
   // How far we are through the component at the "bottom of the page".
   //
   function percentAtBottomOfPage() {
-    if (k.PAGE_ANCHOR == 'bottom') {
-      return p.percent;
-    } else {
-      return p.percent + 1.0 / p.component.lastPageNumber();
-    }
+    return p.percent;
+  }
+
+
+  function pageSizePercentage() {
+    return 1.0 / p.component.lastPageNumber();
   }
 
 
@@ -63,7 +55,8 @@ Monocle.Place = function () {
   function pageAtPercentageThrough(percent) {
     var pages = pagesInComponent();
     if (typeof percent != 'number') { percent = 0; }
-    return Math.max(Math.round(pages * percent), 1);
+    // We round after 4 decimal places because 25*0.8 = 7.000000000000001.
+    return Math.max(Math.ceil(Math.round(pages * percent * 1000) / 1000), 1);
   }
 
 
@@ -160,8 +153,9 @@ Monocle.Place = function () {
   API.setPercentageThrough = setPercentageThrough;
   API.componentId = componentId;
   API.percentAtTopOfPage = percentAtTopOfPage;
-  API.percentOnPage = percentOnPage;
   API.percentAtBottomOfPage = percentAtBottomOfPage;
+  API.percentageThrough = percentAtBottomOfPage;
+  API.pageSizePercentage = pageSizePercentage;
   API.pageAtPercentageThrough = pageAtPercentageThrough;
   API.pageNumber = pageNumber;
   API.pagesInComponent = pagesInComponent;
@@ -173,18 +167,8 @@ Monocle.Place = function () {
   API.onFirstPageOfBook = onFirstPageOfBook;
   API.onLastPageOfBook = onLastPageOfBook;
 
-  API.percentageThrough = k.PAGE_ANCHOR == 'bottom' ? percentAtBottomOfPage :
-    k.PAGE_ANCHOR == 'offset' ? percentOnPage :
-    percentAtTopOfPage;
-
   return API;
 }
-
-
-// Can set this to 'top', 'offset' or 'bottom'. Old Monocle behaviour is 'bottom'.
-//
-Monocle.Place.PAGE_ANCHOR = 'offset';
-Monocle.Place.PAGE_ANCHOR_OFFSET = 0.1;
 
 
 Monocle.Place.FromPageNumber = function (component, pageNumber) {
