@@ -135,6 +135,12 @@ Gala.replaceGroup = function (elem, listeners, newListeners, useCapture) {
 //
 Gala.onTap = function (elem, fn, tapClass) {
   elem = Gala.$(elem);
+  // Throttle the invocation to prevent double firing of the event in envs
+  // that support touch and mouse. Particularly in Firefox and Chrome on IE 8,
+  // a mouse event and touch events are both fired.
+  // Ref https://github.com/joseph/Monocle/pull/216#issuecomment-21424427
+  fn = Gala.throttle(fn, 100);
+
   if (typeof tapClass == 'undefined') { tapClass = Gala.TAPPING_CLASS; }
 
   var tapStartingCoords = {};
@@ -409,6 +415,20 @@ Gala.$ = function (elem) {
   if (typeof elem == 'string') { elem = document.getElementById(elem); }
   return elem;
 }
+
+Gala.throttle = function (func, wait) {
+  var previous = 0;
+
+  return function () {
+    var now = new Date();
+    var remaining = wait - (now - previous);
+    if (remaining <= 0) {
+      previous = now;
+      func.apply(this, arguments);
+    }
+  }
+}
+
 
 
 
