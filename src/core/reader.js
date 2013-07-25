@@ -121,6 +121,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
       options.fontScale
     );
 
+    listen('monocle:turn', onPageTurn);
+
     primeFrames(options.primeURL, function () {
       // Make the reader elements look pretty.
       applyStyles();
@@ -311,23 +313,48 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function recalculateDimensions(andRestorePlace, callback) {
     if (!p.book) { return; }
-    dispatchEvent("monocle:recalculating");
+    if (p.onRecalculate) {
+      var oldFn = p.onRecalculate;
+      p.onRecalculate = function () {
+        oldFn();
+        if (typeof callback == 'function') { callback(); }
+      }
+      return;
+    }
 
-    var place, locus;
-    if (andRestorePlace !== false) {
-      place = getPlace();
-      locus = { percent: place ? place.percentageThrough() : 0 };
+    dispatchEvent("monocle:recalculating");
+    p.onRecalculate = function () {
+      if (typeof callback == 'function') { callback(); }
+      p.onRecalculate = null;
+      dispatchEvent("monocle:recalculated");
+    }
+
+    var onComplete = function () { Monocle.defer(p.onRecalculate); }
+    var onInitiate = onComplete;
+    if (andRestorePlace !== false && p.lastLocus) {
+      onInitiate = function () {
+        p.flipper.moveTo(p.lastLocus, onComplete, false);
+      }
     }
 
     forEachPage(function (pageDiv) {
       pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
     });
 
-    var cb = function () {
-      dispatchEvent("monocle:recalculated");
-      Monocle.defer(callback);
+    Monocle.defer(onInitiate);
+  }
+
+
+  function onPageTurn(evt) {
+    if (p.onRecalculate) {
+    } else {
+      var place = getPlace();
+      p.lastLocus = {
+        componentId: place.componentId(),
+        percent: place.percentageThrough()
+      }
+      BIF.dispatch('monocle:position', { place: place });
     }
-    Monocle.defer(function () { locus ? p.flipper.moveTo(locus, cb) : cb; });
   }
 
 
@@ -374,6 +401,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
     }
     var fn = callback;
     if (!locus.direction) {
+      dispatchEvent('monocle:turning');
       dispatchEvent('monocle:jumping', { locus: locus });
       fn = function () {
         dispatchEvent('monocle:jump', { locus: locus });
