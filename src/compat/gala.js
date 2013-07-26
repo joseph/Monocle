@@ -258,7 +258,7 @@ Gala.Pointers = {
   pointers: {},
 
 
-  enabled: function () { return Monocle.Browser.env.pointer },
+  enabled: function () { return Gala.Pointers.ENV.pointer },
 
   // Track pointer events
   //
@@ -301,6 +301,19 @@ Gala.Pointers = {
   }
 }
 
+Gala.Pointers.ENV = {
+  pointer: (function () {
+    return !!(navigator.pointerEnabled || navigator.msPointerEnabled)
+  })(),
+  noMouse: (function () {
+    var mobileRegex = /mobile|tablet|ip(ad|hone|od)|android/i;
+    return (
+      ('ontouchstart' in window) &&
+      !!navigator.userAgent.match(mobileRegex)
+    );
+  })()
+}
+
 // Get Event Types that are used to bind the different event concepts
 // start, move, end, cancel. This method helps normalize event binding and
 // prevent improper event listening, etc
@@ -317,7 +330,7 @@ Gala.getEventTypes = function () {
       'pointerup MSPointerUp',
       'pointercancel MSPointerCancel'
     ];
-  } else if (Monocle.Browser.env.noMouse) {
+  } else if (Gala.Pointers.ENV.noMouse) {
     types = [
       'touchstart',
       'touchmove',
