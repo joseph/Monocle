@@ -261,13 +261,10 @@ Monocle.Env = function () {
     // CHECK OUT OUR CONTEXT
 
     // Does the device have a MobileSafari-style touch interface?
+    // (Here we can now simply follow the wisdom of Gala.)
     //
-    ["touch", function () {
-      result(
-        ('ontouchstart' in window) ||
-        css.supportsMediaQueryProperty('touch-enabled')
-      );
-    }],
+    ["touch", function () { result(Gala.Pointers.ENV.noMouse); }],
+
 
     // Is the Reader embedded, or in the top-level window?
     //
