@@ -279,6 +279,12 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
     "width: 100% !important;" +
     "position: absolute !important;" +
     "-webkit-text-size-adjust: none;" +
+    "-ms-touch-action: none;" +
+    "-ms-content-zooming: none;" +
+    "-ms-content-zoom-chaining: chained;" +
+    "-ms-content-zoom-limit-min: 100%;" +
+    "-ms-content-zoom-limit-max: 100%;" +
+    "-ms-touch-select: none;" +
   "}",
   "html#RS\\:monocle body * {" +
     "max-width: 100% !important;" +
