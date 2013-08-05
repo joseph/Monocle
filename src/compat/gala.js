@@ -321,7 +321,7 @@ Gala.Pointers.ENV = {
   // everyone will just adopt the pointer spec.
   //
   noMouse: (function () {
-    var mobileRegex = /mobile|tablet|ip(ad|hone|od)|android/i;
+    var mobileRegex = /mobile|tablet|ip(ad|hone|od)|android|silk/i;
     return (
       ('ontouchstart' in window) &&
       !!navigator.userAgent.match(mobileRegex)
