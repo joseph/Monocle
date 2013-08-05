@@ -49,6 +49,7 @@ Monocle.Browser.on = {
   BlackBerry: Monocle.Browser.uaMatch('BlackBerry'),
   Android: (
     Monocle.Browser.uaMatch('Android') ||
+    Monocle.Browser.uaMatch('Silk') ||
     Monocle.Browser.uaMatch(/Linux;.*EBRD/) // Sony Readers
   ),
   MacOSX: (
