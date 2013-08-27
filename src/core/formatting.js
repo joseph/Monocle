@@ -190,60 +190,77 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
 
 
   function adjustFontScaleForDoc(doc, scale) {
-    var j, jj;
-    var elems = doc.getElementsByTagName('*');
     if (scale) {
-      scale = parseFloat(scale);
       if (!doc.body.pfsSwept) {
-        sweepElements(doc, elems);
+        sweepElements(doc);
       }
+      var evtData = { document: doc, scale: parseFloat(scale) };
+      p.reader.dispatchEvent('monocle:fontscaling', evtData);
+      scale = evtData.scale;
 
       // Iterate over each element, applying scale to the original
       // font-size. If a proportional font sizing is already applied to
       // the element, update existing cssText, otherwise append new cssText.
-      //
-      for (j = 0, jj = elems.length; j < jj; ++j) {
-        var newFs = fsProperty(elems[j].pfsOriginal, scale);
-        if (elems[j].pfsApplied) {
-          replaceFontSizeInStyle(elems[j], newFs);
+      walkTree(doc.body, function (elem) {
+        var newFs = fsProperty(Math.round(elem.pfsOriginal*scale));
+        if (elem.pfsApplied) {
+          replaceFontSizeInStyle(elem, newFs);
         } else {
-          elems[j].style.cssText += newFs;
+          elem.style.cssText += newFs;
         }
-        elems[j].pfsApplied = scale;
-      }
-    } else if (doc.body.pfsSwept) {
+        elem.pfsApplied = scale;
+      });
+
+      p.reader.dispatchEvent('monocle:fontscale', evtData);
+    } else if (doc.body.pfsApplied) {
+      var evtData = { document: doc, scale: null };
+      p.reader.dispatchEvent('monocle:fontscaling', evtData);
+
       // Iterate over each element, removing proportional font-sizing flag
       // and property from cssText.
-      for (j = 0, jj = elems.length; j < jj; ++j) {
-        if (elems[j].pfsApplied) {
-          var oprop = elems[j].pfsOriginalProp;
+      walkTree(doc.body, function (elem) {
+        if (elem.pfsApplied) {
+          var oprop = elem.pfsOriginalProp;
           var opropDec = oprop ? 'font-size: '+oprop+' ! important;' : '';
-          replaceFontSizeInStyle(elems[j], opropDec);
-          elems[j].pfsApplied = null;
+          replaceFontSizeInStyle(elem, opropDec);
+          elem.pfsApplied = null;
         }
-      }
+      });
 
       // Establish new baselines in case classes have changed.
-      sweepElements(doc, elems);
+      sweepElements(doc);
+
+      p.reader.dispatchEvent('monocle:fontscale', evtData);
     }
   }
 
 
-  function sweepElements(doc, elems) {
+  function sweepElements(doc) {
     // Iterate over each element, looking at its font size and storing
     // the original value against the element.
-    for (var i = 0, ii = elems.length; i < ii; ++i) {
-      var currStyle = doc.defaultView.getComputedStyle(elems[i], null);
+    walkTree(doc.body, function (elem) {
+      var currStyle = doc.defaultView.getComputedStyle(elem, null);
       var fs = parseFloat(currStyle.getPropertyValue('font-size'));
-      elems[i].pfsOriginal = fs;
-      elems[i].pfsOriginalProp = elems[i].style.fontSize;
-    }
+      elem.pfsOriginal = fs;
+      elem.pfsOriginalProp = elem.style.fontSize;
+    });
     doc.body.pfsSwept = true;
   }
 
 
-  function fsProperty(orig, scale) {
-    return 'font-size: '+(orig*scale)+'px ! important;';
+  function walkTree(node, fn) {
+    if (node.nodeType != 1) { return; }
+    fn(node);
+    node = node.firstChild;
+    while (node) {
+      walkTree(node, fn);
+      node = node.nextSibling;
+    }
+  }
+
+
+  function fsProperty(fsInPixels) {
+    return 'font-size: '+fsInPixels+'px ! important;';
   }
 
 
