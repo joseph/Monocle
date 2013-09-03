@@ -353,7 +353,7 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
         componentId: place.componentId(),
         percent: place.percentageThrough()
       }
-      BIF.dispatch('monocle:position', { place: place });
+      dispatchEvent('monocle:position', { place: place });
     }
   }
 
