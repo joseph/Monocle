@@ -192,7 +192,8 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   // Is this area presently on the screen?
   //
   function rectVisible(rect, l, r) {
-    return rect.left >= l && rect.left < r;
+    var mid = rect.left + (rect.width * 0.5);
+    return mid >= l && mid < r;
   }
 
 
