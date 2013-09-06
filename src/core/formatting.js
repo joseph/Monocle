@@ -202,6 +202,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       // font-size. If a proportional font sizing is already applied to
       // the element, update existing cssText, otherwise append new cssText.
       walkTree(doc.body, function (elem) {
+        if (typeof elem.pfsOriginal == 'undefined') { return; }
         var newFs = fsProperty(Math.round(elem.pfsOriginal*scale));
         if (elem.pfsApplied) {
           replaceFontSizeInStyle(elem, newFs);
@@ -219,6 +220,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       // Iterate over each element, removing proportional font-sizing flag
       // and property from cssText.
       walkTree(doc.body, function (elem) {
+        if (typeof elem.pfsOriginal == 'undefined') { return; }
         if (elem.pfsApplied) {
           var oprop = elem.pfsOriginalProp;
           var opropDec = oprop ? 'font-size: '+oprop+' ! important;' : '';
@@ -239,6 +241,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
     // Iterate over each element, looking at its font size and storing
     // the original value against the element.
     walkTree(doc.body, function (elem) {
+      if (elem.getCTM) { return; } // Ignore SVG elements
       var currStyle = doc.defaultView.getComputedStyle(elem, null);
       var fs = parseFloat(currStyle.getPropertyValue('font-size'));
       elem.pfsOriginal = fs;
