@@ -30,6 +30,9 @@ ol.monelem_controls_contents_list {
 }
 
 li.monelem_controls_contents_chapter {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   list-style: none;
   line-height: 220%;
   padding-left: 1em;
