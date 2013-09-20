@@ -208,7 +208,7 @@ Gala.onContact = function (elem, fns, useCapture, initCallback) {
   elem = Gala.$(elem);
 
   var isLeftClick = function (evt) {
-    return evt[evt.which == 'undefined' ? 'button' : 'which'] < 2;
+    return evt[typeof evt.which == 'undefined' ? 'button' : 'which'] < 2;
   }
 
   var isSingleTouch = function (evt) {
