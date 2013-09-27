@@ -26,6 +26,7 @@ Monocle.Selection = function (reader) {
 
   function pollSelectionOnWindow(win, index) {
     var sel = win.getSelection();
+    if (!sel) { return; }
     var lm = p.lastSelection[index] || {};
     var nm = p.lastSelection[index] = {
       selected: anythingSelected(win),
@@ -140,7 +141,8 @@ Monocle.Selection = function (reader) {
 
 
   function anythingSelected(win) {
-    return !win.getSelection().isCollapsed;
+    var sel = win.getSelection();
+    return sel && !sel.isCollapsed;
   }
 
 
