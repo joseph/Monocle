@@ -12,7 +12,11 @@ Monocle.Browser.uaMatch = function (test) {
 // Detect the browser engine and set boolean flags for reference.
 //
 Monocle.Browser.is = {
-  IE: !!(window.attachEvent && !Monocle.Browser.uaMatch('Opera')),
+  IE: !!(
+    (window.attachEvent && !Monocle.Browser.uaMatch('Opera')) ||
+    // IE 11
+    (window.navigator.appName == 'Netscape' && Monocle.Browser.uaMatch('Trident'))
+  ),
   Opera: Monocle.Browser.uaMatch('Opera'),
   WebKit: Monocle.Browser.uaMatch(/Apple\s?WebKit/),
   Gecko: Monocle.Browser.uaMatch('Gecko') && !Monocle.Browser.uaMatch('KHTML'),
