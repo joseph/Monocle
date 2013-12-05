@@ -290,7 +290,6 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
     "-webkit-font-smoothing: subpixel-antialiased;" +
     "text-rendering: auto !important;" +
     "word-wrap: break-word !important;" +
-    "overflow: visible !important;" +
   "}",
   "html#RS\\:monocle body {" +
     "margin: 0 !important;"+

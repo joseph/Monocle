@@ -279,6 +279,7 @@ Monocle.Panels.Magic = function (flipper, evtCallbacks) {
   function invoke(evtType, evt) {
     if (p.evtCallbacks[evtType]) {
       p.evtCallbacks[evtType](p.action.dir, evt.m.readerX, evt.m.readerY, API);
+      Gala.stop(evt);
     }
   }
 
