@@ -117,6 +117,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
     } else {
       return;
     }
+    var boxes = p.components[cmptId];
 
     var doc = pageDiv.m.activeFrame.contentDocument;
     var offset = getOffset(pageDiv);
@@ -126,10 +127,17 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
       var elems = bhvr.findElements(doc);
       for (var i = 0; i < elems.length; ++i) {
         var elem = elems[i];
-        if (elem.getClientRects) {
+        // Ensure that we're not already masking this element.
+        for (var k = 0, kk = boxes.length; k < kk; ++k) {
+          if (boxes[k].element == elem) {
+            elem = null;
+            break;
+          }
+        }
+        if (elem && elem.getClientRects) {
           var r = elem.getClientRects();
           for (var j = 0; j < r.length; j++) {
-            p.components[cmptId].push({
+            boxes.push({
               element: elem,
               behavior: bhvr,
               left: Math.ceil(r[j].left + offset.l),
