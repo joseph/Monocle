@@ -224,18 +224,20 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function lockingFrameWidths() {
-    if (!Monocle.Browser.env.relativeIframeExpands) { return; }
-    for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
-      cmpt.style.display = "none";
+    if (Monocle.Browser.env.relativeIframeExpands) {
+      for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
+        cmpt.style.display = 'none';
+      }
     }
   }
 
 
   function lockFrameWidths() {
-    if (!Monocle.Browser.env.relativeIframeExpands) { return; }
     for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
-      cmpt.style.width = cmpt.parentNode.offsetWidth+"px";
-      cmpt.style.display = "block";
+      cmpt.style.width = cmpt.parentNode.offsetWidth+'px';
+      if (Monocle.Browser.env.relativeIframeExpands) {
+        cmpt.style.display = 'block';
+      }
     }
   }
 
