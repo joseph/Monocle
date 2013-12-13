@@ -109,7 +109,9 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
       while (cmpt = p.reader.dom.find('component', i++)) {
         var doc = cmpt.contentDocument;
         var styleTag = doc.getElementById('monStylesheet'+sheetIndex);
-        styleTag.parentNode.removeChild(styleTag);
+        if (styleTag !== null){
+            styleTag.parentNode.removeChild(styleTag);
+        }
       }
     });
   }
