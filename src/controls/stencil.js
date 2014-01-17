@@ -134,23 +134,41 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
             break;
           }
         }
-        if (elem && elem.getClientRects) {
-          var r = elem.getClientRects();
-          for (var j = 0; j < r.length; j++) {
-            boxes.push({
-              element: elem,
-              behavior: bhvr,
-              left: Math.ceil(r[j].left + offset.l),
-              top: Math.ceil(r[j].top),
-              width: Math.floor(r[j].width),
-              height: Math.floor(r[j].height)
-            });
+        if (elem) {
+          var elemBoxes = boxesForNode(elem, offset);
+          for (var j = 0, jj = elemBoxes.length; j < jj; ++j) {
+            elemBoxes[j].element = elem;
+            elemBoxes[j].behavior = bhvr;
+            boxes.push(elemBoxes[j]);
           }
         }
       }
     }
 
     return p.components[cmptId];
+  }
+
+
+  function boxesForNode(node, offset) {
+    var boxes = [];
+    if (typeof node.childNodes != 'undefined' && node.childNodes.length) {
+      for (var i = 0, ii = node.childNodes.length; i < ii; ++i) {
+        boxes = boxes.concat(boxesForNode(node.childNodes[i], offset));
+      }
+    } else {
+      var rng = node.ownerDocument.createRange();
+      rng.selectNodeContents(node);
+      var r = rng.getClientRects();
+      for (var i = 0, ii = r.length; i < ii; ++i) {
+        boxes.push({
+          left: Math.ceil(r[i].left + offset.l),
+          top: Math.ceil(r[i].top),
+          width: Math.floor(r[i].width),
+          height: Math.floor(r[i].height)
+        });
+      }
+    }
+    return boxes;
   }
 
 
