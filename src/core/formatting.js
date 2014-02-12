@@ -299,6 +299,7 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
     "position: absolute !important;" +
     "-webkit-text-size-adjust: none;" +
     "-ms-touch-action: none;" +
+    "touch-action: none;" +
     "-ms-content-zooming: none;" +
     "-ms-content-zoom-chaining: chained;" +
     "-ms-content-zoom-limit-min: 100%;" +
