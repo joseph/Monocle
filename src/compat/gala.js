@@ -258,7 +258,9 @@ Gala.Pointers = {
   pointers: {},
 
 
-  enabled: function () { return Gala.Pointers.ENV.pointer },
+  enabled: function () {
+    return Gala.Pointers.ENV.pointer || Gala.Pointers.ENV.msPointer;
+  },
 
   // Track pointer events
   //
@@ -307,9 +309,10 @@ Gala.Pointers.ENV = {
   // Not sure how I feel about this spec but it makes sense to unify
   // the events into a single interface to be used as needed. - DS
   //
-  pointer: (function () {
-    return !!(navigator.pointerEnabled || navigator.msPointerEnabled)
-  })(),
+  msPointer: (function () { return !!navigator.msPointerEnabled })(),
+
+
+  pointer: (function () { return !!navigator.pointerEnabled })(),
 
 
   // Does the system support a mouse
@@ -336,14 +339,19 @@ Gala.Pointers.ENV = {
 Gala.getEventTypes = function () {
   var types;
 
-  if (Gala.Pointers.enabled()) {
-    // Microsoft screwing stuff up with pointers
-    // http://www.w3.org/TR/pointerevents/
+  if (Gala.Pointers.ENV.pointer) {
     types = [
-      'pointerdown MSPointerDown',
-      'pointermove MSPointerMove',
-      'pointerup MSPointerUp',
-      'pointercancel MSPointerCancel'
+      'pointerdown',
+      'pointermove',
+      'pointerup',
+      'pointercancel'
+    ];
+  } else if (Gala.Pointers.ENV.msPointer) {
+    types = [
+      'MSPointerDown',
+      'MSPointerMove',
+      'MSPointerUp',
+      'MSPointerCancel'
     ];
   } else if (Gala.Pointers.ENV.noMouse) {
     types = [
