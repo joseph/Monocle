@@ -160,8 +160,9 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
       rng.selectNodeContents(node);
       var r = rng.getClientRects();
       for (var i = 0, ii = r.length; i < ii; ++i) {
+        var offl = Monocle.Browser.env.widthsIgnoreTranslate ? 0 : offset.l;
         boxes.push({
-          left: Math.ceil(r[i].left + offset.l),
+          left: Math.ceil(r[i].left + offl),
           top: Math.ceil(r[i].top),
           width: Math.floor(r[i].width),
           height: Math.floor(r[i].height)

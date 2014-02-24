@@ -293,6 +293,7 @@ Monocle.Env = function () {
       return result(match[1] < "534.30");
     }],
 
+
     // The latest engines all agree that if a body is translated leftwards,
     // its scrollWidth is shortened. But some older WebKits (notably iOS4)
     // do not subtract translateX values from scrollWidth. In this case,
