@@ -306,12 +306,5 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
     "-ms-content-zoom-limit-max: 100%;" +
     "-ms-touch-select: none;" +
   "}",
-  "html#RS\\:monocle body, html#RS\\:monocle body * {" +
-    "max-width: 100% !important;" +
-  "}",
-  "html#RS\\:monocle img, html#RS\\:monocle video, html#RS\\:monocle object, html#RS\\:monocle svg {" +
-    "max-height: 95% !important;" +
-    "height: auto !important;" +
-  "}",
   "a:not([href]) { color: inherit; }"
 ]

@@ -34,30 +34,51 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     p.width = pdims.width;
 
-    var rules = Monocle.Styles.rulesToString(k.STYLE["columned"]);
-    rules += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
-    rules += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
-    rules += Monocle.Browser.css.toCSSDeclaration('column-fill', 'auto');
-    rules += Monocle.Browser.css.toCSSDeclaration('transform', 'none');
+    var cer = Monocle.Styles.rulesToString(k.STYLE["columned"]);
+    cer += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
+    cer += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
+    cer += Monocle.Browser.css.toCSSDeclaration('column-fill', 'auto');
+    cer += Monocle.Browser.css.toCSSDeclaration('transform', 'none');
 
     if (Monocle.Browser.env.forceColumns && ce.scrollHeight > pdims.height) {
-      rules += Monocle.Styles.rulesToString(k.STYLE['column-force']);
+      cer += Monocle.Styles.rulesToString(k.STYLE['column-force']);
       if (Monocle.DEBUG) {
         console.warn("Force columns ("+ce.scrollHeight+" > "+pdims.height+")");
       }
     }
 
-    if (ce.style.cssText != rules) {
+    var rules = [
+      'html#RS\\:monocle body { '+cer+' }',
+      'html#RS\\:monocle * {',
+        'max-width: '+pdims.col+'px !important;',
+      '}',
+      'img, video, audio, object, svg {',
+        'max-height: '+pdims.height+'px !important;',
+      '}'
+    ]
+
+    // IE10 hack.
+    if (Monocle.Browser.env.documentElementHasScrollbars) {
+      rules.push('html { overflow: hidden !important; }');
+    }
+
+    rules = rules.join('\n');
+
+    var doc = p.page.m.activeFrame.contentDocument;
+    var head = doc.querySelector('head');
+    var sty = head.querySelector('style#monocle_column_rules');
+    if (!sty) {
+      sty = doc.createElement('style');
+      sty.id = 'monocle_column_rules';
+      head.appendChild(sty);
+    }
+
+    if (sty.innerHTML != rules) {
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
-      // IE10 hack.
-      if (Monocle.Browser.env.documentElementHasScrollbars) {
-        ce.ownerDocument.documentElement.style.overflow = 'hidden';
-      }
-
       // Apply body style changes.
-      ce.style.cssText = rules;
+      sty.innerHTML = rules;
 
       if (Monocle.Browser.env.scrollToApplyStyle) {
         ce.scrollLeft = 0;
