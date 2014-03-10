@@ -251,10 +251,14 @@ Monocle.Env = function () {
     ["supportsLocalStorage", function () {
       // NB: Some duplicitous early Android browsers claim to have
       // localStorage, but calls to getItem() fail.
-      result(
-        typeof window.localStorage != "undefined" &&
-        typeof window.localStorage.getItem == "function"
-      )
+      try {
+        result(
+          typeof window.localStorage != "undefined" &&
+          typeof window.localStorage.getItem == "function"
+        )
+      } catch (e) {
+        result(false);
+      }
     }],
 
 
