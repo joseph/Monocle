@@ -420,7 +420,7 @@ Monocle.Env = function () {
     // are rounded.
     //
     ['roundPageDimensions', function () {
-      result(!Monocle.Browser.is.IE);
+      result(!(Monocle.Browser.is.IE && Monocle.Browser.ieVersion < 11));
     }],
 
 

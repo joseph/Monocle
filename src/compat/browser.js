@@ -82,6 +82,14 @@ Monocle.Browser.iOSVersionBelow = function (strOrNum) {
 }
 
 
+if (Monocle.Browser.is.IE) {
+  (function () {
+    var version = navigator.userAgent.match(/(rv:|MSIE )(\d*\.\d*)/)[2];
+    Monocle.Browser.ieVersion = Number(version);
+  })();
+}
+
+
 // Some browser environments are too slow or too problematic for
 // special animation effects.
 //
