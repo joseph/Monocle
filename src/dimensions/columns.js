@@ -48,7 +48,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
     }
 
     var rules = [
-      'html#RS\\:monocle body { '+cer+' }',
       'html#RS\\:monocle * {',
         'max-width: '+pdims.col+'px !important;',
       '}',
@@ -77,7 +76,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
-      // Apply body style changes.
+      // Apply style changes.
+      ce.style.cssText = cer;
       sty.innerHTML = rules;
 
       if (Monocle.Browser.env.scrollToApplyStyle) {
