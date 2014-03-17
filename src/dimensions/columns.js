@@ -76,7 +76,10 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       // Update offset because we're translating to zero.
       p.page.m.offset = 0;
 
-      // Apply style changes.
+      // Make sure that the frame is exactly the same width as the column.
+      p.page.m.activeFrame.style.width = p.width+'px';
+
+      // Apply style changes to the contents of the component.
       ce.style.cssText = cer;
       sty.innerHTML = rules;
 
@@ -116,9 +119,14 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
   function pageDimensions() {
     var elem = p.page.m.sheafDiv;
-    var w = elem.clientWidth;
-    if (elem.getBoundingClientRect) { w = elem.getBoundingClientRect().width; }
-    if (Monocle.Browser.env.roundPageDimensions) { w = Math.round(w); }
+    var w;
+    if (elem.getBoundingClientRect) {
+      w = elem.getBoundingClientRect().width;
+    } else {
+      w = elem.clientWidth;
+    }
+    w = Math.floor(w); // ensure it is an integer
+    w -= w % 2; // ensure it is an even number
     return { col: w, width: w + k.GAP, height: elem.clientHeight }
   }
 

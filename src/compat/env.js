@@ -415,16 +415,6 @@ Monocle.Env = function () {
     }],
 
 
-    // Chrome and Firefox incorrectly clip text when the dimensions of
-    // a page are not an integer. IE10 clips text when the page dimensions
-    // are rounded.
-    //
-    ['roundPageDimensions', function () {
-      result(!(Monocle.Browser.is.IE && Monocle.Browser.ieVersion < 11));
-    }],
-
-
-
     // In IE10, the <html> element of the iframe's document has scrollbars,
     // unless you set its style.overflow to 'hidden'.
     //
