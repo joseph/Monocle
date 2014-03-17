@@ -64,7 +64,13 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
     // After the reader has been resized, this resettable timer must expire
     // the place is restored.
-    resizeTimer: null
+    resizeTimer: null,
+
+    // When we are measuring the length of components to recalculate
+    // pages, recalcPhase will be 1 or 2. If it is 1 or 2 and we get
+    // another recalculation request, recalcQueued will be set to true.
+    recalcPhase: 0,
+    recalcQueued: false
   }
 
   var dom;
@@ -233,9 +239,8 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
 
   function lockFrameWidths() {
-    for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
-      cmpt.style.width = cmpt.parentNode.offsetWidth+'px';
-      if (Monocle.Browser.env.relativeIframeExpands) {
+    if (Monocle.Browser.env.relativeIframeExpands) {
+      for (var i = 0, cmpt; cmpt = dom.find('component', i); ++i) {
         cmpt.style.display = 'block';
       }
     }
@@ -304,52 +309,78 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 
   function performResize() {
     lockFrameWidths();
-    recalculateDimensions(true, afterResized);
+    listen('monocle:recalculated', afterResize);
+    recalculateDimensions();
   }
 
 
-  function afterResized() {
+  function afterResize() {
+    deafen('monocle:recalculated', afterResize);
     dispatchEvent('monocle:resize');
   }
 
 
+  // A recalculation should be made for any event that may change the
+  // dimensions of the content in the visible pages -- such as a window
+  // resize, or font scaling, or a stylesheet change.
+  //
+  // If another recalculation is requested while a recalculation is in
+  // progress, it will be queued up. The 'monocle:recalculated' event will
+  // be deferred until all queued recalculations have been made.
+  //
   function recalculateDimensions(andRestorePlace, callback) {
+    // FIXME: DEPRECATION!
+    if (typeof andRestorePlace != 'undefined') {
+      console.warn('NOTE: recalculateDimensions no longer takes arguments.');
+      if (typeof callback == 'function') {
+        var deprec = function () {
+          deafen('monocle:recalculated', deprec);
+          callback();
+        }
+        listen('monocle:recalculated', deprec);
+      }
+    }
+
     if (!p.book) { return; }
-    if (p.onRecalculate) {
-      var oldFn = p.onRecalculate;
-      p.onRecalculate = function () {
-        oldFn();
-        if (typeof callback == 'function') { callback(); }
-      }
-      return;
+    if (p.recalcPhase > 0) {
+      p.recalcQueued = true;
+    } else {
+      p.recalcPhase = 1;
+      p.recalcQueued = false;
+      dispatchEvent("monocle:recalculating");
+      forEachPage(function (pageDiv) {
+        pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
+      });
+      Monocle.defer(onRecalculationPhase);
     }
+  }
 
-    dispatchEvent("monocle:recalculating");
-    p.onRecalculate = function () {
-      if (typeof callback == 'function') { callback(); }
-      p.onRecalculate = null;
-      dispatchEvent("monocle:recalculated");
+
+  // Phase 0 means no recalculation is in progress.
+  // Phase 1 means we are re-measuring the components.
+  // Phase 2 means we are returning to the correct page.
+  //
+  function onRecalculationPhase() {
+    if (p.recalcQueued) {
+      p.recalcPhase = 0;
+      recalculateDimensions();
+    } else if (p.recalcPhase == 1 && p.lastLocus) {
+      p.recalcPhase = 2;
+      p.flipper.moveTo(p.lastLocus, onRecalculationPhase, false);
+    } else {
+      Monocle.defer(afterRecalculate);
     }
+  }
 
-    var onComplete = function () { Monocle.defer(p.onRecalculate); }
-    var onInitiate = onComplete;
-    if (andRestorePlace !== false && p.lastLocus) {
-      onInitiate = function () {
-        p.flipper.moveTo(p.lastLocus, onComplete, false);
-      }
-    }
 
-    forEachPage(function (pageDiv) {
-      pageDiv.m.activeFrame.m.component.updateDimensions(pageDiv);
-    });
-
-    Monocle.defer(onInitiate);
+  function afterRecalculate() {
+    p.recalcPhase = 0;
+    dispatchEvent('monocle:recalculated');
   }
 
 
   function onPageTurn(evt) {
-    if (p.onRecalculate) {
-    } else {
+    if (p.recalcPhase == 0) {
       var place = getPlace();
       p.lastLocus = {
         componentId: place.componentId(),
@@ -617,26 +648,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   }
 
 
-  /* The Reader PageStyles API is deprecated - it has moved to Formatting */
-
-  function addPageStyles(styleRules, restorePlace) {
-    console.deprecation("Use reader.formatting.addPageStyles instead.");
-    return API.formatting.addPageStyles(styleRules, restorePlace);
-  }
-
-
-  function updatePageStyles(sheetIndex, styleRules, restorePlace) {
-    console.deprecation("Use reader.formatting.updatePageStyles instead.");
-    return API.formatting.updatePageStyles(sheetIndex, styleRules, restorePlace);
-  }
-
-
-  function removePageStyles(sheetIndex, restorePlace) {
-    console.deprecation("Use reader.formatting.removePageStyles instead.");
-    return API.formatting.removePageStyles(sheetIndex, restorePlace);
-  }
-
-
   function fatalSystemMessage(msg) {
     var info = dom.make('div', 'book_fatality', { html: msg });
     var box = dom.find('box');
@@ -659,11 +670,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
   API.listen = listen;
   API.deafen = deafen;
   API.visiblePages = visiblePages;
-
-  // Deprecated!
-  API.addPageStyles = addPageStyles;
-  API.updatePageStyles = updatePageStyles;
-  API.removePageStyles = removePageStyles;
 
   initialize();
 

@@ -27,9 +27,9 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
     if (Monocle.Browser.env.floatsIgnoreColumns) {
       defCSS.push("html#RS\\:monocle * { float: none !important; }");
     }
-    p.defaultStyles = addPageStyles(defCSS, false);
+    p.defaultStyles = addPageStyles(defCSS);
     if (implStyles) {
-      p.initialStyles = addPageStyles(implStyles, false);
+      p.initialStyles = addPageStyles(implStyles);
     }
   }
 
@@ -122,17 +122,19 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
   function changingStylesheet(callback) {
     dispatchChanging();
     var result = callback();
-    p.reader.recalculateDimensions(true, dispatchChange);
+    p.reader.recalculateDimensions();
     return result;
   }
 
 
   function dispatchChanging() {
+    p.reader.listen('monocle:recalculated', dispatchChange);
     p.reader.dispatchEvent("monocle:stylesheetchanging", {});
   }
 
 
   function dispatchChange() {
+    p.reader.deafen('monocle:recalculated', dispatchChange);
     p.reader.dispatchEvent("monocle:stylesheetchange", {});
   }
 
@@ -185,7 +187,7 @@ Monocle.Formatting = function (reader, optStyles, optScale) {
     while (cmpt = p.reader.dom.find('component', i++)) {
       adjustFontScaleForDoc(cmpt.contentDocument, scale);
     }
-    p.reader.recalculateDimensions(true, dispatchChange);
+    p.reader.recalculateDimensions();
   }
 
 

@@ -107,9 +107,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     var w = Math.max(bd.scrollWidth, de.scrollWidth);
 
-    // Add one because the final column doesn't have right gutter.
-    // w += k.GAP;
-
     if (!Monocle.Browser.env.widthsIgnoreTranslate && p.page.m.offset) {
       w += p.page.m.offset;
     }
@@ -132,12 +129,12 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
   function columnCount() {
-    return Math.ceil(columnedWidth() / pageDimensions().width)
+    return Math.ceil(columnedWidth() / p.width)
   }
 
 
   function locusToOffset(locus) {
-    return pageDimensions().width * (locus.page - 1);
+    return p.width * (locus.page - 1);
   }
 
 
@@ -180,7 +177,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
         [win, win.scrollX, win.scrollY],
         [window, window.scrollX, window.scrollY]
       ];
-      //while (s != s.parent) { scrollers.push([s, s.scrollX]); s = s.parent; }
 
       var scroller, x;
       if (Monocle.Browser.env.sheafIsScroller) {
@@ -212,9 +208,6 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     // Percent is the offset divided by the total width of the component.
     var percent = offset / (p.length * p.width);
-
-    // Page number would be offset divided by the width of a single page.
-    // var pageNum = Math.ceil(offset / pageDimensions().width);
 
     return percent;
   }
