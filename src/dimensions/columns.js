@@ -34,7 +34,8 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
     p.width = pdims.width;
 
-    var cer = Monocle.Styles.rulesToString(k.STYLE["columned"]);
+    var cer = Monocle.Styles.rulesToString(k.STYLE['columned']);
+    cer += 'width: '+pdims.col+'px !important;';
     cer += Monocle.Browser.css.toCSSDeclaration('column-width', pdims.col+'px');
     cer += Monocle.Browser.css.toCSSDeclaration('column-gap', k.GAP+'px');
     cer += Monocle.Browser.css.toCSSDeclaration('column-fill', 'auto');
@@ -72,20 +73,18 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       head.appendChild(sty);
     }
 
-    if (sty.innerHTML != rules) {
-      // Update offset because we're translating to zero.
-      p.page.m.offset = 0;
+    // Update offset because we're translating to zero.
+    p.page.m.offset = 0;
 
-      // Make sure that the frame is exactly the same width as the column.
-      p.page.m.activeFrame.style.width = p.width+'px';
+    // Make sure that the frame is exactly the same width as the column.
+    p.page.m.activeFrame.style.width = p.width+'px';
 
-      // Apply style changes to the contents of the component.
-      ce.style.cssText = cer;
-      sty.innerHTML = rules;
+    // Apply style changes to the contents of the component.
+    ce.style.cssText = cer;
+    sty.innerHTML = rules;
 
-      if (Monocle.Browser.env.scrollToApplyStyle) {
-        ce.scrollLeft = 0;
-      }
+    if (Monocle.Browser.env.scrollToApplyStyle) {
+      ce.scrollLeft = 0;
     }
   }
 
@@ -224,17 +223,16 @@ Monocle.Dimensions.Columns = function (pageDiv) {
 
 
 Monocle.Dimensions.Columns.STYLE = {
-  // Most of these are already applied to body, but they're repeated here
-  // in case columnedElement() is ever anything other than body.
-  "columned": {
-    "margin": "0",
-    "padding": "0",
-    "height": "100%",
-    "width": "100%",
-    "position": "absolute"
+  'columned': {
+    'border': 'none !important',
+    'margin': '0 !important',
+    'padding': '0 !important',
+    'height': '100% !important',
+    'position': 'absolute !important'
   },
-  "column-force": {
-    "min-width": "200%",
-    "overflow": "hidden"
+  'column-force': {
+    'width': '100% !important',
+    'min-width': '200% !important',
+    'overflow': 'hidden !important'
   }
 }

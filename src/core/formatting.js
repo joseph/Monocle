@@ -294,11 +294,6 @@ Monocle.Formatting.DEFAULT_STYLE_RULES = [
     "word-wrap: break-word !important;" +
   "}",
   "html#RS\\:monocle body {" +
-    "margin: 0 !important;"+
-    "border: none !important;" +
-    "padding: 0 !important;" +
-    "width: 100% !important;" +
-    "position: absolute !important;" +
     "-webkit-text-size-adjust: none;" +
     "-ms-touch-action: none;" +
     "touch-action: none;" +
