@@ -5,8 +5,6 @@ A silky, tactile browser-based ebook reader.
 Initial development by Joseph Pearson of Inventive Labs. Released under the
 MIT license.
 
-More information (including demos): http://monocle.inventivelabs.com.au
-
 Contributions welcome - fork the repository on
 [GitHub](http://github.com/joseph/monocle).
 
@@ -17,21 +15,19 @@ you can ask them here: https://groups.google.com/forum/#!forum/monocle-js
 
 ## Getting Monocle
 
-The wiki has details on how to build Monocle for production use:
+There's a few different ways to get Monocle. The easiest way to explore
+it is from the test site, which is always running the latest `master`:
 
-    https://github.com/joseph/Monocle/wiki/Building
+http://test.monoclejs.com/test
 
-... and how to run it locally (to explore, to develop against, etc):
+To grab the code for your own use, see:
 
-    https://github.com/joseph/Monocle/wiki/Running-Monocle-locally
+https://github.com/joseph/Monocle/wiki/Getting-Monocle-running
 
 The scripts and stylesheets are separated into:
 
 * `monocore` - the essential Monocle functionality
 * `monoctrl` - the optional basic controls for page numbers, font-sizing, etc
-
-It's recommended that you develop against the unminified files, to make 
-debugging easier. In production, use the minified files.
 
 
 ## Integrating Monocle
@@ -65,29 +61,10 @@ A more advanced scenario involves feeding Monocle a "book data object", from
 which it can lazily load the contents of the book as the user requests it.
 
 
-## Exploring Monocle
-
-If you want to explore all of Monocle's features, you'll find numerous tests
-and examples here:
-
-* http://test.monoclejs.com/test
-
-Alternatively, you can clone this repository and [build 
-Monocle](https://github.com/joseph/Monocle/wiki/Building) (or simply 
-extract the [pre-built Monocle](https://github.com/joseph/Monocle/downloads)
-to `dist`). Then open `test/index.html` in your browser. This will guide you 
-through Monocle's tests, which incidentally demonstrate all the major 
-features. View source or browse the test directory in your text editor for 
-implementation details.
-
-For more info: 
-https://github.com/joseph/Monocle/wiki/Running-Monocle-locally
-
-
 ## Connecting Monocle to your book content
 
-For a non-trivial Monocle implementation, your task is to connect the 
-Monocle Reader to your book's HTML content and structure. You create 
+For a non-trivial Monocle implementation, your task is to connect the
+Monocle Reader to your book's HTML content and structure. You create
 something called "the book data object" to do this.
 
 The book data object is really pretty simple. You'll find the specification
