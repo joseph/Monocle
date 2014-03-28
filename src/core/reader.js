@@ -680,7 +680,6 @@ Monocle.Reader = function (node, bookData, options, onLoadCallback) {
 Monocle.Reader.RESIZE_DELAY = Monocle.Browser.renders.slow ? 500 : 100;
 Monocle.Reader.DEFAULT_SYSTEM_ID = 'RS:monocle'
 Monocle.Reader.DEFAULT_CLASS_PREFIX = 'monelem_'
-Monocle.Reader.DEFAULT_STYLE_RULES = Monocle.Formatting.DEFAULT_STYLE_RULES;
 Monocle.Reader.COMPATIBILITY_INFO =
   "<h1>Incompatible browser</h1>"+
   "<p>Unfortunately, your browser isn't able to display this book. "+

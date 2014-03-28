@@ -270,34 +270,6 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   }
 
 
-  function disable() {
-    p.disabled = true;
-    draw();
-  }
-
-
-  function enable() {
-    p.disabled = false;
-    draw();
-  }
-
-
-  function filterElement(elem, behavior) {
-    if (typeof behavior.filterElement == 'function') {
-      return behavior.filterElement(elem);
-    }
-    return elem;
-  }
-
-
-  function maskAssigned(elem, mask, behavior) {
-    if (typeof behavior.maskAssigned == 'function') {
-      return behavior.maskAssigned(elem, mask);
-    }
-    return false;
-  }
-
-
   API.createControlElements = createControlElements;
   API.addBehavior = addBehavior;
   API.draw = draw;
