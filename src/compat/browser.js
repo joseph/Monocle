@@ -109,12 +109,6 @@ Monocle.Browser.renders = (function () {
 })();
 
 
-// A helper class for sniffing CSS features and creating CSS rules
-// appropriate to the current rendering engine.
-//
-Monocle.Browser.css = new Monocle.CSS();
-
-
 // During Reader initialization, this method is called to create the
 // "environment", which tests for the existence of various browser
 // features and bugs, then invokes the callback to continue initialization.
@@ -124,6 +118,7 @@ Monocle.Browser.css = new Monocle.CSS();
 //
 Monocle.Browser.survey = function (callback) {
   if (!Monocle.Browser.env) {
+    Monocle.Browser.css = new Monocle.CSS();
     Monocle.Browser.env = new Monocle.Env();
     Monocle.Browser.env.survey(callback);
   } else if (typeof callback == "function") {
