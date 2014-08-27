@@ -229,17 +229,31 @@ Monocle.Env = function () {
     // Can we do 3d transforms?
     //
     ["supportsTransform3d", function () {
-      result(
-        css.supportsMediaQueryProperty('transform-3d') &&
-        css.supportsProperty([
-          'perspectiveProperty',
-          'WebkitPerspective',
-          'MozPerspective',
-          'OPerspective',
-          'msPerspective'
-        ]) &&
-        !Monocle.Browser.renders.slow // Some older browsers can't be trusted.
-      );
+      // Some older browsers can't be trusted.
+      if (Monocle.Browser.renders.slow) { return result(false); }
+      // Try it out in a test frame:
+      loadTestFrame(function (fr) {
+        var doc = fr.contentDocument;
+        var elem = doc.createElement('p');
+        var has3d;
+        var sty;
+        var transforms = {
+          'webkitTransform':'-webkit-transform',
+          'OTransform':'-o-transform',
+          'msTransform':'-ms-transform',
+          'MozTransform':'-moz-transform',
+          'transform':'transform'
+        };
+        doc.body.insertBefore(elem, null);
+        for (var t in transforms) {
+          if (elem.style[t] !== undefined) {
+            elem.style[t] = 'translate3d(1px,1px,1px)';
+            sty = fr.contentWindow.getComputedStyle(elem);
+            has3d = sty.getPropertyValue(transforms[t]);
+          }
+        }
+        result(has3d !== undefined && has3d.length > 0 && has3d !== 'none');
+      });
     }],
 
 
