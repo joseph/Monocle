@@ -65,6 +65,7 @@ Monocle.DEBUG = true;
   function init() {
     readUA();
     readBrowser();
+    Monocle.Browser.css = new Monocle.CSS();
     env = new Monocle.Env();
     env.properties.resultCallback = testResult;
     env.survey(assertCompatibility);
