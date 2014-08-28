@@ -60,13 +60,17 @@ Monocle.Styles = {
 
   getX: function (elem) {
     var currStyle = document.defaultView.getComputedStyle(elem, null);
-    var re = /matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+),[^\)]+\)/;
+    var re2d = /matrix\([^,]+,[^,]+,[^,]+,[^,]+,\s*([^,]+)/;
+    var re3d = /matrix3d\(.*,\s*([^,]+),[^,]+,[^,]+,[^\)]+\)/
     var props = Monocle.Browser.css.toDOMProps('transform');
     var matrix = null;
     while (props.length && !matrix) {
       matrix = currStyle[props.shift()];
     }
-    return parseInt(matrix.match(re)[1], 10);
+    var match = matrix.match(re2d) || matrix.match(re3d);
+    if (match) {
+      return parseInt(match[1], 10);
+    }
   },
 
 
