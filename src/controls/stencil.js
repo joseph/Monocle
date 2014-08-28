@@ -5,7 +5,7 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   var p = API.properties = {
     reader: reader,
     behaviors: [],
-    components: {},
+    boxes: {},
     masks: []
   }
 
@@ -20,10 +20,10 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
     p.container = holder.dom.make('div', k.CLS.container);
     p.reader.listen('monocle:turning', hide);
     p.reader.listen('monocle:turn:cancel', show);
-    p.reader.listen('monocle:turn', update);
+    p.reader.listen('monocle:turn', draw);
     p.reader.listen('monocle:stylesheetchange', update);
     p.reader.listen('monocle:resize', update);
-    update();
+    draw();
     return p.container;
   }
 
@@ -46,22 +46,23 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   }
 
 
-  // Resets any pre-calculated rectangles for the active component,
-  // recalculates them, and forces masks to be "drawn" (moved into the new
-  // rectangular locations).
+  // Resets any pre-calculated boxes for all components.
   //
-  function update() {
-    var visPages = p.reader.visiblePages();
-    if (!visPages || !visPages.length) { return; }
-    var pageDiv = visPages[0];
-    var cmptId = pageComponentId(pageDiv);
-    if (!cmptId) { return; }
-    p.components[cmptId] = null;
-    calculateRectangles(pageDiv);
-    draw();
+  function invalidate() {
+    p.boxes = {};
   }
 
 
+  function update() {
+    invalidate();
+    clearTimeout(p.drawTimer);
+    p.drawTimer = setTimeout(draw, 10);
+  }
+
+
+  // Finds boxes and forces masks to be "drawn" (moved into the new
+  // rectangular locations).
+  //
   function hide() {
     p.container.style.display = 'none';
   }
@@ -81,13 +82,16 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
 
 
   // Aligns the stencil container to the shape of the page, then moves the
-  // masks to sit above any currently visible rectangles.
+  // masks to sit above any currently visible boxes.
   //
   function draw() {
     var pageDiv = p.reader.visiblePages()[0];
     var cmptId = pageComponentId(pageDiv);
-    if (!p.components[cmptId]) {
-      return;
+    var boxes = p.boxes[cmptId] || boxesForComponent(pageDiv);
+    if (!Monocle.Browser.is.IE) {
+      // We don't save the boxes in IE, because it loses the object
+      // references and freaks out.
+      p.boxes[cmptId] = boxes;
     }
 
     // Position the container.
@@ -99,9 +103,8 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
     // Layout the masks.
     if (!p.disabled) {
       show();
-      var rects = p.components[cmptId];
-      if (rects && rects.length) {
-        layoutRectangles(pageDiv, rects);
+      if (boxes && boxes.length) {
+        layoutBoxes(pageDiv, boxes);
       }
     }
   }
@@ -110,62 +113,43 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   // Iterate over all the <a> elements in the active component, and
   // create an array of rectangular points corresponding to their positions.
   //
-  function calculateRectangles(pageDiv) {
-    var cmptId = pageComponentId(pageDiv);
-    if (!p.components[cmptId]) {
-      p.components[cmptId] = [];
-    } else {
-      return;
-    }
-    var boxes = p.components[cmptId];
-
+  function boxesForComponent(pageDiv) {
+    var boxes = [];
     var doc = pageDiv.m.activeFrame.contentDocument;
-    var offset = getOffset(pageDiv);
-
+    var offl = Monocle.Browser.env.widthsIgnoreTranslate ? 0 : getOffset(pageDiv).l;
     for (var b = 0, bb = p.behaviors.length; b < bb; ++b) {
       var bhvr = p.behaviors[b];
       var elems = bhvr.findElements(doc);
       for (var i = 0; i < elems.length; ++i) {
-        var elem = elems[i];
-        // Ensure that we're not already masking this element.
-        for (var k = 0, kk = boxes.length; k < kk; ++k) {
-          if (boxes[k].element == elem) {
-            elem = null;
-            break;
-          }
-        }
-        if (elem) {
-          var elemBoxes = boxesForNode(elem, offset);
-          for (var j = 0, jj = elemBoxes.length; j < jj; ++j) {
-            elemBoxes[j].element = elem;
-            elemBoxes[j].behavior = bhvr;
-            boxes.push(elemBoxes[j]);
-          }
+        var elemBoxes = boxesForNode(elems[i]);
+        for (var j = 0, jj = elemBoxes.length; j < jj; ++j) {
+          elemBoxes[j].left += offl;
+          elemBoxes[j].element = elems[i];
+          elemBoxes[j].behavior = bhvr;
+          boxes.push(elemBoxes[j]);
         }
       }
     }
-
-    return p.components[cmptId];
+    return boxes;
   }
 
 
-  function boxesForNode(node, offset) {
+  function boxesForNode(node) {
     var boxes = [];
     if (typeof node.childNodes != 'undefined' && node.childNodes.length) {
       for (var i = 0, ii = node.childNodes.length; i < ii; ++i) {
-        boxes = boxes.concat(boxesForNode(node.childNodes[i], offset));
+        boxes = boxes.concat(boxesForNode(node.childNodes[i]));
       }
     } else {
       var rng = node.ownerDocument.createRange();
       rng.selectNodeContents(node);
-      var r = rng.getClientRects();
-      for (var i = 0, ii = r.length; i < ii; ++i) {
-        var offl = Monocle.Browser.env.widthsIgnoreTranslate ? 0 : offset.l;
+      var rects = rng.getClientRects();
+      for (var i = 0, ii = rects.length; i < ii; ++i) {
         boxes.push({
-          left: Math.ceil(r[i].left + offl),
-          top: Math.ceil(r[i].top),
-          width: Math.floor(r[i].width),
-          height: Math.floor(r[i].height)
+          left: Math.ceil(rects[i].left),
+          top: Math.ceil(rects[i].top),
+          width: Math.floor(rects[i].width),
+          height: Math.floor(rects[i].height)
         });
       }
     }
@@ -173,19 +157,19 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
   }
 
 
-  // Update location of visible rectangles - creating as required.
+  // Update location of visible boxes - creating as required.
   //
-  function layoutRectangles(pageDiv, rects) {
+  function layoutBoxes(pageDiv, boxes) {
     var offset = getOffset(pageDiv);
-    var visRects = [];
-    for (var i = 0; i < rects.length; ++i) {
-      if (rectVisible(rects[i], offset.l, offset.l + offset.w)) {
-        visRects.push(rects[i]);
+    var visBoxes = [];
+    for (var i = 0; i < boxes.length; ++i) {
+      if (boxVisible(boxes[i], offset.l, offset.l + offset.w)) {
+        visBoxes.push(boxes[i]);
       }
     }
 
-    for (i = 0; i < visRects.length; ++i) {
-      var r = visRects[i];
+    for (i = 0; i < visBoxes.length; ++i) {
+      var r = visBoxes[i];
       var cr = {
         left: r.left - offset.l,
         top: r.top,
@@ -201,7 +185,6 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
         height: cr.height+"px",
         position: 'absolute'
       });
-      mask.stencilRect = cr;
     }
   }
 
@@ -218,8 +201,8 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
 
   // Is this area presently on the screen?
   //
-  function rectVisible(rect, l, r) {
-    var mid = rect.left + (rect.width * 0.5);
+  function boxVisible(box, l, r) {
+    var mid = box.left + (box.width * 0.5);
     return mid >= l && mid < r;
   }
 
@@ -272,8 +255,9 @@ Monocle.Controls.Stencil = function (reader, behaviorClasses) {
 
   API.createControlElements = createControlElements;
   API.addBehavior = addBehavior;
-  API.draw = draw;
+  API.invalidate = invalidate;
   API.update = update;
+  API.draw = draw;
   API.toggleHighlights = toggleHighlights;
 
   return API;

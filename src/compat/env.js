@@ -184,13 +184,6 @@ Monocle.Env = function () {
   }
 
 
-  function columnedWidth(fr) {
-    var bd = fr.contentDocument.body;
-    var de = fr.contentDocument.documentElement;
-    return Math.max(bd.scrollWidth, de.scrollWidth);
-  }
-
-
   var envTests = [
 
     // TEST FOR REQUIRED CAPABILITIES
@@ -319,17 +312,20 @@ Monocle.Env = function () {
     //
     ["widthsIgnoreTranslate", function () {
       loadTestFrame(function (fr) {
-        var firstWidth = columnedWidth(fr);
-        var s = fr.contentDocument.body.style;
-        var props = css.toDOMProps("transform");
+        var doc = fr.contentDocument;
+        var div = doc.querySelector('div');
+        var rng = doc.createRange();
+        rng.selectNodeContents(div);
+        var firstLeft = rng.getClientRects()[0].left;
+        var props = css.toCSSProps('transform');
         for (var i = 0, ii = props.length; i < ii; ++i) {
-          s[props[i]] = "translateX(-600px)";
+          doc.body.style.setProperty(props[i], 'translateX(-600px)');
         }
-        var secondWidth = columnedWidth(fr);
+        var secondLeft = rng.getClientRects()[0].left;
         for (i = 0, ii = props.length; i < ii; ++i) {
-          s[props[i]] = "none";
+          doc.body.style.removeProperty(props[i]);
         }
-        result(secondWidth == firstWidth);
+        result(secondLeft == firstLeft);
       });
     }],
 
