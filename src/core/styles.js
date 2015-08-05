@@ -40,7 +40,7 @@ Monocle.Styles = {
     var val = Monocle.Browser.env.supportsTransform3d ?
       'translate3d('+x+', 0, 0)' :
       'translateX('+x+')';
-    val = (x == '0px') ? 'none' : val;
+    //val = (x == '0px') ? 'none' : val;
     s.webkitTransform = s.MozTransform = s.OTransform = s.transform = val;
     return x;
   },

@@ -445,7 +445,11 @@ Monocle.Env = function () {
     // javascript: URLs. With the latter, it tends to put cruft in history,
     // and gets confused by <base>.
     ['loadHTMLWithDocWrite', function () {
-      result(Monocle.Browser.is.Gecko || Monocle.Browser.is.Opera);
+      result(
+        Monocle.Browser.is.Gecko ||
+        Monocle.Browser.is.Opera ||
+        Monocle.Browser.uaMatch('Chrome/4')
+      );
     }]
   ];
 
