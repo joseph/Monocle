@@ -54,6 +54,7 @@ Monocle.Dimensions.Columns = function (pageDiv) {
       '}',
       'img, video, audio, object, svg {',
         'max-height: '+pdims.height+'px !important;',
+        'height: auto !important;',
       '}'
     ]
 
