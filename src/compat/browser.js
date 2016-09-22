@@ -8,6 +8,58 @@ Monocle.Browser.uaMatch = function (test) {
   return !!ua.match(test);
 }
 
+// Compare two version strings
+//
+// 0 if the versions are equal
+// a negative integer iff v1 < v2
+// a positive integer iff v1 > v2
+// NaN if either version string is in the wrong format
+Monocle.Browser.versionCompare = function (v1, v2, options) {
+  var lexicographical = options && options.lexicographical,
+    zeroExtend = options && options.zeroExtend,
+    v1parts = v1.split('.'),
+    v2parts = v2.split('.');
+
+  function isValidPart(x) {
+    return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+  }
+
+  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+    return NaN;
+  }
+
+  if (zeroExtend) {
+    while (v1parts.length < v2parts.length) v1parts.push("0");
+    while (v2parts.length < v1parts.length) v2parts.push("0");
+  }
+
+  if (!lexicographical) {
+    v1parts = v1parts.map(Number);
+    v2parts = v2parts.map(Number);
+  }
+
+  for (var i = 0; i < v1parts.length; ++i) {
+    if (v2parts.length == i) {
+      return 1;
+    }
+
+    if (v1parts[i] == v2parts[i]) {
+      continue;
+    }
+    else if (v1parts[i] > v2parts[i]) {
+      return 1;
+    }
+    else {
+      return -1;
+    }
+  }
+
+  if (v1parts.length != v2parts.length) {
+    return -1;
+  }
+
+  return 0;
+}
 
 // Detect the browser engine and set boolean flags for reference.
 //
@@ -20,7 +72,7 @@ Monocle.Browser.is = {
   Opera: Monocle.Browser.uaMatch('Opera'),
   WebKit: Monocle.Browser.uaMatch(/Apple\s?WebKit/),
   Gecko: Monocle.Browser.uaMatch(/Gecko\//),
-  MobileSafari: Monocle.Browser.uaMatch(/OS \d_.*AppleWebKit.*Mobile/)
+  MobileSafari: Monocle.Browser.uaMatch(/OS \d{1,2}_.*AppleWebKit.*Mobile/)
 }
 
 
@@ -78,7 +130,8 @@ if (Monocle.Browser.is.MobileSafari) {
   })();
 }
 Monocle.Browser.iOSVersionBelow = function (strOrNum) {
-  return !!Monocle.Browser.iOSVersion && Monocle.Browser.iOSVersion < strOrNum;
+  return !!Monocle.Browser.iOSVersion &&
+    Monocle.Browser.versionCompare(Monocle.Browser.iOSVersion, strOrNum) < 0;
 }
 
 
