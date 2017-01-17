@@ -100,12 +100,12 @@ Monocle.Flippers.Scroller = function (reader, setPageFn) {
       }
       stepFn();
     }
+    p.turning = false;
   }
 
 
   function turned() {
-    p.turning = false;
-    p.reader.dispatchEvent('monocle:turn');
+  p.reader.dispatchEvent('monocle:turn');
   }
 
 
