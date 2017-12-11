@@ -5,12 +5,13 @@ A silky, tactile browser-based ebook reader.
 Initial development by Joseph Pearson of Inventive Labs. Released under the
 MIT license.
 
-Contributions welcome - fork the repository on
-[GitHub](http://github.com/joseph/monocle).
-
-MONOCLE NOW HAS A GOOGLE GROUP! If you're new to Monocle and you have questions
-that aren't answered by [the Wiki](https://github.com/joseph/monocle/wiki),
-you can ask them here: https://groups.google.com/forum/#!forum/monocle-js
+____________________________________________________________________________
+THIS PROJECT IS NOW OVER EIGHT YEARS OLD. 
+IT HAS NOT BEEN ACTIVELY MAINTAINED SINCE 2015.
+You are welcome to explore and learn from the code, but it is no longer the
+best approach for modern browsers and devices, and it is not recommended for
+new projects or production applications.
+____________________________________________________________________________
 
 
 ## Getting Monocle
